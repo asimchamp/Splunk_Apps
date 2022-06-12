@@ -15,6 +15,7 @@ jobs:
       - name: Run a inline script
         run: |
           ls -l
+          cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}'
         shell: bash
       - name: Run a shell script file
         run: sh ./app_downloader.sh
