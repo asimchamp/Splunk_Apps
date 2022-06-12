@@ -1,0 +1,14 @@
+name: Splunk App Dowmloader workflow
+
+on: push
+
+jobs:
+  Splunk_app_downloader:
+    name: Splunk App Job
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "This is running inside a ${{ runner.os }} server in Github"
+      - name: Check out source code
+        uses: action/checkpout@v2.4.0
+      - run: echo "This repo is ${{ github.repository }} .."
