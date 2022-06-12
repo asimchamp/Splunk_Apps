@@ -15,9 +15,7 @@ jobs:
       - name: Run a inline script
         run: |
           ls -l
-          echo "1st command"
-          pwd
-          cd SplunkBase
-          echo "last command app"
-          ls -l
-          pwd
+        shell: bash
+      - name: Run a shell script file
+        run: sh ./app_downloader.sh
+        shell: bash
