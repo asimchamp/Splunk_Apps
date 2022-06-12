@@ -12,10 +12,9 @@ jobs:
       - run: echo "This repo is ${{ github.repository }} .."
       - name: Run a inline script
         run: |
-          mkdir SplunkBase
           ls -l
           pwd
-          mv SplunkBase /home/runner/work/
-          ls
           ls ../
           ls ../../
+          ls ../../../
+          ls ../../../../
