@@ -21,7 +21,7 @@ splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt |
 # Checking the DataBase folder present or not
 SplunkBase_folder=$(ls | grep -c SplunkBase)
 
-if [ "$SplunkBase_folder" == 1 ];
+if [ "$SplunkBase_folder" = "1" ];
    then
       echo "SplunkBase folder present."
       curl -L -J -v -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/2890/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print "Name = " $1}' > /home/runner/work/Splunk_Apps/Splunk_Apps/SplunkBase/splunk_name.txt
