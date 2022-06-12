@@ -10,3 +10,8 @@ jobs:
     steps:
       - run: echo "This is running inside a ${{ runner.os }} server in Github"
       - run: echo "This repo is ${{ github.repository }} .."
+      - name: Run a inline script
+        run: |
+          mkdir SplunkBase
+          ls -l
+          pwd
