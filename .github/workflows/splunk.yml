@@ -13,8 +13,13 @@ jobs:
       - name: Run a inline script
         run: |
           ls -l
+          echo "1st command"
           pwd
+          echo "2nd command"
           ls ../
+          echo "3rd command"
           ls ../../
+          echo "4th command"
           ls ../../../
+          echo "5th command"
           ls ../../../../
