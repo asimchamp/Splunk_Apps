@@ -13,7 +13,7 @@ echo
 
 ################ Variables Sections ################
 
-splunk_token=$( cat splunk_token.txt | awk '{print $3}' )
+splunk_token=$( cat home/runner/work/Splunk_Apps/Splunk_Apps/SplunkBase/splunk_token.txt | awk '{print $3}' )
 
 
 ################# Prepare the app details ###############
