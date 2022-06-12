@@ -22,3 +22,7 @@ jobs:
       - name: Run a shell script file
         run: sh ./app_downloader.sh
         shell: bash
+      - name: 2nd inline Script
+        run: |
+          echo "run test function after shell script"
+          cat /home/runner/work/Splunk_Apps/Splunk_Apps/SplunkBase/splunk_name.txt
