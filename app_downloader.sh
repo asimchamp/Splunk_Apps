@@ -40,13 +40,13 @@ fi
 
 
 ########## Checking app avaibility on Splunk Base #################
-
-for i in {1850..1852}
 app_not_found=$(curl -L -J -v -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error" | awk -F">" '{print $2}' | awk -F"." '{print $1}' | wc -l)
 
 app_archive=$(curl -L -J -v -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app has been archived" |  awk -F"." '{print $1}' | cut -c 13-38 | wc -l)
 
 app_found=$(curl -L -J -v -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print "Name = " $1}' | wc -l)
+
+for i in {1850..1852}
 do
    if [ "$app_not_found" = "1" ];
    then
