@@ -118,7 +118,14 @@ echo "Loop Completed for list"
 for e in $(cat app_id.txt)
 do
    download_app=$(cat $splunk_home/merge_uniq.txt | grep $e | wc -l )
-   if [ "$download_app" = "1" ];
+   download_archive_app=$(cat $splunk_home/merge_uniq.txt | grep archived | grep $e | wc -l )
+   
+   if [ "$download_archive_app" = "1" ];
+      then
+      echo "ID=$e"  "App archived available for the Download."
+      app_download_func
+      
+   elif [ "$download_app" = "1" ];
       then
       echo "ID=$e"  "App not available for the Download."
 
