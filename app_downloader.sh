@@ -40,7 +40,7 @@ if [ "$SplunkBase_folder" = "1" ];
 
 fi
 
-APP_folder=$(ls $splunk_home/SplunkBase/ | grep -cw $BASE_APP_NAME)
+APP_folder=$(ls $splunk_home/SplunkBase/ | grep -cw $e"_"$BASE_APP_NAME)
 
 if [ "$APP_folder" = "1" ];
    then
@@ -48,12 +48,12 @@ if [ "$APP_folder" = "1" ];
 
    else
       echo "$BASE_APP_NAME Folder not Present."
-      mkdir $splunk_home/SplunkBase/$BASE_APP_NAME/
+      mkdir $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/
       echo "$BASE_APP_NAME Folder Created."
 
 fi
 
-VER_folder=$(ls $splunk_home/SplunkBase/$BASE_APP_NAME/ | grep -cw $BASE_APP_VER)
+VER_folder=$(ls $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/ | grep -cw $BASE_APP_VER)
 
 if [ "$VER_folder" = "1" ];
    then
@@ -61,7 +61,7 @@ if [ "$VER_folder" = "1" ];
 
    else
       echo "$BASE_APP_VER Folder not Present."
-      mkdir $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER/
+      mkdir $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/
       echo "$BASE_APP_VER Folder Created."
 
 fi
@@ -69,17 +69,17 @@ fi
 ##### Downloading the app file from SplunkBase
 
 
-file_tgz=$(ls $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER/ | grep .tgz | wc -l )
+file_tgz=$(ls $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/ | grep .tgz | wc -l )
 
 if [ "$file_tgz" = "1" ];
    then
       echo "File already present."
 
    else
-      cd $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER/
+      cd $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/
       curl -L -J -O -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/
       sleep 2
-      tar -xvzf $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER
+      tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER
       sleep 2
 fi
 
