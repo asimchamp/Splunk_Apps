@@ -88,7 +88,7 @@ fi
 rm -rf $splunk_home/merge.txt $splunk_home/splunk_name.txt
 
 ########## Checking app avaibility on Splunk Base #################
-for i in {1850..1855};
+for i in $(cat app_id.txt)
 do
 
 app_not_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error: Page not found" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
@@ -115,7 +115,7 @@ sed -i 's/404//g' $splunk_home/splunk_name.txt
 
 echo "Loop Completed for list"
 
-for e in {1850..1855};
+for e in $(cat app_id.txt)
 do
    download_app=$(cat $splunk_home/merge_uniq.txt | grep $e | wc -l )
    if [ "$download_app" = "1" ];
