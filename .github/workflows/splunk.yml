@@ -21,6 +21,7 @@ jobs:
           cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}'
           echo "2nd command"
           ls | grep -c SplunkBase
+          pwd
         shell: bash
       - name: Run a shell script file
         run: sh ./app_downloader.sh
