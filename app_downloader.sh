@@ -90,7 +90,7 @@ fi
 rm -rf $splunk_home/merge.txt $splunk_home/splunk_name.txt
 
 ########## Checking app avaibility on Splunk Base #################
-for i in {1850..1855};
+for i in {1850..1855}
 do
 
 app_not_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error: Page not found" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
