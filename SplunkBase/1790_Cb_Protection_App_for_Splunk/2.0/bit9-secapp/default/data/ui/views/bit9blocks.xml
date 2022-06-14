@@ -1,0 +1,301 @@
+<view template="dashboard.html" isSticky="True">
+	<label>Blocks</label>
+	<module name="AccountBar" layoutPanel="appHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+		<param name="level">warn</param>
+	</module>
+	<module name="TitleBar" layoutPanel="viewHeader">
+		<param name="actionsMenuFilter">dashboard</param>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="viewHeader" autoRun="true">
+		<param name="default">Last 30 days</param>
+		<param name="searchWhenChanged">True</param>
+		<module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Blocks">
+			<param name="search">| savedsearch "File Blocks"</param>
+			<param name="maxCount">10000000</param>
+			<module name="JobProgressIndicator">
+				<module name="HiddenPostProcess" layoutPanel="panel_row2_col1_grp1" group="Blocks">
+					<param name="search">| where TotalField="Total" | fields + total | fieldformat total=tostring(total,"commas")</param>
+					<module name="SingleValue">
+						<param name="afterLabel">Blocks</param>
+						<param name="linkView">../search/flashtimeline</param>
+						<param name="linkSearch">`BlockSearch`</param>
+					</module>
+				</module>
+				<module name="HiddenPostProcess" layoutPanel="panel_row2_col1_grp1" group="Blocks">
+					<param name="search">| where isnull(TotalField) | timechart bins=50 sum(total) as "Blocks"</param>
+					<module name="HiddenChartFormatter">
+						<param name="charting.chart">column</param>
+						<param name="charting.legend.placement">none</param>
+						<param name="charting.axisTitleX.text"></param>
+						<param name="charting.axisTitleX.visibility">collapsed</param>
+						<param name="charting.data.count">50000</param>
+						<module name="JSChart">
+							<module name="HiddenSearch">
+								<param name="search">`BlockSearch`</param>
+								<module name="ConvertToIntention">
+									<param name="intention">
+										<param name="name">time</param>
+									</param>
+									<module name="ViewRedirector">
+										<param name="viewTarget">flashtimeline</param>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row2_col1_grp2" group="Blocks">
+			<param name="search">| savedsearch "File Blocks" | where TotalField="Total" | transpose | rename column as Computer "row 1" as Blocks | where isnum(Blocks) AND Computer!="total" | sort -Blocks</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch`</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="HostName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row2_col1_grp3" group="Blocks">
+			<param name="search">`BlockSearch` | top 0 FileName showperc=false | rename count as Blocks, FileName as "File Name"</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch`</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="FileName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row3_col1_grp1" group="Block Distribution">
+			<param name="search">`BlockSearch` FileHash!="" | join [search eventtype=bit9_fileCatalog TrustValue!="" | eval msgtime=strptime(MessageTime, "%m/%d/%Y %I:%M:%S %p") | sort 0 -msgtime | stats first(TrustValue) as TrustValue by FileHash] | top 0 TrustValue showperc=false | rename count as Blocks, TrustValue as "File Trust" | sort -"File Trust"</param>
+			<module name="JobProgressIndicator">
+				<module name="GenericHeader">
+					<param name="label">
+						Trust
+					</param>
+				</module>
+				<module name="HiddenChartFormatter">
+				  <param name="charting.chart">pie</param>
+				  <param name="charting.chart.sliceCollapsingThreshold">0</param>
+					<module name="JSChart">
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch` [search eventtype=bit9_fileCatalog TrustValue!="" | eval msgtime=strptime(MessageTime, "%m/%d/%Y %I:%M:%S %p") | sort 0 -msgtime | stats first(TrustValue) as TrustValue by FileHash | where TrustValue=$arg1$ | fields + FileHash]</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">stringreplace</param>
+									<param name="arg">
+										<param name="arg1">
+											<param name="value">$click.value$</param>
+										</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row3_col1_grp2" group="Block Distribution">
+			<param name="search">`BlockSearch` | top 0 ProcessFileName showperc=false | rename count as Blocks, ProcessFileName as Process</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch`</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="ProcessFileName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row3_col1_grp3" group="Block Distribution">
+			<param name="search">`BlockSearch` | join FileHash [search eventtype=bit9_fileCatalog ProductName!="" | dedup FileHash | table FileHash, ProductName] | top 0 ProductName showperc=false | rename count as Blocks, ProductName as Product</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch` | join FileHash [search eventtype=bit9_fileCatalog FileHash!="" ProductName="$arg1$" | dedup FileHash | table FileHash, ProductName]</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">stringreplace</param>
+									<param name="arg">
+										<param name="arg1">
+											<param name="value">$click.value$</param>
+										</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row4_col1_grp1" group="Block Sources">
+			<param name="search">`BlockSearch` RuleName!="" | top 0 RuleName showperc=false | rename count as Blocks, RuleName as Rule</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch`</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="RuleName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row4_col1_grp2" group="Block Sources">
+			<param name="search">`BlockSearch` | top 0 EventSubType showperc=false | rename count as Blocks, EventSubType as Reason</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch`</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="EventSubType">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row4_col1_grp3" group="Block Sources">
+			<param name="search">`BlockSearch` | join FileHash [search eventtype=bit9_fileCatalog FileHash!="" Publisher!="" | dedup FileHash | table FileHash, Publisher] | top 0 Publisher showperc=false | rename count as Blocks</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">`BlockSearch` | join FileHash [search eventtype=bit9_fileCatalog FileHash!="" Publisher="$arg1$" | dedup FileHash | table FileHash, Publisher]</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">stringreplace</param>
+									<param name="arg">
+										<param name="arg1">
+											<param name="value">$click.value$</param>
+										</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+</view>

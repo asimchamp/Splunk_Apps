@@ -1,0 +1,228 @@
+<view template="dashboard.html" isSticky="True">
+	<label>Console User Search</label>
+	<module name="AccountBar" layoutPanel="appHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+		<param name="level">warn</param>
+	</module>
+	<module name="TitleBar" layoutPanel="viewHeader">
+		<param name="actionsMenuFilter">dashboard</param>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="viewHeader" autoRun="true">
+		<param name="default">Last 24 hours</param>
+		<param name="searchWhenChanged">True</param>
+		<module name="SearchSelectLister" layoutPanel="viewHeader">
+			<param name="settingToCreate">uname</param>
+			<param name="search">eventtype=bit9_event EventSubTypeId=300 | dedup UserName | table UserName | sort UserName</param>
+			<param name="label">User</param>
+			<param name="searchWhenChanged">True</param>
+			<param name="searchFieldsToDisplay">
+				<list>
+					<param name="label">UserName</param>
+					<param name="value">UserName</param>
+				</list>
+			</param>
+			<module name="ConvertToIntention">
+				<param name="settingToConvert">uname</param>
+				<param name="intention">
+					<param name="name">addterm</param>
+					<param name="arg">
+						<param name="UserName">$target$</param>
+					</param>
+				</param>
+				<module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Events">
+					<param name="search">eventtype=bit9_event | timechart count by EventSubType limit=0</param>
+					<module name="JobProgressIndicator">
+						<module name="HiddenChartFormatter">
+							<param name="charting.chart">column</param>
+							<param name="charting.legend.placement">right</param>
+							<param name="charting.axisTitleX.text"></param>
+							<param name="charting.axisTitleX.visibility">collapsed</param>
+							<param name="charting.chart.stackMode">stacked</param>
+							<param name="charting.data.count">1000000</param>
+							<module name="JSChart">
+								<module name="HiddenSearch">
+									<param name="search">eventtype=bit9_event</param>
+									<module name="ConvertToIntention">
+										<param name="intention">
+											<param name="name">time</param>
+										</param>
+										<param name="intention">
+											<param name="name">addterm</param>
+											<param name="arg">
+												<param name="EventSubType">$click.name2$</param>
+												<param name="UserName">$uname$</param>
+											</param>
+										</param>
+										<module name="ViewRedirector">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row3_col1_grp1" group="User Activity">
+					<param name="search">eventtype=bit9_event EventType!="Discovery" EventType!="Policy Enforcement" | table Timestamp, HostName, EventSubType, Message | rename HostName as Computer, EventSubType as "Event Subtype"</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventType!=\"Discovery\" EventType!=\"Policy Enforcement\" Timestamp=\"$click.value$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row4_col1_grp1" group="New Or Removed Console Users">
+					<param name="search">eventtype=bit9_event (EventSubTypeId=302 OR EventSubTypeId=303) | table Timestamp, EventSubType, Message | rename EventSubType as "Event Subtype"</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event (EventSubTypeId=302 OR EventSubTypeId=303) UserName=\"$uname$\" Timestamp=\"$click.value$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row4_col2_grp1" group="Custom Rules Actions">
+					<param name="search">eventtype=bit9_event EventSubType="Custom rule*" | table Timestamp, EventSubType, Message | rename EventSubType as "Event Subtype"</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventSubType=\"Custom rule*\" UserName=\"$uname$\" Timestamp=\"$click.value$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row5_col1_grp1" group="File Approvals">
+					<param name="search">eventtype=bit9_event (EventSubTypeId=627 OR  EventSubTypeId=623) | table Timestamp, EventSubType, FileHash, HostName, FileTrust | replace "-*" with Unknown in FileTrust | rename EventSubType as "Event Subtype", HostName as Computer, FileHash as Hash, FileTrust as "File Trust"</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event (EventSubTypeId=627 OR  EventSubTypeId=623) UserName=\"$uname$\" Timestamp=\"$click.value$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row5_col2_grp1" group="File Bans">
+					<param name="search">eventtype=bit9_event (EventSubTypeId=635 OR EventSubTypeId=636 OR EventSubTypeId=637) | table Timestamp, EventSubType, FileHash, HostName, FileTrust | replace "-*" with Unknown in FileTrust | rename EventSubType as "Event Subtype", HostName as Computer, FileHash as Hash, FileTrust as "File Trust"</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event (EventSubTypeId=635 OR EventSubTypeId=636 OR EventSubTypeId=637) UserName=\"$uname$\" Timestamp=\"$click.value$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row6_col1_grp1" group="Policy Management by Subtype">			
+					<param name="search">eventtype=bit9_event EventType="Policy Management" | top 10 EventSubType showperc=false | rename EventSubType as "Event Subtype", count as Events</param>
+					<module name="JobProgressIndicator">
+						<module name="HiddenChartFormatter">
+							<param name="charting.chart">bar</param>
+							<param name="charting.legend.placement">none</param>
+							<param name="charting.axisTitleX.text"></param>
+							<param name="charting.axisTitleX.visibility">collapsed</param>
+							<param name="charting.axisTitleY.text"></param>
+							<param name="charting.axisLabelsY.majorLabelStyle.overflowMode">ellipsisNone</param>
+							<module name="JSChart">
+								<module name="HiddenSearch">
+									<param name="search">eventtype=bit9_event</param>
+									<module name="ConvertToIntention">
+										<param name="intention">
+											<param name="name">addterm</param>
+											<param name="arg">
+												<param name="EventSubType">$click.value$</param>
+												<param name="UserName">$uname$</param>
+											</param>
+										</param>
+										<module name="ViewRedirector">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row7_col1_grp1" group="Global Approval by Trust">
+					<param name="search">eventtype=bit9_event EventSubTypeId=627 Trust!="" | top 0 Trust | replace "-*" with Unknown in Trust | rename Trust as "File Trust"</param>
+					<module name="JobProgressIndicator">
+						<module name="HiddenChartFormatter">
+							<param name="charting.chart">pie</param>
+							<param name="charting.chart.sliceCollapsingThreshold">0</param>
+							<module name="JSChart">
+								<module name="SimpleDrilldown">
+									<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventSubTypeId=627 UserName=\"$uname$\" | eval TrustVal=\"$click.value$\" | where ((TrustVal==\"Unknown\" AND Trust%3C0) OR (TrustVal!=\"Unknown\" AND Trust==\"$click.value$\"))"}</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row7_col2_grp1" group="Globally Approved Hashes">
+					<param name="search">eventtype=bit9_event EventSubTypeId=627 FileHash!="" | table FileHash | sort str(FileHash) | rename FileHash as Hash</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventSubTypeId=627 FileHash=$click.value$ UserName=\"$uname$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row8_col1_grp1" group="Local Approval by Trust">			
+					<param name="search">eventtype=bit9_event EventSubTypeId=623 Trust!="" | replace "-*" with Unknown in Trust | top 0 Trust | rename Trust as "File Trust"</param>
+					<module name="JobProgressIndicator">
+						<module name="HiddenChartFormatter">
+						  <param name="charting.chart">pie</param>
+						  <param name="charting.chart.sliceCollapsingThreshold">0</param>
+							<module name="JSChart">
+								<module name="SimpleDrilldown">
+									<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventSubTypeId=623 UserName=\"$uname$\" | eval TrustVal=\"$click.value$\" | where ((TrustVal==\"Unknown\" AND Trust%3C0) OR (TrustVal!=\"Unknown\" AND Trust==\"$click.value$\"))"}</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+				<module name="HiddenSearch" layoutPanel="panel_row8_col2_grp1" group="Top Locally Approved Hashes">
+					<param name="search">eventtype=bit9_event EventSubTypeId=623 | top 0 FileHash showperc=false | sort -num(count), str(FileHash) | rename FileHash as Hash, count as Count</param>
+					<module name="Paginator">
+						<param name="entityName">results</param>
+						<module name="SimpleResultsTable">
+							<param name="entityName">results</param>
+							<param name="displayRowNumbers">off</param>
+							<param name="drilldown">row</param>
+							<module name="SimpleDrilldown">
+								<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventSubTypeId=623 FileHash=$click.value$ UserName=\"$uname$\""}</param>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+</view>

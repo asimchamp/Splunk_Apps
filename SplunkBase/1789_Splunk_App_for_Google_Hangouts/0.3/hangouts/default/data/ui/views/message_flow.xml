@@ -1,0 +1,36 @@
+<form script="autodiscover.js">
+<row>
+    <table>
+      <title>a table for source/target relationship</title>
+      <searchString>|inputlookup 2-node-sankey.csv</searchString>
+      <earliestTime>-60m</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+    <html>
+      <h2>a sankey for source/target relationship</h2>
+      <hr />
+      <div id="2nodesankey-search" 
+	    class="splunk-manager splunk-searchmanager" 
+		data-require="splunkjs/mvc/searchmanager" 
+		data-options='{                         
+		  "app": "hangouts",                      
+		  "search":  {"type": "token_safe", "value": "`googlehangouts`  | stats count,first(user_name_self) as source by user_name_conversation | rename user_name_conversation as Conversation | table count source Conversation"}
+		}'/>
+      <div id="2nodesankey" 
+		class="splunk-view" 
+		data-require="app/hangouts/components/sankeychart/2nodesankey" 
+		data-options='{
+	      "managerid": "2nodesankey-search",
+		  "currentField": "source",
+          "nextField": "Conversation",
+		  "countField": "count",
+		  "height": 400
+		}'/>
+	<hr />
+    </html>
+</row>
+</form>

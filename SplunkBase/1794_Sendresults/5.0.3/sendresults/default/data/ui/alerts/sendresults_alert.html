@@ -1,0 +1,115 @@
+<form class="form-horizontal form-complex">
+  <div>Reminder: All results must contain an "email_to" field with the intended recipient<br/><br/></div>
+  <div class="control-group">
+      <label class="control-label" for="sendresults_sender">Sender</label>
+      <div class="controls">
+          <input type="text" name="action.sendresults_alert.param.sender" id="sendresults_sender" />
+          <span class="help-block">
+            Overrides default sender address (Optional)
+          </span>
+      </div>
+  </div>
+  <div class="control-group">
+      <label class="control-label" for="sendresults_subject">Subject</label>
+      <div class="controls">
+          <input type="text" name="action.sendresults_alert.param.subject" id="sendresults_subject" />
+          <span class="help-block">
+            Overrides default subject text (Optional)
+          </span>
+      </div>
+  </div>
+  <div class="control-group">
+      <label class="control-label" for="sendresults_body">Message Body</label>
+      <div class="controls">
+          <textarea name="action.sendresults_alert.param.body" id="sendresults_body" style="height: 120px;"></textarea>
+          <span class="help-block">
+              Overrides default body text (Optional)
+          </span>
+      </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="sendresults_footer">Message Footer</label>
+    <div class="controls">
+        <textarea name="action.sendresults_alert.param.footer" id="sendresults_footer" style="height: 120px;"></textarea>
+        <span class="help-block">
+            Overrides default footer text (Optional)
+        </span>
+    </div>
+  </div>
+  <div class="control-group">
+      <label class="control-label" for="sendresults_msgstyle">Message Style</label>
+      <div class="controls">
+          <textarea name="action.sendresults_alert.param.msgstyle" id="sendresults_msgstyle" style="height: 120px;"></textarea>
+          <span class="help-block">
+            Inline CSS used to style the email (Optional)
+          </span>
+      </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="sendresults_format_columns">Column Formatting</label>
+    <div class="controls">
+        <input type="text" name="action.sendresults_alert.param.format_columns" id="sendresults_format_columns" />
+        <span class="help-block">
+            A list of fields (comma separated) that will have formatting applied based on the value of the corresponding *-class field (Optional)
+        </span>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="sendresults_bcc">BCC Addresses</label>
+    <div class="controls">
+        <input type="text" name="action.sendresults_alert.param.bcc" id="sendresults_bcc" />
+        <span class="help-block">
+            A list of email addresses (comma separated) that will have the generated emails bcc'd to (Optional)
+        </span>
+    </div>
+  </div>
+  <div class="control-group">
+      <label class="control-label" for="sendresults_maxrcpts">Max Recipients</label>
+      <div class="controls">
+          <input type="text" name="action.sendresults_alert.param.maxrcpts" id="sendresults_maxrcpts" />
+          <span class="help-block">
+            Overrides default limit of 200 recipient emails (Optional)
+          </span>
+      </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+        <label class="checkbox" for="sendresults_showresults">
+            <input type="checkbox" name="action.sendresults_alert.param.showresults" id="sendresults_showresults" value="1" CHECKED/>
+            Show the results table (Optional)
+        </label>
+    </div>
+  </div>
+  <div class="control-group">
+      <div class="controls">
+          <label class="checkbox" for="sendresults_showemail">
+              <input type="checkbox" name="action.sendresults_alert.param.showemail" id="sendresults_showemail" value="1" CHECKED/>
+              Show the "email_to" field (Optional)
+          </label>
+      </div>
+  </div>
+  <div class="control-group">
+      <div class="controls">
+          <label class="checkbox" for="sendresults_showsubj">
+              <input type="checkbox" name="action.sendresults_alert.param.showsubj" id="sendresults_showsubj" value="1" CHECKED/>
+              Show the "email_subj" field (Optional)
+          </label>
+      </div>
+  </div>
+  <div class="control-group">
+      <div class="controls">
+          <label class="checkbox" for="sendresults_showbody">
+              <input type="checkbox" name="action.sendresults_alert.param.showbody" id="sendresults_showbody" value="1" CHECKED/>
+              Show the "email_body" field (Optional)
+          </label>
+      </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+        <label class="checkbox" for="sendresults_showfooter">
+            <input type="checkbox" name="action.sendresults_alert.param.showfooter" id="sendresults_showfooter" value="1" CHECKED/>
+            Show the "email_footer" field (Optional)
+        </label>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,68 @@
+<form stylesheet="user_logon_exp.css">
+  <label>User Experience - Logon Performance</label>
+  <fieldset autoRun="false">
+    <input type="text" token="username">
+      <label>User Name:</label>
+    </input>
+    <input type="text" token="ActivityId">
+      <label>Activity ID</label>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Logon Duration - Username: $username$</title>
+        <search>
+          <query>
+        `xd_winevents_index` sourcetype="wineventlog:microsoft-windows-grouppolicy/operational" ActivityId="$ActivityId$" |
+        transaction ActivityId |
+        fields duration
+        </query>
+        </search>
+        <option name="field">duration</option>
+        <option name="underLabel">Seconds</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Logon Break-Down in Milliseconds</title>
+        <search>
+          <query>`xd_winevents_index` sourcetype="wineventlog:microsoft-windows-grouppolicy/operational" ActivityId="$ActivityId$" |
+        reverse |
+        search *MilliSeconds* | chart max(*MilliSeconds*) AS *MilliSeconds* BY Message</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="userSessions">
+        <title>Logon Detail</title>
+        <search>
+          <query>`xd_winevents_index` sourcetype="wineventlog:microsoft-windows-grouppolicy/operational" ActivityId="$ActivityId$" |
+        reverse |
+        table EventID OpcodeDisplayName Message CSEElaspedTimeInMilliSeconds CSEExtensionName DescriptionString OperationElaspedTimeInMilliSeconds PolicyElaspedTimeInSeconds |
+        rename EventID AS "Event ID" OpcodeDisplayName AS "Operation" CSEElaspedTimeInMilliSeconds AS "CSE Elapsed Time" CSEExtensionName AS "CSE Name" DescriptionString AS "Description" OperationElaspedTimeInMilliSeconds AS "Operation Elapsed Time" PolicyElaspedTimeInSeconds AS "Policy Elasped Time"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">100</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       Note: CSE = <a href="http://technet.microsoft.com/en-us/library/cc978242.aspx" target="_blank">Client Side Extension</a>
+    </html>
+    </panel>
+  </row>
+</form>

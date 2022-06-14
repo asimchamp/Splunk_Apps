@@ -1,0 +1,117 @@
+<form>
+  <label>Multi-select Input</label>
+  <fieldset submitButton="false">
+    <input type="multiselect" token="s_category" searchWhenChanged="true">
+      <label>Category</label>
+      <choice value="*">ANY</choice>
+      <populatingSearch fieldForLabel="Category" fieldForValue="Category">index=sfpd 
+| stats count by Category
+| sort asc Category</populatingSearch>
+      <default>LARCENY/THEFT,VANDALISM,VEHICLE THEFT</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>Category="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Incidents by Time of Day</title>
+        <searchString>index=sfpd $s_category$ | chart count over date_hour by Category | sort asc date_hour</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.seriesColors">[0x639BF1, 0x77BA9B, 0x3B5998, 0xB6A754, 0xC9E1C1, 0xFF9900, 0xFF5A09, 0x0F9FB4, 0x1D2F3E, 0x293E6A]</option>
+        <option name="height">250px</option>
+      </chart>
+      <html>
+        <p>Search Query:</p>
+        <code style="white-space: pre-wrap;">index=sfpd 
+    $s_category$ 
+| chart count over date_hour by Category
+| sort asc date_hour</code>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Multi-select Input</h2>
+        <p>Enable selection of multiple values in a form input, and apply that to your search query.  This input provides the flexibility to configure the prefix adn suffix values, as well as the delimiter to apply between values.</p>
+        <p>To support this multi-value selection, there are a few additional parameters included for this input type:</p>
+        <ul>
+          <li>
+            <b>valuePrefix</b>- This value gets prefixed to each selected value (repeated for n values)</li>
+          <li>
+            <b>valueSuffix</b>- This value gets appended to each selected value (repeated for n values)</li>
+          <li>
+            <b>delimiter</b>- This value gets inserted between each selection (only applied if value greater than 1)</li>
+        </ul>
+        <br/>
+        <h3>Example scenario #1:</h3>
+        <div style="text-indent:50px;">
+          <p>Let's say that you want to allow users to select sourcetypes, and you want the end search query to look like:</p>
+          <code>index=_internal (sourcetype="splunkd" OR sourcetype="scheduled") | top source</code>
+          <p>To produce this output, you will need to set the following:</p>
+          <pre>
+            <![CDATA[
+<input type="multiselect" token="s_sourcetype" searchWhenChanged="true">
+      <label>Sourcetype</label>
+      <choice value="*">ANY</choice>
+      <populatingSearch fieldForLabel="Category" fieldForValue="Category">index=_internal
+| stats count by sourcetype
+| sort asc sourcetype</populatingSearch>
+      <default>*</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>sourcetype="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+     </input>
+     ...
+     <searchString>index=_internal $s_sourcetype$ | top source</searchString>
+]]>
+          </pre>
+        </div>
+        <h3>Example scenario #2:</h3>
+        <div style="text-indent:50px;">
+          <p>Let's say that you want to allow users to select enumerated values from a db, and you want the end search query to look like:</p>
+          <code>dbquery my_db "select * from my_table where sourcetype in (foo, bar);"</code>
+          <p>To produce this output, you will need to set the following:</p>
+          <pre>
+            <![CDATA[
+   <input type="multiselect" token="s_values" searchWhenChanged="true">
+      <label>Values</label>
+      <choice value="foo">foo</choice>
+      <choice value="bar">bar</choice>
+      <choice value="baz">baz</choice>
+      <delimiter>, </delimiter>
+    </input>
+    ...
+    <searchString>dbquery my_db "select * from my_table where sourcetype in ($s_values$);"</searchString>
+]]>
+          </pre>
+        </div>
+      </html>
+    </panel>
+  </row>
+</form>

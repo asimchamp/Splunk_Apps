@@ -1,0 +1,138 @@
+<form>
+  <label>Sys-Health-Check</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="time_tok" searchWhenChanged="true">
+      <label>Time</label>
+      <choice value="-25y">All time</choice>
+      <choice value="-1h">Last hour</choice>
+      <choice value="-6h">Last 6 hours</choice>
+      <choice value="-12h">Last 12 hours</choice>
+      <choice value="-24h">Last day</choice>
+      <choice value="-7d">Last week</choice>
+      <choice value="-1mon">Last month</choice>
+      <choice value="-3mon">Last 3 months</choice>
+      <choice value="-6mon">Last 6 months</choice>
+      <choice value="-1y">Last year</choice>
+      <default>-25y</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>External Table (TCAM) Counters</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex max_match=0 "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.Sys\.HCExtTbl\&gt;\s+Slot-(?&lt;slotNum&gt;\w):\s+Sys-Health-Check:\sExternal\sTable" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC  | search slotNum=* | eval combiField=mvzip(timeStamp,slotNum) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;slot&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$") |  dedup sysName,slot,time | stats count by sysName,sysMAC,slot | rename sysName AS "SysName" sysMAC AS "MAC Address" slot AS "Slot" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>CPU/L2 ECC Counters</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex max_match=0 "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.Sys\.(HCPrcssrECC|Warning)\&gt;\s(MSM|Slot)-(?&lt;msmNum&gt;\w):\s+(Sys-Health-Check:\s+|)CPU/L2\sMemory\sECC\sCounters\shave\sincremented" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC | search msmNum=* | eval combiField=mvzip(timeStamp,msmNum) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;msm&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$")  | dedup sysName,sysMAC,msm,time | stats count by sysName,sysMAC,msm | rename sysName AS "SysName" sysMAC AS "MAC Address" msm AS "MSM/Slot" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Chip Error Counters</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex max_match=0 "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.Sys\.Warning\&gt;\s+MSM-(?&lt;msmNum&gt;\w):\s+Sys-Health-Check\s+Chip\s+Error\s+Counters" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC | search msmNum=* | eval combiField=mvzip(timeStamp,msmNum) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;msm&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$")  | dedup sysName,sysMAC,msm,time | stats count by sysName,sysMAC,msm | rename sysName AS "SysName" sysMAC AS "MAC Address" msmNum AS "MSM/Slot" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Fabric Port State Down</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.Sys\.IntPortDown\&gt;\sMSM-(?&lt;msmNum&gt;\w):\sSys-Health-Check:\sSwitch\sfabric\sport\sstate\sis\sDown\sfor\sModule\sin\sSlot-(?&lt;slotNum&gt;\d)\s\(unit\s(?&lt;unitNum&gt;\d),\sinternal\sport\s(?&lt;portNum&gt;\d+)\)\sconnected\sto\sModule\sin\sSlot-(?&lt;connSlot&gt;\d)\s\(unit\s(?&lt;connUnit&gt;\d),\sinternal\sport\s(?&lt;connPort&gt;\d+)" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC | search msmNum=* slotNum=* unitNum=* portNum=* connSlot=* connUnit=* conPort=* | eval combiField=mvzip(timeStamp,msmNum) | eval combiField=mvzip(combiField,slotNum) | eval combiField=mvzip(combiField,unitNum) | eval combiField=mvzip(combiField,portNum) | eval combiField=mvzip(combiField,connSlot) | eval combiField=mvzip(combiField,connUnit) | eval combiField=mvzip(combiField,connPort) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;msm&gt;.*),(?&lt;slot&gt;.*),(?&lt;unit&gt;.*),(?&lt;port&gt;.*),(?&lt;cSlot&gt;.*),(?&lt;cUnit&gt;.*),(?&lt;cPort&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$")  | dedup sysName,sysMAC,msm,slot,unit,port,cSlot,cUnit,cPort,time | stats count by sysName,sysMAC,msm,slot,unit,port,cSlot,cUnit,cPort | rename sysName AS "SysName" sysMAC AS "MAC Address" msm AS "MSM" slot AS "Slot" unit AS "Unit" port AS "Port" cSlot AS "Connected to Slot" cUnit AS "Connected to Unit" cPort AS "Connected to Port" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>BCM Counters</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.Sys\.Warning\&gt;\sMSM-(?&lt;msmNum&gt;\w):\sSys-Health-Check\sBCM\sCounters\shave\sincremented\son\sUnit\s(?&lt;unitNum&gt;\d+)\sin\sSlot\s+(?&lt;slotNum&gt;\d+)" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC | search msmNum=* unitNum=* slotNum=* | eval combiField=mvzip(timeStamp,msmNum) | eval combiField=mvzip(combiField,unitNum) | eval combiField=mvzip(combiField,slotNum) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;msm&gt;.*),(?&lt;unit&gt;.*),(?&lt;slot&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$")  | dedup sysName,sysMAC,msm,unit,slot,time | stats count by sysName,sysMAC,msm,unit,slot | rename sysName AS "SysName" sysMAC AS "MAC Address" msm AS "MSM" unit AS "Unit" slot AS "Slot" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Slow Path Reroute</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex max_match=0 "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.SM\.SlowPathReroute\&gt;\sMM-(?&lt;msmNum&gt;\w):\s+Slow\spath\straffic\sto\sSlot-(?&lt;slotNum&gt;\w)\sUnit-(?&lt;unitNum&gt;\w)\shas\sbeen\srerouted\sthrough\s(?&lt;rerouteNum&gt;\w+-\w)" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC | search msmNum=* slotNum=* unitNum=* rerouteNum=* | eval combiField=mvzip(timeStamp,msmNum) | eval combiField=mvzip(combiField,slotNum) | eval combiField=mvzip(combiField,unitNum) | eval combiField=mvzip(combiField,rerouteNum) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;msm&gt;.*),(?&lt;slot&gt;.*),(?&lt;unit&gt;.*),(?&lt;reroute&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$")  | dedup sysName,sysMAC,msm,slot,unit,reroute,time | stats count by sysName,sysMAC,msm,slot,unit,reroute | rename sysName AS "SysName" sysMAC AS "MAC Address" msm AS "MSM" slot AS "Card Slot" unit AS "Unit" reroute AS "Rerouted to" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Low Memory</title>
+        <search>
+          <query>index=extnet | rex "SysName:\s+(?&lt;sysName&gt;.*)\s+SysLocation" | rex "System\sMAC:\s+(?&lt;sysMAC&gt;\w{2}:\w{2}:\w{2}:\w{2}:\w{2}:\w{2})" | rex max_match=0 "(?&lt;timeStamp&gt;\d+/\d+/\d+\s+\d+:\d+:\d+\.\d+)\s+\&lt;Warn:HAL\.Sys\.Warning\&gt;\s+(?&lt;msmNum&gt;(MM|MSM)-\w):\s+Sys-Health-Check\sCard\s+(?&lt;cardNum&gt;\w)\s+is\slow\son\s(?&lt;memType&gt;(OS\s|OS\shigh\s|DMA\s|))(m|M)emory" | fillnull value="Not Available" sysName | fillnull value="Not Available" sysMAC | search msmNum=* cardNum=* memType=* | eval combiField=mvzip(timeStamp,msmNum) | eval combiField=mvzip(combiField,cardNum) | eval combiField=mvzip(combiField,memType) | mvexpand combiField | rex field=combiField "(?&lt;time&gt;.*),(?&lt;msm&gt;.*),(?&lt;card&gt;.*),(?&lt;mem&gt;.*)" | convert mktime(time) AS time | where time&gt;relative_time(now(),"$time_tok$")  | dedup sysName,sysMAC,msm,card,mem,time | stats count by sysName,sysMAC,msm,card,mem | rename sysName AS "SysName" sysMAC AS "MAC Address" msm AS "MSM" card AS "Card Slot" mem AS "Memory Type" count AS "Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

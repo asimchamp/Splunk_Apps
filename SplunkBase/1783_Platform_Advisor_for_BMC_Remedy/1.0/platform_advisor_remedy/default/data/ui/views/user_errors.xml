@@ -1,0 +1,36 @@
+<form>
+  <label>User Errors</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>Select a Host:</label>
+      <default>*</default>
+      <choice value="*">all hosts</choice>
+      <populatingSearch fieldForLabel="host" fieldForValue="host">index=main | stats count by host</populatingSearch>
+    </input>
+    <input type="time" searchWhenChanged="true">
+      <default/>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Error Summary by User (API log)</title>
+      <searchString>sourcetype=remedy_api error | top limit=20 user | rename user AS User count AS Count</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+</form>

@@ -1,0 +1,82 @@
+<form>
+  <label>Ziften Network Binary Overview</label>
+  <description></description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>New Network Binary Counts</title>
+        <search>
+          <query>sourcetype=ziften:* message_type=networkconnect |stats min(_time) as _time by imagefilemd5|timechart count|tail 14|sort _time</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>New Network Binary Details</title>
+        <search>
+          <query>sourcetype=ziften:* message_type=networkconnect |eval basename = replace(trim(imagefilepath,"\""), ".*\\\\", "")|stats min(_time) as _time first(basename) as basename count as totalConnections dc(ipaddress) as ipSpan by imagefilemd5|lookup image_info imagefilemd5|fields _time basename fileversion productversion companyname totalConnections ipSpan imagefilemd5|sort -_time</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Binary Association by Port</title>
+        <search>
+          <query>sourcetype=ziften:* message_type=networkconnect |eval basename = replace(trim(imagefilepath,"\""), ".*\\\\", "")|stats values(basename) by port |sort port</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Port Usage by Binary</title>
+        <search>
+          <query>sourcetype=ziften:* message_type=networkconnect |eval basename = replace(trim(imagefilepath,"\""), ".*\\\\", "")|stats values(port) by basename |sort basename</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

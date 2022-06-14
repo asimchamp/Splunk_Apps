@@ -1,0 +1,81 @@
+<form stylesheet="inpage_drilldown_form.css" script="inpage_drilldown_form_binary.js">
+  <label>OTX | Drilldown | Binary</label>
+  <description>AlienVault Open Threat Exchange</description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="text" token="guid" searchWhenChanged="true"/>
+    <input type="text" token="md5" searchWhenChanged="true"/>
+  </fieldset>
+  <row>
+    <chart>
+      <title>First MD5 &amp; Destination Sighting With OTX Tag</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" |eval basename = replace(imagefilepath, ".*\\\\", "")|timechart count by basename</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">none</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table id="master">
+      <title>Binaries With Associated OTX Tags</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx"|stats first(imagefilepath) as "Sample Path" dc(agentguid) as "Unique MD5 Prev With Associated OTX Tag" count as "Gross MD5 Count With Associated OTX Tag" min(_time) as "First Seen" max(_time) as "Last Seen" by imagefilemd5|lookup image_info imagefilemd5|sort -"Unique MD5 Prev With Associated OTX Tag"      |convert ctime("First Seen") ctime("Last Seen")| fields imagefilemd5 "Sample Path"  companyname fileversion productversion "Unique MD5 Prev With Associated OTX Tag" "Gross MD5 Count With Associated OTX Tag" "First Seen" "Last Seen"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table id="detail">
+      <title>Systems With Tagged MD5</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" |where imagefilemd5="$md5$" |makemv delim="," details |stats dc(ipaddress) as "Unique Tagged Destinations" values(details) as "System Tags" values(accountname) as "Seen User Associations" by agentguid |lookup system_info agentguid |sort -"Unique Tagged Destinations"|fields computername agentguid "Unique Tagged Destinations" "System Tags" "Seen User Associations"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Tagged IPs for System &amp; Binary</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" |where imagefilemd5="$md5$" AND agentguid="$guid$" |makemv delim="," details |stats values(details) as "System Tags" count as "Gross Seen Connections" by ipaddress     |sort -"Gross Seen Connections"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+      <drilldown target="OTX Info">
+        <link>
+          <![CDATA[
+  http://www.alienvault.com/apps/rep_monitor/ip/$row.ipaddress$
+       ]]>
+        </link>
+      </drilldown>
+    </table>
+  </row>
+</form>

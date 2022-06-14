@@ -1,0 +1,28 @@
+<dashboard>
+  <label>Drilldown: Log Severity</label>
+  <description/>
+  <row>
+    <chart>
+      <title>Log Severity: $form.errLevel$</title>
+      <searchString>index=extnet sourcetype=log | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=$form.errLevel$ | chart count over host by errLoc useother=f</searchString>
+      <earliestTime>-30d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_device_health?form.host=$click.value$&amp;form.errLevel=$form.errLevel$&amp;form.errLoc=$click.name2$</link>
+      </drilldown>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+</dashboard>

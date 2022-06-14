@@ -1,0 +1,24 @@
+<form>
+  <label>Data Model Acceleration Sourcetypes</label>
+  <description>Shows the sourcetypes found in the data model acceleration data. If there is no data model acceleration enabled this will not return results.</description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Sourcetypes By Data Model</title>
+      <searchString>| rest /services/datamodel/model | search NOT acceleration=*false* | dedup displayName | fields  acceleration displayName title | map search="| tstats summariesonly=true values(sourcetype) AS Sourcetypes from datamodel=$$title$$ | eval DataModel=\"$$displayName$$\"" maxsearches=20 | fields DataModel Sourcetypes</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+</form>

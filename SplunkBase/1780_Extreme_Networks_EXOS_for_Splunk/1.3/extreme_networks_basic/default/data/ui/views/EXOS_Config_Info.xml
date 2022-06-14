@@ -1,0 +1,89 @@
+<dashboard>
+  <label>EXOS Requirements and Configuration for Using the Splunk App</label>
+  <description/>
+  
+  <row>
+    <html>
+      	<style type="text/css">
+		span.monospace{font-family:"Courier New", Courier, monospace; color:purple;}
+        p.monospace{font-family:"Courier New", Courier, monospace; color:purple;}
+        pre.monospace{color:purple;}
+		</style>
+      <h1>General Requirements</h1>
+	  <ol>
+        <li>A Splunk Server running version 6.0 or greater with the Extreme Networks Splunk App installed.</li>
+      <li>An Extreme Networks EXOS switch with network access to the Splunk server hosting the app.
+      <ul>
+        <li>To send proactive tech-support reports to Extreme Networks, the switch will need to be able to access the Internet, specifically 12.38.14.200, TCP port 800.</li>
+        </ul></li>
+        <li>An Extreme Networks EXOS switch running software version 15.4 or greater.</li>
+      </ol>
+      <h1>EXOS Configuration Commands</h1>
+            <ol>
+              <li><pre class="monospace">debug tech-support configure max-collectors 2</pre><br/>
+          Note: This requirement will be removed in a future EXOS release.</li>
+        <li>
+        <ul>
+			<li>(Less common) If you’re using the mgmt port interface to communicate to the server, use this command add the collector:<br/>
+              <p><pre class="monospace">configure tech-support add collector [hostname | ip_address] tcp-port &lt;port#&gt; {ssl [on | off]}</pre></p></li>
+              <li>(More common) If you’re using an interface in one of the user VRs, follow these instructions:<br/>
+        		<pre class="monospace">configure tech-support add collector [hostname | ip_address] tcp-port &lt;port#&gt; {vr vr_name} {from source_ip_address} {ssl [on | off]}</pre>
+        		<p>Our demo setup uses TCP port 6514, which is for Syslog over TLS (RFC 5425).  See:</p>
+                <p>&#xA0;&#xA0;&#xA0;&#xA0;<a href="http://docs.splunk.com/Documentation/Splunk/latest/Security/ConfigureSplunkforwardingtousethedefaultcertificate">this link</a></p>
+        		<p>for information on enabling SSL/TLS (not required).</p>
+                <p>Example:  <pre class="monospace">configure tech-support add collector 192.168.1.100 tcp-port 6514 vr VR-Default from 192.168.1.1 ssl off</pre></p> 
+      <p>Due to PD4-4385171973 (only in 15.4.1), you'll need run the same command again, but without the "add" command.  This serves to reconfigure the addition.  This bug will be fixed in future EXOS releases.</p>
+          </li></ul></li>
+              <li>Validate the proper addition of the collector with the '<span class="monospace">show tech-support collector command</span>'.  At this point, the output should look similar to this:<br/>
+      <pre class="monospace">* X440-24t-10G.8 # show tech-support collector
+	Tech Support Collector:   Enabled
+	Max Collectors:           2
+	Report Collector:         192.168.1.100
+	TCP Port:                 6514
+	Virtual Router:           VR-Default	-- This should match your chosen configuration from above
+	Source IP Addr:           192.168.1.1
+	SSL:                      Off
+	Report Mode:              Automatic
+	Report Data Set:          Summary
+	Report Frequency:         Bootup
+	Last Report:              Not Generated
+	Next Cyclic Report:       Not Scheduled
+	Next One Time Report:     Not Scheduled</pre>
+    <p>You can also use the '<span class="monospace">show configuration techSupport</span>' command to verify what you have entered was accepted.</p></li>
+
+	  <li>Once the collector is added, you can configure the report frequency.  Here’s the options:
+        <pre class="monospace">* X440-24t-10G.19 # configure tech-support collector 192.168.1.100 frequency
+	bootup          Send status report when the switch boots up (Default on)
+	daily           Send status report once a day (Default off)
+	error-detected  Send status report when a critical severity event is logged (Default off)</pre>
+      </li>
+
+              <li>After the frequency is determined, you can configure the data-set.  This is the set of information used in the tech-support report.  The default is “detail” if SSH/SSL is enabled.  “Summary” is used otherwise.<br/>
+		<pre class="monospace">* X440-24t-10G.19 # configure tech-support collector 192.168.1.100 data-set 
+	detail          Output of 'show tech-support all'
+	summary         Output of 'show tech-support &lt;area&gt;' for area general, config, log, VLAN, and EPM</pre>
+     </li>
+              <li>If you want to disable the default configuration of reporting to Extreme Networks but want to keep your own internal reporting, set the frequency of the external collector to “manual” with this command:<br/>
+        <pre class="monospace">configure tech-support collector 12.38.14.200 report manual</pre>
+              </li></ol>
+
+        <h1>Testing the Configuration</h1>
+	  <p>You can manually run the tech-support collector at any time from the CLI.  There’s several options:
+        <pre class="monospace">* X440-24t-10G.20 # run tech-support report
+	&lt;cr&gt;            Execute the command
+	cancel          Cancel scheduled report
+	collector       Report collector (Default all collectors)
+	in              Schedule to run report in some hours
+	now             Run report immediately (Default)</pre></p>
+For this example, we’ll test the collector that we just configured above.  This activity takes about one minute, depending on system load and network speed.
+			<pre class="monospace">* X440-24t-10G.21 # run tech-support report collector 192.168.1.100
+	Connecting to 192.168.1.100:6514 with SSL disabled...
+	Collector connected successfully.
+	Generating summary report for 192.168.1.100:6514................................................................
+	Report generated successfully.
+	Sending report to 192.168.1.100:6514...
+	Report sent successfully</pre>
+    </html>
+    
+  </row>
+</dashboard>

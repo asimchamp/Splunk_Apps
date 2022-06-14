@@ -1,0 +1,34 @@
+<dashboard>
+  <label>About</label>
+  <description/>
+  <row>
+    <html>
+      <h3>About this app</h3>
+      <p>This app was created to aid in onboarding new data into Splunk. It includes some searches and forms that are help you get a better idea of how data is coming into Splunk, and where it is going.</p>
+      <p><strong>Note:</strong> Many of these searches require access to the _internal index. It is meant to be used by admins.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h3>Sourcetype, host, and Index dashboards</h3>
+      <h4><a href="check_timelag_by_sourcetype">Time lag by Sourcetype</a></h4>
+        <p>Runs a search to show the difference between the time an event occurred (according to the timestamp of the event) and the time Splunk indexed the event.</p>
+      <h4><a href="sourcetypes_collected_by_host">Sourcetypes by Host</a></h4>
+      	<p>Lists the sourcetypes collected by host. Also includes a list of the indexes in which the host is found.</p>
+      <h4><a href="hosts_by_sourcetype">Hosts by Sourcetype</a></h4>
+        <p>Lists the hosts and number of events for the selected sourcetype.</p>
+      <h4><a href="sourcetypes_by_index">Sourcetypes by Index</a></h4>
+        <p>Lists the sourcetypes found in each index.</p>
+      <h4><a href="sources_by_host">Sources by Host</a></h4>
+        <p>Lists the source (filenames) from which a host is monitoring events.</p>
+      <h3>CIM and Data Model dashboards</h3>
+      <h4><a href="data_model_acceleration_sourcetypes">Data Model Acceleration Sourcetypes</a></h4>
+        <p>Shows the sourcetypes found in the data model acceleration data.</p>
+      <h4><a href="data_model_search">Data Model Search</a></h4>
+        <p>Runs a data model search for the selected data model and object.</p>
+      <h3>Forwarder dashboards</h3>
+      <h4><a href="forwarder_versions">Forwarder Versions</a></h4>
+        <p>Lists the architecture, OS and version of the forwarders sending data into Splunk.</p>  
+    </html>
+  </row>
+</dashboard>

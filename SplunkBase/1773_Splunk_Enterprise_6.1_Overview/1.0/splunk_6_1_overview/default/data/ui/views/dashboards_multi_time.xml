@@ -1,0 +1,122 @@
+<form>
+  <label>Multiple Time Range Pickers</label>
+  <fieldset submitButton="false"/>
+  <row>
+    <panel>
+      <input type="time" token="inPanel1" searchWhenChanged="true">
+        <label>Time Range Picker (token="inPanel1"</label>
+        <default>
+          <earliestTime/>
+          <latestTime/>
+        </default>
+      </input>
+      <chart>
+        <title>Incident Trend</title>
+        <searchString>index=sfpd | timechart count by PdDistrict</searchString>
+        <earliestTime>$global.earliest$</earliestTime>
+        <latestTime>$global.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x293E6A, 0x77BA9B, 0x3B5998, 0x639BF1, 0xB6A754, 0xC9E1C1, 0xFF9900, 0xFF5A09, 0x0F9FB4, 0x1D2F3E]</option>
+        <option name="height">350px</option>
+      </chart>
+    </panel>
+    <panel>
+      <input type="time" token="inPanel2" searchWhenChanged="true">
+        <label>Time Range Picker (token="inPanel2")</label>
+        <default>
+          <earliestTime/>
+          <latestTime>1370070000</latestTime>
+        </default>
+      </input>
+      <chart>
+        <title>Incident Trend</title>
+        <searchString>index=sfpd | timechart count by PdDistrict</searchString>
+        <earliestTime>$inPanel2.earliest$</earliestTime>
+        <latestTime>$inPanel2.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x293E6A, 0x77BA9B, 0x3B5998, 0x639BF1, 0xB6A754, 0xC9E1C1, 0xFF9900, 0xFF5A09, 0x0F9FB4, 0x1D2F3E]</option>
+        <option name="height">350px</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Incident Trend (Use Inline Explicit Time Range)</title>
+        <searchString>index=sfpd | timechart count by PdDistrict</searchString>
+        <earliestTime>1380610800</earliestTime>
+        <latestTime>1380697200</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x293E6A, 0x77BA9B, 0x3B5998, 0x639BF1, 0xB6A754, 0xC9E1C1, 0xFF9900, 0xFF5A09, 0x0F9FB4, 0x1D2F3E]</option>
+        <option name="height">350px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Multiple Time Range Pickers</h2>
+        <p>Add and configure multiple time range pickers on a single dashboard</p>
+        <ul>
+          <li>Assign each time range picker a unique token value (this will automatically set tokens $token.earliest$ and $token.latest$</li>
+          <li>For each panel search, select, (a) a shared time range picker referenced by label/token name, (b) inline explicit time range, or (c) other token values to use for earliest and latest</li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+</form>

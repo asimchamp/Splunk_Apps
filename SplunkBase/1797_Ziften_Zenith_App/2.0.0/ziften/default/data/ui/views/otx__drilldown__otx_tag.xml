@@ -1,0 +1,108 @@
+<form stylesheet="inpage_drilldown_form.css" script="inpage_drilldown_form_tag.js">
+  <label>OTX | Drilldown | OTX Tag</label>
+  <description>AlienVault Open Threat Exchange</description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="text" token="guid" searchWhenChanged="true"/>
+    <input type="text" token="ipaddress" searchWhenChanged="true"/>
+    <input type="text" token="tag" searchWhenChanged="true"/>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Gross Tag Hits Over Time</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx"|makemv delim="," details|mvexpand details|timechart count by details limit=50</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">none</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table id="master">
+      <title>OTX Tag Prev</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" |makemv delim="," details|mvexpand details|stats dc(agentguid) as "Unique Endpoint Prev" dc(ipaddress) as "Unique IP Prev" count as "Gross Seen Connection Prev" by details |rename details as "tag"| sort -"Unique Endpoint Prev"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table id="detail">
+      <title>Systems By OTX Tag</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx"|makemv delim="," details     |mvexpand details|search details="$tag$" |lookup system_info agentguid|stats max(computername) as computername dc(ipaddress) as "Unique Tagged Destinations" count as "Gross Seen Connections" dc(imagefilemd5) as "Unique Associated MD5s" by agentguid     |sort -"Unique Tagged Destinations"      |fields computername agentguid "Unique Tagged Destinations" "Gross Seen Connections" "Unique Associated MD5s"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table id="moredetail">
+      <title>IP Addresses by System &amp; Tag</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" |where agentguid="$guid$" | eval tags=details|makemv delim="," details     |mvexpand details     |search details="$tag$"     |makemv delim="," tags|stats values(tags) as "All Associated Tags" count as "Gross Seen Connections" dc(imagefilemd5) as "Unique Associated MD5s" by ipaddress      |sort -"Gross Seen Connections" -"Unique Associated MD5s"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>MD5s by System, Tag &amp; IP</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" agentguid="$guid$" ipaddress="$ipaddress$"|stats first(imagefilepath) as imagefilepath count as "Gross Connections Seen" values(accountname) as "Seen Associated Users" by imagefilemd5     |lookup image_info imagefilemd5   |sort -"Gross Connections Seen"     |fields imagefilemd5 imagefilepath companyname fileversion productversion "Gross Connections Seen" "Seen Associated Users"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+      <drilldown target="OTX Info">
+        <link>
+          <![CDATA[
+  http://www.alienvault.com/apps/rep_monitor/ip/$ipaddress$
+       ]]>
+        </link>
+      </drilldown>
+    </table>
+  </row>
+</form>

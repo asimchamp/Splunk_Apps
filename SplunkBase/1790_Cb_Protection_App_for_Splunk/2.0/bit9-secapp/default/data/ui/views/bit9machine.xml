@@ -1,0 +1,99 @@
+<form>
+  <label>Computer Investigation</label>
+
+  <fieldset>
+      <input type="text" token="machineToken">
+          <label>Computer:</label>
+          <default>*</default>
+      </input>
+	  <input type="time" searchwhenchanged="true">
+			<default>Last 7 days</default>
+	  </input>
+  </fieldset>
+      
+  <row>
+      <table>
+          <title>Detection Events</title>
+          <searchTemplate>
+              eventtype=bit9_event HostName="*$machineToken$*" IndicatorName!="" | table Timestamp, HostName, IndicatorName, PathName, FileName, ProcessPathName, ProcessFileName, UserName | rename HostName as Computer, PathName as "Path Name", FileName as "File Name", ProcessPathName as "Process Path Name", ProcessFileName as "Process File Name", UserName as "User Name", IndicatorName as Indicator
+          </searchTemplate>
+      </table>
+  </row>
+  <row>
+	<table>
+		<title>Risky Behavior</title>
+		<searchTemplate>
+			eventtype=bit9_event HostName="*$machineToken$*" `RiskyBehaviorEvents` | table Timestamp, HostName, EventSubType, Message | rename HostName as Computer, EventSubType as "Event Subtype"
+		</searchTemplate>
+	</table>
+	<chart>
+		<title>Risky Behavior Timeline</title>
+		<searchTemplate>
+			eventtype=bit9_event HostName="*$machineToken$*" `RiskyBehaviorEvents` | timechart bins=50 count by EventSubType
+		</searchTemplate>
+          <option name="charting.chart">column</option>
+          <option name="charting.chart.stackMode">stacked</option>
+          <option name="charting.axisTitleX.text"></option>
+		  <option name="charting.axisTitleX.visibility">collapsed</option>
+          <option name="charting.legend.placement">right</option>
+		  <option name="charting.data.count">50000</option>
+	</chart>
+  </row>
+  <row>
+      <table>
+          <title>Blocks</title>
+          <searchTemplate>
+              eventtype=bit9_event HostName="*$machineToken$*" `EventSubTypeBlock` | table Timestamp, HostName, PathName, FileName, ProcessPathName, ProcessFileName, UserName | rename HostName as Computer, PathName as "Path Name", FileName as "File Name", ProcessPathName as "Process Path Name", ProcessFileName as "Process File Name", UserName as "User Name"
+          </searchTemplate>
+      </table>
+  </row>
+  <row>
+      <table>
+          <title>New Files</title>
+          <searchTemplate>
+				eventtype=bit9_filesOnComputers HostName="*$machineToken$*" `FileCreatedOps` | join FileHash [search eventtype=bit9_fileCatalog | table FileHash, TrustValue, ThreatId] | replace "-*" with "" in TrustValue | table Timestamp, HostName, FileName, PathName, ProcessPathName, ProcessFileName, TrustValue, ThreatId | rename HostName as Computer, PathName as "Path Name", FileName as "File Name", ProcessPathName as "Process Path Name", ProcessFileName as "Process File Name", TrustValue as "File Trust", ThreatId as "File Threat"
+          </searchTemplate>
+      </table>
+      <chart>
+          <title>File Activity</title>
+          <searchTemplate>
+				eventtype=bit9_filesOnComputers HostName="*$machineToken$*" `FileActivityOps` | timechart bins=50 count(eval(OpType=0)) as Creations, count(eval(OpType!=0)) as Modifications by HostName
+          </searchTemplate>
+          <option name="charting.chart">column</option>
+          <option name="charting.chart.stackMode">stacked</option>
+          <option name="charting.axisTitleX.text"></option>
+		  <option name="charting.axisTitleX.visibility">collapsed</option>
+          <option name="charting.legend.placement">right</option>
+		  <option name="charting.data.count">50000</option>
+		  <drilldown>
+			<link><![CDATA[/app/search/flashtimeline?q=eventtype=bit9_filesOnComputers HostName="*$form.machineToken$*" `FileActivityOps` earliest=$earliest$ latest=$latest$ | eval clickeditem="$click.name2$" | rex field=clickeditem "(%3F<acttype>%5Cw%2B):%5Cs(%3F<cptr>.%2B)" | where HostName='cptr' | where ((acttype=="Creations" AND OpType==0) OR (acttype=="Modifications" AND OpType==1) OR (acttype=="Modifications" AND OpType==5))]]></link>
+		  </drilldown>
+      </chart>
+  </row>
+  <row>
+	<table>
+		<title>Approved Files</title>
+		<searchTemplate>
+			eventtype=bit9_event HostName="*$machineToken$*" `EventFileApproved` | table Timestamp, HostName, EventSubType, FileName | rename HostName as Computer, EventSubType as "Event Subtype", FileName as "File Name"
+		</searchTemplate>
+	</table>
+  </row>
+  <row>
+      <chart>
+          <title>Events Chart</title>
+          <searchTemplate>
+              eventtype=bit9_event HostName="*$machineToken$*" | top 10 EventSubType, HostName showperc=false | rename EventSubType as "Event Subtype", HostName as Computer
+          </searchTemplate>
+          <option name="charting.chart">bar</option>
+          <option name="charting.legend.placement">none</option>
+      </chart>
+  </row>
+  <row>
+      <table>
+          <title>Health Checks</title>
+          <searchTemplate>
+              eventtype=bit9_event HostName="*$machineToken$*" EventSubTypeId=447 | replace "Info" with "Pass" in Priority | replace "Warning" with "Fail" in Priority | table Timestamp, HostName, Priority, Message | rename HostName as Computer, Priority as Status
+          </searchTemplate>
+      </table>
+  </row>
+</form>

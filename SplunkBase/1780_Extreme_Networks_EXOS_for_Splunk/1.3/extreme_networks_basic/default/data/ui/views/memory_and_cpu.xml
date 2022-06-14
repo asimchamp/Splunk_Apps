@@ -1,0 +1,52 @@
+<form>
+  <label>Memory and CPU</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>Last 7 days</default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Memory Below 50%</title>
+      <searchString>index=extnet | dedup host  | rex max_match=0 "(MSM-(?&lt;slotMSM&gt;\w+)\s+|MM-(?&lt;slotMM&gt;\w+)\s+|Slot-(?&lt;slotNum&gt;\w+)\s+|)Total(\sDRAM\s|\s+)\(KB\):\s+(?&lt;totalDRAM&gt;\d+)"   | rex max_match=0 "(MSM-\w+\s+|MM-\w+|Slot-\w+\s+|)System\s+\(KB\):\s+(?&lt;sysDRAM&gt;\d+)"   | rex max_match=0 "(MSM-\w+\s+|MM-\w+|Slot-\w+\s+|Slot-\w+\s+|)User\s+\(KB\):\s+(?&lt;userDRAM&gt;\d+)"   | rex max_match=0 "(MSM-\w+\s+|MM-\w+|Slot-\w+\s+|Slot-\w+\s+|)Free\s+\(KB\):\s+(?&lt;freeDRAM&gt;\d+)"  | eval memSlot=if(isnotnull(slotMSM),slotMSM,memSlot) | eval memSlot=if(isnotnull(slotNum),slotNum,memSlot) | eval memSlot=if(isnotnull(slotMM),slotMM,memSlot) | eval fields=mvzip(totalDRAM,freeDRAM) | eval fields=if(isnotnull(memSlot),mvzip(fields,memSlot),fields) | mvexpand fields | rex field=fields "(?&lt;fieldTotal&gt;\w+),(?&lt;fieldFree&gt;\d+)(,(?&lt;fieldSlot&gt;\d+)|)" | eval pctFree=round((fieldFree/fieldTotal)*100,2) | where pctFree&lt;50 | eval fieldTotal=round(fieldTotal/1024,2) | eval fieldFree=round(fieldFree/1024,2) | eval eventTime=strftime(_time,"%Y-%m-%d %H:%M:%S") | table host,fieldSlot,fieldTotal,fieldFree,pctFree,eventTime | sort +pctFree | rename host as "IP Address" fieldSlot as "Slot" fieldTotal as "Total DRAM (MB)" fieldFree as "Free DRAM (MB)" pctFree as "Percent DRAM Free" eventTime as "Latest Update"</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+      <drilldown target="drilldown_overview_exosver">
+        <link>/app/extreme_networks_basic/drilldown_memory_usage?form.host=$row.IP Address$</link>
+      </drilldown>
+    </table>
+    <chart>
+      <title>CPU Usage Alerts</title>
+      <searchString>index=extnet cpu | dedup _time host | rex "\&lt;Warn:EPM.cpu\&gt;\sCPU\sutilization\smonitor:\sprocess\s(?&lt;procName&gt;\w+)\sconsumes\s(?&lt;procPct&gt;\d+)\s" | search procName=* | eval eventTime=strftime(_time,"%Y-%m-%d %H:%M:%S") | table eventTime,host,procName,procPct | sort -eventTime | stats count by host | rename eventTime as "Event Time" host as "IP Address" procName as "Process" procPct as "Percent CPU Utilization"</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_cpu_usage_alerts?form.host=$click.value$</link>
+      </drilldown>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+</form>

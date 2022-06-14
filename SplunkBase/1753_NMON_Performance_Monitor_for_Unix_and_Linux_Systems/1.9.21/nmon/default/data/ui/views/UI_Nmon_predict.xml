@@ -1,0 +1,769 @@
+<form script="UI_Nmon_predict.js,modal.js" stylesheet="ui_simple.css,panel_decoration.css" isVisible="true">
+    <label>NMON Predictive interface, Predictive analysis using the forecasting predict command</label>
+    <description></description>
+
+    <!-- Information panel -->
+
+    <row>
+        <panel>
+            <html>
+
+                <div class="imgheader custom-modal">
+                    <img src="../../static/app/nmon/icons/grey_theme/predict.png" alt="Info"/>
+                    <h4><a data-modal-name="Help_modal">Help, information and related links for predictive analysis</a></h4>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal custom-modal-60 fade" id="Help_modal" tabindex="-1" role="dialog" aria-labelledby="Help_modal_Label">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button>
+                                <div style="text-align: left;">
+                                    <h4 class="modal-title" id="Help_modal_Label">Integrated Navigation:</h4>
+                                </div>
+                            </div>
+                            <div class="modal-body">
+
+                                <div style="text-align: center;">
+                                    <img src="../../static/app/nmon/icons/grey_theme/predict.png" alt="predict"/>
+                                    <h1>Predictive analysis with the Splunk builtin predict command </h1>
+                                </div>
+
+                                <div>
+                                    <br />
+                                    <br />
+                                    The predictive analysis interface implements the builtin Splunk command "predict" to forecast time-series data of different main Nmon monitors such as CPU utilization.
+                                    <br />
+                                    By default, this interface will use last past 3 months of data to try predicting the next 3 months potential usage of th selected performance metric
+                                    <br />
+                                    <br />
+                                    Get more information of the predict command and its available options, see <a href="http://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Predict" target="_blank">http://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Predict</a>
+
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </html>
+        </panel>
+    </row>
+
+    <search id="populate_metric">
+        <query>| inputlookup nmon_metric_catalog | search $lpar_filter$</query>
+    </search>
+
+    <!--
+    Dynamic configuration
+    The following searches are being used to define various tokens using event handlers
+    -->
+
+    <!-- OStype -->
+
+    <search id="OSType_detection">
+        <query>eventtype=nmon:performance $host$ | head 1 | stats count by OStype | fields OStype</query>
+        <earliest>$timerange.earliest$</earliest>
+        <latest>$timerange.latest$</latest>
+        <progress>
+            <condition match="'result.OStype'==&quot;Linux&quot;">
+                <set token="metric_for_os">is_Linux=&quot;TRUE&quot;</set>
+                <set token="is_detected">true</set>
+            </condition>
+            <condition match="'result.OStype'==&quot;AIX&quot;">
+                <set token="metric_for_os">is_AIX=&quot;TRUE&quot;</set>
+                <set token="is_detected">true</set>
+            </condition>
+            <condition match="'result.OStype'==&quot;Solaris&quot;">
+                <set token="metric_for_os">is_Solaris=&quot;TRUE&quot;</set>
+                <set token="is_detected">true</set>
+            </condition>
+        </progress>
+    </search>
+
+    <!-- is this an LPAR ? -->
+
+    <search>
+        <query>eventtype=nmon:performance type=LPAR $host$ | head 100 | stats count | where count&gt;0</query>
+        <earliest>$timerange.earliest$</earliest>
+        <latest>$timerange.latest$</latest>
+        <progress>
+            <condition match="$job.resultCount$ == 0">
+                <set token="lpar_filter">metric_name!=&quot;cpu.lpar*&quot; metric_name!=&quot;cpu.pools*&quot;</set>
+            </condition>
+            <condition>
+                <set token="lpar_filter">metric_name=&quot;*&quot;</set>
+            </condition>
+        </progress>
+    </search>
+
+    <!-- definition of metric related tokens -->
+
+    <search id="basesearch_metric_definition" base="populate_metric">
+        <query>search metric_name=$metric_name$ $metric_for_os$</query>
+        <progress>
+            <condition>
+                <set token="metric_dm">$result.metric_dm$</set>
+                <set token="metric_dm_node">$result.metric_dm_node$</set>
+                <set token="metric_dm_prefix">$result.metric_dm_prefix$</set>
+                <set token="metric_has_device">$result.metric_has_device$</set>
+                <set token="metric_device_field">$result.metric_device_field$</set>
+                <set token="metric_dimension_filter">$result.metric_dimension_filter$</set>
+                <set token="metric_value_field">$result.metric_value_field$</set>
+                <set token="metric_unit">$result.metric_unit$</set>
+                <set token="metric_label">$result.metric_label$</set>
+            </condition>
+        </progress>
+    </search>
+
+    <!-- analyse if the metric has a device notion -->
+
+    <search id="bassearch_metric_device" base="populate_metric">
+        <query>search metric_name=$metric_name$ $metric_for_os$</query>
+        <progress>
+            <condition match="'result.metric_has_device'==&quot;TRUE&quot;">
+                <set token="show_device">TRUE</set>
+            </condition>
+            <condition match="'result.metric_has_device'==&quot;FALSE&quot;">
+                <unset token="show_device"></unset>
+            </condition>
+        </progress>
+    </search>
+
+    <!-- analyse if the metric has a volume unit choice option -->
+
+    <search id="basesearch_metric_volume_unit" base="populate_metric">
+        <query>search metric_name=$metric_name$ $metric_for_os$</query>
+        <progress>
+            <condition match="'result.metric_volume_unit_choice'==&quot;TRUE&quot;">
+                <set token="show_unit">TRUE</set>
+            </condition>
+            <condition match="'result.metric_volume_unit_choice'==&quot;FALSE&quot;">
+                <unset token="show_unit"></unset>
+            </condition>
+        </progress>
+    </search>
+
+    <!-- analyse if the metric has a rate unit choice option -->
+
+    <search id="basesearch_metric_rate_unit" base="populate_metric">
+        <query>search metric_name=$metric_name$ $metric_for_os$</query>
+        <progress>
+            <condition match="'result.metric_rate_unit_choice'==&quot;TRUE&quot;">
+                <set token="show_unit_rate">TRUE</set>
+            </condition>
+            <condition match="'result.metric_rate_unit_choice'==&quot;FALSE&quot;">
+                <unset token="show_unit_rate"></unset>
+            </condition>
+        </progress>
+    </search>
+
+    <!-- ################################ -->
+
+    <row>
+        <panel id="settings1">
+            <title>Time range and server selection:</title>
+
+            <input type="time" token="timerange" searchWhenChanged="true">
+                <label>Time Range:</label>
+                <default>
+                    <earliestTime>-30d</earliestTime>
+                    <latestTime>now</latestTime>
+                </default>
+            </input>
+
+            <input type="dropdown" token="timefilter" searchWhenChanged="true">
+                <label>Time Filtering:</label>
+                <choice value="No_Filter">No Filter (24/24, 7/7)</choice>
+                <choice value="Day_BusinessDays_8h-19h">Day Business (08h-19h)</choice>
+                <choice value="Day_WeekEnd_8h-19h">Day WE (08h-19h)</choice>
+                <choice value="Day_AllDays_8h-19h">Day Week (08h-19h)</choice>
+                <choice value="Night_BusinessDays_19h-8h">Night Business (19h-08h)</choice>
+                <choice value="Night_WeekEnd_19h-8h">Night WE (19h-08h)</choice>
+                <choice value="Night_AllDays_19h-8h">Night All Days (19h-08h)</choice>
+                <default>No_Filter</default>
+            </input>
+
+            <input type="dropdown" token="osfilter" searchWhenChanged="true">
+                <label>Filter OS Type:</label>
+                <default>*</default>
+                <prefix>OStype="</prefix>
+                <suffix>"</suffix>
+                <choice value="*">Any OS</choice>
+                <choice value="AIX">AIX</choice>
+                <choice value="Linux">Linux</choice>
+                <choice value="Solaris">Solaris</choice>
+            </input>
+
+            <input id="frameID" type="dropdown" token="frameID" searchWhenChanged="true">
+                <label>Frame IDs:</label>
+                <!-- Populating Data Model Search -->
+                <search>
+                    <query>| tstats count AS Count from datamodel=NMON_Data_CPU where (nodename = CPU.CPU_ALL) (CPU.$osfilter$) groupby "CPU.frameID" prestats=true
+| stats dedup_splitvals=t count AS Count by "CPU.frameID"
+| sort limit=0 "CPU.frameID"
+| rename "CPU.frameID" AS frameID
+| fields - _span | fillnull Count | fields frameID</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <prefix>frameID="</prefix>
+                <suffix>"</suffix>
+                <choice value="*">Any</choice>
+                <default>*</default>
+                <fieldForLabel>frameID</fieldForLabel>
+                <fieldForValue>frameID</fieldForValue>
+            </input>
+
+            <input type="text" token="host-prefilter" searchWhenChanged="true">
+                <label>Optional: Filter hosts populating</label>
+                <default>*</default>
+            </input>
+
+            <input id="host" type="dropdown" token="host" searchWhenChanged="true">
+                <label>Hosts Selection:</label>
+                <!-- Populating Data Model Search -->
+                <search>
+                    <query>| tstats count AS Count from datamodel=NMON_Data_CPU where (nodename = CPU.CPU_ALL) (host=$host-prefilter$) (CPU.$frameID$) (CPU.$osfilter$) groupby host prestats=true
+| stats dedup_splitvals=t count AS Count by host
+| sort limit=0 host
+| fields - _span | fillnull Count | fields host</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <prefix>host="</prefix>
+                <suffix>"</suffix>
+                <fieldForLabel>host</fieldForLabel>
+                <fieldForValue>host</fieldForValue>
+                <!-- Enforce unset of token when host choice is done -->
+                <change>
+                    <unset token="form.holdback_choice"></unset>
+                    <unset token="form.futurespan_choice"></unset>
+                </change>
+            </input>
+
+            <!-- help boxes -->
+
+            <html depends="$host$" rejects="$is_detected$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - Please wait while identifying the operating system... - - - - - - - - - - </p>
+                </div>
+            </html>
+
+            <html rejects="$host$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - ACTION REQUIRED: please select a server name in the host selector above - - - - - - - - - - </p>
+                </div>
+            </html>
+
+        </panel>
+    </row>
+
+    <row>
+        <panel id="settings2">
+            <title>Metric selection and parameters:</title>
+
+            <input token="metric_category" type="dropdown" searchWhenChanged="true">
+                <label>METRIC CATEGORY:</label>
+                <search base="populate_metric">
+                    <query>stats count by metric_category | sort 0 metric_category</query>
+                </search>
+                <choice value="*">Any</choice>
+                <default>*</default>
+                <fieldForLabel>metric_category</fieldForLabel>
+                <fieldForValue>metric_category</fieldForValue>
+                <change>
+                    <!-- unset metric -->
+                    <unset token="metric_dimension_filter"></unset>
+                    <!-- unset the sub linked form token -->
+                    <unset token="form.metric_name"></unset>
+                    <unset token="metric_name"></unset>
+                    <!-- device is dependent from the metric and should be unset as well -->
+                    <unset token="form.device"></unset>
+                    <unset token="show_device"></unset>
+                    <!-- linked to storage -->
+                    <unset token="show_null_saturation_predicted"></unset>
+                    <unset token="show_processing_saturation_predicted"></unset>
+                    <unset token="show_saturation_predicted"></unset>
+                </change>
+            </input>
+
+            <!-- the metric_name dropdown size will be increased using css -->
+
+            <input id="metric_name" token="metric_name" type="dropdown" searchWhenChanged="true">
+                <label>PERFORMANCE METRIC:</label>
+                <search base="populate_metric">
+                    <query>search metric_category="$metric_category$" | table metric_name | sort 0 metric_name</query>
+                </search>
+                <fieldForLabel>metric_name</fieldForLabel>
+                <fieldForValue>metric_name</fieldForValue>
+                <change>
+                    <condition value="storage.df_storage.storage_used">
+                        <set token="storage_metric">true</set>
+                        <unset token="show_processing_saturation_predicted"></unset>
+                        <unset token="show_null_saturation_predicted"></unset>
+                        <unset token="show_saturation_predicted"></unset>
+                    </condition>
+                    <condition>
+                        <unset token="storage_metric"></unset>
+                    </condition>
+                </change>
+            </input>
+
+            <!-- help boxes -->
+
+            <html depends="$is_detected$" rejects="$metric_name$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - ACTION REQUIRED: please select a performance monitor in the selector above - - - - - - - - - - </p>
+                </div>
+            </html>
+
+        </panel>
+    </row>
+
+    <row depends="$show_device$">
+        <panel id="settings3">
+            <title>Devices selection:</title>
+
+            <input id="device" type="dropdown" token="device" searchWhenChanged="true" depends="$show_device$">
+                <label>Device Selection:</label>
+                <!-- Populating Data Model Search -->
+                <search>
+                    <query>| tstats count AS Count from datamodel=$metric_dm$ where (nodename = $metric_dm_node$) (host=$host-prefilter$) ($metric_dm_prefix$.$frameID$) ($metric_dm_prefix$.$osfilter$) ($host$) groupby "$metric_dm_prefix$.$metric_device_field$" prestats=true
+| stats dedup_splitvals=t count AS Count by "$metric_dm_prefix$.$metric_device_field$"
+| sort limit=0 "$metric_dm_prefix$.$metric_device_field$"
+| fields - _span | fillnull Count | fields "$metric_dm_prefix$.$metric_device_field$"
+| rename "$metric_dm_prefix$.$metric_device_field$" AS $metric_device_field$</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <choice value="*">Any</choice>
+                <default>*</default>
+                <fieldForLabel>$metric_device_field$</fieldForLabel>
+                <fieldForValue>$metric_device_field$</fieldForValue>
+                <change>
+                    <set token="storage_prediction_is_processing">true</set>
+                    <unset token="storage_prediction_will_be_satured"></unset>
+                    <unset token="storage_prediction_has_no_prediction"></unset>
+                </change>
+            </input>
+
+            <input type="dropdown" token="storage_unit" depends="$show_device$ $show_unit$">
+                <label>Unit:</label>
+                <choice value="MB">MB</choice>
+                <choice value="GB">GB</choice>
+                <choice value="TB">TB</choice>
+                <default>GB</default>
+                <change>
+                    <condition value="MB">
+                        <set token="metric_math">value</set>
+                        <set token="storage_metric_unit">MB</set>
+                    </condition>
+                    <condition value="GB">
+                        <set token="metric_math">value/1024</set>
+                        <set token="storage_metric_unit">GB</set>
+                    </condition>
+                    <condition value="TB">
+                        <set token="metric_math">value/1024/1204</set>
+                        <set token="storage_metric_unit">TB</set>
+                    </condition>
+                    <condition value="pct">
+                        <set token="metric_math">value</set>
+                        <set token="storage_metric_unit">pct</set>
+                    </condition>
+                </change>
+            </input>
+
+            <input type="dropdown" token="rate_unit" depends="$show_device$ $show_unit_rate$">
+                <label>Unit:</label>
+                <choice value="KBps">KBps</choice>
+                <choice value="MBps">MBps</choice>
+                <choice value="GBps">GBps</choice>
+                <default>KBps</default>
+                <change>
+                    <condition value="KBps">
+                        <set token="metric_math">value</set>
+                        <set token="rate_metric_unit">KBps</set>
+                    </condition>
+                    <condition value="MBps">
+                        <set token="metric_math">value/1000</set>
+                        <set token="rate_metric_unit">MBps</set>
+                    </condition>
+                    <condition value="GBps">
+                        <set token="metric_math">value/1000/1000</set>
+                        <set token="rate_metric_unit">GBps</set>
+                    </condition>
+                </change>
+            </input>
+
+            <!-- help boxes -->
+
+            <html depends="$show_device$" rejects="$device$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - ACTION REQUIRED: please select the associated device to be analysed - - - - - - - - - - </p>
+                </div>
+            </html>
+
+        </panel>
+    </row>
+
+    <row>
+        <panel id="predict1">
+            <title>Prediction parameters:</title>
+
+            <input type="dropdown" token="statsmode" searchWhenChanged="true">
+                <label>Stats mode:</label>
+                <default>perc95</default>
+                <choice value="max">Max</choice>
+                <choice value="avg">Avg</choice>
+                <choice value="min">Min</choice>
+                <choice value="perc95">Percentile 95</choice>
+                <choice value="median">Median</choice>
+                <choice value="mode">Mode</choice>
+                <choice value="range">Range</choice>
+            </input>
+
+            <input type="dropdown" token="algo">
+                <label>Prediction algorithm:</label>
+                <choice value="LL">LL (Local Level)</choice>
+                <choice value="LLP">LLP (Seasonal local level)</choice>
+                <choice value="LLP5">LLP5 (Combines LLT and LLP models)</choice>
+                <choice value="LLT">LLT (Local level trend)</choice>
+                <default>LLP5</default>
+            </input>
+
+            <input type="text" token="interval">
+                <prefix>span="</prefix>
+                <suffix>"</suffix>
+                <default>1d</default>
+                <label>Time span value (ex: 1d for 1 day)</label>
+            </input>
+
+            <input type="dropdown" token="holdback_choice">
+                <label>Holdback:</label>
+                <choice value="auto">auto (none)</choice>
+                <choice value="custom">custom</choice>
+                <default>auto</default>
+                <change>
+                    <condition value="auto">
+                        <unset token="show_holdback"></unset>
+                        <set token="holdback">holdback=0</set>
+                    </condition>
+                    <condition value="custom">
+                        <set token="show_holdback">true</set>
+                        <unset token="holdback">0</unset>
+                    </condition>
+                </change>
+            </input>
+            <input type="text" token="holdback" depends="$show_holdback$">
+                <prefix>holdback="</prefix>
+                <suffix>"</suffix>
+                <label>Nb of last points to ignore</label>
+            </input>
+
+            <input type="dropdown" token="futurespan_choice">
+                <label>Futurespan:</label>
+                <choice value="auto">auto (90)</choice>
+                <choice value="custom">custom</choice>
+                <default>auto</default>
+                <change>
+                    <condition value="auto">
+                        <unset token="show_futurespan"></unset>
+                        <set token="futurespan">future_timespan=90</set>
+                    </condition>
+                    <condition value="custom">
+                        <set token="show_futurespan">true</set>
+                        <unset token="futurespan"></unset>
+                    </condition>
+                </change>
+            </input>
+            <input type="text" token="futurespan" depends="$show_futurespan$">
+                <prefix>future_timespan="</prefix>
+                <suffix>"</suffix>
+                <label>Nb of time points in future</label>
+            </input>
+
+            <input type="dropdown" token="upperlower_choice">
+                <label>Upper/Lower:</label>
+                <choice value="auto">auto (upper75=high lower75=low)</choice>
+                <choice value="custom">custom</choice>
+                <default>auto</default>
+                <change>
+                    <condition value="auto">
+                        <unset token="show_upperlower"></unset>
+                        <set token="upperlower">upper75=high lower75=low</set>
+                    </condition>
+                    <condition value="custom">
+                        <set token="show_upperlower">true</set>
+                        <unset token="upperlower"></unset>
+                    </condition>
+                </change>
+            </input>
+            <input type="text" token="upperlower" depends="$show_upperlower$">
+                <default></default>
+                <label>Enter upper and lower settings:</label>
+            </input>
+
+            <html depends="$show_holdback$" rejects="$holdback$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - ACTION REQUIRED: please enter the number of data points from the end that are not to be used, and press Enter - - - - - - - - - - </p>
+                </div>
+            </html>
+
+            <html depends="$show_futurespan$" rejects="$futurespan$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - ACTION REQUIRED: please enter the number of data points to be predicted, depending on the interval value this will influence the future prediction (for example with 1d as the interval, 90 means predicting for next 90 days), and press Enter - - - - - - - - - - </p>
+                </div>
+            </html>
+
+            <html depends="$show_upperlower$" rejects="$upperlower$">
+                <div class="red_help_user">
+                    <p> - - - - - - - - - - ACTION REQUIRED: please enter lower and upper settings under the form  "upperXX=high lowerXX=high" and press Enter - - - - - - - - - - </p>
+                </div>
+            </html>
+
+        </panel>
+    </row>
+
+    <search id="predicted_storage_saturation">
+        <query>eventtype=nmon:performance $metric_dimension_filter$ (host=$host-prefilter$) ($frameID$) ($osfilter$) ($host$) ($metric_device_field$="$device$")
+| eval storage_metric_unit="$storage_metric_unit$"
+| eval $metric_value_field$=case(storage_metric_unit=="MB", $metric_value_field$, storage_metric_unit=="GB", $metric_value_field$/1024, storage_metric_unit=="TB", $metric_value_field$/1024/1024)
+| eval storage=case(storage_metric_unit=="MB", storage, storage_metric_unit=="GB", storage/1024, storage_metric_unit=="TB", storage/1024/1024)
+| timechart $interval$ $statsmode$($metric_value_field$) AS $metric_value_field$ latest(storage) as storage
+| predict $metric_value_field$ As predict algorithm=$algo$ $holdback$ $futurespan$ $upperlower$
+| filldown storage
+| eval now=now()
+| where (predict&gt;=storage AND _time>now) | sort 0 _time | head 1
+| stats count, min(_time) as predicted_saturation, latest(predict) as predict, latest(storage) as storage
+| eval predicted_saturation=strftime(predicted_saturation, "%d %b %Y"), storage_needs=(predict-storage), storage_margin_90pct=(storage*0.1), storage_margin_80pct=(storage*0.2)
+| eval storage_needs_90pct=round((storage_needs+storage_margin_90pct), 2), storage_needs_80pct=round((storage_needs+storage_margin_80pct), 2)
+| eval prediction_saturation_found=if(predict>storage, "true", "false")</query>
+        <earliest>$timerange.earliest$</earliest>
+        <latest>$timerange.latest$</latest>
+        <progress>
+                <set token="storage_prediction_is_processing">true</set>
+                <unset token="storage_prediction_will_be_satured"></unset>
+                <unset token="storage_prediction_has_no_prediction"></unset>
+        </progress>
+        <finalized>
+            <condition match="'result.prediction_saturation_found'==&quot;false&quot;">
+                <set token="storage_prediction_has_no_prediction">true</set>
+                <unset token="storage_prediction_is_processing"></unset>
+                <unset token="storage_prediction_will_be_satured"></unset>
+            </condition>
+            <condition match="'result.prediction_saturation_found'==&quot;true&quot;">
+                <set token="storage_prediction_will_be_satured">true</set>
+                <unset token="storage_prediction_is_processing"></unset>
+                <unset token="storage_prediction_has_no_prediction"></unset>
+                <set token="predicted_saturation">$result.predicted_saturation$</set>
+                <set token="storage_needs_80pct">$result.storage_needs_80pct$</set>
+                <set token="storage_needs_90pct">$result.storage_needs_90pct$</set>
+            </condition>
+        </finalized>
+
+    </search>
+
+    <row>
+        <panel>
+            <title>$metric_label$</title>
+
+            <html depends="$storage_metric$ $storage_prediction_is_processing$">
+                <div style="font-size: 18px; margin: 10px 0; font-weight: bold; text-align: center; color: black;">
+                    <h2>Please wait while processing the file-system saturation predictive analysis...</h2>
+                </div>
+            </html>
+
+            <html depends="$storage_metric$ $storage_prediction_has_no_prediction$" rejects="$storage_prediction_is_processing$">
+                <div style="font-size: 18px; margin: 10px 0; font-weight: bold; text-align: center; color: black;">
+                    <p>PREDICTIVE ANALYSIS: no saturation prediction could be detected for file-system: <span style="color: #aec6cf; font-size: 200%;">$device$</span></p>
+                </div>
+            </html>
+
+            <html depends="$storage_metric$ $storage_prediction_will_be_satured$" rejects="$storage_prediction_is_processing$">
+                <div style="font-size: 18px; margin: 10px 0; font-weight: bold; text-align: center; color: black;">
+                    <p>PREDICTIVE ANALYSIS: starting date of
+                        <span style="color: #ff6961; font-size: 200%;">$predicted_saturation$</span>
+                        the file-system:
+                        <span style="color: #aec6cf; font-size: 200%;">$device$</span>
+                        might be saturated
+                        <br /><br />
+                        <lu>
+                            <li>Approx. <span style="color: #aec6cf; font-size: 150%;">$storage_needs_90pct$ $storage_metric_unit$</span> of supplementary storage would be needed to keep the storage at 90% of used space</li>
+                            <br />
+                            <li>Approx. <span style="color: #aec6cf; font-size: 150%;">$storage_needs_80pct$ $storage_metric_unit$</span> of supplementary storage would be needed to keep the storage at 80% of used space</li>
+                        </lu>
+                    </p>
+                </div>
+            </html>
+
+            <input type="dropdown" token="span" searchWhenChanged="true">
+                <label>Span:</label>
+                <default>`nmon_span`</default>
+                <choice value="`nmon_span`">auto</choice>
+                <choice value="span=1m">1 minute</choice>
+                <choice value="span=2m">2 minutes</choice>
+                <choice value="span=3m">3 minutes</choice>
+                <choice value="span=4m">4 minutes</choice>
+                <choice value="span=5m">5 minutes</choice>
+                <choice value="span=10m">10 minutes</choice>
+                <choice value="span=15m">15 minutes</choice>
+                <choice value="span=30m">30 minutes</choice>
+                <choice value="span=1h">1 hour</choice>
+                <choice value="span=2h">2 hours</choice>
+                <choice value="span=12h">12 hours</choice>
+                <choice value="span=4h">4 hours</choice>
+                <choice value="span=1d">1 day</choice>
+                <choice value="span=2d">2 days</choice>
+                <choice value="span=1w">7 days</choice>
+                <choice value="span=1mon">1 month</choice>
+            </input>
+
+            <chart rejects="$show_device$">
+                <title></title>
+                <search rejects="$show_device$">
+                    <query>eventtype=nmon:performance $metric_dimension_filter$ (host=$host-prefilter$) ($frameID$) ($osfilter$) ($host$)
+| timechart $interval$ $statsmode$($metric_value_field$) AS $metric_value_field$
+| predict $metric_value_field$ As predict algorithm=$algo$ $holdback$ $futurespan$ $upperlower$</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <option name="charting.axisTitleX.visibility">visible</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.chart">line</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.chart.stackMode">default</option>
+                <option name="charting.chart.style">shiny</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">bottom</option>
+                <option name="charting.chart.nullValueMode">gaps</option>
+                <option name="height">680</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">$metric_unit$</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.fieldColors">{"predict": 0x9d0eaf}</option>
+            </chart>
+
+            <chart depends="$show_device$">
+                <title></title>
+                <search depends="$show_device$">
+                    <query>eventtype=nmon:performance $metric_dimension_filter$ (host=$host-prefilter$) ($frameID$) ($osfilter$) ($host$) ($metric_device_field$="$device$")
+| timechart $interval$ $statsmode$($metric_value_field$) AS $metric_value_field$
+| predict $metric_value_field$ As predict algorithm=$algo$ $holdback$ $futurespan$ $upperlower$</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <option name="charting.axisTitleX.visibility">visible</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.chart">line</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.chart.stackMode">default</option>
+                <option name="charting.chart.style">shiny</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">bottom</option>
+                <option name="charting.chart.nullValueMode">gaps</option>
+                <option name="height">680</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">$metric_unit$</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.fieldColors">{"predict": 0x9d0eaf}</option>
+            </chart>
+
+            <chart depends="$show_device$ $show_unit$">
+                <title></title>
+                <search depends="$show_device$ $show_unit$">
+                    <query>eventtype=nmon:performance $metric_dimension_filter$ (host=$host-prefilter$) ($frameID$) ($osfilter$) ($host$) ($metric_device_field$="$device$")
+| eval storage_metric_unit="$storage_metric_unit$"
+| eval $metric_value_field$=case(storage_metric_unit=="MB", $metric_value_field$, storage_metric_unit=="GB", $metric_value_field$/1024, storage_metric_unit=="TB", $metric_value_field$/1024/1024)
+| eval storage=case(storage_metric_unit=="MB", storage, storage_metric_unit=="GB", storage/1024, storage_metric_unit=="TB", storage/1024/1024)
+| timechart $interval$ $statsmode$($metric_value_field$) AS $metric_value_field$ latest(storage) as storage
+| predict $metric_value_field$ As predict algorithm=$algo$ $holdback$ $futurespan$ $upperlower$
+| filldown storage</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <option name="charting.axisTitleX.visibility">visible</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.chart">line</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.chart.stackMode">default</option>
+                <option name="charting.chart.style">shiny</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">bottom</option>
+                <option name="charting.chart.nullValueMode">gaps</option>
+                <option name="height">680</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">$storage_metric_unit$</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.fieldColors">{"storage": 0xFF0000, "predict": 0x9d0eaf}</option>
+            </chart>
+
+            <chart depends="$show_device$ $show_unit_rate$">
+                <title></title>
+                <search depends="$show_device$ $show_unit_rate$">
+                    <query>eventtype=nmon:performance $metric_dimension_filter$ (host=$host-prefilter$) ($frameID$) ($osfilter$) ($host$) ($metric_device_field$="$device$")
+| eval rate_metric_unit="$rate_metric_unit$"
+| eval $metric_value_field$=case(rate_metric_unit=="KBps", $metric_value_field$, rate_metric_unit=="MBps", $metric_value_field$/1000, rate_metric_unit=="GBps", $metric_value_field$/1000/1000)
+| timechart $interval$ $statsmode$($metric_value_field$) AS $metric_value_field$
+| predict $metric_value_field$ As predict algorithm=$algo$ $holdback$ $futurespan$ $upperlower$</query>
+                    <earliest>$timerange.earliest$</earliest>
+                    <latest>$timerange.latest$</latest>
+                </search>
+                <option name="charting.axisTitleX.visibility">visible</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisX.scale">linear</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.chart">line</option>
+                <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+                <option name="charting.chart.stackMode">default</option>
+                <option name="charting.chart.style">shiny</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+                <option name="charting.legend.placement">bottom</option>
+                <option name="charting.chart.nullValueMode">gaps</option>
+                <option name="height">680</option>
+                <option name="charting.axisTitleX.text">Time</option>
+                <option name="charting.axisTitleY.text">$rate_metric_unit$</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+                <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+                <option name="charting.axisTitleY2.visibility">visible</option>
+                <option name="charting.axisY2.enabled">false</option>
+                <option name="charting.axisY2.scale">inherit</option>
+                <option name="charting.fieldColors">{"storage": 0xFF0000, "predict": 0x9d0eaf}</option>
+            </chart>
+
+        </panel>
+    </row>
+
+</form>

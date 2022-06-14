@@ -1,0 +1,198 @@
+{
+    "modelName": "nufoc",
+    "displayName": "New Unapproved Files On Computers",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 1,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "New_Unapproved_File",
+            "displayName": "New Unapproved File",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "FileHash",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "FileHash",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "FileName",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "FileName",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "HostName",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "HostName",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "InstallerHash",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "InstallerHash",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "PathName",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "PathName",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Policy",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Policy",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "UserName",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "UserName",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "ProcessFileName",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "ProcessFileName",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "ProcessHash",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "ProcessHash",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "ProcessPathName",
+                    "owner": "New_Unapproved_File",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "ProcessPathName",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "eventtype=bit9_event EventSubTypeId=1003 ProcessFileName!=\"\" FileHash!=\"\" FileName!=\"\" UserName!=\"\" HostName!=\"\" PathName!=\"\"",
+                    "owner": "New_Unapproved_File"
+                }
+            ],
+            "lineage": "New_Unapproved_File"
+        }
+    ],
+    "objectNameList": [
+        "New_Unapproved_File"
+    ]
+}
