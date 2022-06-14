@@ -1,0 +1,193 @@
+<form version="1.1" script="table_icons_rangemap.js" stylesheet="table_decorations.css">
+  <label>Reports and Async Reports Performance</label>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="status">
+      <label>Report Status</label>
+      <choice value="">All</choice>
+      <choice value="REQUEST_STATUS=F">Fail</choice>
+      <choice value="REQUEST_STATUS=S">Success</choice>
+      <choice value="REQUEST_STATUS=U">Uninitialized</choice>
+      <default></default>
+    </input>
+    <input type="multiselect" token="USER_ID" searchWhenChanged="true">
+      <label>Username</label>
+      <choice value="">All</choice>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>USER_ID</fieldForValue>
+      <search>
+        <query>eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) | stats count by Name USER_ID | sort -count | eval label=Name." (".count.")" | eval USER_ID="USER_ID=".USER_ID</query>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <default></default>
+      <delimiter> </delimiter>
+    </input>
+    <input type="multiselect" token="REPORT_ID" searchWhenChanged="true">
+      <label>Report Name</label>
+      <choice value="">All</choice>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>REPORT_ID</fieldForValue>
+      <search>
+        <query>eventtype=sfdc-event-log EVENT_TYPE=Report | stats count by REPORT_NAME REPORT_ID | sort -count | eval label=REPORT_NAME." (".count.")" | eval REPORT_ID="REPORT_ID=".REPORT_ID</query>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <default></default>
+      <delimiter> </delimiter>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Report Run Count and Average Execution</title>
+        <search>
+          <query>eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) $status$ $USER_ID$ $REPORT_ID$ | eval rt=RUN_TIME/1000 |  timechart count AS "Report Execution Count" AVG(rt) As "Average Run Time (sec)"  span=6h</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.overlayFields">"Average Run Time (sec)",Median</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Most Active Reports by Exceution Count</title>
+        <search>
+          <query>eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) $status$ $USER_ID$ $REPORT_ID$  | eval r=case(NOT REPORT_ID=="", "private_".REPORT_ID)  | eval REPORT_NAME=if( isnull(REPORT_NAME),r, REPORT_NAME) | eval  STATUS = if (REQUEST_STATUS=="", "S" ,  REQUEST_STATUS) |stats  count by REPORT_NAME     | sort  10 -count | fields - total | rename count AS "Report and Refreshed Dashboard Count"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Most Active Reports by Distinct Users</title>
+        <search>
+          <query>eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) $status$ $USER_ID$ $REPORT_ID$   | eval r=case(NOT REPORT_ID=="", "private_".REPORT_ID)  | eval REPORT_NAME=if( isnull(REPORT_NAME),r, REPORT_NAME) | stats dc(Username) as u by REPORT_NAME   | sort  10 -u| rename u AS "Report and Refreshed Dashboard by Distinct User"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+      </chart>
+    </panel>
+    <panel>
+      <table id="table2">
+        <title>Reports by Most Active Username Table</title>
+        <search>
+          <query>eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) $status$ $USER_ID$ $REPORT_ID$| stats count by Name, Username, USER_ID | sort -count| rename count AS "Report Run Count"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown target="SFDC User">
+          <link>https://login.salesforce.com/$row.USER_ID$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table1">
+        <title>Reports Performance - Sorted by Slowest</title>
+        <search>
+          <query>eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun)   $status$ $USER_ID$ $REPORT_ID$ | eval r=case(NOT REPORT_ID=="", "private_".REPORT_ID)  | eval REPORT_NAME=if( isnull(REPORT_NAME),r, REPORT_NAME) | eval rt=RUN_TIME/1000 | eval fail = if(REQUEST_STATUS=="F", "1", "0") |  eval  STATUS = if (REQUEST_STATUS=="", "S" ,  REQUEST_STATUS) |chart values(REPORT_ID) as ReportId  AVG(rt) as avg MAX(rt) as max median(rt) as median perc90(rt) as perc90 sum(fail) as sum_fail count values(REPORT_ID) as ReportId  by REPORT_NAME|  eval load=count*avg | sort -load | rangemap field=avg low=0-1 elevated=2-50 severe=50-1000 default=severe |  rename sum_fail AS "Number of Failure" | rename max as "Max Run Time (sec)" | rename avg as "Average Run Time (sec)" | rename perc90 as "90th Percentile Run Time (sec)" | rename median as "Median Run Time (Sec)"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown target="SFDC Report">
+          <link>https://login.salesforce.com/$row.ReportId$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

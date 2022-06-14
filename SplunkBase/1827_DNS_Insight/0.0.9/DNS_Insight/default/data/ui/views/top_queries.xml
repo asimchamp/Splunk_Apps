@@ -1,0 +1,142 @@
+<form version="1.1">
+  <label>Top Queries</label>
+  <search id="base_search_top">
+    <query>sourcetype=tshark:port53 OR sourcetype=port53tttt message_type=QUERY src=$src$ dest=$dest$ source=$source$ | fields src dest query</query>
+  </search>
+
+  <fieldset autoRun="true" submitButton="false">
+
+    <input type="dropdown" token="source" searchWhenChanged="true" id="source_input">
+      <label>source</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <default>*</default>
+      <search>
+        <query>| tstats count where sourcetype IN (tshark:port53, port53tttt) by source |fields source</query>
+      </search>
+    </input>
+
+
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="src" searchWhenChanged="true">
+     <label>Client IP</label>
+     <default>*</default>
+    </input>
+    <input type="text" token="dest" searchWhenChanged="true">
+     <label>DNS Server IP</label>
+     <default>*</default>
+    </input>
+
+  </fieldset>
+
+  <row>
+    <table>
+      <title>Top Queries</title>
+      <search base="base_search_top"><query>stats count, dc(src) AS "Number of Clients" by query | sort -count</query></search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+  <row>
+    <table>
+      <title>Top Level Domains (TLD)</title>
+      <search base="base_search_top"><query>rex field=query "\.(?P&lt;TLD>[^\.]+)$"|stats sparkline count(TLD) AS Count, dc(query) AS "Number of Queries to this TLD", dc(src) AS "Number of Clients" by TLD|sort -Count </query></search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+   <row>
+    <table>
+      <title>Top Domains</title>
+      <search base="base_search_top"><query>rex field=query "(?&lt;dns_subdomain>.*)\.(?&lt;Domain>[^\.]+\.[^\.]+)$" |stats sparkline count(Domain) AS Count, dc(query) AS "Count of Queries to this Domain", dc(src) AS "Number of Clients" by Domain|sort -Count </query></search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  
+  <row>
+    <table>
+      <title>Top Reverse Resolution Entries (PTR) IPv4</title>
+      <search base="base_search_top"><query>search TERM(PTR) TERM(in-addr) TERM(arpa) |  rex field=query "(?P&lt;label4>[^\.]+)\.(?P&lt;label3>[^\.]+)\.(?P&lt;label2>[^\.]+)\.(?P&lt;label1>[^\.]+)\.in\-addr\.arpa$" | eval ptr_normalized=label1.".".label2.".".label3.".".label4| stats count,dc(src) AS "Number of Clients" by ptr_normalized | sort -count</query></search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>  
+
+  <row>
+    <table>
+      <title>Top Reverse Resolution Entries (PTR) IPv6</title>
+      <search base="base_search_top"><query><![CDATA[ search TERM(PTR) TERM(ip6) TERM(arpa) | rex field=query "(?<ptr>.*)\.ip6\.arpa$" | rex field=ptr "^(?<arpa32>.)\.(?<arpa31>.)\.(?<arpa30>.)\.(?<arpa29>.)\.(?<arpa28>.)\.(?<arpa27>.)\.(?<arpa26>.)\.(?<arpa25>.)\.(?<arpa24>.)\.(?<arpa23>.)\.(?<arpa22>.)\.(?<arpa21>.)\.(?<arpa20>.)\.(?<arpa19>.)\.(?<arpa18>.)\.(?<arpa17>.)\.(?<arpa16>.)\.(?<arpa15>.)\.(?<arpa14>.)\.(?<arpa13>.)\.(?<arpa12>.)\.(?<arpa11>.)\.(?<arpa10>.)\.(?<arpa9>.)\.(?<arpa8>.)\.(?<arpa7>.)\.(?<arpa6>.)\.(?<arpa5>.)\.(?<arpa4>.)\.(?<arpa3>.)\.(?<arpa2>.)\.(?<arpa1>.)$" | eval ptr6_normalized=arpa1.arpa2.arpa3.arpa4.":".arpa5.arpa6.arpa7.arpa8.":".arpa9.arpa10.arpa11.arpa12.":".arpa13.arpa14.arpa15.arpa16.":".arpa17.arpa18.arpa19.arpa20.":".arpa21.arpa22.arpa23.arpa24.":".arpa25.arpa26.arpa27.arpa28.":".arpa29.arpa30.arpa31.arpa32 | stats count , dc(src) AS "Number of Clients" by ptr6_normalized ]]></query></search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>  
+
+
+  <row>
+    <chart>
+      <title>Top Destinations</title>
+      <search base="base_search_top"><query>timechart count by dest</query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top Sources</title>
+      <search base="base_search_top"><query>timechart count by src</query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  
+</form>

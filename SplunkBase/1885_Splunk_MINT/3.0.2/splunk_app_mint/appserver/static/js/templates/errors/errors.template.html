@@ -1,0 +1,72 @@
+<div id="layout">
+    <div class="FiltersRight">
+    </div>
+    <div class="BodyLeft errors-parent">
+        <div class="NavBreadcrumb">
+        </div>
+
+        <div class="normal">
+          <div class="big-graph"></div>
+          <div class="table"></div>
+        </div>
+
+        <div class="drilldown" style="display: none;">
+          <a href="#" class="error-drilldown btn btn-primary">Go to search</a>
+          <div id="error-details" class="grid7">
+            <div id="total-stats">
+              <div class="top-metric">
+                <h3>Total Occurrences</h3>
+                <p id="total-occurrences"></p>
+              </div>
+              <div class="top-metric">
+                <h3>Total Affected Users</h3>
+                <p id="total-affected-users"></p>
+              </div>
+              <div class="metric">
+                <h3>Memory Usage on Crash</h3>
+                <p id="total-memory"></p>
+              </div>
+            </div>
+            <div id="occurrences-graph"></div>
+
+            <ul class="nav-tabs">
+              <li data-id="stacktrace" role="presentation" class="active"><a href="#">Stacktrace</a></li>
+              <li data-id="affected-users" role="presentation"><a href="#">Affected users</a></li>
+            </ul>
+
+            <div class="content-tabs" id="stacktrace"></div>
+            <div class="content-tabs" id="affected-users" style="display:none;"></div>
+          </div>
+          <div id="aggregated-metrics" class="grid3">
+            <h3>Aggregated Metrics</h3>
+
+              <div class="agreggated-metric">
+                <h3>Network</h3>
+                <div id="network"></div>
+              </div>
+
+              <!-- <div class="agreggated-metric"> -->
+              <!--   <h3>Gps</h3> -->
+              <!--   <div id="gps"></div> -->
+              <!-- </div> -->
+
+              <div class="agreggated-metric">
+                <h3>App Version</h3>
+                <div id="app-version"></div>
+              </div>
+
+              <div class="agreggated-metric">
+                <h3>OS Versions</h3>
+                <div id="os-version"></div>
+              </div>
+
+              <div class="agreggated-metric">
+                <h3>Devices</h3>
+                <div id="device"></div>
+              </div>
+
+          </div>
+        </div>
+    </div>
+</div>
+

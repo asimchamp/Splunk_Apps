@@ -1,0 +1,34 @@
+<dashboard>
+  <label>Home</label>
+  <row>
+    <html>
+      <h1>Forwarder Health App Overview</h1>
+      <p>This app looks to address 2 main goals across your Splunk deployment in relation to Universal and Heavy Forwarder health.
+      <ul>
+        <li>Where the host system is generating more logs than the default configurations are set to handle</li>
+        <li>Environmental or host based configuration issues/misconfigurations</li>
+        </ul>
+      </p>
+      <h3>Files monitored and throughput</h3>
+      <p>While forwarder default settings are usually sufficient you might have systems where the forwarder is hitting the limit either in terms of the number of files being monitored or volume of data being sent back to your indexer(s). A dashboard designed to highlight these issues is Limits and Path Monitoring Messages.</p>
+      <h3>Environmental or Host issues</h3>
+      <p>Splunk is used in countless ways and environments. There is no practical way to account for every possible internally reported warning or error message. The rather simplistic alternate is to compare the volume of internal logs a host is generating to the average internal logs generated in the environment. You might find any number of issues with forwarders that generate large volumes of internal logs that run the gamut between host logs not being ingested to host logs being re-indexed over and over. The point of this app is not to provide feedback on why a forwarder is generating tons of logs as much as show you it is happening and provide you will the information needed to either search on Splunk answers and/or open a ticket with Splunk support. For example we had a forwarder generating 142x the average logs, made a simple configuration change, and all was well.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h1>Getting Started</h1>
+      <p>1. Go into the macros section and update the macros related to your search heads and indexers. The point here is to filter those out as they will skew the numbers.</p>
+      <p>2. After reviewing the Limits and Path Monitoring Messages dashboard you might find you want to receive emails for either the file descriptor or throughput panels. Those are already saved searches so that process is pretty straight forward.</p>
+      <p>3. Review the Internal Event Count Overview dashboard. This will give you a high level overview of the forwarders in your deployment.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Score Methodology</h2>
+      <p>As mentioned the idea of comparing the internal log volume to the average in order to highlight issues is simplistic but effective. The scoring is simpilarly simplistic. The number of times over the average volume is subtracted from 10. In other words if a forwarder is generating 3x the average log volume it would have a score of 7 (10 - 3 = 7). The beauty of this approach is it scales both in terms of different environments as well as dynamically responding to situations on forwarders getting resolved as there will always be top producers.</p>
+      <h2>But what about system resource usage?</h2>
+      <p>Great question. It is likely you are bringing in resource usage already but I don't know your field names or polling frequency. While field aliases are an option I have chosen not to address this aspect of forwarder health at this time. With introspection being introduced in 6.1 and beyond some options open up.</p>
+    </html>
+  </row>
+</dashboard>

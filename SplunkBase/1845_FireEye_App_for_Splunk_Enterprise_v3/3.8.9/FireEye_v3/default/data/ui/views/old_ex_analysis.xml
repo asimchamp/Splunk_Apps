@@ -1,0 +1,105 @@
+<form script="inpage_drilldown_form.js" stylesheet="custom.css" version="1.1">
+  <label>EX - Analysis</label>
+  <description>Analysis Dashboard for FireEye EX Events</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="false">
+    <!-- Add Wildcard Filter -->
+    <!-- Used for dropdown - Input field hidden using javascript. <div id = #field3 -->
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Search</label>
+      <default>*</default>
+      <suffix></suffix>
+    </input>
+    <input type="text" token="ID" searchWhenChanged="true"></input>
+    <input type="dropdown" token="ackstatus" searchWhenChanged="true">
+      <label>Acknowledge Status</label>
+      <choice value="Y">Yes</choice>
+      <choice value="N">No</choice>
+      <choice value="*">All</choice>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table id="master">
+        <title>Alerts</title>
+        <search><query>
+          eventtype=fe product="Email MPS" $wild$ | lookup acknotes id as id | eval Ack=if(isnull('alert.ack'),"",'alert.ack') | search Ack=* | eval UrlHash = coalesce(file_hash,malware_url) | sort -occurred | table Ack, id, signature, severity, occurred, subject, suser, duser, UrlHash | rename id AS ID, signature AS Malware, severity AS Severity, occurred AS Occurred, duser AS Recipient, subject AS Subject, suser AS Sender, UrlHash AS "URL/Md5sum", locations as "Location"
+        </query></search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="detail">
+        <title>Alert Detail: $ID$</title>
+        <search><query>eventtype=fe product="Email MPS" $wild$ | lookup acknotes id as id | eval UrlHash = coalesce(file_hash,malware_url) | eval Notes=if(isnull('Notes'), "Empty", 'Notes') | table id, Notes, UrlHash, ext_ref | rename id as ID, Notes as "Event Notes", ext_ref AS "Event Link"</query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="drilldown">cell</option>
+        <drilldown target="_blank">
+          <condition field="Event Notes">
+            <link target="_blank">/app/$app$/acknotes?earliest=$earliest$&amp;latest=$latest$&amp;form.product=EX&amp;form.id=$ID$</link>
+          </condition>
+          <condition field="UrlHash">
+            <link target="_blank">/app/$app$/vtlookup?UrlHash=$row.UrlHash$</link>
+          </condition>
+          <condition field="Event Link">$row.ext_ref$</condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Recipient</title>
+        <search><query>eventtype=fe product="Email MPS" $wild$ | stats count(duser), count(file_hash), count(request), max(signature), max(occurred) by duser | rename duser AS Recipient, count(duser) as "Total Malicious Email", count(file_hash) AS "Attachment", count(request) AS URL, max(signature) AS "Last Malware", max(occurred) AS "Last Seen at (UTC)"</query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Sender</title>
+        <search><query>eventtype=fe product="Email MPS" $wild$ | stats dc(duser), count(duser), count(file_hash), count(request), max(signature), max(occurred) by suser | rename suser AS Sender, dc(duser) AS "Unique Recipient", count(duser) as "Total Malicious Email", count(file_hash) AS "Attachment", count(request) AS URL, max(signature) AS "Last Malware", max(occurred) AS "Last Seen at (UTC)"</query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+</form>

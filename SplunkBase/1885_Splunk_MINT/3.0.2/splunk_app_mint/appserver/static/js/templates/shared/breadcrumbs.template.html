@@ -1,0 +1,8 @@
+<ul class="breadcrumbs">
+	<% _.each(data, function(breadcrumb, index) { %>
+		<li data-id="<%- index %>" class="breadcrumb-list-item">
+		  	<a href="#"><%- breadcrumb %></a>
+			<i class="icon icon-chevron-right"></i>
+		</li>
+	<% }); %>
+</ul>

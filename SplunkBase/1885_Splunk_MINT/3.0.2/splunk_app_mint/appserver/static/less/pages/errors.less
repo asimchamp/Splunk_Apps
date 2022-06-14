@@ -1,0 +1,242 @@
+// import app and core less , but only as reference. We can use any needed
+// styles/vars/mixins without polluting the output css
+@import (reference) "../common";
+
+// import filters less as shared filters view is used
+@import "../shared/filters";
+
+//Main Layout Styling
+#layout{
+    .FiltersRight{
+      min-height: 1400px;
+    }
+    .BodyLeft{
+      //ErrorList Table
+        .table{
+          #errors-list{
+            td{
+              white-space: normal;
+            }
+            td.icon {
+              font-size: 18px;
+              padding: 7px 20px;
+            }
+          }
+        }
+        .drilldown{
+          a.error-drilldown{
+            float: right;
+            margin-top: -37px;
+            margin-right: 20px;
+          }
+          //Left side
+          #error-details{
+            border-right:1px solid @border-color;
+            //Top data
+            #total-stats{
+              .top-metric, .metric{
+                display: inline-block;
+                margin-top: 20px;
+                .single-css{
+                  font-size: 18px;
+                  font-weight: 400;
+                  padding: 0px 10px 10px 17px;
+                  color: @red;
+                }
+                h3{
+                  margin-bottom: 0px;
+                  margin-top: 0px;
+                  padding-bottom: 8px;
+                  padding-top: 0px;
+                }
+                p{
+                  .single-result{
+                    font-size: 18px;
+                    font-weight: 400 !important;
+                    color: @red;
+                  }
+                  .single-value{
+                    margin:0px;
+                    margin-left: 5px;
+                  }
+                  .after-label{
+                      font-size: 18px;
+                      color: @red;
+                  }
+                }
+              }
+              .top-metric{
+                border-right: 1px solid @border-color;
+              }
+            }
+            //Graph     
+            #occurrences-graph{
+              padding-bottom: 10px;
+              border-bottom: 1px solid @border-color;
+              height: 250px;
+              #occurrences-chart{
+                height: 250px;
+                margin-top:10px;
+                padding: 0px 10px;
+              }
+            }
+            //Stacktrace, Affected users
+            .nav-tabs{
+              list-style: none;
+              margin: 0px 0px 0px 10px;
+              li.active{
+                a{
+                  margin-right: 0px !important;
+                }
+              }
+              li.active:first-child:before{
+                  border-left: 0;
+                  transform: skew(0deg, 0);
+                  -webkit-transform: skew(0deg, 0);
+              }
+              li:first-child:before{
+                  transform: skew(0deg, 0);
+                  -webkit-transform: skew(0deg, 0);
+              }
+            }
+            //Contect inside tabs
+            .content-tabs{
+              h4{
+                background-color: @lightgray;
+                font-weight: 600;
+                font-size: 14px;
+                color: @darkblue;
+                margin-top: 1px;
+                padding: 10px 20px;
+              }
+              table{
+                width: 100%;
+                tr{
+                  &:nth-child(even){
+                    background-color: @lightgray;
+                  }
+                  td{
+                    padding: 10px 20px;
+                    border-bottom: 1px solid @border-color;
+                    &:first-child{
+                      border-right:1px solid @border-color;
+                    }
+                  }
+                }
+              }
+            }
+            //Threads tabs
+            #threads{
+              padding: 10px 20px;
+              margin: 0;
+              list-style: none;
+              background: @lightgray;
+              margin: 1px 0px 0px 0px;
+              border-bottom: 2px solid @border-color2;
+              li{
+                display: inline-block;
+                padding: 0px 15px 0px 0px;
+                cursor: pointer;
+                color: #bbbbbb;
+              }
+              li.active{
+                color: @darkblue;
+              }
+            }
+            //Notification messages
+            .notifications{
+              margin: 10px 0px -10px 20px;
+            }
+            //Stacktrace tab
+            #stacktrace{
+              #notifications{
+                padding: 0px 20px;
+                .alert{
+                    margin-left: 20px;
+                    margin-bottom: 0px;
+                }
+              }
+              table{
+                td{
+                  word-break: break-all;
+                }
+              }
+            }
+            //Affected users tab
+            #affected-users{
+              table{
+                td{
+                  color: @darkgray;
+                  cursor: inherit;
+                }
+                tr:hover{
+                  background-color:none;
+                }
+              }
+            }
+          }
+          //Right side
+          #aggregated-metrics{
+            background-color: @lightgray2;
+            height: auto !important;
+            min-height: 1353px;
+            h3{
+              margin-top: 5px;
+            }
+            .agreggated-metric{
+              .percentage{
+                  margin-left: 20px;
+                  max-width: 120px;
+                  div{
+                    float: left;
+                    display: inline-block;
+                    height: 40px;
+                  }
+              }
+              //Bar chart
+              ul{
+                  list-style: none;
+                  width: 159px;
+                  height: 65px;
+                  margin: 0px 0px;
+                  display: inline-block;
+                  li{
+                    vertical-align: top;
+                    line-height: 15px;
+                    font-weight: 600;
+                    span{
+                      margin-right: 5px;
+                      font-size: 12px;
+                      margin-left: 5px;
+                      overflow: hidden;
+                      white-space: nowrap;
+                      text-overflow: ellipsis;
+                      /*width: 85px;*/
+                      display: inline-block;
+                      font-weight: 400;
+                      vertical-align: top;
+                    }
+                  }
+              }
+            }
+          }
+/*          .table-recent{
+            h3{
+              margin-bottom: 10px;
+            }
+            table{
+              td{
+                cursor: default;
+                &:hover{
+                  background-color:none;
+                }
+                &:first-child{
+                  color:black;
+                }
+              }
+            }
+          }*/
+        }
+    }
+}
+

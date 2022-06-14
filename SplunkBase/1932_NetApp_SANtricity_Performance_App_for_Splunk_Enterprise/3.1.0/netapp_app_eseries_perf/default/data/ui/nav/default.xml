@@ -1,0 +1,31 @@
+<nav>
+  <view label="Home" name="nesa_home" default="true"/>
+  <collection label="Configuration">
+    <view name="config_summary"/>
+    <divider/>
+    <view name="config_array"/>
+    <view name="config_vgroups"/>
+    <view name="config_volumes"/>
+    <divider/>
+    <view name="config_volumes_setup"/>
+    <view name="config_drives_setup"/>
+  </collection>
+  <collection label="Performance">
+    <view name="perf_array"/>
+    <view name="perf_vgroups"/>
+    <view name="perf_volumes"/>
+    <view name="perf_drives"/>
+    <divider/>
+    <view name="perf_array_drive"/>
+    <view name="perf_array_host"/>
+    <divider/>
+    <view name="perf_cachehits"/>
+    <view name="perf_volume_latency"/>
+  </collection>
+  <collection label="Events">
+    <view name="mel_general"/>
+    <view name="event_component"/>
+  </collection>
+  <view name="hierarchy_view"/>
+  <view name="search"/>
+</nav>

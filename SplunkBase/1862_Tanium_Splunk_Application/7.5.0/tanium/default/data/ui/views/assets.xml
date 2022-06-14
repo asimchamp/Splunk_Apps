@@ -1,0 +1,228 @@
+<form>
+  <label>Tanium Asset</label>
+  <description>Asset Management</description>
+  <fieldset submitButton="false">
+    <input type="time" token="timefield1">
+      <label></label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Tanium Managed Systems</title>
+        <search>
+          <query>`tanium_index` Question="Client-Status" | stats distinct_count(HostName)</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">64</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0x555","0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[1,30,70,100,200,400]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Client-Status" | table _time,ComputerId,HostName,ClientNetworkLocation,SendState,ReceiveState,Status,LastRegistration,FullVersion,ProtocolVersion&amp;earliest=$field8.earliest$&amp;latest=$field8.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Tanium Unmanaged Interfaces</title>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" Managed="0" | stats dc(MacAddress)</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">65</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1,2]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20%22Question=Tanium-Discover%22%20%7C%20table%20computerid,%20hostname,%20ipaddress,%20natipaddress,%20macaddress,%20macorganization,%20os,%20osgeneration,%20ports,%20method,%20lastdiscoveredat,%20lastmanagedat,%20unmanageable&amp;earliest=$timefield1.earliest$&amp;latest=$timefield1.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Tanium Lost Interface</title>
+        <search>
+          <query>`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*Lost*Interface" | stats distinct_count(MacAddress)</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">64</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*Lost*Interface" | table HostName,TaniumComputerId,MacOrganization,Os,LastManagedAt,LastDiscoveredAt&amp;earliest=$field8.earliest$&amp;latest=$field8.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Managed Asset Over Time by Count</title>
+        <search>
+          <query>`tanium_index` Question="Client-Status" NOT Version=0.0.0.0 | bucket span=1d _time | timechart  span=1d dc(HostName)</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Computer Name</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Asset by Hardware</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset"  | dedup Computer_Name 
+| stats count(Chassis_Type) by Chassis_Type</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Basic-Asset" | table Computer_Name Computer_Serial_Number Operating_System Manufacturer Chassis_Type&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Asset by Operating System</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset" | stats count(Operating_System) by Operating_System</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Basic-Asset" | table Computer_Name Computer_Serial_Number Operating_System Manufacturer Chassis_Type&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Asset by Manufacturer</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset" 
+| stats count(Manufacturer) by Manufacturer</query>
+          <earliest>$timefield1.earliest$</earliest>
+          <latest>$timefield1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Basic-Asset" | table Computer_Name Computer_Serial_Number Operating_System Manufacturer Chassis_Type&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="timefield2">
+        <label>Time Search</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="fieldComputerName">
+        <label>Computer Name Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="fieldUser">
+        <label>User Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="fieldSerialNumber">
+        <label>Serial Number Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="fieldOperatingSystem" searchWhenChanged="true">
+        <label>Operating System Search</label>
+        <choice value="*">All Operating Systems</choice>
+        <fieldForLabel>Operating_System</fieldForLabel>
+        <fieldForValue>Operating_System</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset" | 
+            dedup Operating_System | fields Operating_System</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="fieldManufacturer" searchWhenChanged="true">
+        <label>Manufacturer Search</label>
+        <choice value="*">All Manufacturers</choice>
+        <fieldForLabel>Manufacturer</fieldForLabel>
+        <fieldForValue>Manufacturer</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset" | 
+            dedup Manufacturer | fields Manufacturer</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="fieldChassisType" searchWhenChanged="true">
+        <label>Chassis Type</label>
+        <choice value="*">All Chassis_Types</choice>
+        <fieldForLabel>Chassis_Type</fieldForLabel>
+        <fieldForValue>Chassis_Type</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset" | 
+            dedup Chassis_Type| fields Chassis_Type</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Assets</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Basic-Asset" Computer_Name="*$fieldComputerName$*" Last_Logged_In_User="*$fieldUser$*" Computer_Serial_Number="*$fieldSerialNumber$*" Operating_System=$fieldOperatingSystem$ Manufacturer=$fieldManufacturer$ Chassis_Type=$fieldChassisType$ | dedup Computer_Name | table  _time,Computer_Name,Last_Logged_In_User,Computer_Serial_Number,Operating_System,Manufacturer,Chassis_Type</query>
+          <earliest>$timefield2.earliest$</earliest>
+          <latest>$timefield2.latest$</latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

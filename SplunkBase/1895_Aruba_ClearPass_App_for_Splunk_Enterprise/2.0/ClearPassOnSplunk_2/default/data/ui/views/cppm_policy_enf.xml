@@ -1,0 +1,75 @@
+<form>
+  <label>Policy Enforcement</label>
+
+  <fieldset autoRun="True" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+   <input type="dropdown" token="server">
+      <label>ClearPass Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <populatingSearch fieldForValue="cphost" fieldForLabel="cphost">
+        <![CDATA[eventtype=cppm | stats count by cphost]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+
+  <searchTemplate>
+      eventtype=cppm-posture cphost=$server$ 
+  </searchTemplate>
+
+ <row>
+    <single>
+      <searchString> eventtype=cppm-posture cphost=$server$ | stats count </searchString>
+      <option name="underLabel">Total Policy Enforcements</option>
+    </single>
+    <single>
+      <searchString> eventtype=cppm-posture cphost=$server$ enf_profiles="*"| dedup enf_profiles | stats count</searchString>
+      <option name="underLabel">Total Enforcement Profiles</option>
+    </single>
+    <single>
+      <searchString> eventtype=cppm-posture cphost=$server$ roles="*" |dedup roles | stats count</searchString>
+      <option name="underLabel">Total Roles</option>
+    </single>
+    <single>
+      <searchString> eventtype=cppm-posture cphost=$server$ spt!="HEALTHY" | stats count</searchString>
+      <option name="underLabel">UnHealthy Sessions</option>
+    </single>
+ </row>
+
+  <row>
+    <chart>
+      <title>Top 10 Roles Assigned</title>
+      <searchString> eventtype=cppm-posture cphost=$server$ | chart count by roles |sort by -count|head 10 </searchString>
+      <option name="charting.chart">bar</option>
+    </chart>
+
+    <chart>
+      <title>Top 10 Enforcement Profiles</title>
+      <searchString> eventtype=cppm-posture cphost=$server$ | chart count by enf_profiles |sort by -count|head 10</searchString>
+      <option name="charting.chart">bar</option>
+    </chart>
+
+    <chart>
+      <title>Health Status</title>
+      <searchString> eventtype=cppm-posture cphost=$server$ | chart count by spt </searchString>
+      <option name="charting.chart">pie</option>
+    </chart>
+  </row>
+   
+  <row>
+    <chart>
+      <title>Policy Enforcements</title>
+      <searchString> eventtype=cppm-posture cphost=$server$ |timechart usenull=f count</searchString>
+      <option name="charting.chart">line</option>
+    </chart>
+
+  </row>
+   
+</form>
+
+

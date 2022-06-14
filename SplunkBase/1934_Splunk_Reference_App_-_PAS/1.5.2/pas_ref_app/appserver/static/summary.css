@@ -1,0 +1,57 @@
+/* Filter tags */
+.filter_tags {
+    margin-left: 10px;
+    float: left;
+}
+.filter { background-color: #273542; }
+.exclude { background-color: #E73E2E; }
+
+/* Make contextual menus appear at a sane location and size,
+ * overriding Splunk's Bootstrap. */
+.dropdown-menu {
+    margin-top: -20px;
+    margin-left: 0px;
+    width: 10em;
+}
+
+.splunk-timerange {
+    float: right;
+     /* padding-top: 2px;
+     margin-right: 5px;*/
+     position: relative;
+     left: 25px;
+     top:-37px;"
+ }
+
+ .input-timerangepicker {
+ 	height:0;
+ }
+
+ .dashboard-row {
+    position: relative;
+ 	top:-39px;
+ }
+
+ .html h3 { 
+	font-size: 16px; !important;
+	font-weight: normal; !important;
+    margin: 2px 0;
+ }
+
+
+/* overriding resize-handle */
+div .ui-resizable-handle {
+    display:none !important;
+}
+
+/* shifting Filter input field next to the label to maximize the screen real estate */
+div.bootstrap-tagsinput {
+    position: relative;
+    left:100px; !important;
+    top:-25px;
+    padding: 2px;
+}
+
+div.filter_tags {
+    height:25px !important; 
+}

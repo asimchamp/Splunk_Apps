@@ -1,0 +1,290 @@
+<form>
+  <label>Tanium Application Visibility</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field19">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Application Crashes</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Last-App-Crash" NOT Last_App_Crash="[no*" | stats distinct_count(Computer_Name)</query>
+          <earliest>$field19.earliest$</earliest>
+          <latest>$field19.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">132</option>
+        <option name="rangeColors">["0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Last-App-Crash" | table Computer_Name,Last_App_Crash,Count&amp;earliest=$field19.earliest$&amp;latest=$field19.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>Highest CPU Consumption by Process</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Highest-CPU-Usage-by-Process" | rex "High-CPU-Processes.5.=(?&lt;Process&gt;\S+?)\s" | top limit=20 Process</query>
+          <earliest>$field19.earliest$</earliest>
+          <latest>$field19.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Highest-CPU-Usage-by-Process" | rex "High-CPU-Processes.5.=(?&lt;Process&gt;\S+?)\s" | table Process,Computer_Name,Last_Logged_In_User&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Highest Memory Consumption by Process</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Highest-Memory-Usage-by-Process" | rex "High-Memory-Processes.5.=(?&lt;Process&gt;\S+?)\s" | top limit=20 Process</query>
+          <earliest>$field19.earliest$</earliest>
+          <latest>$field19.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Highest-Memory-Usage-by-Process" | rex "High-Memory-Processes.5.=(?&lt;Process&gt;\S+?)\s" | table  Process,Computer_Name,Last_Logged_In_User&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Most Installed Applications</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Installed-Applications" |top limit=20 Name</query>
+          <earliest>$field19.earliest$</earliest>
+          <latest>$field19.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Installed-Applications" | table Name,Version,Computer_Name,Last_Logged_In_User&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Rare Running Processes</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Running-Processes-with-MD5-Hash" | rare limit=20 Path</query>
+          <earliest>$field19.earliest$</earliest>
+          <latest>$field19.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Running-Processes-with-MD5-Hash" | table Path,Computer_Name,Last_Logged_In_User&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Least Installed Application</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Installed-Applications" |rare limit=20 Name</query>
+          <earliest>$field19.earliest$</earliest>
+          <latest>$field19.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Installed-Applications" | table Name,Version,host,Count&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field9">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field2">
+        <label>Running Application Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Running Applications</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Running-Applications" Name=$field2$ | dedup Name| table Name,Version,Name,Computer_Name |sort Count -count desc</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="time" token="field10">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field3">
+        <label>Running Process Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Running Processes</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Running-Processes-with-MD5-Hash" Path=$field3$ |dedup Path |table Path,Computer_Name</query>
+          <earliest>$field10.earliest$</earliest>
+          <latest>$field10.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field11">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field4">
+        <label>Running Services Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Running Services</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Running-Services" Running_Service=$field4$ | dedup Running_Service | table Running_Service,Computer_Name |sort Count -count desc</query>
+          <earliest>$field11.earliest$</earliest>
+          <latest>$field11.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="time" token="field13">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field6">
+        <label>Installed Application Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Installed Applications</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Installed-Applications" Name=$field6$ | dedup Name |table Name,Version,Count |sort Count -count desc</query>
+          <earliest>$field13.earliest$</earliest>
+          <latest>$field13.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field12">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field5">
+        <label>Stopped Services Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Stopped Services</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Stopped-Services" Stopped_Service=$field5$ | dedup Stopped_Service | table Stopped_Service,Computer_Name |sort Count -count desc</query>
+          <earliest>$field12.earliest$</earliest>
+          <latest>$field12.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="time" token="field14">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field7">
+        <label>Uninstallable Application Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Uninstallable Applications</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Uninstallable-Applications" Name=$field7$ | dedup Name| table Name,Version,Computer_Name |sort Count -count desc</query>
+          <earliest>$field14.earliest$</earliest>
+          <latest>$field14.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

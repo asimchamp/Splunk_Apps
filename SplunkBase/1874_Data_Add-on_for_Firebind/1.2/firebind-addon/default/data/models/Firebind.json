@@ -1,0 +1,1513 @@
+{
+  "modelName": "Firebind",
+  "displayName": "Firebind",
+  "description": "Firebind Recon Product Data Model",
+  "objectSummary": {
+    "Event-Based": 8,
+    "Transaction-Based": 0,
+    "Search-Based": 0
+  },
+  "objects": [
+    {
+      "objectName": "Scan",
+      "displayName": "Scan",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "targetReflectorName",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "name",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpOpenCount",
+          "owner": "Scan",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Open TCP Port Count",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpClosedCount",
+          "owner": "Scan",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Closed TCP Port Count",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "udpClosedCount",
+          "owner": "Scan",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Closed UDP Port Count",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "udpOpenCount",
+          "owner": "Scan",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Open UDP Port Count",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpListCount",
+          "owner": "Scan",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "TCP Port Count",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "udpListCount",
+          "owner": "Scan",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "UDP Port Count",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpClosed",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Closed TCP Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpOpen",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Open TCP Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "udpClosed",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Closed UDP Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "udpOpen",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Open UDP Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpList",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "TCP Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "udpList",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "UDP Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "Scan",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [],
+      "constraints": [
+        {
+          "search": "type=\"ScanRecord\" severity=\"RESULT\" sourcetype=\"firebind\"",
+          "owner": "Scan"
+        }
+      ],
+      "lineage": "Scan"
+    },
+    {
+      "objectName": "TCP_Speed_Test",
+      "displayName": "TCP Speed Test",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "name",
+          "owner": "TCP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "TCP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "targetReflectorName",
+          "owner": "TCP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "TCP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [
+        {
+          "outputFields": [
+            {
+              "fieldName": "downloadSpeed",
+              "owner": "TCP_Speed_Test",
+              "type": "number",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "Download Speed",
+              "comment": "",
+              "fieldSearch": ""
+            }
+          ],
+          "calculationID": "0jqx0skd55l",
+          "owner": "TCP_Speed_Test",
+          "editable": true,
+          "comment": "",
+          "calculationType": "Eval",
+          "expression": "round(downloadRate,3)"
+        },
+        {
+          "outputFields": [
+            {
+              "fieldName": "uploadSpeed",
+              "owner": "TCP_Speed_Test",
+              "type": "number",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "Upload Speed",
+              "comment": "",
+              "fieldSearch": ""
+            }
+          ],
+          "calculationID": "brpgbmoewpm",
+          "owner": "TCP_Speed_Test",
+          "editable": true,
+          "comment": "",
+          "calculationType": "Eval",
+          "expression": "round(uploadRate,3)"
+        }
+      ],
+      "constraints": [
+        {
+          "search": "type=\"TcpSpeedTestRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "TCP_Speed_Test"
+        }
+      ],
+      "lineage": "TCP_Speed_Test"
+    },
+    {
+      "objectName": "UDP_Speed_Test",
+      "displayName": "UDP Speed Test",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "name",
+          "owner": "UDP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "UDP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "targetReflectorName",
+          "owner": "UDP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "UDP_Speed_Test",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "downloadDuration",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Download Duration",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "downloadPacketLoss",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Download Packet Loss",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "downloadPacketsLost",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Download Packets Lost",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "downloadRate",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Download Rate",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "uploadDuration",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Upload Duration",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "uploadPacketLoss",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Upload PacketLoss",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "uploadPacketsLost",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Upload Packets Lost",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "uploadRate",
+          "owner": "UDP_Speed_Test",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Upload Rate",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [],
+      "constraints": [
+        {
+          "search": "type=\"UdpSpeedTestRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "UDP_Speed_Test"
+        }
+      ],
+      "lineage": "UDP_Speed_Test"
+    },
+    {
+      "objectName": "TCP_Latency__Jitter",
+      "displayName": "TCP Latency & Jitter",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "clientAverageRttDelay",
+          "owner": "TCP_Latency__Jitter",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "RTT",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "clientHalfAverageRttDelay",
+          "owner": "TCP_Latency__Jitter",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Latency",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "TCP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "name",
+          "owner": "TCP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "targetReflectorName",
+          "owner": "TCP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "TCP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [
+        {
+          "outputFields": [
+            {
+              "fieldName": "clientJitter",
+              "owner": "TCP_Latency__Jitter",
+              "type": "number",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "Client Jitter",
+              "comment": "",
+              "fieldSearch": ""
+            }
+          ],
+          "calculationID": "18t9d7lnvi7",
+          "owner": "TCP_Latency__Jitter",
+          "editable": true,
+          "comment": "",
+          "calculationType": "Eval",
+          "expression": "round(clientToServerRfc1889Jitter,3)"
+        },
+        {
+          "outputFields": [
+            {
+              "fieldName": "serverJitter",
+              "owner": "TCP_Latency__Jitter",
+              "type": "number",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "Server Jitter",
+              "comment": "",
+              "fieldSearch": ""
+            }
+          ],
+          "calculationID": "591dxsnnkq",
+          "owner": "TCP_Latency__Jitter",
+          "editable": true,
+          "comment": "",
+          "calculationType": "Eval",
+          "expression": "round(serverToClientRfc1889Jitter,3)"
+        }
+      ],
+      "constraints": [
+        {
+          "search": "type=\"TcpMeasuresRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "TCP_Latency__Jitter"
+        }
+      ],
+      "lineage": "TCP_Latency__Jitter"
+    },
+    {
+      "objectName": "UDP_Latency__Jitter",
+      "displayName": "UDP Latency & Jitter",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "clientAverageRttDelay",
+          "owner": "UDP_Latency__Jitter",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "RTT",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "clientHalfAverageRttDelay",
+          "owner": "UDP_Latency__Jitter",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Latency",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "UDP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "name",
+          "owner": "UDP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "targetReflectorName",
+          "owner": "UDP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "UDP_Latency__Jitter",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [
+        {
+          "outputFields": [
+            {
+              "fieldName": "clientJitter",
+              "owner": "UDP_Latency__Jitter",
+              "type": "number",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "Client Jitter",
+              "comment": "",
+              "fieldSearch": ""
+            }
+          ],
+          "calculationID": "1qqtam4tb6",
+          "owner": "UDP_Latency__Jitter",
+          "editable": true,
+          "comment": "",
+          "calculationType": "Eval",
+          "expression": "round(clientToServerRfc1889Jitter,3)"
+        },
+        {
+          "outputFields": [
+            {
+              "fieldName": "serverJitter",
+              "owner": "UDP_Latency__Jitter",
+              "type": "number",
+              "required": false,
+              "multivalue": false,
+              "hidden": false,
+              "editable": true,
+              "displayName": "Server Jitter",
+              "comment": "",
+              "fieldSearch": ""
+            }
+          ],
+          "calculationID": "jueblhi4im",
+          "owner": "UDP_Latency__Jitter",
+          "editable": true,
+          "comment": "",
+          "calculationType": "Eval",
+          "expression": "round(serverToClientRfc1889Jitter,3)"
+        }
+      ],
+      "constraints": [
+        {
+          "search": "type=\"UdpMeasuresRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "UDP_Latency__Jitter"
+        }
+      ],
+      "lineage": "UDP_Latency__Jitter"
+    },
+    {
+      "objectName": "HTTP_Check",
+      "displayName": "HTTP Check",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "duration",
+          "owner": "HTTP_Check",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Duration",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "HTTP_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "name",
+          "owner": "HTTP_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "statusLine",
+          "owner": "HTTP_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Status Line",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "url",
+          "owner": "HTTP_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "HTTP_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [],
+      "constraints": [
+        {
+          "search": "type=\"HttpCheckRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "HTTP_Check"
+        }
+      ],
+      "lineage": "HTTP_Check"
+    },
+    {
+      "objectName": "Port_Check",
+      "displayName": "Port Check",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "Port_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "target",
+          "owner": "Port_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Target",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpClosed",
+          "owner": "Port_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Closed",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpOpen",
+          "owner": "Port_Check",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Open",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "tcpPorts",
+          "owner": "Port_Check",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Ports",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "Port_Check",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [],
+      "constraints": [
+        {
+          "search": "type=\"PortCheckRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "Port_Check"
+        }
+      ],
+      "lineage": "Port_Check"
+    },
+    {
+      "objectName": "Ping",
+      "displayName": "Ping",
+      "parentName": "BaseEvent",
+      "fields": [
+        {
+          "fieldName": "hostName",
+          "owner": "Ping",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "hostName",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "hostAddress",
+          "owner": "Ping",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "hostAddress",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "requestSize",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Request Size",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "packetsTransmitted",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Packets Transmitted",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "packetsReceived",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Packets Received",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "time",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Duration",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "rttMin",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Rount Trip Min Latency",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "rttAvg",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Round Trip Average Latency",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "halfRttAvg",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "One Way Average Latency",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "rttMax",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Round Trip Max Latency",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "rttMdev",
+          "owner": "Ping",
+          "type": "number",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Round Trip Standard Deviation",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "error",
+          "owner": "Ping",
+          "type": "boolean",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Error",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "scanConfigurationCode",
+          "owner": "Ping",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "scanConfigurationCode",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "initiatingReflectorName",
+          "owner": "Ping",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Initiating Reflector",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "name",
+          "owner": "Ping",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "Component",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "_time",
+          "owner": "BaseEvent",
+          "type": "timestamp",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "_time",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "host",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "host",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "source",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "source",
+          "comment": "",
+          "fieldSearch": ""
+        },
+        {
+          "fieldName": "sourcetype",
+          "owner": "BaseEvent",
+          "type": "string",
+          "required": false,
+          "multivalue": false,
+          "hidden": false,
+          "editable": true,
+          "displayName": "sourcetype",
+          "comment": "",
+          "fieldSearch": ""
+        }
+      ],
+      "calculations": [],
+      "constraints": [
+        {
+          "search": "type=\"PingRecord\" severity=\"RESULT\" complete=\"true\" sourcetype=\"firebind\"",
+          "owner": "Ping"
+        }
+      ],
+      "lineage": "Ping"
+    }
+  ],
+  "objectNameList": [
+    "Scan",
+    "TCP_Speed_Test",
+    "UDP_Speed_Test",
+    "TCP_Latency__Jitter",
+    "UDP_Latency__Jitter",
+    "HTTP_Check",
+    "Port_Check",
+    "Ping"
+  ]
+}

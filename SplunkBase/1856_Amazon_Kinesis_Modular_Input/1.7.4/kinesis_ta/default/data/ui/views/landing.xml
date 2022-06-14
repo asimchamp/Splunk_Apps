@@ -1,0 +1,39 @@
+<dashboard version="1.1" hideEdit="true">
+    <label>Amazon Kinesis Modular Input v1.7.4</label>
+    
+    <row>
+        <panel>
+            <html>
+
+            <h1>Overview</h1>
+            <p>       
+            This is a Splunk Modular Input Add-On for indexing records from Amazon Kinesis.<br/>
+            The Python code in this App is dual 2.7/3 compatible.<br/>
+            This version of the App enforces Python 3 for execution of the modular input script when running on Splunk 8+ in order to satisfy Splunkbase AppInspect requirements.<br/>
+            If running this App on Splunk versions prior to 8 , then Python 2.7 will get executed.<br/>
+            </p>
+
+            <hr/>
+            <h1>Quickstart</h1>
+       
+           <p>Browse to the <a href="../../../en-US/app/kinesis_ta/activation_key" target="_blank">Activation Key</a> menu tab and enter your activation key.</p>
+            <p>Browse to the <a href="../../../en-US/app/kinesis_ta/setup_page" target="_blank">Setup Credentials</a> menu tab and enter any AWS Secret Credentials you require.</p>
+            <p>Encrypted credentials are saved to <code>$SPLUNK_HOME/etc/apps/kinesis_ta/local/passwords.conf</code></p>
+            <p>Browse to the <a href="../../../en-US/manager/kinesis_ta/data/inputs/kinesis" target="_blank">Data Inputs</a> tab and setup your Kinesis Inputs.</p>
+            
+            <hr/>
+            <h1>Developer</h1>
+
+            <p>
+       
+            This App is built and supported by the team at <a href="https://www.baboonbones.com" target="_blank">BaboonBones</a>
+
+            </p>
+
+                                    
+            </html>
+        </panel>
+    </row>
+
+    
+</dashboard>

@@ -1,0 +1,164 @@
+<dashboard>
+  <label>Tanium Health</label>
+  <description>Dashboard for basic Tanium Health Indicators</description>
+  <row>
+    <panel>
+      <single>
+        <title>Disk Space Issues</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Tanium-Server-Health" NOT Low_Disk_Space="[no-results]" | dedup Computer_Name | stats count(Low_Disk_Space)</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <refresh>1h</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index`  Question="Splunk-Tanium-Server-Health" NOT Low_Disk_Space="[no-results]"&amp;earliest=-24h@h&amp;latest=now</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>Database Size</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Tanium-Database-Size*" | rex field=SQL_Database_Sizes "(?&lt;Database_Name&gt;\w*)-(?&lt;Database_Size&gt;\d*)(?&lt;Database_Unit&gt;\wB)"| search Database_Name = "tanium*" | timechart span=1d max(Database_Size) by Database_Name</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Tanium Client Versions</title>
+        <search>
+          <query>`tanium_index` (Question="Splunk-Tanium-Database-Size" OR Question="Splunk-Tanium-Client-Status" OR Question="Splunk-Server-Health") | dedup Computer_Name | stats count(Tanium_Client_Version) by Tanium_Client_Version</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Client Version History</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Tanium-Client-Status" | timechart span=1d count by Tanium_Client_Version</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Tanium Client Status</title>
+        <search>
+          <query>`tanium_index` (Question="Splunk-Tanium-Database-Size" OR Question="Splunk-Tanium-Client-Status" OR Question="Splunk-Server-Health") | dedup Computer_Name | stats count(Tanium_Client_Core_Health) by Tanium_Client_Core_Health</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Memory Utilisation Trend</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Tanium-Server-Health" | dedup Computer_Name | rex field=CPU_Consumption "(?&lt;CPU_Percent&gt;\d*)"| rex field=Memory_Consumption "(?&lt;Memory_Percent&gt;\d*)"
+| timechart span=1d eval(max(Memory_Percent)) by Computer_Name</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>CPU Utilisation Trend</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Tanium-Server-Health" | dedup Computer_Name | rex field=CPU_Consumption "(?&lt;CPU_Percent&gt;\d*)"| rex field=Memory_Consumption "(?&lt;Memory_Percent&gt;\d*)"
+| timechart span=1d eval(max(CPU_Percent)) by Computer_Name</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Today's CPU and Memory Utilisation</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Tanium-Server-Health" | dedup Computer_Name | rex field=CPU_Consumption "(?&lt;CPU_Percent&gt;\d*)"| rex field=Memory_Consumption "(?&lt;Memory_Percent&gt;\d*)"| table Computer_Name, CPU_Percent,Memory_Percent</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <search>
+          <query>`tanium_index` (Question="Splunk-Tanium-Database-Size" OR Question="Splunk-Tanium-Client-Status" OR Question="Splunk-Tanium-Server-Health")</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="list.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </event>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,75 @@
+// import app and core less , but only as reference. We can use any needed
+// styles/vars/mixins without polluting the output css
+@import (reference) "../common";
+
+// import filters less as shared filters view is used
+@import "../shared/filters";
+
+//Main Layout Styling
+#layout{
+    .BodyLeft{
+      //Graph
+      #AnalyticsTechnicalGraph{
+        margin: 15px 15px;
+        width: 98%;
+        height: 250px;
+        #main-chart{
+          height: 250px;
+        }
+      }
+      //Table
+        #bottom-table{
+          //No drilldown
+          table{
+            td{
+              &:first-child{
+                color:black;
+              }
+            }
+            //Bar chart inside table
+            td.nbar {
+              vertical-align: middle;
+              width: 100%;
+              height: 20px;
+              border: 0;
+              background-color: @border-color2;
+              float:left;
+              padding: 0!important;
+              margin: 0;
+              a{
+                cursor: default;
+                span{
+                  color: @darkgray;
+                  background-color: @blue;
+                  height: 20px;
+                  min-width: 2px;
+                  max-width: 100%;
+                  display: block;
+                }
+              }
+              span.usage {
+                position: relative;
+                top: -18px;
+                width: 100%;
+                display: block;
+                text-align: center;
+                z-index: 999;
+              }
+            }
+            td.icon {
+              padding-right: 8px;
+            }
+          }
+        }
+    }
+    .FiltersRight{
+      min-height: 1075px;
+    }
+    #populate-table{
+      z-index: 99999;
+    }
+}
+
+
+
+

@@ -1,0 +1,169 @@
+<form version="1.1" stylesheet="application.css" script="perf_drive_drilldown.js,timerange.js">
+  <label>Performance - Volume Group/Pool by Drive</label>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="time" searchWhenChanged="true" id="timerange">
+      <label>Time</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="arrayId">
+      <label>Array</label>
+      <search>
+        <query>| inputlookup nesa_volume_groups | stats count by arrayId, arrayName</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>host="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="volumeGroup">
+      <label>Volume Groups/Pools</label>
+      <search id="search_volumeGroup_id">
+        <query>| inputlookup nesa_volume_groups | rename arrayId as host | search $arrayId$ | dedup volumeGroup | fields host volumeGroup</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>volumeGroup</fieldForLabel>
+      <fieldForValue>volumeGroup</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>volumeGroup="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+  </fieldset>
+  <search id="baseSearch">
+    <query>
+      `get_nesa_index` sourcetype=eseries:drive-stats $arrayId$ | search $volumeGroup$ | lookup nesa_drives arrayId as host volumeGroupRef as volumeGroupRef diskId as diskId output arrayName | eval label = 'arrayName'." / ".'volumeGroup'." / ".'driveLabel' | fields _time label readIOps writeIOps readResponseTime writeResponseTime readThroughput writeThroughput
+    </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| stats count | eval class="None" | eval label="Performance - Volume Group/Pool by Volume"</query>
+        </search>
+        <option name="field">label</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <link>
+            <![CDATA[/app/netapp_app_eseries_perf/perf_volumes?form.arrayId=$form.arrayId$]]>
+          </link>
+        </drilldown>
+      </single>
+      <single id="single_id">
+        <search>
+          <query>| stats count | eval class="None" | eval label="Configuration - Volume"</query>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="field">label</option>
+        <option name="refresh.time.visible">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Read IOPS by Drive</title>
+        <search base = "baseSearch">
+          <query>timechart useother=f limit=50 span=5m mean(readIOps) AS reads by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">IOps</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Write IOPS by Drive</title>
+        <search base = "baseSearch">
+          <query>timechart useother=f limit=50 span=5m mean(writeIOps) AS writes by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">IOps</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Read Latency by Drive</title>
+        <search base = "baseSearch">
+          <query>timechart useother=f limit=50 span=5m mean(readResponseTime) AS read_latency by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Write Latency by Drive</title>
+        <search base = "baseSearch">
+          <query>timechart useother=f limit=50 span=5m mean(writeResponseTime) AS write_latency by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Read Throughput by Drive</title>
+        <search base = "baseSearch">
+          <query>timechart useother=f limit=50 mean(readThroughput) AS read_thru by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">MBytes</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Write Throughput by Drive</title>
+        <search base = "baseSearch">
+          <query>timechart useother=f limit=50 mean(writeThroughput) AS write_thru by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">MBytes</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

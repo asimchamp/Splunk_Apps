@@ -1,0 +1,84 @@
+<form>
+  <label>DHCP Insight</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-30m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>DHCP Type Distribution</title>
+      <searchString>sourcetype=dhcp|timechart count by dhcp_message</searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  
+  <row>
+    <table>
+      <title>Top MAC Addresses</title>
+      <searchString>sourcetype=dhcp|top client_mac_addr limit=100</searchString>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top Hostname</title>
+      <searchString>sourcetype=dhcp|top hostname limit=100</searchString>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top IP Client</title>
+      <searchString>sourcetype=dhcp|top ip_client limit=100</searchString>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top Offers</title>
+      <searchString>sourcetype=dhcp|stats count by domain_name,domain_name_server,router,server_id,subnet_mask,dhcp_message</searchString>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+
+
+
+
+</form>

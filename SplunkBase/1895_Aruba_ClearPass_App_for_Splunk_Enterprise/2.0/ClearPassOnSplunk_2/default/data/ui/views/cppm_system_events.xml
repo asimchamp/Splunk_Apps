@@ -1,0 +1,67 @@
+<form>
+  <label>System Events</label>
+
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>@d</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="server">
+      <label>ClearPass Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <populatingSearch fieldForValue="cphost" fieldForLabel="cphost">
+        <![CDATA[eventtype=cppm | stats count by cphost]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+  
+    <row> 
+    <table>
+      <title>Failed Events</title>
+      <searchString>
+ 	eventtype=cppm-system-events  cphost=$server$ | where level="ERROR" | stats count by category, description | head 10
+      </searchString>
+    </table>
+    <table>
+      <title>Latest Events</title>
+      <searchString>
+	eventtype=cppm-system-events  cphost=$server$ level="*" | stats count by level, category, description | head 10
+      </searchString>
+    </table>
+  
+    </row>
+
+    <row> 
+    <table>
+      <title>ClearPass Logins</title>
+      <searchString>
+ 	eventtype=cppm-system-events  cphost=$server$ | where category="Logged in" | head 5 |table timestamp, cphost, description, action_key
+      </searchString>
+    </table>
+    <table>
+      <title>AV Updates</title>
+      <searchString>
+ 	eventtype=cppm-system-events  cphost=$server$ | where category="AV/AS Updates" | head 5 |table timestamp, cphost, description, action_key
+      </searchString>
+    </table>
+    </row>
+  
+    <row> 
+    <table>
+      <title>UserAgents Updates</title>
+      <searchString>
+ 	eventtype=cppm-system-events  cphost=$server$ | where category="UserAgents Updates" | head 5 |table cphost, description, action_key
+      </searchString>
+    </table>
+    <table>
+      <title>Hotfixes Updates</title>
+      <searchString>
+ 	eventtype=cppm-system-events  cphost=$server$ | where category="Hotfixes Updates" | head 10 |table cphost, description, action_key
+      </searchString>
+    </table>
+    </row>
+
+</form>

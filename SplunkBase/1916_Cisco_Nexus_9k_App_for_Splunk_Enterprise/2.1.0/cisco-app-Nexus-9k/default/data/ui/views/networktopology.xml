@@ -1,0 +1,28 @@
+<dashboard script="autodiscover.js">
+  <label>Network Topology</label>
+  <search id="search1">
+    <query>`nexus_index` sourcetype=cisco:nexus:json component=nxneighbor | lookup nexus_hostname_lookup device AS device OUTPUT hostname AS hostname  | lookup nexus_hostname_lookup device AS v4mgmtaddr OUTPUT hostname AS hostnamedest | stats values(component) as component values(v4mgmtaddr) as v4mgmtaddr  values(port_id) as port_id by device, hostname, hostnamedest, intf_id |   stats values(component) as component, values(device) as device,values(port_id) as "Local Interface" by v4mgmtaddr, intf_id, hostname, hostnamedest | rename intf_id as "Remote Interface" | rename device as "Local Device" | rename v4mgmtaddr as "Remote Device" | stats count by "Local Device","Remote Device","Local Interface","Remote Interface",component, hostname, hostnamedest</query>
+    <earliest>0</earliest>
+    <latest></latest>
+  </search>
+  <row>
+    <panel>
+      <title>Dashboard Overview</title>
+      <html>
+        <p>This dashboard contains topology of entire network consists of nexus switches. Each node represents a nexus switch and a link represents a connection between source switch and destination switch. CDP nieghboring information is represented in a graphical way. </p>
+        <p>Mouse hover/click on a link will give information about Source IP address, Source Interface, Destination IP address, Destination Interface. Mouse hover/click on a node will give information about Switch IP address. </p>
+        <p>Graph can be dragged and adjusted for better viewing.</p>
+        <div id="force-directed" class="splunk-view" data-require="app/cisco-app-Nexus-9k/components/networktopology/networktopology" data-options="{         &quot;managerid&quot;: &quot;search1&quot;         }">
+        </div>
+        <style type="text/css">
+        #force-directed{
+        height: 500px;
+        }
+        .splunk-textinput input{
+         width: 100px;
+        }
+        </style>
+      </html>
+    </panel>
+  </row>
+</dashboard>

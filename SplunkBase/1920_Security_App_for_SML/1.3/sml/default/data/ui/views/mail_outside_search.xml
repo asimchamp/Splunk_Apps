@@ -1,0 +1,70 @@
+<form script="mail_outside_search.js">
+  <fieldset submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+      <label>検索期間</label>
+    </input>
+    <input type="text" token="input_pc" searchWhenChanged="true">
+      <label>PC名(前方一致:pc*)</label>
+      <default>*</default>
+      <prefix>pc_name=</prefix>
+    </input>
+    <input type="text" token="input_account" searchWhenChanged="true">
+      <label>アカウント(前方一致:user*)</label>
+      <default>*</default>
+      <prefix>user_account=</prefix>
+    </input>
+    <input type="text" token="input_from_mail" searchWhenChanged="true">
+      <label>送信者メール(前方一致:mail*)</label>
+      <default>*</default>
+      <prefix>from_mail=</prefix>
+    </input>
+    <input type="text" token="input_to_mail" searchWhenChanged="true">
+      <label>受信者メール(部分一致:*mail*)</label>
+      <default>*</default>
+      <prefix>to_mail=</prefix>
+    </input>
+    <input id="input_subject" token="token_subject" type="text" searchWhenChanged="true">
+      <label>件名</label>
+      <default>*</default>
+    </input>
+    <input id="input_mail_attach" token="token_mail_attach" type="text" searchWhenChanged="true">
+      <label>添付ファイル</label>
+      <default>*</default>
+    </input>
+    <input type="checkbox" token="input_attach_state" searchWhenChanged="true">
+      <label>添付状態</label>
+      <default>attach_exist</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <delimiter> OR </delimiter>
+      <valuePrefix>attach_state=</valuePrefix>
+      <choice value="attach_exist">添付あり</choice>
+      <choice value="attach_absent">添付なし</choice>
+    </input>
+  </fieldset>
+  <label>メール社外送信検索</label>
+  <row>
+    <panel>
+      <table>
+        <title>社外送信メールの添付ファイル一覧</title>
+        <searchString>index=smllog sourcetype = smllog_400 inout_category=outside $input_pc$ $input_account$ $input_from_mail$ $input_to_mail$ $token_subject$ $token_mail_attach$
+            | eval attach_state=if(isnotnull(mail_attach), "attach_exist", "attach_absent")            
+            | search $input_attach_state$
+            | eval mail_attach=split(mail_attach, "/") | eval to_mail=split(to_mail, "/")
+            | table log_date, log_time, pc_name, user_account, from_mail, to_mail, subject, mail_attach
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+</form>

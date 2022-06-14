@@ -1,0 +1,123 @@
+<dashboard>
+  <label>Advanced Field Extractor</label>
+  <description></description>
+  
+  <row>
+    <panel>
+      <html>
+        <h2>Advanced Field Extractor</h2>
+
+        <p>In Splunk 6.2, we’ve made it easier to extract fields from your data with the Advanced Field Extractor (AFX). A replacement of the existing field extraction utility, AFX enables you to easily capture multiple fields in a single extraction and specify required text to filter events for extraction (improving accuracy and efficiency). AFX also provides a number of methods for detecting false positives in order to help you validate your field extractions and improve the accuracy of your fields.</p>
+
+        <br/>
+
+        <h3>Search filter</h3>
+
+        <p>With the search filter, you can enter a keyword to filter events by, so that you can better drill down to the exact event containing your desired value to extract into a field. This can also help you validate extractions – once you’ve selected a sample value to extract, you can type in other values that should be extracted to this field in the search filter to make sure they are also being extracted (extractions are highlighted in the event listing).</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_SearchFilter.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Sample Events &amp; Highlight-to-Extract</h3>
+
+        <p>In the legacy field extractor, Splunk Enterprise asks you to type in sample values for fields to extract. In the (new) Advanced Field Extractor, you’re now asked to select a sample event from the event listing to extract values from, and in the next step, highlight values in the chosen sample event to create field extractions.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_SampleEvents.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <p>You can select additional sample events in the “Select Sample” and “Select Fields” steps of the workflow, and highlight field values (in the “Select Fields” step) from the additional sample events to improve the accuracy of the extraction that is generated. </p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_SampleEventsHighlight.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Extract multiple fields at once</h3>
+
+        <p>Rather than extract one field at a time, try highlighting multiple values in your selected sample event – you’ll see color-coded highlighting apply to the listed events. To remove or rename a field, simply click its value in the sample event.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_ExtractFields.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Specify Required Text</h3>
+
+        <p>Sometimes a source type may contain different kinds of events, and in order to extract fields from the various patterns you may want to go through the extraction process more than once, for each of the patterns. Or maybe you want to make sure that a value is only extracted to a field from specific events. To improve both accuracy and efficiency, you can now specify required text: values in the event will be extracted as fields only when the event contains the required text. At this time, only one value can be defined as required text, and you cannot require and extract the same value. <b>To require text, highlight as if to extract, but choose “require”.</b></p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_Specify.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Validating and fixing field extractions</h3>
+
+        <p>After defining field extractions in the “Select fields” step, you should verify their efficacy before saving them. In the “Validate” step, the Advanced Field Extractor offers a variety of methods for identifying values that shouldn’t have been extracted (false positives) and lets you provide feedback for the purpose of improving accuracy.</p>
+
+        <p><b>Counterexample feedback:</b> In the “Validate” step, highlighted extractions in the event listing will be displayed with an “x” next to them. If the highlighted value is not what you want to be extracted, click its “x” to provide feedback to the advanced field extractor that this is an inappropriate extraction. Chosen counterexamples will be listed above the event listing with the inappropriate values marked in strike-through. If possible, Splunk will update the regular expression that defines the field extraction to improve its accuracy based on your feedback. If the chosen counterexample didn’t help (or made things worse), you may remove it by clicking on the “x” to the left of the counterexample event.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_Counterexample.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/>
+
+        <p><b>Event listing options:</b> Select “diverse values” or “outliers” in the clustering drop-down and Splunk will display events in the list that may be difficult to find amidst a sea of typical results (often the strange events are the rarest and hardest to find).</p>
+
+        <p><b>Matching options:</b> Select “Matches” or “Non-Matches” to have Splunk display events for which the field extractions you defined were successful or unsuccessful.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_EventListing.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Field Stats</h3>
+
+        <p>To better inspect the extracted values for a field, click on its field tab. You will see a chart showing its values (similar to “ | top &lt;field&gt;” or “ | stats count by &lt;field&gt;”). If you see an incorrect value, you can click it to add it as a filter. When you click a field value in a field stats tab, the filter box will fill with a “field=value” search and the events you see listed will be limited to those that match the filter.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_FieldStats.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Existing Fields</h3>
+
+        <p>To see what fields have been previously defined for the chosen sourcetype, click the “Existing Fields” button at the top right. You’ll see a list of each field that’s defined, and a link to open it in manual mode (of the Advanced Field Extractor).</p>
+
+        <p><b>Note:</b> Only fields defined through the field extractor, or as EXTRACT- groups in props.conf, will be listed in this section.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_ExistingFields.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/><br/>
+
+        <h3>Manual Mode</h3>
+
+        <p>If you speak Regular Expression, you may define one manually rather than highlighting values to extract. Currently only accessable in the “Select sample” step (this will change), manual mode will bypass the wizard workflow and you will not be able to provide counterexample feedback to improve your RegEx. You will however, get to take advantage of the event listing features like filtering on keywords and match/non-match, event listing options, field stats, and highlighting of extracted values.</p>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_ManualMode1.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/>
+
+        <img src="/static/app/splunk_6_2_overview/images/AFX_ManualMode2.png" style="margin-left:auto; margin-right:auto;"/>
+
+        <br/><br/>
+
+      </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,244 @@
+<form>
+  <label>Operations</label>
+  <description>Operations Analysis</description>
+  <fieldset submitButton="false">
+    <input type="time" token="field9">
+      <label></label>
+      <default>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Highest CPU Consumption by Process</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Highest-CPU-Usage-by-Process" | rex "High-CPU-Processes.5.=(?&lt;Process&gt;\S+?)\s" | top limit=20 Process</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="height">215</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Highest Memory Consumption by Process</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Highest-Memory-Usage-by-Process" | rex "High-Memory-Processes.5.=(?&lt;Process&gt;\S+?)\s" | top limit=10 Process</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="height">217</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>CPU Usage &gt;75%</title>
+        <search>
+          <query>`tanium_index` sourcetype=tanium Question="Splunk-High-CPU-Utilization*"
+| where len(CPU_Consumption) &lt;= 5
+| rex field=CPU_Consumption "(?&lt;CPU_Percent&gt;\d+)"
+| where CPU_Percent &gt;= 75 
+| stats distinct_count(Computer_Name) AS dc_high_cpu_count</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">90</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1,2]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-High-CPU-Utilization" CPU_Consumption="*" | eval length=len(CPU_Consumption)| search length &lt; 6 | rex field=CPU_Consumption (?&lt;CPU_Percent&gt;.*)- | where CPU_Percent &gt;= 75 | table _time,Computer_Name,Last_Logged_In_User,CPU_Consumption&amp;earliest=$field9.earliest$&amp;latest=$field9.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Low Disk Space</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Low-Disk-Space" | stats dc(Computer_Name)</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">90</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1,3]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <set token="src_type_tok5">$click.value$</set>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Uptime &gt; 30 Days</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-High-Uptime-Over-30-Days" | dedup Computer_Name | 
+            table Computer_Name Operating_System High_Uptime | stats distinct_count(Computer_Name)</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">91</option>
+        <option name="rangeColors">["0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-High-Uptime-Over-30-Days" | dedup Computer_Name | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table Computer_Name,High_Uptime,Last_Logged_In_User,Operating_System,Chassis_Type,Computer_Serial_Number | sort - High_Uptime&amp;earliest=$field9.earliest$&amp;latest=$field9.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Memory &gt; 75%</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-High-Memory-Utilization" 
+| dedup Computer_Name 
+| rex field=Memory_Consumption "(?&lt;Memory_Percent&gt;\d+)"
+| where Memory_Percent &gt;= 75 
+| stats distinct_count(Computer_Name) AS dc_high_mem_count</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">90</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-High-Memory-Utilization" | dedup Computer_Name  | rex field=Memory_Consumption (?&lt;Memory_Percent&gt;.*)- | where Memory_Percent &gt;= 75&amp;earliest=$field9.earliest$&amp;latest=$field9.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>System Packet Loss</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Packet-Loss" Packet_Loss="*" NOT Packet_Loss="N*" | stats distinct_count(Computer_Name)</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">90</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,20,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Running Process Computer and User Mapping</title>
+      <input type="time" token="field5">
+        <label></label>
+        <default>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field6">
+        <label>Computer Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field7">
+        <label>Last Logged In User</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field8">
+        <label>Path</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <search>
+          <query>`tanium_index` Question="Splunk-Running-Processes-with-MD5-Hash" Computer_Name="*$field6$*" Last_Logged_In_User="*$field7$*" 
+            Path="*$field8$*" | dedup _time,Computer_Name 
+            | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] |
+            table _time,Computer_Name,Last_Logged_In_User,Path,Operating_System,Chassis_Type</query>
+          <earliest>$field5.earliest$</earliest>
+          <latest>$field5.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field9">
+        <label>Time Range</label>
+        <default>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field10">
+        <label>Computer Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field11">
+        <label>IP address</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field12">
+        <label>Last Logged in User</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Tanium Endpoint and User Search</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Machine-User" Computer_Name=$field10$ IP_Address=$field11$ Last_Logged_In_User=$field12$ | 
+            eval date_time = strftime(_time,"%m/%d/%y %H:%M:%S") | 
+            table date_time,Computer_Name,IP_Address,Last_Logged_In_User</query>
+          <earliest>$field9.earliest$</earliest>
+          <latest>$field9.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

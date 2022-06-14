@@ -1,0 +1,88 @@
+// import app and core less , but only as reference. We can use any needed
+// styles/vars/mixins without polluting the output css
+@import (reference) "../common";
+
+// quick fix for the grunt
+.select2-search-choice .select2-search-choice-close {
+	background: url('/static/app/splunk_app_mint/images/select2.png') right top no-repeat !important;
+}
+//Filters
+.FiltersRight{
+    min-height: 925px;
+    min-width:185px;
+    background-color: @filtersbg;
+    vertical-align: top;
+    height: 100%;
+    .fieldset{
+      margin: 0 18px;
+      .dropdown-container{
+        #error-handled-control{
+            margin-bottom: 10px;
+        } 
+      }
+      .splunk-choice-input{
+        padding-bottom: 15px;
+      }
+    }
+    h3{ 
+        color: @darkblue;
+        float: left;
+    	margin-bottom: 5px;
+    }
+    //TimeRange Filter customization
+    #timerange-picker {
+        a.btn{
+          padding: 4px 5px;
+        }
+        .time-label {
+          max-width: 89%;
+        }
+    }
+    #toggle-filters{
+        float: right;
+        display: inline-block;
+        color: @darkblue;
+        font-size: 16px;
+        margin: 15px;
+        i{
+            letter-spacing: -3px;
+        }
+    }
+    //input width
+    .select2-container{
+        width: 100% !important;
+        min-width: 98% !important;
+    }
+}
+//Filters closed
+.FiltersRight.filters-small{
+    width:3% !important;
+    min-width: 0px;
+    h3 {
+        float: none;
+        white-space: nowrap;
+        padding: 0 0 0 10px;
+        .rotate();
+        span {
+            color: @blue;
+            padding: 0 5px;
+        }
+    }
+    #toggle-filters{
+        text-align: center;
+        width: 100%;
+        margin: 15px 0px 25px;
+        float: none;
+        .rotate(180deg);
+    }
+}
+//Big main body when you close the filters
+.BodyLeft.filters-hidden{
+  width: 97% !important;
+}
+
+
+
+
+
+

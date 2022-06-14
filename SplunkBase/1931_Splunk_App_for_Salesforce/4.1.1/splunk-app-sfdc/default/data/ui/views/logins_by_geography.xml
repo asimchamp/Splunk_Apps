@@ -1,0 +1,77 @@
+<form version="1.1">
+  <label>Logins by Geography</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label/>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="radio" token="Status">
+      <label>Login Status</label>
+      <choice value="Status=*">All</choice>
+      <choice value="Status!=&quot;Success&quot;">Fail</choice>
+      <choice value="Status=&quot;Success&quot;">Success</choice>
+      <default>Status=*</default>
+    </input>
+    <input type="multiselect" token="USER_ID" searchWhenChanged="true">
+      <label>Username</label>
+      <choice value="">All</choice>
+      <default></default>
+        
+    
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>USER_ID</fieldForValue>
+      <search>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+        <query>
+    eventtype=sfdc-event-log EVENT_TYPE=ApexExecution | stats count by Name USER_ID | sort -count | eval label=Name." (".count.")" | eval USER_ID="USER_ID=".USER_ID
+      </query></search>
+     
+     
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <map>
+        <search><query> eventtype=sfdc-login-history $Status$ $USER_ID$| iplocation SourceIp |  geostats latfield=lat longfield=lon count by Status
+      </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+          </search>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Login by Geography - Sorted by Highest Failure Rate</title>
+        <search>
+          <query>
+          
+          eventtype=sfdc-login-history Status=* $USER_ID$ | iplocation SourceIp   | eval Country=if(Country=="", "Unknown", Country)  | eval success=if(Status=="Success", "1", "0")   | eval fail=if(Status!="Success", "1", "0") |  stats count As "login_count" SUM(fail) As "failed_login_count" by Country | eval failure_rate=failed_login_count*100/login_count | sort -failure_rate - failed_login_count
+          </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

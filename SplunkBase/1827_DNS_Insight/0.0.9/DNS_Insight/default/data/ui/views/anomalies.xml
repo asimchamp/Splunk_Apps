@@ -1,0 +1,88 @@
+<form version="1.1">
+  <label>Anomalies</label>
+  <search id="base_search_anomalies">
+    <query>sourcetype=tshark:port53 OR sourcetype=port53tttt src=$src$ dest=$dest$ source=$source$ | fields transaction_id src dest reply_code query dns_len message_type</query>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+
+    <input type="dropdown" token="source" searchWhenChanged="true" id="source_input">
+      <label>source</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <default>*</default>
+      <search>
+        <query>| tstats count where sourcetype IN (tshark:port53, port53tttt) by source |fields source</query>
+      </search>
+    </input>
+
+
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="src" searchWhenChanged="true">
+     <label>Client IP</label>
+     <default>*</default>
+    </input>
+    <input type="text" token="dest" searchWhenChanged="true">
+     <label>DNS Server IP</label>
+     <default>*</default>
+    </input>
+
+  </fieldset>  
+  <row>
+    <table>
+      <title>Top DNS Errors</title>
+      <search base="base_search_anomalies"><query> transaction transaction_id src dest maxspan=4s  |search reply_code!="NoError" | stats count, values(reply_code) AS "Reply Code", avg(duration) AS Duration, dc(src) by query | eval Duration=round(Duration,2) | sort -count</query></search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+  <row>
+    <chart>
+      <title>DNS Packet Length</title>
+      <search base="base_search_anomalies"><query> timechart median(dns_len) AS "Median Len",max(dns_len) AS "Max Len" | eval MaxUDP=512 | rename MaxUDP AS "common max UDP limit (512B)"</query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  
+  <row>
+    <chart>
+      <title>Number of Labels in the query</title>
+      <search base="base_search_anomalies"><query>search message_type=QUERY | rex field=query mode=sed "s/[^\.]//g"|eval dns_labels=len(query)+1|timechart count by dns_labels </query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  
+</form>

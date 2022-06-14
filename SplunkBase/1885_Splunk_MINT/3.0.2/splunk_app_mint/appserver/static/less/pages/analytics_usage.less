@@ -1,0 +1,24 @@
+// import app and core less , but only as reference. We can use any needed
+// styles/vars/mixins without polluting the output css
+@import (reference) "../common";
+
+// import filters less as shared filters view is used
+@import "../shared/filters";
+
+//Main Layout Styling
+#layout{
+	.BodyLeft{
+		#AnalyticsOverviewGraph{
+			margin: 15px 15px;
+	        width: 98%;
+	    	height: 300px;
+	        #main-chart{
+	            height: 300px;
+	        } 
+		}
+	}
+    #populate-table{
+      z-index: 99999;
+    }
+}
+

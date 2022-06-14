@@ -1,0 +1,141 @@
+<form script="inpage_drilldown_form.js" stylesheet="custom.css" version="1.1">
+  <label>CM - Analysis</label>
+  <description>Analysis Dashboard for FireEye CM Events</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Search</label>
+      <default>*</default>
+      <suffix/>
+    </input>
+    <!-- Used for dropdown - Input field hidden using javascript. <div id = #field3 -->
+    <input type="text" token="ID" searchWhenChanged="true"/>
+  </fieldset>
+
+  <row>
+    <html><p><font color="#BD362F"><h1>NX Data</h1></font></p></html>
+  </row>
+
+  <row>
+    <table id="master">
+      <title>Alerts</title>
+      <search><query>eventtype=fe product="CMS" $wild$ | eval UrlHash=case (category=="malware-object",file_hash, category=="web-infection", objURL, category=="malware-callback" OR category=="domain-match",infURL)| sort -occurred | table source, sourcetype, category, id, signature, severity, occurred, transport, src_ip, src_port, dest_ip, dest_port, UrlHash | rename category AS Type, id AS ID, signature AS Malware, severity AS Severity, occurred AS Occurred, transport AS Protocol, src_ip AS "Source IP", src_port AS "Source Port", dest_ip AS "Target IP", dest_port AS "Target Port", UrlHash AS "URL/Md5sum", locations as "Location"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+
+    <row>
+    <table id="detail">
+      <title>Alert Detail: $ID$</title>
+      <search><query>eventtype=fe product="CMS" id=$ID$ $wild$ | table _raw, ext_ref | rename _raw AS "Raw Event", ext_ref AS "Event Link"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">none</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  
+  <row>
+    <table>
+      <title>Callbacks</title>
+      <search><query>eventtype=fe product="CMS" category="domain-match" $wild$ | stats count(infURL) as "Events", distinct_count(src_ip) as "Hosts", max(occurred) as "Last Seen" by infURL | table infURL, locations, Events, Hosts, "Last Seen" | rename infURL as "C&amp;C Server", locations as "Locations" | sort –"Last Seen"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+
+ <row>
+    <html><p><font color="#BD362F"><h1>EX Data</h1></font></p></html>
+ </row>
+
+  <row>
+    <table>
+      <title>Alerts</title>
+      <search><query>eventtype=fe product="CMS" $wild$ | eval file_hash = coalesce(file_hash,malware_url) | sort -occurred | table source, sourcetype, id, signature, severity, occurred, suser, duser, file_hash | rename id AS ID, signature AS Malware, severity AS Severity, occurred AS Occurred, duser AS Recipient, suser AS Sender, file_hash AS "URL/Md5sum", locations as "Location"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+
+  <row>
+    <table>
+      <title>Recipient</title>
+      <search><query>eventtype=fe product="CMS" $wild$ | stats count(duser), count(file_hash), count(request), max(signature), max(occurred) by duser | rename duser AS Recipient, count(duser) as "Total Malicious Email", count(file_hash) AS "Attachment", count(request) AS URL, max(signature) AS "Last Malware", max(occurred) AS "Last Seen at (UTC)"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+
+  <row>
+    <table>
+      <title>Sender</title>
+      <search><query>eventtype=fe product="CMS" $wild$ | stats dc(duser), count(duser), count(file_hash), count(request), max(signature), max(occurred) by suser | rename suser AS Sender, dc(duser) AS "Unique Recipient", count(duser) as "Total Malicious Email", count(file_hash) AS "Attachment", count(request) AS URL, max(signature) AS "Last Malware", max(occurred) AS "Last Seen at (UTC)"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+
+
+
+
+
+</form>

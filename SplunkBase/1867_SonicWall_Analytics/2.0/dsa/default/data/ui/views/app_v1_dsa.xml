@@ -1,0 +1,113 @@
+<form script="multi_select_fw_name.js, multi_value_token_fw_name.js">
+  <label>Applications v1</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <label>Applications</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default></default>
+    </input>
+  </fieldset>
+  <label>Applications</label>
+  <!-- Leverage row grouping to put the input in the panel -->
+  <row grouping="2,1">
+    <html>
+      <label>Filter by Firewall Name:</label>
+      <div id="multi_value_input"/>
+    </html>
+    <table>
+      <title>Search of Firewalls</title>
+      <searchString>index=sonicwall template_type=dynamic | eval firewall_hostname=coalesce(firewall_hostname, host)  | stats count by firewall_hostname, host   | rename firewall_hostname as "Firewall", count as "Total Events" | fieldformat "Total Events"=tostring('Total Events',"commas")</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <map>
+      <title>Application by Location</title>
+      <searchString>index=sonicwall TemplateID=257 OR tid=357 firewall_hostname="$multiTokenQuery$"
+        (dest_ip!=192.168.1.0/24 OR dest_ip!=10.0.0.0/8 OR dest_ip!=172.20.0.0/16)  
+        | iplocation allfields=True dest_ip 
+        | geostats latfield=lat longfield=lon count by app_name</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="mapping.data.maxClusters">500</option>
+      <option name="mapping.markerLayer.markerMaxSize">20</option>
+      <option name="maping.map.zoom">4</option>
+    </map>
+  </row>
+  <row>
+    <table>
+      <title>Top Applications</title>
+      <searchString>index=sonicwall TemplateID=257 OR tid=357 firewall_hostname="$multiTokenQuery$" app_name!="ICMP" | eval friendly_name=coalesce(user_id, src_ip) | eval total_octets=(init_to_resp_octets + resp_to_init_octets) | chart sum(init_to_resp_octets) as "Outbound Octets", sum(resp_to_init_octets) as "Inbound Octets" , sum(total_octets), first(friendly_name) as "Source" by app_name | sort -total_octets | rename sum(total_octets) as "Total octets" | rename app_name to "Application"</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+      <drilldown>
+        <link>/app/dsa/app_drilldown</link>
+      </drilldown>
+    </table>
+    <chart>
+      <title>App Pie Chart</title>
+      <searchString>index=sonicwall  TemplateID=257 OR tid=357 firewall_hostname="$multiTokenQuery$" app_name!="ICMP" | eval raw_total_octets=(init_to_resp_octets + resp_to_init_octets) | chart sum(raw_total_octets) as total_octets by app_name | sort -total_octets | rename total_octets as "Total Octets" | rename app_name as "Application"</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+      <table>
+        <title>Instant Messaging</title>
+        <search>
+          <query>index=sonicwall app_cat_name=IM tid=257 | chart values(app_name) as "IM Application" by src_ip | rename src_ip as "Source IP"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+      </table>
+  </row>
+  <row>
+    <chart>
+      <title>Applications by Time</title>
+      <searchString>index=sonicwall  TemplateID=257 OR tid=357 firewall_hostname="$multiTokenQuery$" app_name!="ICMP" | eval app_name=coalesce(app_name, app_id) | eval total_kb=(init_to_resp_octets+resp_to_init_octets)/1024 | timechart per_hour(total_kb)  by app_name</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">collapsed</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleY.text">MB</option>
+    </chart>
+  </row>
+</form>

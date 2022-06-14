@@ -1,0 +1,163 @@
+<form script="single_trend.js, multi_select_fw_name.js, multi_value_token_fw_name.js" stylesheet="single_trend.css">
+  <label>URLs v2</label>
+  <description>URLs detected by the Firewall</description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+      <label>Filter by Firewall Name:</label>
+      <div id="multi_value_input"/>
+    </html>
+      <table>
+        <title>Search of Firewalls</title>
+        <searchString>index=sonicwall TemplateID=262 OR tid=359| eval firewall_hostname=coalesce(firewall_hostname, host) | stats count by firewall_hostname | rename firewall_hostname as "Firewall"  | rename firewall_hostname as "Firewall", count as "Total URLs" | fieldformat "Total URLs"=tostring('Total URLs',"commas")</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <searchString>index=sonicwall TemplateID=262 OR tid=359 firewall_hostname="$multiTokenQuery$"| chart count | fieldformat count=tostring(count,"commas")</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="linkView">search</option>
+        <option name="field">count</option>
+        <option name="underLabel">Total URLs</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <searchString>index=sonicwall TemplateID=262 OR tid=359 firewall_hostname="$multiTokenQuery$"| top url_domain limit=1</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="beforeLabel">Top Domain</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Top URL Rating</title>
+        <search>
+          <query>index=sonicwall tid=278 OR tid=465 "url-rating_val2=*" | foreach url_rating_val* [ eval url_rating = mvappend(url_rating, &lt;&lt;FIELD&gt;&gt;) ] | top url_rating limit=1 | lookup sonicwall_ratings rating_index AS url_rating | fields rating_name</query>
+        </search>
+        <option name="underLabel">Top URL Category</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top Domains</title>
+        <search>
+          <query>index=sonicwall TemplateID=262 OR tid=359 firewall_hostname="$multiTokenQuery$"| regex url_domain!="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?!\d)" | rex field=url_domain "\.(?&lt;base_domain&gt;\S+\.\S+)$" | eval base_domain = coalesce(base_domain, url_domain) | top limit=100 base_domain | rename base_domain as "Domain" | fieldformat count=tostring(count,"commas") | eval percent=round(percent,2)</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <search>
+          <query>index=sonicwall TemplateID=262 OR tid=359 firewall_hostname="$multiTokenQuery$"| regex url_domain!="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?!\d)" | rex field=url_domain "\.(?&lt;base_domain&gt;\S+\.\S+)$" | eval base_domain = coalesce(base_domain, url_domain) | top base_domain</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <search>
+          <query>index=sonicwall tid=278 OR tid=465 "url-rating_val2=*" | foreach url_rating_val* [ eval url_rating = mvappend(url_rating, &lt;&lt;FIELD&gt;&gt;) ] | stats count by url_rating | lookup sonicwall_ratings rating_index AS url_rating | rename rating_name as "Rating" | fields Rating, count</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>most popular search engines</title>
+        <search>
+          <query>index=sonicwall tid=262 OR tid=278 OR tid=359 "url-rating_val1=29" | regex url_domain!="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?!\d)" | rex field=url_domain "\.(?&lt;base_domain&gt;\S+\.\S+)$" | chart count by base_domain | sort - count | rename count as "total hits"</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">left</option>
+      </chart>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,16 @@
+<panel>
+  <title>Inspection Violations by Neighborhood</title>
+  <chart>
+    <search>
+      <query>index=&quot;sf_food_health&quot; sourcetype=sf_food_violations risk_category=&quot;*&quot; neighborhood=&quot;*&quot;  
+| stats count(eval(risk_category=&quot;High Risk&quot;)) as &quot;High Risk&quot; count(eval(risk_category=&quot;Moderate Risk&quot;)) as &quot;Moderate Risk&quot; count(eval(risk_category=&quot;Low Risk&quot;)) as &quot;Low Risk&quot; count as &quot;Total Violations&quot; by neighborhood 
+| sort -&quot;Total Violations&quot; limit=10 
+| fields - &quot;Total Violations&quot;</query>
+      <earliest>0</earliest>
+      <latest>now</latest>
+    </search>
+    <option name="charting.chart">bar</option>
+    <option name="charting.chart.stackMode">stacked</option>
+    <option name="charting.fieldColors">{&quot;High Risk&quot;:0xD85E3D, &quot;Moderate Risk&quot;:0xFAC61D,&quot;Low Risk&quot;:0x6BB7C8}</option>
+  </chart>
+</panel>

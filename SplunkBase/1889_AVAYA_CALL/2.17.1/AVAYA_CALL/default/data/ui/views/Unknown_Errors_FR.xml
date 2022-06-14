@@ -1,0 +1,118 @@
+<form>
+  <label>Erreurs Inconnues</label>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <input type="time" token="DetailCall" searchWhenChanged="true">
+        <label>Période</label>
+        <default>
+          <earliest>@mon</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="TimeWindow">
+        <label>Fenêtre Temps Spécifique</label>
+        <choice value="&quot;&quot;">Tout le Temps</choice>
+        <choice value="`TimeWindow_WorkingDays`">Jours Ouvrés</choice>
+        <choice value="`TimeWindow_DayClosed`">Jours Fermés</choice>
+        <choice value="`TimeWindow_Weekend`">Weekend</choice>
+        <choice value="`TimeWindow_NightTime`">Nuits</choice>
+        <choice value="`TimeWindow_Lunch`">Déjeuner</choice>
+        <default>""</default>
+        <initialValue>""</initialValue>
+      </input>
+      <input type="text" token="Token_Call_ID" searchWhenChanged="true">
+        <label>Identifiant d'Appel</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="Token_Direction">
+        <label>Sens de l'Appel</label>
+        <choice value="*">Tout</choice>
+        <choice value="O0">Sortant</choice>
+        <choice value="I0">Entrant</choice>
+        <choice value="O1">Interne</choice>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_Caller" searchWhenChanged="true">
+        <label>Numéro Appelant</label>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_Called" searchWhenChanged="true">
+        <label>Numéro Appelé</label>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_Dialled" searchWhenChanged="true">
+        <label>Numéro Composé</label>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_Device1" searchWhenChanged="true">
+        <label>Terminal</label>
+        <default>V8000</default>
+      </input>
+      <input type="text" searchWhenChanged="true" token="Token_Party1Name">
+        <label>Utilisateur</label>
+        <choice value="aMartin">aMartin</choice>
+        <choice value="Acamping1">Camping</choice>
+        <choice value="*">Tout</choice>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_Device2" searchWhenChanged="true">
+        <label>Terminal 2</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" searchWhenChanged="true" token="Token_Party2Name">
+        <label>Utilisateur2</label>
+        <fieldForLabel>TEST24</fieldForLabel>
+        <fieldForValue>AVAYA_Party1Name</fieldForValue>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_External_Targeting_Cause" searchWhenChanged="true">
+        <label>Code Cause Appel Externe</label>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_External_Targeter_Id" searchWhenChanged="true">
+        <label>ID Appel Externe</label>
+        <default>*</default>
+      </input>
+      <input type="text" token="Token_External_Targeted_Number" searchWhenChanged="true">
+        <label>Numéro d'Appel Externe</label>
+        <default>*</default>
+      </input>
+      <table>
+        <title>Appels Détaillés</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Calling_Direction=$Token_Direction$   
+AVAYA_External_Targeted_Number=$Token_External_Targeted_Number$
+AVAYA_External_Targeter_Id=$Token_External_Targeter_Id$
+AVAYA_External_Targeting_Cause=$Token_External_Targeting_Cause$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Call_ID=$Token_Call_ID$
+AVAYA_Dialled_Number=$Token_Dialled$
+AVAYA_Called_Number=$Token_Called$
+AVAYA_Party2Name=$Token_Party2Name$
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Party1Device=$Token_Device1$
+AVAYA_Party2Device=$Token_Device2$
+$TimeWindow$
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`Call_Global_Time`
+`FR_DetailCall_RENAME`
+`FR_DetailCall_Table`</query>
+          <earliest>$DetailCall.earliest$</earliest>
+          <latest>$DetailCall.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

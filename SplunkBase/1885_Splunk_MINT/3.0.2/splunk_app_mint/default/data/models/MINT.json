@@ -1,0 +1,786 @@
+{
+    "objectNameList": [],
+    "objectSummary": {},
+    "displayName": "MINT",
+    "description": "",
+    "modelName": "MINT",
+    "objects": [
+        {
+            "objectName": "All_MINT",
+            "displayName": "All MINT",
+            "parentName": "BaseEvent",
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "remoteIP_lon",
+                            "owner": "All_MINT",
+                            "type": "number",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Longtitude",
+                            "comment": "GeoIP derived longtitude",
+                            "fieldSearch": "remoteIP_lon=*",
+                            "lookupOutputFieldName": "lon"
+                        },
+                        {
+                            "fieldName": "remoteIP_lat",
+                            "owner": "All_MINT",
+                            "type": "number",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Latitude",
+                            "comment": "GeoIP derived latitude",
+                            "fieldSearch": "remoteIP_lat=*",
+                            "lookupOutputFieldName": "lat"
+                        },
+                        {
+                            "fieldName": "remoteIP_City",
+                            "owner": "All_MINT",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "City",
+                            "comment": "GeoIP derived city",
+                            "fieldSearch": "remoteIP_City=*",
+                            "lookupOutputFieldName": "City"
+                        },
+                        {
+                            "fieldName": "remoteIP_Region",
+                            "owner": "All_MINT",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Region",
+                            "comment": "",
+                            "fieldSearch": "remoteIP_Region=*",
+                            "lookupOutputFieldName": "Region"
+                        },
+                        {
+                            "fieldName": "remoteIP_Country",
+                            "owner": "All_MINT",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Country",
+                            "comment": "",
+                            "fieldSearch": "remoteIP_Country=*",
+                            "lookupOutputFieldName": "Country"
+                        }
+                    ],
+                    "inputField": "remoteIP",
+                    "calculationType": "GeoIP",
+                    "comment": "",
+                    "owner": "All_MINT",
+                    "calculationID": "3giey87w0p5",
+                    "editable": true
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "tag=mint"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "string",
+                    "displayName": "Device",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "device",
+                    "required": true,
+                    "comment": "The mobile device type."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Locale",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "locale",
+                    "required": true,
+                    "comment": "The device's locale."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Version Code",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "appVersionCode",
+                    "required": true,
+                    "comment": "The app version code."
+                },
+                {
+                    "type": "string",
+                    "displayName": "App Version",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "appVersionName",
+                    "required": true,
+                    "comment": "The app version name."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Carrier",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "carrier",
+                    "required": true,
+                    "comment": "The mobile carrier."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Connection Type",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "connection",
+                    "required": true,
+                    "comment": "The type of connection (such as 'WiFi' or 'UMTA')."
+                },
+                {
+                    "type": "string",
+                    "displayName": "OS Version",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "osVersion",
+                    "required": true,
+                    "comment": "The version of the device operating system."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Package",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "packageName",
+                    "required": true,
+                    "comment": "The package or binary name of the app."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Platform",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "platform",
+                    "required": true,
+                    "comment": "The app platform ('Android', 'iOS', or 'WP')."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Current View",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "currentView",
+                    "required": false,
+                    "comment": "The current view"
+                },
+                {
+                    "type": "string",
+                    "displayName": "User Identifier",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "userIdentifier",
+                    "required": false,
+                    "comment": "The developer set user identifier."
+                },
+                {
+                    "type": "string",
+                    "displayName": "App User ID",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "uuid",
+                    "required": true,
+                    "comment": "A unique user identifier."
+                },
+                {
+                    "type": "ipv4",
+                    "displayName": "Remote IP",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "remoteIP",
+                    "required": true,
+                    "comment": "The remote IP address."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Network State",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "state",
+                    "required": false,
+                    "comment": "The connection state (such as 'Connecting' or 'Connected')."
+                },
+
+                {
+                    "type": "string",
+                    "displayName": "Application Environment",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "appEnvironment",
+                    "required": false,
+                    "comment": "The application envrironment ( such as 'Release' or 'Staging'"
+                }
+            ]
+        },
+        {
+            "objectName": "Usage",
+            "displayName": "Usage",
+            "parentName": "All_MINT",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "tag=usage"
+                }
+            ],
+            "fields": []
+        },
+        {
+            "objectName": "Session",
+            "displayName": "Sessions",
+            "parentName": "Usage",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:ping OR sourcetype=mint:gnip"
+                }
+            ],
+            "fields": []
+        },
+        {
+            "objectName": "View",
+            "displayName": "Views",
+            "parentName": "Usage",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:view"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "string",
+                    "displayName": "Current",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "current",
+                    "required": true,
+                    "comment": "The name of the current view"
+                },
+                {
+                    "type": "string",
+                    "displayName": "Previous",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "previous",
+                    "required": true,
+                    "comment": "The name of the previous view"
+                },
+                {
+                    "type": "number",
+                    "displayName": "Elapsed Time",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "elapsedTime",
+                    "required": true,
+                    "comment": "The time between two views in milliseconds"
+                },
+                {
+                    "type": "number",
+                    "displayName": "Load Time",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "loadTime",
+                    "required": true,
+                    "comment": "The time it took for a view to load"
+                },
+                {
+                    "type": "number",
+                    "displayName": "Domain Lookup Time",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "domainLookupTime",
+                    "required": true,
+                    "comment": "Time in seconds, null in iOS"
+                },
+                {
+                    "type": "number",
+                    "displayName": "DOM Processing Time",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "domProcessingTime",
+                    "required": true,
+                    "comment": "Time in seconds, null in iOS"
+                },
+                {
+                    "type": "number",
+                    "displayName": "Server Time",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "serverTime",
+                    "required": true,
+                    "comment": "Time in seconds, null in iOS"
+                }
+            ]
+        },
+        {
+            "objectName": "Pings",
+            "displayName": "Sessions Starts",
+            "parentName": "Session",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:ping"
+                }
+            ],
+            "fields": []
+        },
+        {
+            "objectName": "Gnips",
+            "displayName": "Sessions Stops",
+            "parentName": "Session",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:gnip"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "number",
+                    "displayName": "Session Duration",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "ses_duration",
+                    "required": true,
+                    "comment": "The session duration, in milliseconds."
+                }
+            ]
+        },
+        {
+            "objectName": "Events",
+            "displayName": "Events",
+            "parentName": "Usage",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:event"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "string",
+                    "displayName": "Level",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "level",
+                    "required": false,
+                    "comment": "The log level of the event."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Event Name",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "event_name",
+                    "required": true,
+                    "comment": "The event name."
+                }
+            ]
+        },
+        {
+            "objectName": "Performance",
+            "displayName": "Performance",
+            "parentName": "All_MINT",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "tag=performance"
+                }
+            ],
+            "fields": []
+        },
+        {
+            "objectName": "Errors",
+            "displayName": "Errors",
+            "parentName": "Performance",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:error"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "string",
+                    "displayName": "Handled",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "handled",
+                    "required": true,
+                    "comment": "Whether the error was handled."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Exception Class",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "klass",
+                    "required": true,
+                    "comment": "The class of the exception."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Error Message",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "message",
+                    "required": true,
+                    "comment": "The error message."
+                },
+                {
+                    "type": "string",
+                    "displayName": "errorHash",
+                    "hidden": true,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "errorHash",
+                    "required": true,
+                    "comment": "The error hash, which MINT creates for grouping errors."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Time until crash",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "msFromStart",
+                    "required": true,
+                    "comment": "The time between starting the app and the exception, in milliseconds."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Used Memory (MB)",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "memAppTotal",
+                    "required": true,
+                    "comment": "The number of bytes taken by the heap at its current size."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Available Memory (MB)",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "memAppAvailable",
+                    "required": true,
+                    "comment": "The number of bytes currently available on the heap without expanding the heap."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Max Memory (MB)",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "memAppMax",
+                    "required": true,
+                    "comment": "The maximum number of bytes the heap can expand to."
+                },
+                {
+                    "type": "number",
+                    "displayName": "System Memory (MB)",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "memSysTotal",
+                    "required": false,
+                    "comment": "The number of bytes in device memory."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Error Origin",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "where",
+                    "required": true,
+                    "comment": "The origin where the error occurred"
+                }
+            ]
+        },
+        {
+            "objectName": "Transaction",
+            "displayName": "Transactions",
+            "parentName": "Performance",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:trstart OR sourcetype=mint:trstop"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "string",
+                    "displayName": "Transaction Id",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "transaction_id",
+                    "required": false,
+                    "comment": "The transaction ID."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Transaction Name",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "tr_name",
+                    "required": false,
+                    "comment": "The transaction name."
+                }
+            ]
+        },
+        {
+            "objectName": "TransactionStop",
+            "displayName": "Transactions Stop",
+            "parentName": "Transaction",
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:trstop"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "number",
+                    "displayName": "Transaction Duration",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "tr_duration",
+                    "required": false,
+                    "comment": "The duration of the transaction, in milliseconds."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Transaction Status",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "status",
+                    "required": false,
+                    "comment": "The transaction status."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Stop Reason",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "reason",
+                    "required": false,
+                    "comment": "The reason for the transaction stop."
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "failureErrorID",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Failure Error ID",
+                            "comment": "The error ID for the transaction failure",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(status==\"FAIL\", reason, \"\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "cancellationReason",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Cancellation Reason",
+                            "comment": "The user-defined reason for the transaction cancellation",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(status==\"CANCEL\", reason, \"\")"
+                }
+            ]
+        },
+        {
+            "objectName": "TransactionStart",
+            "displayName": "Transactions Start",
+            "parentName": "Transaction",
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:trstart"
+                }
+            ],
+            "fields": []
+        },
+        {
+            "objectName": "Network_Monitoring",
+            "displayName": "Network Monitoring",
+            "parentName": "Performance",
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "domain",
+                            "type": "string",
+                            "required": true,
+                            "multivalue": false,
+                            "hidden": false,
+                            "displayName": "Domain",
+                            "comment": "The URI domain.",
+                            "fieldSearch": ""
+                        },
+                        {
+                            "fieldName": "path",
+                            "type": "string",
+                            "required": true,
+                            "multivalue": false,
+                            "hidden": false,
+                            "displayName": "Path",
+                            "comment": "The URI path.",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "inputField": "url",
+                    "comment": "The request URL",
+                    "calculationType": "Rex",
+                    "expression": "(?<domain>[^/]+)(?<path>[^?]*)"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "sourcetype=mint:network"
+                }
+            ],
+            "fields": [
+                {
+                    "type": "string",
+                    "displayName": "URL",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "url",
+                    "required": true,
+                    "comment": "The request URL."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Latency",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "latency",
+                    "required": true,
+                    "comment": "The network service latency."
+                },
+                {
+                    "type": "string",
+                    "displayName": "HTTP Status Code",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "statusCode",
+                    "required": true,
+                    "comment": "The HTTP response status code."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Request Length (bytes)",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "requestLength",
+                    "required": true,
+                    "comment": "The length of the request, in bytes."
+                },
+                {
+                    "type": "number",
+                    "displayName": "Response Length",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "responseLength",
+                    "required": true,
+                    "comment": "The length of the response, in bytes."
+                },
+                {
+                    "type": "boolean",
+                    "displayName": "Failed",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "failed",
+                    "required": true,
+                    "comment": "Whether the request failed."
+                },
+                {
+                    "type": "string",
+                    "displayName": "Network Exception",
+                    "hidden": false,
+                    "multivalue": false,
+                    "fieldSearch": "",
+                    "fieldName": "exception",
+                    "required": false,
+                    "comment": "The contents of the HTTP exception that occurred."
+                }
+            ]
+        }
+    ]
+}

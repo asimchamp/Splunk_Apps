@@ -1,0 +1,113 @@
+<form version="1.1">
+  <label>Overview</label>
+    <search id="base_search_overview">
+     <query>sourcetype=tshark:port53 OR sourcetype=port53tttt src=$src$ dest=$dest$ source=$source$ | fields dns_len query length reply_code Len message_type record_type transport</query>
+    </search>
+
+ <fieldset autoRun="true" submitButton="false">
+
+    <input type="dropdown" token="source" searchWhenChanged="true" id="source_input">
+      <label>source</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <default>*</default>
+      <search>
+        <query>| tstats count where sourcetype IN (tshark:port53, port53tttt) by source |fields source</query>
+      </search>
+    </input>
+
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="src" searchWhenChanged="true">
+     <label>Client IP</label>
+     <default>*</default>
+    </input>
+    <input type="text" token="dest" searchWhenChanged="true">
+     <label>DNS Server IP</label>
+     <default>*</default>
+    </input>
+
+
+  </fieldset>
+  <row>
+    <single>
+      <title>Total Events</title>
+      <search base="base_search_overview"><query>stats count</query></search>
+    </single>
+
+    <single>
+      <title>Parsing Errors</title>
+      <search base="base_search_overview"><query>search NOT dns_len=0 NOT query=* NOT length=0 NOT reply_code=* NOT Len=0* | stats count</query></search>
+    </single>
+
+
+  </row>
+
+  <row>
+    <chart>
+      <title>Query Type Distribution</title>
+      <search base="base_search_overview"><query>search message_type=QUERY | timechart count by record_type</query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+
+
+
+  <row>
+    <chart>
+      <title>Return Code Distribution</title>
+      <search base="base_search_overview"><query>search message_type=RESPONSE reply_code=*|timechart count by reply_code</query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    <option name="charting.fieldColors">{"NXDomain": 0xF5A9A9, "NoError": 0xBCF5A9, "ServFail": 0xA9BCF5, "Refused": 0xF5F6CE}</option>
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+      <title>Protocol (UDP/TCP) Distribution</title>
+      <search base="base_search_overview"><query>search message_type=QUERY transport=*|timechart count by transport</query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+
+</form>

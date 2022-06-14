@@ -1,0 +1,30 @@
+<dashboard>
+  <label>Splunk Forwarder GUID Duplication</label>
+  <row>
+    <html>
+      <p>In my experience duplicate GUIDs show up most often when a virtual server replication process isn't setup correctly from a Splunk perspecitve (e.g. they haven't run the <a href="http://docs.splunk.com/Documentation/Splunk/latest/Forwarding/Makeadfpartofasystemimage" target="_blank"> clone-prep-clear-config </a> command). The concern isn't that there are forwarders with the same GUID as much as Splunk only goes through the process to identify the server name once. This is used to populate the host field. If you have multiple GUIDs there is a good chance you have multiple servers reporting data with the same host name.</p>
+      <p>To get rid of the duplicate GUID you can delete the instance.cfg file in $SPLUNK_HOME/etc. To manually change the server name to correct the host field population update the inputs.conf file in $SPLUNK_HOME/etc/system/local. Note you will not be able to simply send an inputs.conf file from the deployment server as items in etc/system/local trump etc/app.</p>
+    </html>
+  </row>
+  <row>
+    <table>
+      <title>GUIDs Found on Multiple Systems</title>
+      <searchString>index=_internal source="/opt/splunk/var/log/splunk/metrics.log" CASE(Metrics) TERM(group=tcpin_connections) | dedup sourceIp guid hostname   | stats dc(sourceIp) as Unique_IPs by guid | where Unique_IPs &gt; 1| sort -Unique_IPs</searchString>
+      <earliestTime>-60m@m</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>GUIDs Found on Multiple Systems - Detailed</title>
+      <searchString>index=_internal source="/opt/splunk/var/log/splunk/metrics.log" CASE(Metrics) TERM(group=tcpin_connections) | dedup sourceIp guid hostname | lookup dnslookup clientip as sourceIp OUTPUT clienthost as dns_entry | fillnull value="-" dns_entry | stats count by sourceIp guid hostname dns_entry  | stats dc(sourceIp) as Unique_IPs list(sourceIp) as Source_IPs list(hostname) as HostNames list(dns_entry) as DNS_Names by guid | where Unique_IPs &gt; 1| sort -Unique_IPs</searchString>
+      <earliestTime>-60m@m</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</dashboard>

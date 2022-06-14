@@ -1,0 +1,21 @@
+Version 1.1
+
+-  Migrated the dashboards to Simple XML
+-  Added Severity filtering options
+-  Now requires Splunk 6.1
+
+Version 1.2
+
+- Complete dashboard redesign including various filtering capabilities
+- Changed all dashboard searches from raw to pivot
+- Added support for macOS log files
+- Added Splunk data model uberAgentMeta
+- Added additional logfile uAInSessionHelper.log
+- Added new sourcetype uberAgent:Meta:uAInSessionHelperLog
+- Added additional logfile uberAgentIEExtension.log
+- Added new sourcetype uberAgent:Meta:uAIEExtensionLog
+- Added additional logfile uberAgentSandbox.log
+- Added new sourcetype uberAgent:Meta:uASandboxLog
+- Changed the default index name from uberagent_log to ua_meta_log
+- Added macros.conf to centrally rename the index
+- Changed the sourcetype name from uberAgent:log to uberAgent:Meta:uberAgentLog

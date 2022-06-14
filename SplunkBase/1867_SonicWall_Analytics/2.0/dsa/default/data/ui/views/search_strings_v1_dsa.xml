@@ -1,0 +1,337 @@
+<form>
+  <label>Search Strings v1</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="multiselect" token="firewall">
+      <label>Firewalls</label>
+      <search>
+        <query>index=sonicwall TemplateID=262 OR tid=359 | eval firewall_hostname=coalesce(firewall_hostname, host) | top firewall_hostname</query>
+      </search>
+      <fieldForLabel>firewall_hostname</fieldForLabel>
+      <fieldForValue>firewall_hostname</fieldForValue>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <valuePrefix>firewall_hostname="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>top searches</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 google OR twitter OR apple OR stack OR youtube OR amazon OR bing OR wikipedia OR ebay OR ask OR linkedin OR newegg OR netflix $firewall$ | urldecode | chart count, values(url_process_function) by url_search_string | sort -count | rename url_search_string as "searches" | rename count as "total" | rename values(url_process_function) as "process function"</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>hits by site</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 $firewall$ | urldecode | search url_search_string="*" | chart count by url_process_function | sort -count</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <chart>
+      <title>search by engine</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 $firewall$ | urldecode | search url_search_string="*" | top url_process_function</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart.bubbleMaximumSize">50</option>
+      <option name="charting.chart.bubbleMinimumSize">10</option>
+      <option name="charting.chart.bubbleSizeBy">area</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>google searches</title>
+      <search>
+        <query>index=sonicwall tid=262 tid=262 OR tid=359 google "q=" $firewall$ | urldecode | chart count by google_search | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>bing</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 bing $firewall$ | urldecode | search url_process_function=bing | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>ask</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 ask "q=" $firewall$ | urldecode | search url_process_function=ask | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>twitter</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 "q=" search twitter $firewall$ | urldecode | chart count by twitter_search | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>facebook</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 facebook $firewall$ | urldecode | search url_process_function="facebook" | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>amazon searches</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 amazon $firewall$ | urldecode | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>ebay searches</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 ebay $firewall$ | urldecode | search url_process_function="ebay" | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>newegg</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 newegg $firewall$ | urldecode | search url_process_function=newegg | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>craigslist searches</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 craigslist $firewall$ | urldecode | search NOT url_type="image" | search cl_uri_root="search" |  chart count, values(cl_sub_region) by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <chart>
+      <title>craigslist sales area</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 craigslist $firewall$ | urldecode | search NOT url_type="image" | search cl_uri_root="search" | top limit=10 cl_sales_area</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart.bubbleMaximumSize">50</option>
+      <option name="charting.chart.bubbleMinimumSize">10</option>
+      <option name="charting.chart.bubbleSizeBy">area</option>
+    </chart>
+    <chart>
+      <title>craigslist by region</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 craigslist $firewall$ | urldecode  | search NOT cl_region="www" | chart count by cl_sub_region</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart.bubbleMaximumSize">50</option>
+      <option name="charting.chart.bubbleMinimumSize">10</option>
+      <option name="charting.chart.bubbleSizeBy">area</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>wikipedia</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 wikipedia $firewall$ | urldecode | search url_process_function="wikipedia" | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>linked in</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 linkedin $firewall$ | urldecode | search url_process_function=linkedin | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>reddit</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 reddit $firewall$ | urldecode | search url_process_function=reddit | chart count by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Generic</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 NOT google NOT twitter NOT apple NOT stack NOT youtube NOT amazon NOT bing NOT wikipedia NOT ebay $firewall$ | urldecode | search url_process_function=generic | chart count, values(url_base_domain) by url_search_string | sort -count</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+    <chart>
+      <title>top generic domain</title>
+      <search>
+        <query>index=sonicwall tid=262 OR tid=359 NOT google NOT twitter NOT apple NOT stack NOT youtube NOT amazon NOT bing NOT wikipedia NOT ebay $firewall$ | urldecode | search url_process_function=generic | top url_base_domain</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart.bubbleMaximumSize">50</option>
+      <option name="charting.chart.bubbleMinimumSize">10</option>
+      <option name="charting.chart.bubbleSizeBy">area</option>
+    </chart>
+  </row>
+</form>

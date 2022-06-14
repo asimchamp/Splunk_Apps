@@ -1,0 +1,40 @@
+<form stylesheet="web_input_monitoring.css" script="web_input_monitoring.js">
+  <label>Overview</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="timefield">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query><![CDATA[sourcetype="web_input" OR source="web_input://*" | eval response_code=case(response_code != "", response_code, browser != "integrated_client", "NA", true(), response_code) | stats values(url) as url latest(title) as title latest(response_code) as response_code sum(raw_match_count) as total_matches distinct_count(url) as unique_urls latest(_time) as last_seen sparkline(sum(raw_match_count)) as matches by source | eval url=mvindex(url, 0) | sort -total_matches | rex field=source "web_input://(?<source>.*)" | `timesince(last_seen,last_seen)` | table title source response_code last_seen total_matches unique_urls matches url]]></query>
+          <earliest>$timefield.earliest$</earliest>
+          <latest>$timefield.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format field="matches" type="sparkline">
+          <option name="barColor">#65A636</option>
+          <option name="lineColor">#65A636</option>
+          <option name="spotColor">#65A636</option>
+          <option name="fillColor">#65A636</option>
+        </format>
+        <drilldown>
+				<link><![CDATA[/app/website_input/search?earliest=$earliest$&latest=$latest$&q=source%3D"web_input://$row.source$"%20%7C%20table%20_time%20%20url%20match*]]></link>
+		</drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

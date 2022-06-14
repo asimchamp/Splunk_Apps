@@ -1,0 +1,55 @@
+<form>
+  <label>MDM Category Stats</label>
+
+  <description>
+	MDM Categories - Table
+  </description>
+
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+   <input type="dropdown" token="ownership">
+      <label>Ownership</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <choice value="Corporate">Corporate</choice>
+      <choice value="Employee">Employee</choice>
+    </input>
+  </fieldset>
+
+
+  <row>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known |dedup macAddress |stats count by Ownership</searchString>
+      <title>Distribution by Ownership</title>
+    </table>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Compromised</searchString>
+      <title>Compromised Devices</title>
+    </table>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Encryption_Enabled</searchString>
+      <title>Encryption Enabled</title>
+    </table>
+  </row>
+
+  <row>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Model</searchString>
+      <title>Distribution by Model</title>
+    </table>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Manufacturer</searchString>
+      <title>Distribution by Manufacturer</title>
+    </table>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by OS_Version</searchString>
+      <title>Distribution by OS Version</title>
+    </table>
+  </row>
+
+</form>

@@ -1,0 +1,824 @@
+<endpoint name="data/inputs/protocol">
+	<header>Protocol Data Inputs</header>
+	<breadcrumb>
+		<parent hidecurrent="False">datainputstats</parent>
+		<name>Protocol Data Inputs</name>
+	</breadcrumb>
+	<elements>
+		<element name="sourceFields" type="fieldset">
+			<view name="list" />
+			<view name="edit" />
+			<view name="create" />
+			<elements>
+
+				<element name="name" label="Stanza Name">
+					<view name="list" />
+					<view name="create" />
+
+					<key name="exampleText"><![CDATA[
+
+    If you require an encrypted credential in your configuration , then you can enter it on the App's setup page<br>
+        <br>
+        Then in your configration below refer to it in the format <code>{encrypted:somekey}</code><br>
+        <br>
+        Where <code>somekey</code> is any value you choose to enter on the setup page to reference your credential.<br>
+    ]]></key>
+				</element>
+				<element name="activation_key" label="Activation Key">
+					<view name="list" />
+					<view name="create" />
+					<view name="edit" />
+					<key name="exampleText">Visit &lt;a href="http://www.baboonbones.com/#activation"
+						target="_blank"&gt;http://www.baboonbones.com/#activation&lt;/a&gt; to
+						obtain a non-expiring key</key>
+				</element>
+				<element name="log_level" type="select" label="Log Level">
+                    <view name="edit" />
+                    <view name="create" />
+                    <options>
+                        <opt value="OFF" label="OFF" />
+                        <opt value="FATAL" label="FATAL" />
+                        <opt value="INFO" label="INFO" />
+                        <opt value="WARN" label="WARN" />
+                        <opt value="ERROR" label="ERROR" />
+                        <opt value="DEBUG" label="DEBUG" />
+                        <opt value="TRACE" label="TRACE" />
+                        <opt value="ALL" label="ALL" />
+                    </options>
+                    <key name="exampleText">Logging level for messages written to $SPLUNK_HOME/var/log/splunk/protocolmodinput_app_modularinput.log, defaults to 'INFO'</key>
+                </element>
+
+				<element name="protocol" type="select" label="Protocol">
+					<onChange>
+
+						<key name="_action">showonly</key>
+						<group_set>
+							<group name="udp_settings" />
+							<group name="tcp_settings" />
+							<group name="sockjs_settings" />
+						</group_set>
+						<key name="udp">udp_settings</key>
+						<key name="http">tcp_settings</key>
+						<key name="tcp">tcp_settings</key>
+						<key name="sockjs">sockjs_settings</key>
+						<key name="websocket">tcp_settings</key>
+
+					</onChange>
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+
+					<options>
+						<opt value="tcp" label="TCP" />
+						<opt value="udp" label="UDP" />
+						<opt value="http" label="HTTP POST,PUT and File Upload" />
+						<opt value="sockjs" label="SockJS" />
+						<opt value="websocket" label="Websockets" />
+					</options>
+				</element>
+
+
+
+				<element name="bind_address" type="textfield" label="Server Bind Address">
+
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+					<key name="exampleText">Network interface address to bind to , IP or hostname
+						, defaults to 0.0.0.0 (listen on all interfaces)</key>
+				</element>
+
+				<element name="port" type="textfield" label="Server Port">
+
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+					<key name="exampleText">Network port to open.For ports less than 1024 ,
+						you'll need to be running with root permissions</key>
+				</element>
+
+				<element name="output_type" type="select" label="Data Output">
+					<onChange>
+
+						<key name="_action">showonly</key>
+						<key name="stdout">NONE</key>
+						<group_set>
+							<group name="tcp_output_settings" />
+							<group name="hec_output_settings" />
+						</group_set>
+						<key name="tcp">tcp_output_settings</key>
+						<key name="hec">hec_output_settings</key>
+
+					</onChange>
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+
+					<options>
+						<opt value="stdout" label="STDOUT" />
+						<opt value="tcp" label="TCP" />
+						<opt value="hec" label="HTTP Event Collector" />
+					</options>
+				</element>
+
+				<element name="hec_output_settings" type="fieldset">
+					<key name="legend">HTTP Event Collector Output</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="hec_port" type="textfield" label="HTTP(s) Port">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">HTTP(s) Port that you have setup in Splunk</key>
+						</element>
+						<element name="hec_token" type="textfield" label="Authorisation Token">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Authorisation Token that you have setup in Splunk
+							</key>
+						</element>
+						<element name="hec_host" type="textfield" label="HTTP(s) Host">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Optionally set this if you want to override the default "localhost"</key>
+        </element>
+        
+        <element name="hec_endpoint" type="select" label="Endpoint">
+          
+          <view name="edit"/>
+          <view name="create"/>
+
+          <key name="exampleText">Choose which Endpoint to send events to</key>
+     
+          <options>
+            <opt value="raw" label="Raw Events" />
+			<opt value="event" label="JSON Events" />
+						                                              
+		  </options>
+        </element>
+						<element name="hec_poolsize" type="textfield" label="HTTP Client Pool Size">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">You can setup a pool of HTTP client
+								connections.Defaults to 1</key>
+						</element>
+						<element name="hec_https" type="checkbox" label="Use HTTPs ?">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Note : Plain HTTP performs better</key>
+						</element>
+						<element name="hec_batch_mode" type="checkbox" label="Use Batch Mode ?">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Send events to SplunkD in batches vs individual
+								events</key>
+							<onChange>
+								<key name="_action">showonly</key>
+								<key name="0">NONE</key>
+								<key name="1">ALL</key>
+								<group_set>
+									<group name="hec_batch_mode_settings" />
+								</group_set>
+							</onChange>
+						</element>
+
+						<element name="hec_batch_mode_settings" type="fieldset">
+							<key name="legend">Batch Mode Settings</key>
+							<view name="edit" />
+							<view name="create" />
+							<elements>
+
+
+								<element name="hec_max_batch_size_bytes" type="textfield"
+									label="Maximum batch size">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Will flush a batch upload at this size, defaults
+										to 1048576 (1 MB)</key>
+								</element>
+								<element name="hec_max_batch_size_events" type="textfield"
+									label="Maximum batch event count">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Will flush a batch upload at this number of
+										events, defaults to 100</key>
+								</element>
+								<element name="hec_max_inactive_time_before_batch_flush"
+									type="textfield" label="Inactivity time before flushing batch buffer">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Will flush a batch upload after this period of
+										inactivity , defaults to 5000 (5 secs)</key>
+								</element>
+
+
+							</elements>
+						</element>
+
+
+					</elements>
+				</element>
+
+				<element name="tcp_output_settings" type="fieldset">
+					<key name="legend">TCP Output</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="output_port" type="textfield" label="TCP Output Port">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">TCP Output Port. TCP input in Splunk will be
+								dynamically created for you if it does not exist.</key>
+						</element>
+
+
+
+					</elements>
+				</element>
+
+
+				<element name="tcp_settings" type="fieldset">
+					<key name="legend">Common TCP Settings</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+						<element name="use_ssl" type="checkbox"
+							label="Use a secure connection (TLS) ?">
+							<onChange>
+								<key name="_action">showonly</key>
+								<key name="0">NONE</key>
+								<key name="1">ALL</key>
+								<group_set>
+									<group name="tls" />
+								</group_set>
+							</onChange>
+
+							<view name="edit" />
+							<view name="create" />
+
+						</element>
+
+						<element name="tls" type="fieldset">
+							<key name="legend">TLS Settings</key>
+							<view name="edit" />
+							<view name="create" />
+							<elements>
+
+
+
+								<element name="keystore_pass" type="textfield"
+									label="Java Keystore password">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="keystore_path" type="textfield" label="Java Keystore path">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="truststore_pass" type="textfield"
+									label="Java Truststore password">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="truststore_path" type="textfield"
+									label="Java Truststore path">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="client_auth_required" type="checkbox"
+									label="Client Authentication Required ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+
+							</elements>
+						</element>
+
+						<element name="socket_settings" type="fieldset">
+							<key name="legend">Socket Settings</key>
+							<view name="edit" />
+							<view name="create" />
+							<elements>
+								<element name="receive_buffer_size" type="textfield"
+									label="TCP Receive Buffer Size">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Receive Buffer Size (bytes)</key>
+								</element>
+								<element name="so_linger" type="textfield" label="SO Linger">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Time in seconds.Using a negative value will
+										disable it</key>
+								</element>
+								<element name="tcp_nodelay" type="checkbox" label="TCP NoDelay ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+								<element name="tcp_keepalive" type="checkbox" label="TCP KeepAlive ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+							</elements>
+						</element>
+
+					</elements>
+				</element>
+
+
+
+				<element name="udp_settings" type="fieldset">
+					<key name="legend">UDP Settings</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="ip_version" type="select" label="IP Version">
+
+							<view name="edit" />
+							<view name="create" />
+
+							<options>
+								<opt value="v4" label="Version 4" />
+								<opt value="v6" label="Version 6" />
+
+							</options>
+						</element>
+						<element name="udp_receive_buffer_size" type="textfield"
+							label="UDP Receive Buffer Size">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Receive Buffer Size (bytes)</key>
+						</element>
+						<element name="set_broadcast" type="checkbox" label="Set Broadcast Mode ?">
+
+							<view name="edit" />
+							<view name="create" />
+
+						</element>
+
+						<element name="is_multicast" type="checkbox" label="Multicast ?">
+							<onChange>
+								<key name="_action">showonly</key>
+								<key name="0">NONE</key>
+								<key name="1">ALL</key>
+								<group_set>
+									<group name="multicast" />
+								</group_set>
+							</onChange>
+							<view name="edit" />
+							<view name="create" />
+
+						</element>
+
+						<element name="multicast" type="fieldset">
+							<key name="legend">Multicast Settings</key>
+							<view name="edit" />
+							<view name="create" />
+							<elements>
+								<element name="multicast_group" type="textfield" label="Multicast Group">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">IP address pattern of the network interface</key>
+								</element>
+								<element name="multicast_ttl" type="textfield" label="Multicast TTL">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Time to live</key>
+								</element>
+								<element name="set_multicast_loopback_mode" type="checkbox"
+									label="Set Multicast Loopback Mode ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+							</elements>
+						</element>
+
+					</elements>
+				</element>
+
+				<element name="sockjs_settings" type="fieldset">
+					<key name="legend">SockJS Settings</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="session_timeout" type="textfield" label="Session Timeout">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Session timeout in seconds</key>
+						</element>
+						<element name="heartbeat_period" type="textfield" label="Heartbeat Period">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Heatbeat period in seconds</key>
+						</element>
+						<element name="app_name" type="textfield" label="Application Name">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Defaults to "splunk" , so the URI would be
+								http://somehost/splunk</key>
+						</element>
+						<element name="use_ssl" type="checkbox"
+							label="Use a secure connection (TLS) ?">
+							<onChange>
+								<key name="_action">showonly</key>
+								<key name="0">NONE</key>
+								<key name="1">ALL</key>
+								<group_set>
+									<group name="tls" />
+								</group_set>
+							</onChange>
+
+							<view name="edit" />
+							<view name="create" />
+
+						</element>
+
+						<element name="tls" type="fieldset">
+							<key name="legend">TLS Settings</key>
+							<view name="edit" />
+							<view name="create" />
+							<elements>
+
+
+
+								<element name="keystore_pass" type="textfield"
+									label="Java Keystore password">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="keystore_path" type="textfield" label="Java Keystore path">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="truststore_pass" type="textfield"
+									label="Java Truststore password">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="truststore_path" type="textfield"
+									label="Java Truststore path">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+								<element name="client_auth_required" type="checkbox"
+									label="Client Authentication Required ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+
+							</elements>
+						</element>
+						<element name="socket_settings" type="fieldset">
+							<key name="legend">Socket Settings</key>
+							<view name="edit" />
+							<view name="create" />
+							<elements>
+
+								<element name="receive_buffer_size" type="textfield"
+									label="TCP Receive Buffer Size">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Receive Buffer Size (bytes)</key>
+								</element>
+								<element name="so_linger" type="textfield" label="SO Linger">
+
+									<view name="edit" />
+									<view name="create" />
+									<key name="exampleText">Time in seconds.Using a negative value will
+										disable it</key>
+								</element>
+								<element name="tcp_nodelay" type="checkbox" label="TCP NoDelay ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+								<element name="tcp_keepalive" type="checkbox" label="TCP KeepAlive ?">
+
+									<view name="edit" />
+									<view name="create" />
+
+								</element>
+
+							</elements>
+						</element>
+
+					</elements>
+				</element>
+
+
+				<element name="data_handler_settings" type="fieldset">
+					<key name="legend">Custom Data Handler</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="handler_verticle" type="textfield"
+							label="Custom data handler name">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Custom data handler name, a vertx polyglot verticle
+								that you've placed in the protocol_ta/bin/datahandlers
+								directory. ie: ExampleHandler , ExampleHandler.js ,
+								foo.somepackage.MyHandler , SomeHandler.py</key>
+						</element>
+
+						<element name="handler_config" type="textfield"
+							label="Custom data handler config">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">A JSON Config String to pass to the handler,
+								example : {"foo":"1","zoo":"goo"}</key>
+						</element>
+
+
+
+					</elements>
+				</element>
+
+
+				<element name="scalability_settings" type="fieldset">
+					<key name="legend">Scalability and Performance Tuning</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="server_verticle_instances" type="textfield"
+							label="Server verticle instances">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Defaults to 1.You can increase the number of
+								instances to utilise more cores on your server.Refer to
+								http://vertx.io/vertx2/core_manual_java.html#specifying-number-of-instances
+							</key>
+						</element>
+
+						<element name="handler_verticle_instances" type="textfield"
+							label="Data handler verticle instances">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Defaults to 1.You can increase the number of
+								instances to utilise more cores on your server.Refer to
+								http://vertx.io/vertx2/core_manual_java.html#specifying-number-of-instances
+							</key>
+						</element>
+
+						<element name="output_verticle_instances" type="textfield"
+							label="Output verticle instances">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Defaults to 1.You can increase the number of
+								instances to utilise more cores on your server.Refer to
+								http://vertx.io/vertx2/core_manual_java.html#specifying-number-of-instances
+							</key>
+						</element>
+
+						<element name="accept_backlog" type="textfield"
+							label="Accept backlog (requires OS settings also)">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Refer to
+								http://vertx.io/vertx2/manual.html#improving-connection-time</key>
+						</element>
+
+
+					</elements>
+				</element>
+
+				<element name="additional_startup_settings" type="fieldset">
+					<key name="legend">Additional Startup Settings</key>
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+
+
+						<element name="additional_jvm_propertys" type="textfield"
+							label="Additional JVM System Properties">
+
+							<view name="edit" />
+							<view name="create" />
+							<key name="exampleText">Parameter string in format
+								'key1=value1,key2=value2,key3=value3'</key>
+						</element>
+
+					</elements>
+				</element>
+			</elements>
+		</element>
+
+		<element name="sourcetypeFields" type="fieldset">
+			<view name="list" />
+			<view name="edit" />
+			<view name="create" />
+			<elements>
+				<element name="spl-ctrl_sourcetypeSelect" type="select"
+					label="Set sourcetype">
+					<onChange>
+						<!-- <key name="auto">NONE</key> -->
+						<key name="_action">showonly</key>
+						<group_set>
+							<group name="sourcetype" />
+							<group name="spl-ctrl_from_list" />
+						</group_set>
+						<key name="sourcetype">sourcetype</key>
+						<key name="spl-ctrl_from_list">spl-ctrl_from_list</key>
+					</onChange>
+					<options>
+						<!-- <opt value="auto" label="Automatic"/> -->
+						<opt value="spl-ctrl_from_list" label="From list" />
+						<opt value="sourcetype" label="Manual" />
+					</options>
+					<view name="edit" />
+					<view name="create" />
+					<!-- <key name="exampleText">Set to automatic and Splunk will classify 
+						and assign sourcetype automatically. Unknown sourcetypes will be given a 
+						placeholder name.</key> -->
+					<key name="processValueEdit">[[ e for e in ['sourcetype'] if form_defaults.get(e)
+						][0]]</key>
+					<key name="processValueAdd">[[ e for e in ['sourcetype'] if form_defaults.get(e)
+						][0]]</key>
+				</element>
+				<element name="sourcetype" type="textfield" label="Source type">
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+					<key name="exampleText">If this field is left blank, the default value of
+						script will be used for the source type.</key>
+					<key name="processValueList">_('Automatic') if (value==None or value=='') else value</key>
+					<key name="submitValueAdd">form_data.get('spl-ctrl_from_list') if
+						form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list'
+						else value if
+						form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' else None
+					</key>
+					<key name="submitValueEdit">form_data.get('spl-ctrl_from_list') if
+						form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list'
+						else value if
+						form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' else None
+					</key>
+					<key name="labelList">Source type</key>
+				</element>
+				<element name="spl-ctrl_from_list" type="select"
+					label="Select source type from list">
+					<view name="edit" />
+					<view name="create" />
+					<key name="exampleText">Splunk
+						classifies all common data types automatically, but if you're
+						looking for something specific, you can find more source types in
+						the <![CDATA[<a href="../../../apps/remote">Splunkbase apps browser</a>]]>
+						or online at <![CDATA[<a href="http://www.splunkbase.com/" target="_blank">www.splunkbase.com</a>]]>.
+					</key>
+					<key name="requiredIfVisible" />
+					<key name="dynamicOptions" type="dict">
+						<key name="keyName">title</key>
+						<key name="keyValue">title</key>
+						<key name="splunkSource">/saved/sourcetypes</key>
+						<key name="splunkSourceParams" type="dict">
+							<key name="count">-1</key>
+							<key name="search">'pulldown_type=true'</key>
+						</key>
+						<key name="prefixOptions" type="list">
+							<item type="list">
+								<item></item>
+								<item>Choose...</item>
+							</item>
+						</key>
+					</key>
+				</element>
+			</elements>
+			<key name="legend">Source type</key>
+			<key name="helpText">Set sourcetype field for all events from this source.
+			</key>
+		</element>
+
+
+		<element name="spl-ctrl_EnableAdvanced" type="checkbox" label="More settings"
+			class="spl-mgr-advanced-switch">
+			<view name="edit" />
+			<view name="create" />
+			<onChange>
+				<key name="_action">showonly</key>
+				<key name="0">NONE</key>
+				<key name="1">ALL</key>
+				<group_set>
+					<group name="advanced" />
+				</group_set>
+			</onChange>
+		</element>
+		<element name="advanced" type="fieldset" class="spl-mgr-advanced-options">
+			<view name="edit" />
+			<view name="create" />
+			<elements>
+				<element name="hostFields" type="fieldset">
+					<key name="legend">Host</key>
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+						<element name="host" type="textfield" label="Host field value">
+							<view name="edit" />
+							<view name="create" />
+						</element>
+					</elements>
+				</element>
+				<element name="indexField" type="fieldset">
+					<key name="legend">Index</key>
+					<key name="helpText">Set the destination index for this source.</key>
+					<view name="list" />
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+						<element name="index" type="select" label="Index">
+							<view name="list" />
+							<view name="edit" />
+							<view name="create" />
+							<key name="dynamicOptions" type="dict">
+								<key name="keyName">title</key>
+								<key name="keyValue">title</key>
+								<key name="splunkSource">/data/indexes</key>
+								<key name="splunkSourceParams" type="dict">
+									<key name="search">'isInternal=false disabled=false'</key>
+									<key name="count">-1</key>
+									<key name="datatype">'all'</key>
+								</key>
+							</key>
+						</element>
+					</elements>
+				</element>
+			</elements>
+		</element>
+
+		<element name="eai:acl.app" label="App">
+			<view name="list" />
+			<key name="processValueList">entity['eai:acl']['app'] or ""</key>
+		</element>
+
+	</elements>
+</endpoint>

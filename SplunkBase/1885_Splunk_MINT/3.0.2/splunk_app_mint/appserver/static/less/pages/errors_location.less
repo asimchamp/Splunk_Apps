@@ -1,0 +1,35 @@
+// import app and core less , but only as reference. We can use any needed
+// styles/vars/mixins without polluting the output css
+@import (reference) "../common";
+
+// import filters less as shared filters view is used
+@import "../shared/filters";
+
+
+//Main Layout Styling
+#layout{
+  .choro{
+    height: 400px;
+    #mapview{
+      //Ember css
+      .shared-reportvisualizer{
+        height: 400px !important;
+      }
+      .leaflet-control-zoom, .leaflet-reset-zoom{
+        display: none;
+      }
+    }
+  }
+  #errors-chart{
+      height:220px;
+      padding:0px 10px;
+  }
+  #errors-avg{
+    .single-css{
+      font-size: 18px;
+      font-weight: 400;
+      padding: 0px 10px 10px 17px;
+      color: @red;
+    }
+  }
+}

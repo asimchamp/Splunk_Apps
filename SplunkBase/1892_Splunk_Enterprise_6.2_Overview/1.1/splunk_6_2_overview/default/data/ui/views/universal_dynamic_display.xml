@@ -1,0 +1,125 @@
+<dashboard>
+  <label>Universal Hide-Show Objects</label>
+  <description></description>
+  <row>
+    <panel>
+      <table>
+        <title>Top Violation Types</title>
+        <searchString>index="sf_food_health" sourcetype=sf_food_violations risk_category="High Risk" neighborhood="*"
+| stats count by description
+| sort -count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime></latestTime>
+        <drilldown>
+          <set token="violation_type">$row.description$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$violation_type$">
+      <title>Violation Summary ("$violation_type$")</title>
+      <chart>
+        <title>Top Neighborhoods</title>
+        <searchString>index="sf_food_health" sourcetype=sf_food_violations description="$violation_type$" | top neighborhood</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime></latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+      <table>
+        <title>Top Businesses</title>
+        <searchString>index="sf_food_health" sourcetype=sf_food_violations description="$violation_type$" | stats values(name) as name values(address) as address values(neighborhood) as neighborhood  count as "Total Violations" by business_id  | fields - business_id  | sort -"Total Violations"</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime></latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="field1">
+        <label>Show another input?</label>
+        <choice value="Yes">Yes</choice>
+        <choice value="No">No</choice>
+        <change>
+          <condition value="Yes">
+            <set token="showMoreOptions">true</set>
+          </condition>
+          <condition value="No">
+            <unset token="showMoreOptions"/>
+          </condition>
+        </change>
+      </input>
+      <input type="dropdown" token="field2" depends="$showMoreOptions$">
+        <label>Select Second Choice</label>
+        <choice value="Yes">Yes</choice>
+        <choice value="No">No</choice>
+      </input> 
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Universal Hide-Show Objects</h2>
+        <p>Dynamically control display for all objects on a dashboard.</p>
+        <p>Use tokens to control show/hide of dashboard rows, panels, inputs, and elements</p>
+        <ul>
+          <li>To show a dashboard panel based on the existence of a token, use: <code><![CDATA[<panel depends="$showPanel$">]]></code></li>
+          <li>To hide a dashboard panel based on the existence of a token, use: <code><![CDATA[<panel rejects="$hidePanel$">]]></code></li>
+          <li>To only show an element based on tokens in existence, and other tokens not in existence, use: <code><![CDATA[<chart depends="$token1$, $token2$" rejects="$token3$">]]></code></li>
+          <li>To only show a second form input once the first input is already selected, use: <code><![CDATA[<input type="dropdown" token="second_select" depends="$first_select$">]]></code></li>
+        </ul>
+        <pre>
+<![CDATA[
+      <input type="dropdown" token="field1">
+        <label>Show another input?</label>
+        <choice value="Yes">Yes</choice>
+        <choice value="No">No</choice>
+        <change>
+
+          <!-- If user selects "Yes", then set token that will display the secondary form input -->
+          <condition value="Yes">
+            <set token="showMoreOptions">true</set>
+          </condition>
+
+          <!-- If user selects "No", then unset token that will effectively hide the secondary form input -->
+          <condition value="No">
+            <unset token="showMoreOptions"/>
+          </condition>
+        </change>
+      </input>
+
+      <!-- Only show this form input if the token "showMoreOptions" is set -->
+      <input type="dropdown" token="field2" depends="$showMoreOptions$">
+        <label>Select Second Choice</label>
+        <choice value="Yes">Yes</choice>
+        <choice value="No">No</choice>
+      </input> 
+]]>
+        </pre>
+      </html>
+    </panel>
+  </row>
+</dashboard>

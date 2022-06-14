@@ -1,0 +1,332 @@
+{% extends "sentry:template/sentry_base_with_full_controls.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}} | Analytic - Non-Employee{% endblock title %}
+{% block css %}
+    <!-- Style sheets are loaded here -->
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <style>
+
+    </style>
+{% endblock css %}
+
+{% block sentry_header %}
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+        <div class="span12 dashboard-header clearfix">
+            <h2>Analytic: Non-Employee</h2>
+        </div>
+{% endblock sentry_header %}
+
+{% block content %}
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 33.33%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="chartTopNonEmp" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>Top Non-Employee Access</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cell" style="width: 66.66%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="chartNonEmpTimeline" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>Non-Employee Access over Time by Type</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 40%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="tableNonEmpNoDemo" style="width: 100%">
+                        <div class="panel-head">
+                            <!--<h3>BTG Failure without Success</h3>-->
+	                   	</div>
+                            <div class="heading_wrapper">
+	                            <span class="heading_3">Non-Employee Access (No Demographics)</span>
+	                            <div id="help_icon" class="eyeIcon">i
+			                        <div id="help_info_outer" class="custom-dropdown-menu hidden">
+				                        <div id="help_info_inner" class="custom-dropdown-msg">
+				                            This report is meant to be used by sorting custient count, access count, and average access 
+			                                to identify large custient counts, large amounts of access, and/or excessive access per custient 
+			                                respectively for users with no demographic information beyond their name.
+				                        </div>
+			                        </div>
+			                    </div>
+	                    	</div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cell" style="width: 60%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="chartNonEmpNoDemoTimeline" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>Non-Employee Avg. Access over Time (No Demographics)</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="tableNonEmpLastname" style="width: 100%">
+                        <div class="panel-head">
+                            <!--<h3>Non-Employee Access</h3>-->
+	                   	</div>
+                            <div class="heading_wrapper">
+	                            <span class="heading_3">Non-Employee Viewing Lastname (No Demographics)</span>
+	                            <div id="help_icon" class="eyeIcon">i
+			                        <div id="help_info_outer" class="custom-dropdown-menu hidden">
+				                        <div id="help_info_inner" class="custom-dropdown-msg">
+				                            Users accessing custients with same last name that have no other demographic information beyond their name.
+				                        </div>
+			                        </div>
+			                    </div>
+	                    	</div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="tableNonEmpAccess" style="width: 100%">
+                        <div class="panel-head">
+                            <!--<h3>Non-Employee Access</h3>-->
+	                   	</div>
+                            <div class="heading_wrapper">
+	                            <span class="heading_3">Non-Employee Access (Limited Demographics)</span>
+	                            <div id="help_icon" class="eyeIcon">i
+			                        <div id="help_info_outer" class="custom-dropdown-menu hidden">
+				                        <div id="help_info_inner" class="custom-dropdown-msg">
+				                            This report should be used similarly to the Non-Employee Access (No Demographics) for users that do not have complete demographics.
+				                        </div>
+			                        </div>
+			                    </div>
+	                    	</div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content%}
+
+{% block managers %}
+
+    {% searchmanager
+        id="searchTopNonEmp"
+        search='index="sentry_summary" stat="nonemp" | stats sum(count) as access_count by user_id | sort -access_count | head 15'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+    {% searchmanager
+        id="searchNonEmpTimeline"
+        search='index="sentry_summary" stat="nonemp" | lookup emp_types emp_type OUTPUT emp_type_name | timechart sum(count) as access_count by emp_type_name'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+    {% searchmanager
+        id="searchNonEmpAccess"
+        search='index="sentry_summary" report=nonemp_access user_id="$selUserID$" apps="$selApp$" emp_name!="-*" NOT [| inputlookup triage $includeTriaged$ | rename app AS apps | fields user_id, apps ] | lookup emp_types emp_type | eval emp_type=emp_type_name | sort -_time -cust_count -avg_access | table _time,date,cust_count,access_count,avg_access,apps,user_id,emp_name,emp_type,emp_org,emp_job_title,emp_dept'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+    {% searchmanager
+        id="searchNonEmpNoDemo"
+        search='index=sentry_summary report=nonemp_nodemo user_id="$selUserID$" apps="$selApp$" NOT [| inputlookup triage $includeTriaged$ | rename app AS apps | fields user_id apps ] | sort -date -cust_count | table date,cust_count,access_count,avg_access,apps,user_id,emp_name'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+    {% searchmanager
+        id="searchNonEmpLastname"
+        search='index=sentry_summary report=nonemp_view_lastname user_id="$selUserID$" cust_id="$selCustID$"  app="$selApp$" NOT [| inputlookup triage $includeTriaged$ | fields user_id cust_id app] | sort -access_time | table access_time,app,access_type,metric_name,user_id,cust_id,emp_name,cust_name'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+    {% searchmanager
+        id="searchNonEmpNoDemoTimeline"
+        search='index=sentry_summary report=nonemp_nodemo apps="$selApp$" | timechart sum(avg_access) AS avg_access by user_id useother=f'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+
+{% endblock managers %}
+
+{% block js %}
+<script>
+	require(["splunkjs/mvc"], function() {
+	    require.config({
+	        baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+	        waitSeconds: 0 // Disable require.js load timeout 
+	    });
+	
+		require(["splunkjs/ready!", 
+	             "splunkjs/mvc/simplexml/element/table",
+	             "splunkjs/mvc/simplexml/element/chart"], function(mvc, TableElement, ChartElement) {
+	    	
+	        // Initialization 
+	
+	        // Set the default time range 
+	        timerange.val({"earliest_time": "-7d@h", "latest_time": "now"});
+	        
+	        // Set default for the App dropdown 
+	        dropdownTriageApp.settings.set("default", "*")
+	        
+	        // Set default for the App dropdown 
+	        dropdownApp.settings.set("default", "*")
+	
+	        
+	        // Searches that should only run on initialization
+	        //mvc.Components.getInstance("searchTopNonEmp").startSearch();
+	        //mvc.Components.getInstance("searchNonEmpTimeline").startSearch();
+	        //mvc.Components.getInstance("searchNonEmpNoDemoTimeline").startSearch();
+	        
+	        searches.push(mvc.Components.getInstance("searchNonEmpAccess"));
+	        searches.push(mvc.Components.getInstance("searchNonEmpNoDemo"));
+	        searches.push(mvc.Components.getInstance("searchNonEmpLastname"));
+	        searches.push(mvc.Components.getInstance("searchTopNonEmp"));
+	        searches.push(mvc.Components.getInstance("searchNonEmpTimeline"));
+	        searches.push(mvc.Components.getInstance("searchNonEmpNoDemoTimeline"));
+	        
+	        
+	 
+	        // Views 
+	
+	        var chartTopNonEmp = new ChartElement({
+	            "id": "chartTopNonEmp",
+	            "managerid": "searchTopNonEmp",
+	            "charting.chart": "pie",
+	            "link.visible": false,
+                    "drilldown": "none",
+	            "drilldownRedirect": "false",
+	            "el": $('#chartTopNonEmp')
+	        }, {tokens: true}).render();
+	
+	        var chartNonEmpTimeline = new ChartElement({
+	            "id": "chartNonEmpTimeline",
+	            "managerid": "searchNonEmpTimeline",
+	            "charting.chart": "column",
+	            "link.visible": false,
+                    "drilldown": "none",
+	            "drilldownRedirect": "false",
+	            "el": $('#chartNonEmpTimeline')
+	        }, {tokens: true}).render();
+	
+	        var chartNonEmpNoDemoTimeline = new ChartElement({
+	            "id": "chartNonEmpNoDemoTimeline",
+	            "managerid": "searchNonEmpNoDemoTimeline",
+	            "charting.chart": "column",
+	            "link.visible": false,
+	            "drilldownRedirect": "false",
+	            "drilldown": "none",
+	            "height": 450,
+	            "el": $('#chartNonEmpNoDemoTimeline')
+	        }, {tokens: true}).render();
+	
+	        var tableNonEmpNoDemo = new TableElement({
+	            "id": "tableNonEmpNoDemo",
+	            "managerid": "searchNonEmpNoDemo",
+	            "fields": "date,cust_count,access_count,avg_access,apps,user_id",
+	            "pageSize": "15",
+	            "drilldownRedirect": "false",
+	            "link.inspectSearch.visible": false,
+	            "link.openSearch.visible": false,
+	            "el": $('#tableNonEmpNoDemo')
+	        }, {tokens: true}).render();
+	
+	        var tableNonEmpLastname = new TableElement({
+	            "id": "tableNonEmpLastname",
+	            "managerid": "searchNonEmpLastname",
+	            "fields": "access_time,app,access_type,metric_name,user_id,cust_id,emp_name,cust_name",
+	            "pageSize": "15",
+	            "drilldownRedirect": "false",
+	            "link.inspectSearch.visible": false,
+	            "link.openSearch.visible": false,
+	            "el": $('#tableNonEmpLastname')
+	        }, {tokens: true}).render();
+	
+	        var tableNonEmpAccess = new TableElement({
+	            "id": "tableNonEmpAccess",
+	            "managerid": "searchNonEmpAccess",
+	            "fields": "date,cust_count,access_count,avg_access,apps,user_id,emp_name,emp_type,emp_org,emp_job_title,emp_dept",
+	            "pageSize": "15",
+	            "drilldownRedirect": "false",
+	            "link.inspectSearch.visible": false,
+	            "link.openSearch.visible": false,
+	            "el": $('#tableNonEmpAccess')
+	        }, {tokens: true}).render();
+	
+	
+	        // Event Handlers
+	
+	        chartNonEmpTimeline.on("click:chart", function(e) {
+	            e.preventDefault();
+	        });
+
+	        chartNonEmpNoDemoTimeline.on("click:chart", function(e) {
+	            e.preventDefault();
+	        });
+
+	        chartTopNonEmp.on("click:chart", function(e) {
+	            e.preventDefault();
+	            tokens.set({"selUserID": e.value});
+	            tokens.set({"selTriageUserID": e.value});
+	            $("#buttonSearch").click();
+	        });
+	
+	        tableNonEmpNoDemo.on("click", function(e) {
+	            e.preventDefault();
+	            var earlyTime = tokens.get("earlyTime");
+	            var lateTime = tokens.get("lateTime");
+	            var selApp = tokens.get("selApp");
+	            redirector({'selUserID': e.data['row.user_id'], 'selCustID': "*", 'selApp': e.data['row.app'], 'earlyTime': earlyTime, 'lateTime': lateTime}, 'lookup');
+	        });
+	
+	        tableNonEmpLastname.on("click", function(e) {
+	            e.preventDefault();
+	            var earlyTime = tokens.get("earlyTime");
+	            var lateTime = tokens.get("lateTime");
+	            var selApp = tokens.get("selApp");
+	            redirector({'selUserID': e.data['row.user_id'], 'selCustID': e.data['row.cust_id'], 'selApp': e.data['row.app'], 'earlyTime': earlyTime, 'lateTime': lateTime}, 'lookup');
+	        });
+	
+	        tableNonEmpAccess.on("click", function(e) {
+	            e.preventDefault();
+	            var earlyTime = tokens.get("earlyTime");
+	            var lateTime = tokens.get("lateTime");
+	            var selApp = tokens.get("selApp");
+	            redirector({'selUserID': e.data['row.user_id'], 'selCustID': e.data['row.cust_id'], 'selApp': e.data['row.app'], 'earlyTime': earlyTime, 'lateTime': lateTime}, 'lookup');
+	        });
+
+	    });
+    });
+</script>
+{% endblock js %}
+

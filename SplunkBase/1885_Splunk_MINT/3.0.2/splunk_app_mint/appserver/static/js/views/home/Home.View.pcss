@@ -1,0 +1,260 @@
+@import "../pcss/common.pcss";
+/*h2 title*/
+.section-title{
+	display: inline-block;
+    margin-top: 15px;
+}
+.section-subtitle{
+	margin-left:20px;
+	/*color: $gray;*/
+}
+/*Add new button*/
+.add-project-controls{
+	display: inline-block;
+	margin-top: -6px;
+	vertical-align: middle;
+}
+/*Manage connection*/
+.general-controls{
+	.btn [class^=icon]{
+		font-size: 16px;
+		margin-right: 5px;
+	}
+	.mint-settings{
+		margin-bottom: 10px;
+	    margin-left: 18px;
+	}
+}
+
+/*Add Project popup*/
+.modal.modal-project{
+	width:650px;
+	margin-left: -325px;
+	height:auto;
+	.modal-body {
+		height: auto;
+		max-height: 1000px; /* required to overwrite default of 180px */
+	}
+}
+/*Forms inside sdd project popup*/
+.form.form-project{
+	width:350px;
+	display:inline-block;
+	border-right: 1px solid $border-color;
+	.control-group {
+		margin-bottom: 0;
+	}
+	.projects-selectapps{
+		height: 200px;
+		.controls {
+			overflow: auto;
+			height: 175px;
+		}
+		.apps-loading-status{
+			font-size: 12px;
+			font-weight: normal;
+			line-height: 16px;
+		}
+	}
+}
+/*Mint express texts*/
+.cta-mint-express{
+	width:205px;
+	display:inline-block;
+	position: absolute;
+	top: 20px;
+	p{
+		margin-left:15px;
+		span{
+			color: $mediumgray;
+			display: block;
+			padding-top: 10px;
+		}
+	}
+}
+/*Notifications*/
+.form-flash-messages{
+	width: 245px;
+	display: inline-block;
+	position: absolute;
+	bottom: 0;
+	right: 10px;
+}
+
+/*Project box*/
+.dashboard-row{
+	padding: 10px 18px;
+    margin-top: 15px;
+	div{
+		display:inline-block;
+		div{
+			display: block;
+		}
+	}
+	.dashboard-cell{
+		background-color: $lightgray2;
+		margin: 0px 20px 20px 0px;
+		/*.smooth-transition;*/
+		@mixin BgTransition;
+		&:hover{
+			background-color: rgba(234, 237, 239, 0.8);
+			background-color: @lightgray;
+		}
+		h3{
+	        margin: 0px 0px 15px 0px;
+			word-wrap: break-word;
+			display: inline-block;
+			width: 280px;
+			vertical-align: top;
+			a{
+				/*.smooth-transition2;*/
+				@mixin ColorTransition;
+				color: $darkblue;
+				&:hover{
+					color: @blue;
+				}
+			}
+		}
+		.projectname{
+			a{
+				i{
+					padding: 0px 4px 0px 7px;
+					font-size: 13px;
+					vertical-align: top;
+					border-left: 1px solid $border-color;
+					display: inline-block;
+				}
+				&:nth-child(2),&:nth-child(1){
+					i{
+						margin-left: 2px;
+						border-left: none;
+					}
+				}
+			}
+		}
+		p{
+			display: inline-block;
+			padding: 15px 18px 5px;
+			span{
+				line-height: 20px;
+			}
+		}
+		.chart-mau{
+			span{
+				color: $blue;
+			}
+		}
+		.chart-avg-latency{
+			span{
+				color: $yellow;
+			}
+		}
+		.chart-crash-rate{
+			span{
+				color: $red;
+			}
+		}
+		.dashboard-panel{
+			background-color: $lightgray;
+			border:none;
+			@mixin rounded 0px;
+			margin: 0px;
+			height: 63px;
+			.dashboard-element{
+				width: 140px;
+				display: inline-block;
+				vertical-align: top;
+				p{
+					padding: 10px 5px 0px 19px;
+					text-transform: uppercase;
+					font-weight: 600;
+					font-size: 14px;
+					color: $darkblue;
+				}
+				span{
+					font-size: 18px;
+					font-weight: 500;
+				}
+				.no-results{
+					margin-left: 20px;
+				}
+				.single-value{
+				    margin: 0px 0px 10px 18px;
+					.after-label{
+						margin-left: 3px;
+                        /*font-size: 16px;*/
+					}
+				}
+				.alert{
+					margin: 0px;
+					padding: 0px 0px 0px 15px;
+					vertical-align: top;
+					i{
+						display: none;
+					}
+				}
+				.splunk-message-container{
+					padding:0px;
+				}
+			}
+		}
+	}
+}
+/*Side bar with information*/
+.BodyLeft{
+	width: 100% !important;
+	.side-info{
+		background-color: $lightgray2;
+	    height: auto !important;
+	    min-height: 650px;
+    	p{
+    		padding: 5px 18px 0px;
+    	}
+    	.platforms{
+    		#android,#ios{
+    			display: inline-block;
+    			h3{
+    				text-transform: none;
+				    font-weight: 500;
+				    font-size: 13px;
+				    padding: 0px 18px;
+    			}
+    			p{
+    				font-size:18px;
+    			}
+    			span{
+    				padding: 0px 18px;
+    			}
+    			.green{
+    				color:$green;
+					font-size:18px;
+    			}
+    			.red{
+					color: $red;
+					font-size:18px;
+    			}
+    		}
+    	}
+	}
+	.home-filters{
+	    display: inline-block;
+	    float: right;
+	    padding: 10px 20px 0px;
+	    #timerange-filter, #env-filter{
+    	    display: inline-block;
+		    vertical-align: top;
+		    margin-right: 20px;
+	    }
+	}
+}
+/*Settings popup*/
+#legal-checkboxes{
+    label{
+        width: 390px;
+    }
+}
+#legal-checkbox{
+    position: absolute;
+    margin-top: -72px;
+}
+

@@ -1,0 +1,116 @@
+<form>
+  <label>Users</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time_token" searchWhenChanged="true">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="mso_token" searchWhenChanged="true">
+      <label>Multi-Site Orchestrator</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <fieldForLabel>mso_host</fieldForLabel>
+      <fieldForValue>mso_host</fieldForValue>
+      <search>
+        <query>eventtype="cisco_mso" mso_api_endpoint=userDetails OR mso_api_endpoint=userRoles | fields mso_host | dedup mso_host | table mso_host</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <change>
+        <unset token="show_role"></unset>
+        <unset token="show_username"></unset>
+      </change>
+    </input>
+  </fieldset>
+  <row rejects="$mso_token$">
+      <panel>
+      <html>
+       <p><i>Data is not available in selected time range or MSO data collection is not configured. Try expanding the time range or configure the MSO: <a href="/app/TA_cisco-ACI/aci_setup" target="_blank">Setup Page</a></i></p>
+     </html>
+    </panel>
+  </row>
+  <row depends="$mso_token$">
+    <panel>
+      <table>
+        <title>Users</title>
+        <search>
+          <query>eventtype="cisco_mso" mso_api_endpoint=userDetails mso_host=$mso_token$| dedup id | table username, emailAddress, accountStatus | rename username as Username, emailAddress as "Email Address", accountStatus as "Account Status"</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <set token="show_username">True</set>
+          <set token="query">eventtype="cisco_mso" mso_api_endpoint=userDetails username=$row.Username$ mso_host=$mso_token$ | dedup id | table username, firstName, firstName, latName, id, phoneNumber consecutiveFailedAttempts, currentLockoutTime, domainId, roles_accessType, needsPasswordUpdate | transpose | rename "row 1" as "Details"</set>
+          <unset token="show_role"></unset>
+          <set token="username">$row.Username$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Roles</title>
+        <search>
+          <query>eventtype="cisco_mso" mso_api_endpoint=userRoles mso_host=$mso_token$ | dedup id | table name, displayName | rename name as "Actual Name", displayName as "Display Name"</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <set token="show_role">True</set>
+          <set token="query">eventtype="cisco_mso" mso_api_endpoint=userRoles name=$row.Actual Name$ mso_host=$mso_token$ | dedup id | table displayName, id, description, readPermissions, writePermissions | transpose | rename "row 1" as "Details"</set>
+          <unset token="show_username"></unset>
+          <set token="role_name">$row.Actual Name$</set>
+          <set token="display">$row.Display Name$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row depends="$show_username$">
+    <panel>
+      <table>
+        <title>Details of User - $username$</title>
+        <search>
+          <query>$query$</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row depends="$show_role$">
+    <panel>
+      <table>
+        <title>Details of Role - $display$</title>
+        <search>
+          <query>$query$</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row depends="$mso_token$">
+    <panel>
+      <table>
+        <title>User  Activity</title>
+        <search>
+          <query>eventtype="cisco_mso"  mso_api_endpoint=msoAuditRecords type="user-auth" mso_host=$mso_token$| table timestamp, user_username, user_firstName, user_lastName, user_domainName, type, event
+| rename timestamp as Timestamp,user_username as Username, user_firstName as "First Name", user_lastName as "Last Name ", user_domainName as "Domain Name ", type as "Type", event as "Event"</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

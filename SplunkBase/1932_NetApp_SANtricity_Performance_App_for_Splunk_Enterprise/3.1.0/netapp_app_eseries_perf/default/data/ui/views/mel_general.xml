@@ -1,0 +1,116 @@
+<form version="1.1" script="timerange.js">
+  <label>Events by Array</label>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" searchWhenChanged="true" id="timerange">
+      <label>Time</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="arrayId" searchWhenChanged="true">
+      <label>Array</label>
+      <search>
+        <query>
+          | inputlookup nesa_volume_groups | stats count by arrayId, arrayName
+        </query>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+    </input>
+    <input type="dropdown" token="priority" searchWhenChanged="true">
+      <label>Priority</label>
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <choice value="priorityInfo">Informational</choice>
+      <choice value="priorityWarning">Warning</choice>
+      <choice value="priorityCritical">Critical</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Critical Events</title>
+        <search>
+          <query> `get_nesa_index` sourcetype=eseries:mel-events host="$arrayId$" priority="priorityCritical" | stats distinct_count(sequenceNumber) AS count</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="field">count</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Informational Events</title>
+        <search>
+          <query> `get_nesa_index` sourcetype=eseries:mel-events host="$arrayId$" priority="priorityInfo" | stats distinct_count(sequenceNumber) AS count</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="field">count</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Array Events</title>
+        <search>
+          <query> `get_nesa_index` sourcetype=eseries:mel-events host="$arrayId$" priority="$priority$" | stats min(_time) AS _time, first(_raw) AS _raw by host, sequenceNumber | fields - sequenceNumber | spath | eval eventType=tostring(eventType, "hex")." ".description | top eventType showperc=false</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisTitleX.text">Event Code</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Array Events by Priority Over Time</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:mel-events host="$arrayId$" priority="$priority$" | eval priority=replace(priority, "priority", "") | timechart dc(sequenceNumber) AS count by priority</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>MEL Event Table</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:mel-events host="$arrayId$" priority="$priority$" | rename comment AS "Deduplicate this, based on the sequenceNumber field" | stats min(_time) AS _time, min(_indextime) AS first_seen, max(_indextime) AS last_seen, first(_raw) AS _raw by host, sequenceNumber | fields - sequenceNumber | spath | `ctime(timeStamp)` AS stamp | `ctime(*seen)` | eval priority=replace(priority, "priority", "") | eval eventType=tostring(eventType, "hex") | JOIN type=LEFT host [inputlookup array_controller_label.csv | rename arrayId as host | table host, arrayName]  | eval Time=_time | convert timeformat="%Y-%m-%d %H:%M:%S" ctime(Time)  | table Time, first_seen, last_seen, arrayName, stamp, priority, critical, description, sequenceNumber, eventType, category, componentType, componentLocation.label, eventSourceController | rename first_seen AS "First seen"           last_seen AS "Last seen"           priority AS Priority   arrayName AS Array   stamp AS Stamp   critical AS Critical   description AS Description   sequenceNumber AS "Sequence #"   eventType AS "Event Type"   category AS Category   componentType AS "Component Type"   componentLocation.label AS "Component Location"   eventSourceController AS "Source Controller"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

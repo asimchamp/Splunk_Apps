@@ -1,0 +1,163 @@
+<form script="link_switcher.js, autodiscover.js">
+  <label>Applications v2</label>
+  <description>Uses IPFix v2 templates to generate data</description>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="multiselect" token="firewall" searchWhenChanged="true">
+      <label>Select Firewalls</label>
+      <search>
+        <query>index=sonicwall template_type=dynamic | dedup firewall_hostname</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>firewall_hostname</fieldForLabel>
+      <fieldForValue>firewall_hostname</fieldForValue>
+      <valuePrefix>firewall_hostname="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All Firewalls</choice>
+      <default>*</default>
+    </input>
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-4h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="bad_app">
+      <label>Filter application</label>
+      <search>
+        <query>index=sonicwall tid=257 OR tid=357 OR tid=462 | top app_name limit=50</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>app_name</fieldForLabel>
+      <fieldForValue>app_name</fieldForValue>
+      <valuePrefix>app_name!="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> </delimiter>
+      <default>ICMP</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Firewall Activity</title>
+        <search>
+          <query>index=sonicwall $firewall$ template_type=dynamic  $bad_app$ firewall_hostname!="IPFix Converter" | top  firewall_hostname, app_name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <option name="refresh.auto.interval">60</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Applications by time</title>
+        <search>
+          <query>index=sonicwall $firewall$ TemplateID=257 OR tid=357 OR tid=462  OR tid=456 OR tid=457 $bad_app$ | eval app_name=coalesce(app_name, app_id) | eval total_kb=(init_to_resp_octets+resp_to_init_octets)/1024 | timechart per_hour(total_kb) by app_name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.auto.interval">64</option>
+      </chart>
+    </panel>
+  </row>
+  <!-- Begin Link Switched Section -->
+  <row grouping="4">
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <div class="link-switcher" data-items="link1,link2,link3">Select a view: <!--Links go here-->
+      </div>
+    </html>
+    <table id="link1">
+      <title>Applications by total flows</title>
+      <search>
+        <query>index=sonicwall $firewall$ tid=257 OR tid=357 OR tid=462 OR tid=456 OR tid=457 $bad_app$  | lookup sonicwall_app_description app_id as app_uuid OUTPUTNEW app_description as app_description | chart count, values(app_description) by app_name | sort - count | rename values(app_description) as "Description" | rename app_name as "Application" | rename count as "Total Flows"</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+      <option name="refresh.auto.interval">65</option>
+    </table>
+    <chart id="link2">
+      <title>Applicaiton by Count</title>
+      <search>
+        <query>index=sonicwall $firewall$ tid=257 OR tid=357 OR tid=462 OR tid=456 OR tid=457 $bad_app$ | chart count by app_name</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+      </search>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.bubbleMaximumSize">50</option>
+      <option name="charting.chart.bubbleMinimumSize">10</option>
+      <option name="charting.chart.bubbleSizeBy">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="refresh.auto.interval">35</option>
+    </chart>
+    <map id="link3">
+      <title>Application by Location</title>
+      <search>
+        <query>index=sonicwall $firewall$ TemplateID=257 OR tid=357 OR tid=462  OR tid=456 OR tid=457 $bad_app$ (dest_ip!=192.168.1.0/24 OR dest_ip!=10.0.0.0/8 OR dest_ip!=172.20.0.0/16) | iplocation allfields=True dest_ip | geostats latfield=lat longfield=lon count by app_name</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+      </search>
+      <option name="mapping.data.maxClusters">100</option>
+      <option name="mapping.drilldown">all</option>
+      <option name="mapping.map.center">(0,0)</option>
+      <option name="mapping.map.zoom">2</option>
+      <option name="mapping.markerLayer.markerMaxSize">50</option>
+      <option name="mapping.markerLayer.markerMinSize">10</option>
+      <option name="mapping.markerLayer.markerOpacity">0.8</option>
+      <option name="mapping.tileLayer.maxZoom">7</option>
+      <option name="mapping.tileLayer.minZoom">0</option>
+      <option name="drilldown">all</option>
+      <option name="refresh.auto.interval">70</option>
+    </map>
+  </row>
+</form>

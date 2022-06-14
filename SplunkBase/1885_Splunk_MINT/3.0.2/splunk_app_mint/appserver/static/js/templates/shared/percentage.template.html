@@ -1,0 +1,17 @@
+<div class="percentage tooltip-css">
+  <% _.each(results, function(row) { %>
+	  <div style="width:<%- row.value %>%; background:<%- row.color %>"></div>
+  <% }) %>
+  <strong class="tooltip-css-style">
+	  <% _.each(results, function(row) { %>
+	  	  <span style="color: <%- row.color %>;"><%- row.name %></span>
+	  	  <%- row.value %>%<br/>
+	  <% }) %>
+  </strong>
+</div>
+<ul>
+  <% _.each(results, function(row) { %>
+  <li><span style="color: <%- row.color %>;"><%- row.name %></span> <%- row.value %>% </li>
+  <% }) %>
+</ul>
+

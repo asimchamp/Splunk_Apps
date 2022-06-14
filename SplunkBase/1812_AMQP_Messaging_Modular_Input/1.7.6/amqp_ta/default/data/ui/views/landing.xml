@@ -1,0 +1,37 @@
+<dashboard version="1.1">
+    <label>AMQP Messaging Modular Input v1.7.6</label>
+    
+    <row>
+        <panel>
+            <html>
+
+            <h1>Overview</h1>
+            <p>
+            This is a Splunk Modular Input Add-On for indexing messages from an AMQP Broker.It utilizes the RabbitMQ Java client library(v5.12.0) , but can be used against any AMQP v0-9-1, 0-9 and 0-8 compliant broker. <br/>
+            The Python code in this App is dual 2.7/3 compatible.<br/>
+            This version of the App enforces Python 3 for execution of the modular input script when running on Splunk 8+ in order to satisfy Splunkbase AppInspect requirements.<br/>
+            If running this App on Splunk versions prior to 8 , then Python 2.7 will get executed.<br/>
+		    </p>
+
+            <hr/>
+		    <h1>Quickstart</h1>
+
+		    <p>Browse to the <a href="../../../en-US/app/amqp_ta/activation_key" target="_blank">Activation Key</a> menu tab and enter your activation key.</p>
+            <p>Browse to the <a href="../../../en-US/app/amqp_ta/setup_page" target="_blank">Setup Credentials</a> menu tab and enter any usernames/passwords you require.</p>
+            <p>Encrypted credentials are saved to <code>$SPLUNK_HOME/etc/apps/amqp_ta/local/passwords.conf</code></p>
+            <p>Browse to the <a href="../../../en-US/manager/amqp_ta/data/inputs/amqp" target="_blank">Data Inputs</a> tab and setup your AMQP Inputs.</p>
+            
+            <hr/>
+		    <h1>Developer</h1>
+
+		    <p>
+       
+            This App is built and supported by the team at <a href="https://www.baboonbones.com" target="_blank">BaboonBones</a>
+
+		    </p>
+
+             			            
+            </html>
+        </panel>
+    </row>
+</dashboard>

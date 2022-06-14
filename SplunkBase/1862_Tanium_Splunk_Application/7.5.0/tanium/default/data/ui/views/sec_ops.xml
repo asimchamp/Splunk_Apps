@@ -1,0 +1,357 @@
+<form>
+  <label>Security Operations</label>
+  <description>Tanium Endpoint Security Operations</description>
+  <fieldset submitButton="false">
+    <input type="time" token="field17">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Threat Response Alerts Over Time</title>
+        <search>
+          <query>`tanium_index` (sourcetype::tanium:detect:signals OR sourcetype::tanium:detect:openioc OR sourcetype::tanium:detect:yara) | timechart count by sourcetype  | bucket span=1d _time</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.text">Count</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Number of Alerts</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Highest Risk Systems</title>
+        <search>
+          <query>`tanium_index` (Question="Tanium-Discover" OR Question="Splunk-Windows-Workstation-USB-Write-Protect" OR Question="Splunk-Firewall-Status" OR Question="Splunk-Windows-Workstation-Bitlocker-Status") | top limit=20 Computer_Name</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="height">215</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Tanium Managed Systems</title>
+        <search>
+          <query>`tanium_index` Question="Client-Status" | stats dc(HostName)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">64</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0x555","0xd93f3c"]</option>
+        <option name="rangeValues">[8,30,70,100,200]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Tanium Lost System</title>
+        <search>
+          <query>`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*Lost*Interface" | stats dc(MacAddress)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">64</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20(Question=%22Discover-Notifications%22%20OR%20%22Discover%20Notifications%22)%20Event=%22*Lost*Interface%22%20%0A%7C%20%20table%20_time,LastDiscoveredAt,LastManagedAt,HostName,MacAddress,MacOrganization,Event&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Tanium Unmanaged Interfaces</title>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" Managed="0" | stats dc(MacAddress)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">65</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1,2]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20%22Question=Tanium-Discover%22%20%7C%20table%20computerid,%20hostname,%20ipaddress,%20natipaddress,%20macaddress,%20macorganization,%20os,%20osgeneration,%20ports,%20method,%20lastdiscoveredat,%20lastmanagedat,%20unmanageable&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Threat Response Alerts</title>
+        <search>
+          <query>`tanium_index` (sourcetype::tanium:detect:signals OR sourcetype::tanium:detect:openioc OR sourcetype::tanium:detect:yara) | stats dc(Alert Id)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">65</option>
+        <option name="rangeColors">["0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` (sourcetype::tanium:detect:signals OR sourcetype::tanium:detect:openioc OR sourcetype::tanium:detect:yara) | dedup Alert_Id&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Spectre-Meltdown Exposed Systems</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Spectre-Scan" State="Vulnerable" |stats distinct_count(Computer_Name)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">65</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Spectre-Scan" State="VULNERABLE" | table Computer_Name,State,Reason&amp;earliest=$field17.earliest$&amp;latest=$field17.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Windows USB No Write Protection</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Windows-Workstation-USB-Write-Protect" NOT USB_Write_Protected="True" | stats dc(Computer_Name)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">65</option>
+        <option name="rangeColors">["0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Windows-Workstation-USB-Write-Protect" NOT USB_Write_Protected="True" | dedup Computer_Name | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table Computer_Name,Last_Logged_In_User,USB_Write_Protected,Operating_System,Chassis_Type,Computer_Serial_Number&amp;earliest=$field17.earliest$&amp;latest=$field17.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Windows Workstation No Firewall</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Firewall-Status" | Table Computer_Name IP_Address Firewall_Status Last_Logged_In_User | stats dc(Computer_Name)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">64</option>
+        <option name="rangeColors">["0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Firewall-Status" | Table Computer_Name IP_Address Firewall_Status Last_Logged_In_User | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table _time,Computer_Name,Firewall_Status,Last_Logged_In_User,Chassis_Type,Computer_Serial_Number,Operating_System&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Windows Workstation No Bitlocker</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Windows-Workstation-Bitlocker-Status" NOT Protected_Status="Protected On" | dedup Computer_Name | Table Computer_Name, Protection_Status, Encryption_Method, Lock_Status | stats dc(Computer_Name)</query>
+          <earliest>$field17.earliest$</earliest>
+          <latest>$field17.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="height">64</option>
+        <option name="rangeColors">["0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-Windows-Workstation-Bitlocker-Status" | dedup Computer_Name | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table Computer_Name,Last_Logged_In_User,Protection_Status, Encryption_Method, Lock_Status,Operating_System,Chassis_Type,Computer_Serial_Number&amp;earliest=$field17.earliest$&amp;latest=$field17.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field4">
+        <label>Time Range</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field1">
+        <label>Computer Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field2">
+        <label>IP address</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field3">
+        <label>Last Logged in User</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Tanium Endpoint and User Search</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Machine-User" Computer_Name=$field1$ IP_Address=$field2$ Last_Logged_In_User=$field3$ |dedup _time,Computer_Name | eval date_time = strftime(_time,"%m/%d/%y %H:%M:%S") | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table _time,Computer_Name,Last_Logged_In_User,IP_Address,Operating_System,Chassis_Type,Computer_Serial_Number | sort _time</query>
+          <earliest>$field4.earliest$</earliest>
+          <latest>$field4.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Running Processes</title>
+      <input type="time" token="field7">
+        <label>Time Range</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field10">
+        <label>Computer Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field8">
+        <label>Path or Process Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field9">
+        <label>MD5 Hash</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <search>
+          <query>`tanium_index` Question="Splunk-Running-Processes-with-MD5-Hash" Computer_Name=$field10$ Path=$field8$ Hash=$field9$ | table Computer_Name,Path,Hash | sort Count -count desc</query>
+          <earliest>$field7.earliest$</earliest>
+          <latest>$field7.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field11">
+        <label>Time Range</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field12">
+        <label>AutoRun Entry</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field13">
+        <label>MD5 Hash</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>AutoRun with MD5 Hash</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Auto-Run-Details" Entry=$field12$ MD5_Hash=$field13$ | Table Entry, Publisher,MD5_Hash</query>
+          <earliest>$field11.earliest$</earliest>
+          <latest>$field11.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="time" token="field14">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field15">
+        <label>Computer Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field16">
+        <label>Stopped Service Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Stopped Services</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Stopped-Services" Computer_Name=$field15$ Stopped_Service=$field16$  |Table Computer_Name,Stopped_Service</query>
+          <earliest>$field14.earliest$</earliest>
+          <latest>$field14.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,129 @@
+<dashboard>
+  <label>Tanium Splunk Application</label>
+  <description></description>
+  <row>
+    <panel>
+      <html>
+     <h3>Tanium Splunk Application</h3>
+     <p>This app contains dashboards for working with data from Tanium. You will need to configure your Tanium instance with Saved Questions and use Tanium Connect to export the data to Splunk. Please contact your Tanium TAM for assistance and documentation. You can email <a href="mailto://support@tanium.com">Tanium Support</a> for assistance if you are not sure who your TAM is.</p>
+     <p>The default configuration assumes Tanium data is going to <tt>index=tanium</tt> If this is not the case, edit <tt>macros.conf</tt>.</p>
+     <p>
+          <a href="https://support.tanium.com/s/">Tanium Support</a>
+        </p>
+     <p>
+          <a href="https://www.tanium.com">Tanium Website</a>
+        </p>
+   </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$show_panel$">
+      <single>
+        <title>Unmanaged Assets</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' == 0">
+              <unset token="show_panel"></unset>
+            </condition>
+            <condition match="'job.resultCount' &gt;= 1">
+              <set token="show_panel">true</set>
+            </condition>
+          </progress>
+          <query>`tanium_index` "Question=Tanium-Discover" | timechart span=30d count(MacAddress)</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Tanium Clients</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' == 0">
+              <unset token="show_panel"></unset>
+            </condition>
+            <condition match="'job.resultCount' &gt;= 1">
+              <set token="show_panel">true</set>
+            </condition>
+          </progress>
+          <query>`tanium_index` Question="Client-Status" | timechart span=30d count(HostName)</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">/app/tanium/assets</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Vulnerabilities</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' == 0">
+              <unset token="show_panel"></unset>
+            </condition>
+            <condition match="'job.resultCount' &gt;= 1">
+              <set token="show_panel">true</set>
+            </condition>
+          </progress>
+          <query>`tanium_index` "Comply Vulnerability Findings" CVSS_Score!=NULL CVSS_Score!="" | timechart count(CVE)</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">/app/tanium/comply</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Threat Response Alerts</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' == 0">
+              <unset token="show_panel"></unset>
+            </condition>
+            <condition match="'job.resultCount' &gt;= 1">
+              <set token="show_panel">true</set>
+            </condition>
+          </progress>
+          <query>`tanium_index` (sourcetype::tanium:detect:signals OR sourcetype::tanium:detect:openioc OR sourcetype::tanium:detect:yara) | timechart span=30d count(Alert Id)</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">/app/tanium/threatresponse</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+</dashboard>

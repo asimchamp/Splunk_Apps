@@ -1,0 +1,274 @@
+<form>
+  <label>Numéros Spéciaux</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Période d'Analyse</label>
+      <default>
+        <earliest>@w0</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="TimeWindow">
+      <label>Fenêtre Temps Spécifique</label>
+      <choice value="&quot;&quot;">Tout le Temps</choice>
+      <choice value="`TimeWindow_WorkingDays`">Jours Ouvrés</choice>
+      <choice value="`TimeWindow_DayClosed`">Jours Fermés</choice>
+      <choice value="`TimeWindow_Weekend`">Weekend</choice>
+      <choice value="`TimeWindow_NightTime`">Nuits</choice>
+      <choice value="`TimeWindow_Lunch`">Déjeuner</choice>
+      <default>""</default>
+      <initialValue>""</initialValue>
+    </input>
+    <input type="text" token="Token_Party1Name">
+      <label>Utilisateur</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="Token_Called" searchWhenChanged="true">
+      <label>Numéro Appelé</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Numéros Internationaux</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Called_Number_2Digit=00
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+| lookup AVAYA_International_Prefix_FR.csv AVAYA_Called_Number OUTPUTNEW Pays
+ `FR_DetailCall_RENAME`
+| table Date Heure "Utilisateur" "Numéro Appelé" "Pays" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Pays">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Numéros d'Urgence  - 15 - 17 - 18 - 112 - 114 - 115 - 116000 - 119 - 191 - 196 - 197</title>
+        <search>
+          <query>`sourcelog`
+ (AVAYA_Dialled_Number="15" OR
+ AVAYA_Dialled_Number="17" OR
+ AVAYA_Dialled_Number="18" OR 
+ AVAYA_Dialled_Number="112" OR
+ AVAYA_Dialled_Number="114" OR
+ AVAYA_Dialled_Number="115" OR 
+ AVAYA_Dialled_Number="119" OR
+ AVAYA_Dialled_Number="191" OR
+ AVAYA_Dialled_Number="196" OR
+ AVAYA_Dialled_Number="197" OR
+ AVAYA_Dialled_Number="116000")
+ AVAYA_Is_Internal=0
+ AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+ `FR_DetailCall_RENAME`
+ | table Date Heure  "Utilisateur" "Numéro Appelé" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Services à Valeurs Ajoutées - 08xxxxxxxx</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Called_Number_2Digit=08
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+| lookup AVAYA_Special_Call_Number_FR.csv AVAYA_Dialled_Number OUTPUTNEW "Tarification_Prefix"
+| rename "Tarification_Prefix" AS "Tarification"
+| rename AVAYA_Called_Number_10Digit AS "Numéro 08XXXXXXXX"
+| rename AVAYA_Called_Number_10DigitEnd AS "Code DTMF"
+ `FR_DetailCall_RENAME`
+| table Date Heure  "Utilisateur" 
+"Numéro 08XXXXXXXX"
+"Code DTMF"
+ "Tarification" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Services à Valeurs Ajoutées  - 3xxx</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Called_Number_2Digit!=33
+AVAYA_Dialled_Number&gt;2999
+AVAYA_Dialled_Number&lt;4000
+AVAYA_Is_Internal=0 AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+| lookup AVAYA_Special_Call_Number_FR.csv AVAYA_Dialled_Number OUTPUTNEW "Tarification_Prefix"
+| rename "Tarification_Prefix" AS "Tarification"
+| rename AVAYA_Called_Number_4Digit AS "Numéro 3XXX"
+| rename AVAYA_Called_Number_4DigitEnd AS "Code DTMF"
+ `FR_DetailCall_RENAME`
+| table Date Heure  "Utilisateur"  "Numéro 3XXX" "Code DTMF" "Tarification" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Services des Opérateurs de Réseau - 10xx</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Called_Number_2Digit=10
+AVAYA_Dialled_Number&gt;999
+AVAYA_Dialled_Number&lt;1100
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+| lookup AVAYA_Special_Call_Number_FR.csv AVAYA_Dialled_Number OUTPUTNEW "Tarification_Prefix"
+| rename "Tarification_Prefix" AS "Tarification"
+| rename AVAYA_Called_Number_4Digit AS "Numéro 10XX"
+| rename AVAYA_Called_Number_6DigitEnd AS "Code DTMF"
+ `FR_DetailCall_RENAME`
+| table Date Heure  "Utilisateur" "Numéro 10XX" "Code DTMF" "Tarification" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Services à valeurs sociales harmonisés - 116xxx</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Dialled_Number&gt;115999
+AVAYA_Dialled_Number&lt;117000
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+| lookup AVAYA_Special_Call_Number_FR.csv AVAYA_Dialled_Number OUTPUTNEW "Tarification_Prefix"
+| rename "Tarification_Prefix" AS "Tarification"
+| rename AVAYA_Called_Number_6Digit AS "Numéro 116XXX"
+| rename AVAYA_Called_Number_6DigitEnd AS "Code DTMF"
+ `FR_DetailCall_RENAME`
+| table Date Heure  "Utilisateur"  "Numéro 116XXX" "Code DTMF"  "Tarification" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Services de Renseignements Téléphoniques - 118xxx</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Dialled_Number&gt;117999
+AVAYA_Dialled_Number&lt;119000
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+| lookup AVAYA_Special_Call_Number_FR.csv AVAYA_Dialled_Number OUTPUTNEW "Tarification_Prefix"
+| rename "Tarification_Prefix" AS "Tarification"
+| rename AVAYA_Called_Number_6Digit AS "Numéro 118XXX"
+| rename AVAYA_Called_Number_6DigitEnd AS "Code DTMF"
+ `FR_DetailCall_RENAME`
+| table Date Heure  "Utilisateur" "Numéro 118XXX" "Code DTMF" "Tarification" "Durée d'Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

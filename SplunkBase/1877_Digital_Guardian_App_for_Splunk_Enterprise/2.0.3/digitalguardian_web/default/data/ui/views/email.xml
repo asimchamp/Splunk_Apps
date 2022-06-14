@@ -1,0 +1,171 @@
+<form script="summary_email.js, tagmanager.js" stylesheet="custom.css, tagmanager.css, dashboard.css">
+  <label>Email Overview</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="wildcard" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+      <prefix>*</prefix>
+      <suffix>*</suffix>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="radio" token="rules" searchWhenChanged="true">
+      <label>Was Rule Violation?</label>
+      <choice value="True">Yes</choice>
+      <choice value="False">No</choice>
+      <choice value="*">Both</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="radio" token="classified" searchWhenChanged="true">
+      <label>Was Classified?</label>
+      <choice value="True">Yes</choice>
+      <choice value="False">No</choice>
+      <choice value="*">Both</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time Range</label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <search id="baseEventSearch">
+   <query>index=`index_macro` sourcetype=`events_sourcetype` eventtype=egress_email $wildcard$ | bucket _time span=1h | stats dc(Event_ID) as count, count(Event_ID) as details by _time Computer_Name User_Name Application Operation Was_Classified Was_Rule_Violation Source_Directory Source_File_Extension Computer_Type Email_Domain_Name Email_Recipient_Type</query>
+   <earliest>$time.earliest$</earliest>
+   <latest>$time.latest$</latest>
+  </search>
+  <search id="baseFileSearch">
+   <query>index=`index_macro` sourcetype=`events_sourcetype` eventtype=egress_email NOT Source_File_Extension="" $wildcard$ | bucket _time span=1h | stats dc(Event_ID) as Count sum(Detail_File_Size) as Size by _time Source_File_Extension Was_Classified Was_Rule_Violation Computer_Name User_Name Application Operation Source_Directory Computer_Type Email_Domain_Name Email_Recipient_Type | eval Size=Size/1024/1024 </query>
+   <earliest>$time.earliest$</earliest>
+   <latest>$time.latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <div class="panel-body">
+            <div class="filter_tags" style="float:left">
+                <h6>Filter Criteria:</h6>
+                <input id="filter_tags_input" type="text"/>
+            </div>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="emails_by_hour_day">
+        <title>Emails By Hour/Day</title>
+        <search base="baseEventSearch">
+          <query> search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | timechart sum(count) as count by Computer_Type</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="email_details_by_hour_day">
+        <title>Email Details by Hour/Day</title>
+        <search base="baseEventSearch">
+          <query> search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | timechart sum(count) as Events, sum(details) as "Event Details"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="top_10_computers">
+        <title>Top 10 Computers</title>
+        <search base="baseEventSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(count) as count by Computer_Name | sort - count | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <table id="top_10_users">
+        <title>Top 10 Users</title>
+        <search base="baseEventSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(count) as count by User_Name | sort - count | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <table id="top_10_applications">
+        <title>Top 10 Applications</title>
+        <search base="baseEventSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(count) as count by Application | sort - count | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="top_10_recipient_types">
+        <title>Top 10 Recipient Types</title>
+        <search base="baseEventSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(count) as count by Email_Recipient_Type | sort - count | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <table id="top_10_email_domains">
+        <title>Top 10 Email Domains</title>
+        <search base="baseEventSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(count) as count by Email_Domain_Name | sort - count | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <table id="top_10_source_directories">
+        <title>Top 10 Source Directories</title>
+        <search base="baseEventSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(count) as count by Source_Directory | sort - count | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="top_10_extensions_count">
+        <title>Top 10 Extensions by Count</title>
+        <search base="baseFileSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(Count) as Count sum(Size) as Size by Source_File_Extension | sort - Size | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+    <panel>
+      <table id="top_10_extensions_size">
+        <title>Top 10 Extensions by Size</title>
+        <search base="baseFileSearch">
+          <query>search Was_Classified=$classified$ | search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(Count) as Count sum(Size) as Size by Source_File_Extension | sort - Size | head 10</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

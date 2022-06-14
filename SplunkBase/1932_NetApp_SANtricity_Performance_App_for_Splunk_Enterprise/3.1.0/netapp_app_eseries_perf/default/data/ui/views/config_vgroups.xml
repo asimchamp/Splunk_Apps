@@ -1,0 +1,236 @@
+<form version="1.1" stylesheet="row_coloring.css,application.css" script="preferred_controller_row_coloring.js,drive_optimal_row_coloring.js">
+  <label>Configuration - Volume Groups/Pools</label>
+  <search id="baseSearch">
+    <query>
+      `get_nesa_index` sourcetype=eseries:graph host="$arrayId$" | head 1 | `expand_json_array(volumeGroup)` | search label="$volumeGroup$"
+    </query>
+    <earliest>-2h@h</earliest>
+    <latest>now</latest>
+  </search>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="dropdown" token="arrayId" searchWhenChanged="true">
+      <label>Array</label>
+      <search>
+        <query>
+          | inputlookup nesa_volume_groups | stats count by arrayId, arrayName
+        </query>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+    </input>
+    <input type="dropdown" token="controllerLabel" searchWhenChanged="true">
+      <label>Controller</label>
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <search>
+        <query>
+          | inputlookup nesa_controllers | search arrayId="$arrayId$" | dedup controllerLabel
+        </query>
+      </search>
+      <fieldForLabel>controllerLabel</fieldForLabel>
+      <fieldForValue>controllerLabel</fieldForValue>
+    </input>
+    <input type="dropdown" token="volumeGroup" searchWhenChanged="true">
+      <label>Volume Groups/Pools</label>
+      <search>
+        <query>
+          | inputlookup nesa_volume_groups | search [| inputlookup nesa_volumes | search [| inputlookup nesa_controllers | search arrayId="$arrayId$" controllerLabel="$controllerLabel$" | fields arrayId, controllerRef] | fields arrayId, volumeGroupRef ] | fields volumeGroup
+        </query>
+      </search>
+      <fieldForLabel>volumeGroup</fieldForLabel>
+      <fieldForValue>volumeGroup</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>
+          | stats count | eval class="None" | eval label="Configuration - Array Summary"
+        </query>
+        </search>
+        <option name="field">label</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <link>
+            <![CDATA[/app/netapp_app_eseries_perf/config_array?form.arrayId=$form.arrayId$]]>
+          </link>
+        </drilldown>
+      </single>
+      <single>
+        <search>
+          <query>
+          | stats count | eval class="None" | eval label="Performance - Volume Group/Pool by Volume"
+        </query>
+        </search>
+        <option name="field">label</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <link>
+            <![CDATA[/app/netapp_app_eseries_perf/perf_volumes?form.arrayId=$form.arrayId$&form.controllerLabel=$form.controllerLabel$&form.volumeGroup=$form.volumeGroup$]]>
+          </link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Volume Groups/Pools</title>
+        <search base="baseSearch">
+          <query>
+        </query>
+        </search>
+        <option name="field">label</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>State</title>
+        <search base="baseSearch">
+          <query>
+        </query>
+        </search>
+        <option name="field">state</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Status</title>
+        <search base="baseSearch">
+          <query>
+          eval status=case(offline="false", "online", offline="true", "offline")
+        </query>
+        </search>
+        <option name="field">status</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Drive Speeds Match</title>
+        <search base="baseSearch">
+          <query>
+          eval class=if(spindleSpeedMatch="true", "non-existent-CSS-class", "elevated") | eval spindleSpeedMatch=upper(spindleSpeedMatch)
+        </query>
+        </search>
+        <option name="field">spindleSpeedMatch</option>
+        <!-- The "None" class gives a grey style to the text instead of black. -->
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Volume Count</title>
+        <search>
+          <query>
+          `get_nesa_index` sourcetype=eseries:graph host="$arrayId$" | head 1 | `expand_json_array(volume)` | lookup nesa_controllers arrayId AS host, controllerRef AS currentManager OUTPUT controllerLabel | lookup nesa_volume_groups arrayId AS host, volumeGroupRef OUTPUT volumeGroup | search volumeGroup="$volumeGroup$" controllerLabel="$controllerLabel$" | stats count
+        </query>
+          <earliest>-2h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="field">count</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Drive Count</title>
+        <search>
+          <query>
+          `get_nesa_index` sourcetype=eseries:graph host="$arrayId$" | head 1 | `expand_json_array(drive)` | lookup nesa_volume_groups arrayId AS host, volumeGroupRef AS currentVolumeGroupRef OUTPUT volumeGroup | search volumeGroup="$volumeGroup$" | stats count
+        </query>
+          <earliest>-2h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="field">count</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>RAID Level</title>
+        <search base="baseSearch">
+          <query>
+          eval raidLevel=if(raidLevel!="raidDiskPool", upper(raidLevel), raidLevel)
+        </query>
+        </search>
+        <option name="field">raidLevel</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Capacity</title>
+        <search base="baseSearch">
+          <query>
+          `_bytes_to_GiB(totalRaidedSpace)`
+        </query>
+        </search>
+        <option name="field">totalRaidedSpace</option>
+        <option name="underLabel">GiB</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="volumes_table">
+        <title>Volumes in this Group on Controller "$controllerLabel$"</title>
+        <search>
+          <query>
+          `get_nesa_index` sourcetype=eseries:graph host="$arrayId$" | head 1 | `expand_json_array(volume)` | lookup nesa_controllers arrayId AS host, controllerRef AS currentManager OUTPUT controllerLabel | lookup nesa_volume_groups arrayId AS host, volumeGroupRef OUTPUT volumeGroup | search volumeGroup="$volumeGroup$" controllerLabel="$controllerLabel$" | `_bytes_to_GiB(capacity)` | eval Preferred=if(tostring(currentManager)==tostring(preferredManager), "TRUE", "FALSE") | lookup nesa_controllers arrayId AS host, controllerRef AS currentManager OUTPUT controllerLabel | rename controllerLabel AS currentManager | lookup nesa_controllers arrayId AS host, controllerRef AS preferredManager OUTPUT controllerLabel | rename controllerLabel AS preferredManager | `nesa_short_volume_table_field_list` | `nesa_short_volume_table_field_renames`
+        </query>
+          <earliest>-2h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+/app/netapp_app_eseries_perf/config_volumes?form.arrayId=$form.arrayId$&form.controllerLabel=$form.controllerLabel$&form.volumeGroup=$form.volumeGroup$&form.volume=$row.Volume$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Capacity</title>
+        <search base="baseSearch">
+          <query>table usedSpace, freeSpace | rename usedSpace AS allocated, freeSpace AS unallocated | transpose | rename "row 1" as row1 | `_bytes_to_GiB(row1)` | rename row1 as "Size(GiB)"</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="drives_table">
+        <title>Drives in this Group</title>
+        <search>
+          <query>
+            <![CDATA[`get_nesa_index` sourcetype=eseries:graph host="$arrayId$" | head 1 | `expand_json_array(drive)` | lookup nesa_volume_groups volumeGroupRef AS currentVolumeGroupRef, arrayId AS host OUTPUT volumeGroup | search volumeGroup="$volumeGroup$" | lookup nesa_drives arrayId AS host, diskId AS id OUTPUT driveLabel | foreach usableCapacity, rawCapacity [ `_bytes_to_GiB(<<FIELD>>)` ] | eval driveMediaType=upper(driveMediaType) | eval averageEraseCountPercent=if(driveMediaType="SSD", 'ssdWearLife.averageEraseCountPercent', null()) | eval spareBlocksRemainingPercent=if(driveMediaType="SSD", 'ssdWearLife.spareBlocksRemainingPercent', null()) | foreach currentSpeed, maxSpeed [ eval <<FIELD>>=replace(<<FIELD>>, "speed", "") ] | `nesa_full_drive_table_field_list` | `nesa_full_drive_table_field_renames` | eval Interface=upper(Interface)]]>
+          </query>
+          <earliest>-2h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

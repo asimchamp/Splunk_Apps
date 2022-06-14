@@ -1,0 +1,18 @@
+<a href="" title="Project" class="dropdown-toggle" data-toggle="popdown">
+    <div>
+        <p class="projectname"><%- project.entry.get('name') || _("None Selected").t() %>
+        </p>
+        <!-- <p class="platform">(Platform)</p> -->
+    </div>
+    <b class="caret"></b>
+</a>
+<div class="dropdown-menu">
+    <div class="arrow"></div>
+    <ul>
+        <% projects.each(function(project) { %>
+            <li>
+                <a href="#" class="dropdown-menu-item"><%- project.entry.get('name') %></a>
+            </li>
+        <% }) %>
+    </ul>
+</div>

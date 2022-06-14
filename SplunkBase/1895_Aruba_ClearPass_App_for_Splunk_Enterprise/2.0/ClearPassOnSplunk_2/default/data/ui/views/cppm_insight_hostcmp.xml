@@ -1,0 +1,47 @@
+<form>
+  <label>Insight Dashboard Server Compare</label>
+
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  
+  <row>
+    <chart>
+      <title>Logins by Server</title>
+      <searchTemplate>eventtype=cppm-authentication | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+    <chart>
+      <title>Failure by Server</title>
+      <searchTemplate>eventtype=cppm-fail-authentication | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>RADIUS Protocol by Server</title>
+      <searchTemplate>eventtype=cppm-radius | stats count by cphost </searchTemplate>
+      <option name="charting.chart">bar</option>
+    </chart>
+
+    <chart>
+      <title>Employee Role Distribution</title>
+      <searchTemplate>eventtype=cppm | where match(roles, "Employee") | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+    <chart>
+      <title>Healthy Percent Distribution</title>
+      <searchTemplate>eventtype=cppm-pass-authentication | where spt="HEALTHY" | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+  </row>
+
+
+</form>

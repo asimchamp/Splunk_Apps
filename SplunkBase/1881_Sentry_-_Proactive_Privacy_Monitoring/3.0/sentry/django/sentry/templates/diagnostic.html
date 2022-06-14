@@ -1,0 +1,99 @@
+{# Boilerplate for a Django Bindings template #}
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}} | Home{% endblock title %}
+{% block css %}
+    <!-- Style sheets are loaded here -->
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <style>
+
+        /* Disclaimer */
+        #intro{padding-left:10pt; padding-top:10pt; font-size:13px;line-height: 15pt;}
+        #disclaimer{padding-left:20pt; padding-top:10pt; padding-bottom:5pt}
+
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="dashboard-body container-fluid main-section-body">
+    <div class="row">
+        <div class="span12 dashboard-header clearfix">
+        </div>
+    </div>    
+        <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-body">
+                        <div id="intro">
+							Following the installation of the Sentry framework and the Sentry technology add-ons, the navigation bar needs to be synced across both apps to provide a seamless experience.
+							<ul>
+								<li><font color="red"><b>Note:</b></font> An automatic synchronization takes place every 5 minutes.</li>
+								<li>Select Sync Navigation. </li>
+								<li>Wait for the refresh button to become enabled.</li>
+								<li>Select the Refresh Navigation to force synchronization between Sentry framework and Sentry technology add-ons.</li>
+							</ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div CLASS="panel-head">
+       	                <h3>Manual Navigation Sync</h3>
+   	                </div>
+	                <div class="panel-body">
+	                    <button id="buttonSyncNav" class="btn btn-primary">Sync Navigation</button>
+	                    <button id="buttonRefreshNav" class="btn btn-primary">Refresh Navigation</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+</div>
+{% endblock content%}
+
+{% block managers %}
+	{% searchmanager
+        id="searchSyncNav"
+        search="| syncnav"
+        autostart=false
+    %}
+{% endblock managers %}
+
+{% block js %}
+<script src="{{STATIC_URL}}sentry/customJS.js" type="text/javascript"></script>
+<script>
+    require(["splunkjs/ready!"], function(mvc) {
+    	require.config({
+	        baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+	        waitSeconds: 0 // Disable require.js load timeout 
+	    });
+    	
+    	var searchSyncNav = mvc.Components.getInstance("searchSyncNav");
+
+    	$("#buttonRefreshNav").prop('disabled', true);
+    	
+    	$("#buttonSyncNav").on("click", function() {
+    		searchSyncNav.startSearch();
+		});
+		
+		$("#buttonRefreshNav").on("click", function() {
+			window.open(document.location + '../../../../debug/refresh?entity=/data/ui/nav');
+		});
+		
+		searchSyncNav.on("search:done", function(properties){
+			$("#buttonRefreshNav").prop('disabled', false);
+		});
+		
+		
+    });
+</script>
+{% endblock js %}

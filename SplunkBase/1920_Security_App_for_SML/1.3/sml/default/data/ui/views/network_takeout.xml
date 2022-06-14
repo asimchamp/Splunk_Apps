@@ -1,0 +1,136 @@
+<form script="autodiscover.js">
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <label>ネットワーク経由持ち出し</label>
+  <row>
+    <panel>
+      <chart>
+        <title>時間帯別ウェブアップロードファイル数</title>
+        <searchString>index=smllog sourcetype=smllog_300 web_subtype=upload
+            | stats count(upload_filename) AS ファイル数 by date_hour 
+            | sort date_hour 
+            | eventstats avg(ファイル数) as average 
+            | eval average=round(average,0)
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>情報漏えい危険度</title>
+        <searchString>index=smllog sourcetype=smllog_300 web_subtype=upload
+            | stats count by leak_category
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+            <link>
+            <![CDATA[
+                /app/sml/leak_by_user?form.sourcetype=300%20web_subtype%3Dupload&form.leak_category=$click.value$&earliest=$earliest$&latest=$latest$
+            ]]>
+            </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>ウェブアップロードファイルの種類</title>
+        <searchString>index=smllog sourcetype = smllog_300 web_subtype=upload
+            | rex field=upload_filename "(?&lt;upload_filename_ext&gt;[^.]+)$" 
+            | eval upload_filename_ext=lower(upload_filename_ext) 
+            | top upload_filename_ext 
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+        <html>
+            <h2>ウェブアップロードファイル名キーワードTop100</h2>
+            <div id="upload_kwds_search"
+                 class="splunk-manager splunk-searchmanager "
+                 data-require="splunkjs/mvc/searchmanager"
+                 data-options='{
+                        "app": "sml",
+                        "preview": true,
+                        "search": "index=smllog sourcetype=smllog_300 web_subtype=upload | eval kwds_upload=split(upload_keywords,\"/\") | top limit=100 kwds_upload | sort kwds_upload"
+                    }'>
+            </div>
+            <div id="upload_kwds"
+                 class="splunk-view"
+                 data-require="app/sml/components/tagcloud/tagcloud"
+                 data-options='{
+                        "minFontSize": 14,
+                        "maxFontSize": 55,
+                        "managerid": "upload_kwds_search",
+                        "valueField": "count",
+                        "labelField": "kwds_upload"
+                     }'>
+            </div>
+        </html>
+    </panel>
+  </row>
+</form>

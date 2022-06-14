@@ -1,0 +1,61 @@
+<form>
+  <label>MDM Category Charts</label>
+
+  <description>
+	MDM Details
+  </description>
+
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+   <input type="dropdown" token="ownership">
+      <label>Ownership</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <choice value="Corporate">Corporate</choice>
+      <choice value="Employee">Employee</choice>
+    </input>
+  </fieldset>
+
+
+  <row>
+    <chart>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known |dedup macAddress |stats count by Ownership</searchString>
+      <title>Distribution by Ownership</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Compromised</searchString>
+      <title>Compromised Devices</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Encryption_Enabled</searchString>
+      <title>Encryption Enabled</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Model</searchString>
+      <title>Distribution by Model</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by Manufacturer</searchString>
+      <title>Distribution by Manufacturer</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |stats count by OS_Version</searchString>
+      <title>Distribution by OS Version</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+  </row>
+
+</form>

@@ -1,0 +1,30 @@
+<form>
+  <label>Audit Records</label>
+
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>@d</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="server">
+      <label>ClearPass Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <populatingSearch fieldForValue="cphost" fieldForLabel="cphost">
+        <![CDATA[eventtype=cppm | stats count by cphost]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+  
+    <row> 
+    <table>
+      <title>Audit Records</title>
+      <searchString>
+ 	eventtype=cppm CPPM_AUDIT_Record cphost=$server$ | fields _time, Source, Action, Category User |fields - _raw
+      </searchString>
+    </table>
+    </row>
+
+</form>

@@ -1,0 +1,80 @@
+<form script="summary_classification.js, tagmanager.js" stylesheet="custom.css, tagmanager.css, dashboard.css">
+  <label>Classification Overview</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="wildcard" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+      <prefix>*</prefix>
+      <suffix>*</suffix>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="radio" token="rules" searchWhenChanged="true">
+      <label>Was Rule Violation?</label>
+      <choice value="True">Yes</choice>
+      <choice value="False">No</choice>
+      <choice value="*">Both</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="time" id="timerange" token="time" searchWhenChanged="true">
+      <label>Time Range</label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <search id="baseEventSearch">
+   <query> index=`index_macro` sourcetype=`events_sourcetype` Was_Classified="true" $wildcard$ | stats count(Event_ID) as Count by User_Name Source_File_Extension Was_Classified Was_Rule_Violation</query>
+   <earliest>$time.earliest$</earliest>
+   <latest>$time.latest$</latest>
+  </search>
+  <row>
+      <panel>
+        <html>
+          <div class="panel-body">
+              <div class="filter_tags" style="float:left">
+                  <h6>Filter Criteria:</h6>
+                  <input id="filter_tags_input" type="text"/>
+              </div>
+          </div>
+        </html>
+      </panel>
+    </row>
+    <row>
+      <panel>
+        <table id="trend_chart">
+          <title>Classification Events by Application and Operation</title>
+          <search>
+            <query>index=`index_macro` sourcetype=`events_sourcetype` $wildcard$ $rules$ $filter$ $exclude$ | chart count(Event_ID) as Count over Application by Operation</query>
+          </search>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </table>
+      </panel>
+    </row>
+    <row>
+      <panel>
+        <chart id="user_table">
+          <title>Top Users</title>
+          <search base="baseEventSearch">
+            <query>search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(Count) as Count by User_Name | sort - Count | head 10</query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">bar</option>
+        </chart>
+      </panel>
+      <panel>
+        <chart id="document_table">
+          <title>Top Extensions</title>
+          <search base="baseEventSearch">
+            <query>search Was_Rule_Violation=$rules$ | search $filter$ | search $exclude$ | stats sum(Count) as Count by Source_File_Extension | sort - Count | head 10</query>
+            <earliest>$time.earliest$</earliest>
+            <latest>$time.latest$</latest>
+          </search>
+          <option name="charting.chart">bar</option>
+        </chart>
+      </panel>
+    </row>
+  </form>

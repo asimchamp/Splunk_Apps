@@ -1,0 +1,115 @@
+<form version="1.1">
+  <label>Out of Area Logins</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label/>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+      </input>
+    <input type="dropdown" token="Admin" searchWhenChanged="true">
+      <label>User Privileges</label>
+      <choice value="">All</choice>
+      <choice value="Profile.PermissionsModifyAllData=true Profile.PermissionsModifyAllData=true">Admin</choice>
+      <choice value="(Profile.PermissionsModifyAllData=false OR Profile.PermissionsModifyAllData=false)">non-Admin</choice>
+      <choice value="Profile.PermissionsApiEnabled=true">API</choice>
+      <default/>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Out of Area Login</title>
+       <search><query>
+          eventtype=sfdc-login-history $Admin$ | eval profile_country_name=case(profile_country=="UK", "United Kingdom", profile_country=="USA", "United States" , profile_country=="US", "United States", profile_country=="UAE", "United Arab Emirates", profile_country=="United Kingdom (GB)" ,"United Kingdom" ,profile_country=="England", "United Kingdom", profile_country=="United States of America",  "United States", profile_country="Sussex", "United Kingdom", profile_country="Territory of Texas USA", "United States" ,  profile_country="Russian Federation", "Russia" ,profile_country=="Czech Republic", "Czechia" , profile_country!="null", profile_country)      | iplocation allfields=true SourceIp   | where lower(profile_country_name) != lower(Country) AND Country!=""| timechart count as out_of_area_login  span=6h by Status
+            </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Most Active IPs</title>
+        <search><query>
+
+          eventtype=sfdc-login-history $Admin$ | eval profile_country_name=case(profile_country=="UK", "United Kingdom", profile_country=="USA", "United States" , profile_country=="US", "United States", profile_country=="UAE", "United Arab Emirates", profile_country=="United Kingdom (GB)" ,"United Kingdom" ,profile_country=="England", "United Kingdom", profile_country=="United States of America",  "United States", profile_country="Sussex", "United Kingdom", profile_country="Territory of Texas USA", "United States" ,  profile_country="Russian Federation", "Russia" ,profile_country=="Czech Republic", "Czechia" , profile_country!="null", profile_country)      | iplocation allfields=true SourceIp   | where lower(profile_country_name) != lower(Country) AND Country!=""| top SourceIp limit=10
+        </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Most Active IPs Table</title>
+        <search><query>
+      eventtype=sfdc-login-history $Admin$ | eval profile_country_name=case(profile_country=="UK", "United Kingdom", profile_country=="USA", "United States" , profile_country=="US", "United States", profile_country=="UAE", "United Arab Emirates", profile_country=="United Kingdom (GB)" ,"United Kingdom" ,profile_country=="England", "United Kingdom", profile_country=="United States of America",  "United States", profile_country="Sussex", "United Kingdom", profile_country="Territory of Texas USA", "United States" ,  profile_country="Russian Federation", "Russia" ,profile_country=="Czech Republic", "Czechia" , profile_country!="null", profile_country)      | iplocation allfields=true SourceIp   | where lower(profile_country_name) != lower(Country) AND Country!=""| stats count last(_time) as t last(Country) as lcountry last(City) as lcity by SourceIp | eval last_login_time=strftime(t, "%Y-%d-%m %H:%M:%S")| fields - t| sort -count | head 10  | rename count as "Login Count" profile_city as "Profile City" profile_country_name as "Profile Country"  last_login_time as "Last Login time" lcountry as "Last Login from Country" lcity as "Last Login from City "</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Out of Area Logins Table</title>
+                <search><query>
+        eventtype=sfdc-login-history $Admin$ | eval profile_country_name=case(profile_country=="UK", "United Kingdom", profile_country=="USA", "United States" , profile_country=="US", "United States", profile_country=="UAE", "United Arab Emirates", profile_country=="United Kingdom (GB)" ,"United Kingdom" ,profile_country=="England", "United Kingdom", profile_country=="United States of America",  "United States", profile_country="Sussex", "United Kingdom", profile_country="Territory of Texas USA", "United States" ,  profile_country="Russian Federation", "Russia" ,  profile_country=="Korea", "South Korea", profile_country=="Czech Republic", "Czechia" , profile_country!="null", profile_country)      | iplocation allfields=true SourceIp   | where lower(profile_country_name) != lower(Country) AND Country!=""| stats count last(_time) as t last(Country) as lcountry last(City) as lcity by Username profile_country_name profile_city | eval last_login_time=strftime(t, "%Y-%d-%m %H:%M:%S")| fields - t| sort -count  | rename count as "Login Count" profile_city as "Profile City" profile_country_name as "Profile Country"  last_login_time as "Last Login time" lcountry as "Last Login from Country" lcity as "Last Login from City "
+        </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+                </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

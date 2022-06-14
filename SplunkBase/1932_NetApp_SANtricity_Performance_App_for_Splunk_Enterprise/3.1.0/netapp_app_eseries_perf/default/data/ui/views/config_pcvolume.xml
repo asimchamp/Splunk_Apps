@@ -1,0 +1,19 @@
+<form version="1.1" >
+  <label>Configuration - Parent Child Volume</label>
+  <row>
+    <panel>
+      <table>
+        <title>Volume</title>
+        <search>
+          <query>earliest=-4h `get_nesa_index` sourcetype=eseries:graph | stats first(_raw) AS _raw by host | spath sa.saData.storageArrayLabel output=arrayName | spath volumeGroup{} output=volumeGroup | eval volumeGroup_count=mvcount(volumeGroup) | fields - volumeGroup | spath volume{} output=volume | eval volume_count=mvcount(volume) | fields - volume | spath drive{} output=drive | eval drive_count=mvcount(drive) | fields - drive | spath configGeneration output=configGeneration | spath sa.saData.needsAttention output=needsAttention | spath sa.saData.fixing output=fixing | spath sa.saData.bootTime output=boot | `ctime(boot)` | spath sa.saData.chassisSerialNumber output=serialNumber | table arrayName, host, needsAttention, fixing, configGeneration, volumeGroup_count, volume_count, drive_count, boot, serialNumber | rename host AS arrayId arrayName AS "Array Name" volumeGroup_count AS "Volume Groups/Pools Count" volume_count AS "Volume Count" drive_count AS "Drive Count" boot AS "Boot Time" serialNumber AS "Serial Number" configGeneration AS "Config Generation" needsAttention AS "Needs Attention" fixing AS "Fixup Activity"</query>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <option name="rowNumbers">true</option>
+        <drilldown>
+          <link><![CDATA[/app/netapp_app_eseries_perf/config_array?form.arrayId=$row.arrayId$]]></link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

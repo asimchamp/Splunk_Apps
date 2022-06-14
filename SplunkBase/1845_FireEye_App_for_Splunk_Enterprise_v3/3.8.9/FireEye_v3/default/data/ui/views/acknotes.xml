@@ -1,0 +1,85 @@
+<form stylesheet="custom.css" version="1.1">
+  <label>Acknowledge Events</label>
+  <description>Enter the input data below.  Click the submit button to activate the preview window.  When satisfied Click the Submit hyperlink in preview.</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="product" searchWhenChanged="true">
+      <label>Product</label>
+      <choice value="NX">NX</choice>
+      <choice value="EX">EX</choice>
+      <choice value="AX">AX</choice>
+      <choice value="FX">FX</choice>
+      <choice value="HX">HX</choice>
+      <default>NX</default>
+    </input>
+    <input type="text" token="id" searchWhenChanged="true">
+      <label>ID</label>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="Ack" searchWhenChanged="true">
+      <label>Acknowledge</label>
+      <choice value="Y">Yes</choice>
+      <choice value="N">No</choice>
+    </input>
+    <input type="text" token="Note">
+      <label>Notes</label>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Update a ticket - Preview</title>
+        <search><query>
+          | inputlookup acknotes where id="$id$" AND Product="$product$" | appendpipe [stats count | where count==0] | eval execute=if(isnull(id),"| localop | stats count | eval id=$id$ | eval Product=\"$product$\" | eval Ack=\"$Ack$\" | eval Notes=\"$Note$\" | outputlookup acknotes append=True","| inputlookup acknotes where id=\"$id$\" AND Product=\"$product$\" | eval Ack=\"$Ack$\" | eval Notes=\"$Note$\" | outputlookup acknotes append=True") | eval kvid=$id$ | eval kvproduct="$product$" | eval kvack="$Ack$" | eval kvnote="$Note$" | eval Submit="Click me to Submit" | table kvid, kvproduct, kvack, kvnote, execute, Submit
+        </query></search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="drilldown">cell</option>
+        <drilldown target="_blank">
+          <condition field="kvid"></condition>
+          <condition field="kvproduct"></condition>
+          <condition field="kvack"></condition>
+          <condition field="knote"></condition>
+          <condition field="Submit">
+            <link target="_blank">/app/FireEye_v3/search?q=$row.execute$</link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>All tickets - Filtered by id and product</title>
+        <search><query>
+          | inputlookup acknotes where id="$id$" AND Product="$product$" | table _key, id, Product, Ack, Notes
+        </query></search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="master">
+        <title>Alerts filtered by id (not product)</title>
+        <search><query>
+          eventtype=fe id=$id$ |  lookup acknotes id as id | table product, category, id, signature, severity, occurred
+        </query></search>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>        
+      </table>
+    </panel>
+  </row>
+</form>

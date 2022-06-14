@@ -1,0 +1,158 @@
+<form>
+  <label>DNS Activity v1</label>
+  <description></description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>DNS Server Count</title>
+        <searchString>index=sonicwall TemplateID=257 OR tid=357 app_name="General DNS" | dedup dest_ip | stats count(dest_ip)</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="linkView">search</option>
+        <option name="beforeLabel">DNS Server Count</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total DNS Queries</title>
+        <searchString>index=sonicwall TemplateID=257 OR tid=357 app_name=*dns*  | stats count | fieldformat count=tostring(count, "commas")</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="beforeLabel">Total DNS Queries</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <title>5 min. Window</title>
+      <table>
+        <title>Realtime top 5 Servers</title>
+        <search>
+          <query>index=sonicwall TemplateID=257 OR tid=357 app_name=*dns* | chart sparkline count by dest_ip | sort -count | fieldformat count=tostring(count, "commas") | rename dest_ip to "Server IP"</query>
+          <earliest>rt-5m</earliest>
+          <latest>rt</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">scatter</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">5</option>
+        <!-- Set sparkline options here; make sure that field matches field name of the search results -->
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25px</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <map>
+        <searchString>index=sonicwall tid=257 app_name=*DNS* (dest_ip!=192.168.1.0/24 OR dest_ip!=10.0.0.0/8 OR dest_ip!=172.20.0.0/16) | iplocation dest_ip | geostats count by dest_ip</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>DNS server list</title>
+        <searchString>index=sonicwall TemplateID=257 OR tid=357 app_name=*dns* | chart count, sparkline(count, 8h) as trend by dest_ip | sort -count | rename dest_ip as "DNS Server" | rename count as "Total" | fieldformat "Total"=tostring('Total',"commas")</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <!-- Set sparkline options here; make sure that field matches field name of the search results -->
+        <format type="sparkline" field="trend">
+          <option name="type">bar</option>
+          <option name="height">30px</option>
+          <option name="barWidth">5px</option>
+          <!-- Use colorMap to map specific values to selected colors -->
+          <option name="colorMap">
+            <option name="100:">#5379AF</option>
+            <option name=":99">#9ac23c</option>
+          </option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top DNS Servers</title>
+        <searchString>index=sonicwall TemplateID=257 OR tid=357 app_name="General DNS" | top dest_ip</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Hits Per Server</title>
+        <searchString>index=sonicwall TemplateID=257 OR tid=357 app_name="General DNS" | timechart count(_raw) as "Total DNS Querries" by dest_ip</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

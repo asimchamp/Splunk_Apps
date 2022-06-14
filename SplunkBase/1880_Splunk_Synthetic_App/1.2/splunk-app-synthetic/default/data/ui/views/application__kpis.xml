@@ -1,0 +1,152 @@
+<form script="single_trend.js" stylesheet="single_trend.css">
+  <label>Application  Performance</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <label/>
+      <default>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="multiselect" token="app_name" searchWhenChanged="true">
+      <label>Applicationn Name</label>
+      <choice value="">All</choice>
+      <populatingSearch earliest="$earliest$" latest="$latest$" fieldForLabel="label" fieldForValue="app_name">index=synthetic sourcetype=synthetic | stats count by app_name| sort -count | eval label=app_name." (".count.")" | eval app_name="app_name=\"".app_name."\""</populatingSearch>
+      <default/>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Performance KPI</title>
+        <searchString>index=synthetic sourcetype=synthetic $app_name$  event_type=end| eval threshold=case(transaction_name == "Login", "2", transaction_name == "Logout", "2.5", transaction_name == "Edit Account Info", "3", transaction_name == "Search Account", "3", transaction_name == "Search Song", "3", transaction_name == "Search Album", "3",  transaction_name == "Download Song", "4") | eval success=if(transaction_duration&lt;=threshold, "1", "0")  | timechart sum(success) as s , count as c  span=12h | eval perf_kpi=s*100/c</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="field">perf_kpi</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+      <single>
+        <title>Availibility KPI</title>
+        <searchString>index=synthetic sourcetype=synthetic $app_name$  |  transaction execution_id transaction_name maxspan=10m |  eval success=if(isnull(transaction_end),0, 1) |eval total=if(isnull(event_type),0, 1) | stats sum(success) AS total_success sum(total) AS total_number by app_name _time| eval availibility=total_success*100/total_number  | search total_number&gt;0| timechart avg(availibility) as avail_kpi span=12h| sort - _time</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="field">avail_kpi</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>Performance SLA</title>
+        <searchString>index=synthetic sourcetype=synthetic $app_name$   event_type=end| eval threshold=case(transaction_name == "Login", "2", transaction_name == "Logout", "2.5", transaction_name == "Edit Account Info", "3", transaction_name == "Search Account", "3", transaction_name == "Search Song", "3", transaction_name == "Search Album", "3",  transaction_name == "Download Song", "4") | eval success=if(transaction_duration&lt;=threshold, "1", "0")  | timechart sum(success) as s , count as c  span=12h | eval perf_kpi=s*100/c | fields - s, c, _time | head 1</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">radialGauge</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[0,30,90,100]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.gaugeColors">[0xd13b3b,0xFFE800,0x7e9f44]</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Availibility SLA</title>
+        <searchString>index=synthetic sourcetype=synthetic $app_name$ |  transaction execution_id transaction_name maxspan=20m|  eval success=if(isnull(transaction_end),0, 1) |eval total=if(isnull(event_type),0, 1) | stats sum(success) AS total_success sum(total) AS total_number by app_name _time| eval availibility=total_success*100/total_number  | search total_number&gt;0| timechart avg(availibility) as avail_kpi span=12h| sort - _time | fields - _time, total_success | head 1</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">radialGauge</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[0,30,90,100]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.gaugeColors">[0xd13b3b,0xFFE800,0x7e9f44]</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Transaction Availibility</title>
+        <searchString>index=synthetic sourcetype=synthetic $app_name$ |  transaction execution_id transaction_name maxspan=10m |  eval success=if(isnull(transaction_end),0, 1) |eval total=if(isnull(event_type),0, 1) | stats sum(success) AS total_success sum(total) AS total_number by transaction_name _time| eval availibility=total_success*100/total_number  | search total_number&gt;0| timechart span=6h avg(availibility) by transaction_name</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Application Availibility</title>
+        <searchString>index=synthetic sourcetype=synthetic $app_name$  |  transaction execution_id transaction_name maxspan=5m|  eval success=if(isnull(transaction_end),0, 1) |eval total=if(isnull(event_type),0, 1) | stats sum(success) AS total_success sum(total) AS total_number by app_name _time| eval availibility=total_success*100/total_number  | search total_number&gt;0| timechart avg(availibility) by app_name</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

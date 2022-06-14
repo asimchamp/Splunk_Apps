@@ -1,0 +1,29 @@
+<form script="external_link.js" stylesheet="custom.css" version="1.1">
+  <label>Dodreport Lookup</label>
+  <search id="dodreport"><query>| script getdodreport __EXECUTE__ "$search_report_id$" | spath input=answer</query></search>
+      <description>Enter the Report ID below.</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="search_report_id" searchWhenChanged="true">
+      <label>Report ID</label>
+      <default>$id:reportid$</default>
+      <suffix/>
+    </input>
+  </fieldset>
+<row>
+    <panel>
+      <single>
+        <title>Report Link</title>
+        <search base="dodreport"><query>table answer</query></search>
+      	<option name="drilldown">none</option>
+      	<drilldown>
+      		<link target="_blank">$row.answer$</link>
+      	</drilldown>
+        <option name="wrap">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </single>
+    </panel>
+  </row>
+</form>

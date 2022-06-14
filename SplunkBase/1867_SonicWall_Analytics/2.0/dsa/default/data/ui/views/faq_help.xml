@@ -1,0 +1,26 @@
+<dashboard>
+    <label>Frequently Asked Questions</label>
+    <row>
+        <html>
+          <h2>Providing Feedback</h2>
+          <p>If you have any feedback, (positive or negative) feel free to email splunk_help@sonicwall.com. 
+            The application is under active development. We need your feedback to know what to improve or develop. When a feature is
+            functioning well for you, please let us know. 
+          </p>
+          <h1>FAQ</h1>
+          <h2>Applications Dashboard displays nothing</h2>
+          <p>The $SPLUNK_HOME/dsa/lookups/sonicwall_firewall.csv lookup file does not include your firewall IP/name in it.
+            To fix this, manually run the SonicWALL Firewalls Report as detailed in the installation instructions.
+          </p>
+          <h2>Total data sent does not appear correct</h2>
+          <p>There is a known bug present in the 6.x versions where connections that have timed out (insted of FYN)
+             are not reported through IPFix Connection Closed. We are working on making the bug fix for this available. 
+             In the meantime, you should not consider the total data values accurate.
+          </p>
+          <h2>Threats blocked is 0</h2>
+          <p>To see a non-zero number, you can download a test/sample virus payload to stimulate the firewall. 
+            For more information, see http://www.eicar.org/86-0-Intended-use.html.
+          </p>
+      </html>
+    </row>
+</dashboard>

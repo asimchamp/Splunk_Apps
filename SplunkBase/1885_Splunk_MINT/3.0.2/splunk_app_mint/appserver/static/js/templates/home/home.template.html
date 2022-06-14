@@ -1,0 +1,46 @@
+<div id="layout">
+	<div class="BodyLeft">
+		<div class="grid7">
+			<h2 class="section-title"><%- _('My projects').t() %></h2>
+
+			<div class="add-project-controls">
+			    <a href="#" class="btn btn-primary add-project"><%- _('Add New').t() %></a>
+			</div>
+			<div class="home-filters">
+				<div id="timerange-filter">
+					<span>Time Range:</span>
+				</div>
+				<div id="env-filter">
+					<span>Environment:</span>
+				</div>
+			</div>
+			<!-- Row of Projects -->
+			<div class="dashboard-row dashboard-row2"></div>
+	    </div>
+	    <!-- right side -->
+    	<div class="side-info grid3">
+    		<div class="last-event">
+	    		<h3>Your SDK versions</h3>
+	    		<div class="platforms">
+		    		<div id="android"></div>
+		    		<div id="ios"></div>
+	    		</div>
+    		</div>
+    		<div id="last-event-holder" class="last-event">
+    		</div>
+    		<div class="documentation-links">
+	    		<h3>Documentation</h3>
+					<p>About the Splunk MINT Add-on <a href="http://docs.splunk.com/Documentation/MintAddon/latest/UserGuide/AbouttheSplunkMINTAddon" target="_blank" class="external"><%- _('Learn more').t() %></a></p>
+	    		<p>About the Splunk MINT App <a href="http://docs.splunk.com/Documentation/MintApp/latest/UserGuide/AbouttheSplunkMINTApp" target="_blank" class="external"><%- _('Learn more').t() %></a></p>
+	    		<p>Use the Splunk MINT App <a href="http://docs.splunk.com/Documentation/MintApp/latest/UserGuide/UsetheSplunkMINTApp" target="_blank" class="external"><%- _('Learn more').t() %></a></p>
+	    		<p>About Splunk MINT Management Console <a href="http://docs.splunk.com/Documentation/MINTMgmtConsole/latest/UserGuide/AboutSplunkMINTManagementConsole" target="_blank" class="external"><%- _('Learn more').t() %></a></p>
+	    		<p>Splunk MINT SDK for iOS Developer Guide <a href="http://docs.splunk.com/Documentation/MintIOSSDK/latest/DevGuide/Requirementsandinstallation" target="_blank" class="external"><%- _('Learn more').t() %></a></p>
+	    		<p>Splunk MINT SDK for Android Developer Guide <a href="http://docs.splunk.com/Documentation/MintAndroidSDK/latest/DevGuide/Requirementsandinstallation" target="_blank" class="external"><%- _('Learn more').t() %></a></p>
+    		</div>
+		    <div class="general-controls">
+		    	<h3>Settings</h3>
+		        <a href="#" class="btn mint-settings"><i class="icon-gear"></i><%- _('Settings').t() %></a>
+		    </div>
+		</div>
+	</div>
+</div>

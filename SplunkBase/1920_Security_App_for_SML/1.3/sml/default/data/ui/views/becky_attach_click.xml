@@ -1,0 +1,91 @@
+<form>
+  <fieldset>
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>@mon</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+      <label>検索期間</label>
+    </input>
+    <input type="text" token="input_attach">
+      <label>添付ファイル名(前方一致：abc*)</label>
+    </input>
+  </fieldset>
+  <label>メール添付検索</label>
+  <row>
+    <panel>
+      <chart>
+        <title>時間帯別添付ファイルを開いた回数</title>
+        <searchString>index=smllog sourcetype=smllog_0 proc_name!=b2.exe "B2Temp\\Attach" $input_attach$
+            | eval hour=substr(log_time, 0, 2) 
+            | stats count by hour | sort by hour
+            | eventstats avg(count) as average 
+            | eval average=round(average,0)
+        </searchString>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>添付ファイルを開いたアプリケーションの割合</title>
+        <searchString>index=smllog sourcetype=smllog_0 proc_name!=b2.exe "B2Temp\\Attach" $input_attach$
+          | top proc_name
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>開いた添付ファイル一覧</title>
+        <searchString>index=smllog sourcetype=smllog_0 proc_name!=b2.exe "B2Temp\\Attach" $input_attach$
+          | table pc_name, log_date, log_time, proc_name, operate, file0, file1
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+</form>
