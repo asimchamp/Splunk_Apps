@@ -17,12 +17,42 @@ splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 
 splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
 
+workfow_number='1'
+
+# Checking the Workflow folder present or not
+workfow_folder=$(ls $splunk_home/ | grep -cw workfow)
+
+if [ "$workfow_folder" = "1" ];
+   then
+      echo "workfow folder present."
+
+   else
+      echo "workfow Folder not Present."
+      mkdir $splunk_home/workfow/
+      echo "workfow Folder Created."
+
+fi
+
+# Checking the Workflow number folder present or not
+workfow_number_folder=$(ls $splunk_home/workfow/ | grep -cw workfow$workfow_number)
+
+if [ "$workfow_number_folder" = "1" ];
+   then
+      echo "workfow folder present."
+
+   else
+      echo "workfow Folder not Present."
+      mkdir $splunk_home/workfow/workfow$workfow_number
+      echo "workfow Folder Created."
+
+fi
+
 app_download_func ()
 {
 ################# Prepare the app details ###############
-BASE_APP_NAME=$( cat $splunk_home/splunk_name.txt | grep $e | awk -F"=" '{print $3}' |  awk -F"," '{print $1}' |  sed "s/ $//g" | sed 's/ /_/g' )
+BASE_APP_NAME=$( cat $splunk_home/workfow/workfow$workfow_number/splunk_name.txt | grep $e | awk -F"=" '{print $3}' |  awk -F"," '{print $1}' |  sed "s/ $//g" | sed 's/ /_/g' )
 
-BASE_APP_VER=$( cat $splunk_home/splunk_name.txt | grep $e | awk -F"," '{print $2}' | awk -F"=" '{print $2}' )
+BASE_APP_VER=$( cat $splunk_home/workfow/workfow$workfow_number/splunk_name.txt | grep $e | awk -F"," '{print $2}' | awk -F"=" '{print $2}' )
 
 BASE_DOWN_URL='http://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/'
 
@@ -84,12 +114,12 @@ fi
 
 }
 
-rm -rf $splunk_home/splunk_name.txt
+rm -rf $splunk_home/workfow/workfow$workfow_number/splunk_name.txt
 
 previous_check_func()
 {
 
-previous_download_app=$(cat $splunk_home/merge_uniq.txt | grep $e | wc -l )
+previous_download_app=$(cat $splunk_home/workfow/workfow$workfow_number/merge_uniq.txt | grep $e | wc -l )
 
 if [ "$previous_download_app" = "1" ];
    then
@@ -97,42 +127,43 @@ if [ "$previous_download_app" = "1" ];
    
 else
    app_not_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error: Page not found" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
-   echo "ID=$i" "app_not_found="$app_not_found, >> $splunk_home/1_app_not_found.txt
-   cat $splunk_home/1_app_not_found.txt | grep "404 Error: Page not found" >> $splunk_home/merge.txt
+   echo "ID=$i" "app_not_found="$app_not_found, >> $splunk_home/workfow/workfow$workfow_number/1_app_not_found.txt
+   cat $splunk_home/1_app_not_found.txt | grep "404 Error: Page not found" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
 
    app_archive=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app has been archived" |  awk -F"." '{print $1}' | cut -c 13-38 )
-   echo "ID=$i" "app_not_found="$app_archive, >> $splunk_home/2_app_archive.txt
-   cat $splunk_home/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/merge.txt
+   echo "ID=$i" "app_not_found="$app_archive, >> $splunk_home/workfow/workfow$workfow_number/2_app_archive.txt
+   cat $splunk_home/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
 
    app_not_available=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app is currently not available" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
-   echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/3_app_not_available.txt
-   cat $splunk_home/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/merge.txt
+   echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/workfow/workfow$workfow_number/3_app_not_available.txt
+   cat $splunk_home/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
 
    app_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print $1}' )
    app_version=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep 'sb-release-select u-for="download-modal" sb-selector="release-version" sb-target="' | sed -n '1p' | awk -F"=" '{print $4}' | awk -F"\"" '{print $2}' )
-   echo "ID=$i" "app_found="$app_found, "app_version="$app_version >> $splunk_home/splunk_name.txt
+   echo "ID=$i" "app_found="$app_found, "app_version="$app_version >> $splunk_home/workfow/workfow$workfow_number/splunk_name.txt
 
 fi
 
 }
 
 ########## Checking app avaibility on Splunk Base #################
-for i in $(cat app_id.txt)
+for i in $(cat $splunk_home/workfow/workfow$workfow_number/app_id.txt)
 do
    previous_check_func
 
 done
 
-sort $splunk_home/merge.txt | uniq -d > $splunk_home/merge_uniq.txt
-rm -rf $splunk_home/merge.txt $splunk_home/*_app_*
-sed -i 's/404//g' $splunk_home/splunk_name.txt
+sort $splunk_home/workfow/workfow$workfow_number/merge.txt | uniq -d > $splunk_home/workfow/workfow$workfow_number/1merge_uniq.txt
+sort $splunk_home/workfow/workfow$workfow_number/1merge_uniq.txt | uniq -d >> $splunk_home/workfow/workfow$workfow_number/merge_uniq.txt
+rm -rf $splunk_home/workfow/workfow$workfow_number/merge.txt $splunk_home/workfow/workfow$workfow_number/1merge_uniq.txt $splunk_home/workfow/workfow$workfow_number/*_app_*
+sed -i 's/404//g' $splunk_home/workfow/workfow$workfow_number/splunk_name.txt
 
 echo "Loop Completed for list"
 
-for e in $(cat app_id.txt)
+for e in $(cat $splunk_home/workfow/workfow$workfow_number/app_id.txt)
 do
-   download_app=$(cat $splunk_home/merge_uniq.txt | grep $e | wc -l )
-   download_archive_app=$(cat $splunk_home/merge_uniq.txt | grep archived | grep $e | wc -l )
+   download_app=$(cat $splunk_home/workfow/workfow$workfow_number/merge_uniq.txt | grep $e | wc -l )
+   download_archive_app=$(cat $splunk_home/workfow/workfow$workfow_number/merge_uniq.txt | grep archived | grep $e | wc -l )
    
    if [ "$download_archive_app" = "1" ];
       then
