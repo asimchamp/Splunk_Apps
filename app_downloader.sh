@@ -128,15 +128,15 @@ if [ "$previous_download_app" = "1" ];
 else
    app_not_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error: Page not found" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
    echo "ID=$i" "app_not_found="$app_not_found, >> $splunk_home/workfow/workfow$workfow_number/1_app_not_found.txt
-   cat $splunk_home/1_app_not_found.txt | grep "404 Error: Page not found" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
+   cat $splunk_home/workfow/workfow$workfow_number/1_app_not_found.txt | grep "404 Error: Page not found" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
 
    app_archive=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app has been archived" |  awk -F"." '{print $1}' | cut -c 13-38 )
    echo "ID=$i" "app_not_found="$app_archive, >> $splunk_home/workfow/workfow$workfow_number/2_app_archive.txt
-   cat $splunk_home/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
+   cat $splunk_home/workfow/workfow$workfow_number/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
 
    app_not_available=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app is currently not available" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
    echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/workfow/workfow$workfow_number/3_app_not_available.txt
-   cat $splunk_home/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
+   cat $splunk_home/workfow/workfow$workfow_number/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/workfow/workfow$workfow_number/merge.txt
 
    app_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print $1}' )
    app_version=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep 'sb-release-select u-for="download-modal" sb-selector="release-version" sb-target="' | sed -n '1p' | awk -F"=" '{print $4}' | awk -F"\"" '{print $2}' )
