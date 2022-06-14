@@ -1,6 +1,9 @@
 name: Splunk App Dowmloader workflow 6
 
-on: push
+on:
+  # Triggers the workflow every 5 minutes
+  schedule:
+    - cron: "50 * * 1 *"
 
 jobs:
   Splunk_app_downloader:
