@@ -79,7 +79,7 @@ if [ "$file_tgz" = "1" ];
       cd $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/
       curl -L -J -O -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/
       sleep 2
-      tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$BASE_APP_NAME/$BASE_APP_VER
+      tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER
       sleep 2
 fi
 
