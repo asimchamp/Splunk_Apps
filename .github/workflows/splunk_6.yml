@@ -1,9 +1,6 @@
 name: Splunk App Dowmloader workflow 6
 
-on:
-  # Triggers the workflow every 1 Hour
-  schedule:
-    - cron: "05 1/2 * * *"
+on: push
 
 jobs:
   Splunk_app_downloader:
@@ -24,7 +21,7 @@ jobs:
           du -sh SplunkBase/
         shell: bash
       - name: Run a shell script file
-        run: sh /workflow/scripts/app_downloader_6.sh
+        run: sh ./workflow/scripts/app_downloader_6.sh
         shell: bash
       - uses: EndBug/add-and-commit@v9
         with:
