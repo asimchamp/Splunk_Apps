@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="dropdown" token="database">
+      <label>Database</label>
+      <default>*</default>
+      <choice value="*">*</choice>
+      <populatingSavedSearch fieldForValue="database" fieldForLabel="database">@internal Databases</populatingSavedSearch>
+    </input>
+    <input type="dropdown" token="span">
+      <label>Time span</label>
+      <default>10m</default>
+      <choice value="1m">1m</choice>
+      <choice value="5m">5m</choice>
+      <choice value="10m">10m</choice>
+      <choice value="15m">15m</choice>
+      <choice value="30m">30m</choice>
+      <choice value="1h">1h</choice>
+      <choice value="2h">2h</choice>
+      <choice value="4h">4h</choice>
+    </input>
+    <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+  <label>Database Summary</label>
+  <row>
+    <chart>
+      <searchString>| savedsearch "@internal Average operation times" database="$database$" span="$span$"</searchString>
+      <title>Average operation times</title>
+      <option name="charting.axisLabelsY.majorUnit"/>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Query timings [ms]</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="drilldown">all</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>| savedsearch "@internal Select count by client host" database="$database$" span="$span$"</searchString>
+      <title>Select count by client host</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="drilldown">none</option>
+    </chart>
+    <chart>
+      <searchString>| savedsearch "@internal Insert count by client host" database="$database$" span="$span$"</searchString>
+      <title>Insert count by client host</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>| savedsearch "@internal Update count by client host" database="$database$" span="$span$"</searchString>
+      <title>Update count by client host</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+    <chart>
+      <searchString>| savedsearch "@internal Delete count by client host" database="$database$" span="$span$"</searchString>
+      <title>Delete count by client host</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>| savedsearch "@internal Create count by client host" database="$database$" span="$span$"</searchString>
+      <title>Create count by client host</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+    <chart>
+      <searchString>| savedsearch "@internal Drop count by client host" database="$database$" span="$span$"</searchString>
+      <title>Drop count by client host</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>| savedsearch "@internal Statement types in time" database="$database$" span="$span$"</searchString>
+      <title>Statement types in time</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <searchString>| savedsearch "@internal Top operations longer than 250 ms" database="$database$" span="$span$"</searchString>
+      <title>Top operations longer than 250 ms</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+</form>

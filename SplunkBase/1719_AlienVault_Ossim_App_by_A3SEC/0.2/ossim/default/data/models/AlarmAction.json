@@ -1,0 +1,360 @@
+{
+    "modelName": "AlarmAction", 
+    "description": "From Action Log (sourcetype=ossim_action)", 
+    "displayName": "AlarmAction", 
+    "objects": [
+        {
+            "fields": [
+                {
+                    "required": false, 
+                    "displayName": "ALARMA", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "ALARMA", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "BACKLOG", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "BACKLOG", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "DATA1", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "DATA1", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "DATA2", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "DATA2", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "DATA3", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "number", 
+                    "fieldName": "DATA3", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "DATA4", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "DATA4", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "DSTIP", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "DSTIP", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "Evento", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "Evento", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "eventtype", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "eventtype", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "EVID", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "EVID", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "FECHA", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "FECHA", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "ID", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "number", 
+                    "fieldName": "ID", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "NOMBREDST", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "NOMBREDST", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "NOMBRESRC", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "NOMBRESRC", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "RIESGO", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "number", 
+                    "fieldName": "RIESGO", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "SEN", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "SEN", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "SID", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "number", 
+                    "fieldName": "SID", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "SRCIP", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "ipv4", 
+                    "fieldName": "SRCIP", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "USER", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "USER", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "dst_ip", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "ipv4", 
+                    "fieldName": "dst_ip", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "src_ip", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "ipv4", 
+                    "fieldName": "src_ip", 
+                    "hidden": false
+                }, 
+                {
+                    "required": false, 
+                    "displayName": "SubAlarma", 
+                    "multivalue": false, 
+                    "comment": "", 
+                    "type": "string", 
+                    "fieldName": "SubAlarma", 
+                    "hidden": false
+                }
+            ], 
+            "displayName": "EventosBase", 
+            "calculations": [
+                {
+                    "comment": "", 
+                    "inputField": "SRCIP", 
+                    "outputFields": [
+                        {
+                            "required": true, 
+                            "displayName": "SRCIP_lon", 
+                            "lookupOutputFieldName": "lon", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "number", 
+                            "fieldName": "SRCIP_lon", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "SRCIP_lat", 
+                            "lookupOutputFieldName": "lat", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "number", 
+                            "fieldName": "SRCIP_lat", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "SRCIP_City", 
+                            "lookupOutputFieldName": "City", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "string", 
+                            "fieldName": "SRCIP_City", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "SRCIP_Region", 
+                            "lookupOutputFieldName": "Region", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "string", 
+                            "fieldName": "SRCIP_Region", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "SRCIP_Country", 
+                            "lookupOutputFieldName": "Country", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "string", 
+                            "fieldName": "SRCIP_Country", 
+                            "hidden": false
+                        }
+                    ], 
+                    "calculationID": "huoht52t5ro", 
+                    "calculationType": "GeoIP"
+                }, 
+                {
+                    "comment": "", 
+                    "inputField": "dst_ip", 
+                    "outputFields": [
+                        {
+                            "required": true, 
+                            "displayName": "dst_ip_lon", 
+                            "lookupOutputFieldName": "lon", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "number", 
+                            "fieldName": "dst_ip_lon", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "dst_ip_lat", 
+                            "lookupOutputFieldName": "lat", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "number", 
+                            "fieldName": "dst_ip_lat", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "dst_ip_City", 
+                            "lookupOutputFieldName": "City", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "string", 
+                            "fieldName": "dst_ip_City", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "dst_ip_Region", 
+                            "lookupOutputFieldName": "Region", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "string", 
+                            "fieldName": "dst_ip_Region", 
+                            "hidden": false
+                        }, 
+                        {
+                            "required": true, 
+                            "displayName": "dst_ip_Country", 
+                            "lookupOutputFieldName": "Country", 
+                            "multivalue": false, 
+                            "comment": "", 
+                            "type": "string", 
+                            "fieldName": "dst_ip_Country", 
+                            "hidden": false
+                        }
+                    ], 
+                    "calculationID": "qf1fcgvnlh", 
+                    "calculationType": "GeoIP"
+                }
+            ], 
+            "constraints": [
+                {
+                    "search": "sourcetype=ossim_action"
+                }
+            ], 
+            "parentName": "BaseEvent", 
+            "objectName": "EventosBase", 
+            "comment": ""
+        }, 
+        {
+            "fields": [], 
+            "displayName": "alarma", 
+            "calculations": [], 
+            "constraints": [
+                {
+                    "search": "RIESGO>=1"
+                }
+            ], 
+            "parentName": "EventosBase", 
+            "objectName": "alarma", 
+            "comment": ""
+        }
+    ], 
+    "objectNameList": [
+        "EventosBase", 
+        "alarma"
+    ], 
+    "objectSummary": {
+        "Transaction-Based": 0, 
+        "Interfaces": 0, 
+        "Search-Based": 0, 
+        "Interface Implementations": 0, 
+        "Event-Based": 2
+    }
+}

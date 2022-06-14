@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>HDX Applications</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+    <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+  </fieldset>
+  
+<row>
+       <chart>
+        <title>HDX Active Applications Over Time</title>
+        <searchString>
+            index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") 
+            | join type=inner `CONNECTION` [ search index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` | fields `CONNECTION`]
+            | timechart distinct_count(appName)
+        </searchString>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Time</option> 
+        <option name="charting.axisTitleY.text">Active HDX Applications</option> 
+    </chart>
+</row>
+<row>
+    <chart>
+        <title>HDX Data Usage By Top Applications</title>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisTitleX.text">Application</option> 
+        <option name="charting.axisTitleY.text">MB</option> 
+        <searchString>
+            index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS")  
+                | join type=inner `CONNECTION` [ search index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` ]
+                | stats sum(octetDeltaCount) as conn_bytes values(appName) as appName by `CONNECTION`          
+                | `ICA_APP_NAME_FIX(appName)`
+                | stats sum(conn_bytes) as bytes by appName          
+                | fields appName bytes
+                | `FORMAT_MB(bytes)`
+                | sort -num(bytes)            
+                | head 10
+      </searchString>
+    </chart>
+    
+    <chart>
+      <title>HDX Data Reduction By Top Applications</title>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.axisTitleX.text">Applications</option> 
+      <option name="charting.axisTitleY.text">MB</option> 
+      <searchString>
+            index=cloudbridge observationPointId="$observerId$" TemplateName="604_ACCELERATED" 
+          | join type=inner `CONNECTION` [search index=cloudbridge observationPointId="$observerId$" TemplateName="256_INGRESS" OR TemplateName="257_EGRESS" | fields `CONNECTION` appName] 
+          | join type=inner `CONNECTION` [search index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` | fields `CONNECTION` ]
+          | eval clearText = decompressionClearTextDeltaBytes + compressionClearTextDeltaBytes 
+          | eval cipherText = decompressionCipherTextDeltaBytes + compressionCipherTextDeltaBytes
+          | stats sum(clearText) AS clearTextConn sum(cipherText) AS cipherTextConn values(appName) as appName by `CONNECTION`
+          | `ICA_APP_NAME_FIX(appName)`
+          | stats sum(clearTextConn) AS clearTextSum sum(cipherTextConn) AS cipherTextSum by appName
+          | where clearTextSum > 0 AND cipherTextSum > 0
+          | eval dataReduction=clearTextSum - cipherTextSum 
+          | `FORMAT_MB(dataReduction)`
+          | stats sum(dataReduction) as sum_dataReduction BY appName
+          | fields appName sum_dataReduction 
+          | sort -num(sum_dataReduction) 
+          | head 10     
+      
+    </searchString>
+    </chart>
+
+  </row>
+  
+</form>
+
+

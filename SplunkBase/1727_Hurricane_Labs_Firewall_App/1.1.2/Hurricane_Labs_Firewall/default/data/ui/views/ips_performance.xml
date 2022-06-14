@@ -1,0 +1,76 @@
+<form>
+ <label>IPS Performance Impact</label>
+ <fieldset autoRun="true" submitButton="false">
+    <input type="time">
+      <default>
+        <earliestTime>-15m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    
+    <input type="dropdown" token="dvc" searchWhenChanged="true">
+      <label>Firewall:</label>
+      <default>*</default>
+      
+     <!-- Define the default value -->      
+      <choice value="*">All</choice>
+      
+     <!-- Define the choices with a populating search -->
+      <populatingSearch fieldForValue="dvc" fieldForLabel="dvc">
+        <![CDATA[eventtype="fw_event" product="SmartDefense" dvc=* | dedup dvc | table dvc ]]>
+      </populatingSearch>
+    </input>  
+   
+    <input type="dropdown" token="Performance_Impact_Detail" searchWhenChanged="true">
+      <label>Performance Impact Level:</label>
+      <default>*</default>
+      
+     <!-- Define the default value -->      
+      <choice value="*">All</choice>
+      
+     <!-- Define the choices with a populating search -->
+      <populatingSearch fieldForValue="Performance_Impact_Detail" fieldForLabel="Performance_Impact_Detail">
+        <![CDATA[eventtype="fw_event" product="SmartDefense" dvc=$dvc$ Performance_Impact_Detail=* | dedup Performance_Impact_Detail | table Performance_Impact_Detail ]]>
+      </populatingSearch>
+    </input>   
+
+    <input type="dropdown" token="Confidence_Level_Detail" searchWhenChanged="true">
+      <label>Confidence Level:</label>
+      <default>*</default>
+      
+     <!-- Define the default value -->      
+      <choice value="*">All</choice>
+      
+     <!-- Define the choices with a populating search -->
+      <populatingSearch fieldForValue="Confidence_Level_Detail" fieldForLabel="Confidence_Level_Detail">
+        <![CDATA[ eventtype="fw_event" product="SmartDefense" Performance_Impact_Detail=$Performance_Impact_Detail$ dvc=$dvc$ Confidence_Level_Detail=* | dedup Confidence_Level_Detail | table Confidence_Level_Detail ]]>
+      </populatingSearch>
+    </input>    
+   
+  </fieldset>
+  <searchTemplate>
+   index="opsec*" eventtype="fw_event" product="SmartDefense" Performance_Impact_Detail=$Performance_Impact_Detail$ dvc=$dvc$ Confidence_Level_Detail=$Confidence_Level_Detail$ eventtype="allowed" OR eventtype="blocked" 
+   | fields eventtype action src dst dvc attack policy_name Profile Severity Severity_Detail Impact Performance_Impact_Detail Confidence_Level_Detail
+  </searchTemplate>
+  
+  <row>
+    <table>
+      <title>Allowed IPS Event Details</title>
+      <searchPostProcess>
+           | search eventtype="allowed" | top dvc attack action Severity Severity_Detail Performance_Impact_Detail Confidence_Level_Detail limit="0" | sort -Severity 
+           | rename dvc AS "Firewall" attack as "Attack Type" Performance_Impact_Detail AS "Performance Impact" Confidence_Level_Detail AS "Confidence Level" action AS "Action Taken" Severity_Detail AS "Severity" count as "Count"
+      </searchPostProcess>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Blocked IPS Event Details</title>
+      <searchPostProcess>
+           | search eventtype="blocked" | top dvc attack action Severity Severity_Detail Performance_Impact_Detail Confidence_Level_Detail limit="0" | sort -Severity 
+           | rename dvc AS "Firewall" attack as "Attack Type" Performance_Impact_Detail AS "Performance Impact" Confidence_Level_Detail AS "Confidence Level" action AS "Action Taken" Severity_Detail AS "Severity" count as "Count"
+      </searchPostProcess>
+    </table>
+  </row>
+
+  
+</form>

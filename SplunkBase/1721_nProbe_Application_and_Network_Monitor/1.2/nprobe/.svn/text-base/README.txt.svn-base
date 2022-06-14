@@ -1,0 +1,18 @@
+This free app is meant for:
+
+- Use with Splunk® Free
+- Receive Flow data from nProbe
+
+Download the nProbe App for security and network monitoring at http://apps.splunk.com/app/1721/.
+
+This App from ntop.org allows you to ingest Flow data in Splunk® Free.
+
+Get started in 3 easy steps:
+
+1. Install and enable the app by completing the setup page
+2. Send your Flow to the default listening port: 3333 via nProbe 
+3. Begin collecting and analyzing Flow with Spluk!
+
+Here is how it works: Flow is sent from your nProbe instance over the TCP protocol to port 3333. The nProbe bundled with the app receives the data and converts it into JSON messages. The data is sent to the local Splunk TCP data input 3333 which was created for you during the app installation.
+
+Please read the Quick Start Guide (SPLUNK_HOME/ect/apps/nprobe/appserver/static).

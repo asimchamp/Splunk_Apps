@@ -1,0 +1,14 @@
+<!--Copyright (C) 2005-2013 Splunk Inc. All Rights Reserved.-->
+<view autoCancelInterval="90" isPersistable="true" isSticky="true" isVisible="true" objectMode="viewconf" onunloadCancelJobs="true" template="alerts:/templates/dashboard.html">
+  <label>Help</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter"></param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="SAjaxInclude" layoutPanel="panel_row1_col1">
+    <param name="url">/static/app/alerts/RedAlert.html</param>
+  </module>
+</view>

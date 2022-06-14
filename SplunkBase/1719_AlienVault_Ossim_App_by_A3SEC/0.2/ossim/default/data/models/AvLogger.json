@@ -1,0 +1,625 @@
+{
+    "objectSummary": {
+        "Event-Based": 1, 
+        "Search-Based": 0, 
+        "Interface Implementations": 0, 
+        "Interfaces": 0, 
+        "Transaction-Based": 0
+    }, 
+    "displayName": "AvLogger", 
+    "modelName": "AvLogger", 
+    "description": "Data Model Logger (sourcetype=avlogger)", 
+    "objectNameList": [
+        "Logger"
+    ], 
+    "objects": [
+        {
+            "calculations": [], 
+            "objectName": "Logger", 
+            "fields": [
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "ctx", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "ctx"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "data", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "data"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "datalen", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "datalen"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "date"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_hour", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "date_hour"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_mday", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "date_mday"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_minute", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "date_minute"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_month", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "date_month"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_second", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "date_second"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_wday", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "date_wday"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_year", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "date_year"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_zone", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "date_zone"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "delay", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "delay"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "delays", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "delays"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "device", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "device"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "dsn", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "dsn"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "dst_host", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "dst_host"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "dst_ip", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "dst_ip"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "dst_net", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "dst_net"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "dst_port", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "dst_port"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "euid", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "euid"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "eventtype", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "eventtype"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "fdate", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "fdate"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "filename", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "filename"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "id", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "id"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "idm_host_dst", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "idm_host_dst"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "idm_host_src", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "idm_host_src"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "index", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "index"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "linecount", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "linecount"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "orig_to", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "orig_to"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "plugin_id", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "plugin_id"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "plugin_sid", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "plugin_sid"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "proto", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "proto"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "punct", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "punct"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "relay", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "relay"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rep_act_dst", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rep_act_dst"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rep_act_src", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rep_act_src"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rep_prio_dst", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rep_prio_dst"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rep_prio_src", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rep_prio_src"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rep_rel_dst", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rep_rel_dst"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rep_rel_src", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rep_rel_src"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "rhost", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "rhost"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "sensor", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "sensor"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "splunk_server", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "splunk_server"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "src_host", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "src_host"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "src_ip", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "src_ip"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "src_net", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "src_net"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "src_port", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "src_port"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "status", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "status"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "tag", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "tag"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "tag::eventtype", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "tag::eventtype"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "timeendpos", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "timeendpos"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "timestartpos", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "timestartpos"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "to", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "to"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "tty", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "tty"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "tzone", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "tzone"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "uid", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "uid"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "unix_category", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "unix_category"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "unix_group", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "unix_group"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "user", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "user"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "userdata1", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "userdata1"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "userdata2", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "userdata2"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "userdata3", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "userdata3"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "userdata4", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "userdata4"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "username", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "username"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "v", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "v"
+                }
+            ], 
+            "parentName": "BaseEvent", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "sourcetype=avlogger"
+                }
+            ], 
+            "displayName": "Logger"
+        }
+    ]
+}

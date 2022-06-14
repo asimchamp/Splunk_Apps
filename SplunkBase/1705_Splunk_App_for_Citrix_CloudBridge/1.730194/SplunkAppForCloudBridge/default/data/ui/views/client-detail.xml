@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Client Details</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+    <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+    <input type="text" token="sourceIPv4Address"> 
+        <label>Client</label>
+    </input> 
+  </fieldset>
+ 
+  <row>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Bandwidth Savings: </option>
+      <searchString>
+          index=cloudbridge (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") sourceIPv4Address="$sourceIPv4Address$" | 
+          `JOIN_ACCELERATED` |
+          `BW_SAVINGS_PERCENT`
+      </searchString>
+    </single>
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Compression Ratio: </option>
+        <searchString>
+            index=cloudbridge (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") sourceIPv4Address="$sourceIPv4Address$" |
+            `JOIN_ACCELERATED` |
+            `COMPRESSION_RATIO()`
+        </searchString>
+    </single>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Connections: </option>
+      <searchString>
+            index=cloudbridge (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") sourceIPv4Address="$sourceIPv4Address$" |
+            stats count by `CONNECTION` |
+            stats count
+      </searchString>
+    </single>
+  </row>
+
+  <row>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Applications: </option>
+      <searchString>`256_1_DISTINCT_COUNT("sourceIPv4Address=\"$sourceIPv4Address$\"",appName)`</searchString>
+    </single>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Avg WAN Latency(RTT): </option>
+      <option name="afterLabel">ms</option>
+      <searchString>`AVG_WAN_LATENCY("sourceIPv4Address=\"$sourceIPv4Address$\"")`</searchString>
+    </single>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">WAN RTOs: </option>
+      <searchString>`APP_RTOS("sourceIPv4Address=\"$sourceIPv4Address$\"")`</searchString>
+    </single>
+  </row>
+
+  <row>
+    <chart>
+      <searchString>`WAN_THROUGHPUT("sourceIPv4Address=\"$sourceIPv4Address$\"")`</searchString>
+      <title>WAN Throughput</title>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Time</option> 
+      <option name="charting.axisTitleY.text">Mbps</option> 
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+      <searchString>`LATENCY("sourceIPv4Address=\"$sourceIPv4Address$\"")`</searchString>
+      <title>Latency(RTT)</title>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Time</option> 
+      <option name="charting.axisTitleY.text">ms</option> 
+    </chart>
+  </row>
+   
+</form>
+

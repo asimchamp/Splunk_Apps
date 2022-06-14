@@ -1,0 +1,141 @@
+{
+    "objects": [
+        {
+            "fields": [
+                {
+                    "fieldName": "source", 
+                    "required": false, 
+                    "displayName": "source", 
+                    "owner": "BaseEvent", 
+                    "comment": "", 
+                    "hidden": true, 
+                    "type": "string", 
+                    "multivalue": false
+                }, 
+                {
+                    "fieldName": "sourcetype", 
+                    "required": false, 
+                    "displayName": "sourcetype", 
+                    "owner": "BaseEvent", 
+                    "comment": "", 
+                    "hidden": true, 
+                    "type": "string", 
+                    "multivalue": false
+                }, 
+                {
+                    "fieldName": "action", 
+                    "required": false, 
+                    "displayName": "action", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "dest", 
+                    "required": false, 
+                    "displayName": "dest", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "dport", 
+                    "required": false, 
+                    "displayName": "dport", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "number"
+                }, 
+                {
+                    "fieldName": "equiptype", 
+                    "required": false, 
+                    "displayName": "equiptype", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "filter", 
+                    "required": false, 
+                    "displayName": "filter", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "mac", 
+                    "required": false, 
+                    "displayName": "mac", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "port", 
+                    "required": false, 
+                    "displayName": "port", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "protocol", 
+                    "required": false, 
+                    "displayName": "protocol", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }, 
+                {
+                    "fieldName": "sport", 
+                    "required": false, 
+                    "displayName": "sport", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "number"
+                }, 
+                {
+                    "fieldName": "src", 
+                    "required": false, 
+                    "displayName": "src", 
+                    "comment": "", 
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "type": "string"
+                }
+            ], 
+            "displayName": "Security Event", 
+            "objectName": "Security_Event", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "category=\"SEC:DETECT\" NOT (TISCAN OR \"filter status\")"
+                }
+            ], 
+            "parentName": "BaseEvent", 
+            "calculations": []
+        }
+    ], 
+    "modelName": "TiMatrixEvent", 
+    "description": "", 
+    "objectNameList": [
+        "Security_Event"
+    ], 
+    "objectSummary": {
+        "Event-Based": 1, 
+        "Interfaces": 0, 
+        "Transaction-Based": 0, 
+        "Interface Implementations": 0, 
+        "Search-Based": 0
+    }, 
+    "displayName": "TiMatrixEvent"
+}

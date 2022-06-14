@@ -1,0 +1,80 @@
+<form script="link_switcher.js, autodiscover.js, table_data_bar.js, forminput_panels.js" stylesheet="table_data_bar.css, forminput_panels.css">
+  <label>Puppet Agent</label>
+  <description>The puppet activities on the selected system</description>
+    <fieldset autoRun="true" submitButton="false">
+      <input type="dropdown" token="field1" searchWhenChanged="true">
+       <label>Select a Module:</label>
+        <populatingSearch fieldForValue="Module" fieldForLabel="Module" earliest="$time1.earliest$" latest="$time1.latest$">
+          <![CDATA[index=* host=$host$ puppet-agent ((daemon.notice OR daemon.info) main changed NOT "is changed") OR ((daemon.error OR daemon.warning) main) | rex field=_raw "(\]\/)(?<Module>[^\/\[]*)" | bucket _time span=5m | dedup Module]]>
+        </populatingSearch>
+      </input>
+      <input type="dropdown" token="host" searchWhenChanged="true">
+       <label>Select a System:</label>
+        <populatingSearch fieldForValue="host" fieldForLabel="host" earliest="$time1.earliest$" latest="$time1.latest$">
+          <![CDATA[index=* puppet-agent "Retrieving plugin" | fields+ host | dedup host | sort host]]>
+        </populatingSearch>
+      </input>
+	  <input type="time" token="time1" searchWhenChanged="true">
+        <label>Select a time:</label>
+			<default>Today</default>
+	  </input>
+    </fieldset>
+    <row grouping="3">
+        <html>
+            <h2>Puppet Module</h2>
+            <div class="link-switcher" data-items="table1,table2"></div>
+        </html>
+        <table id="table1">
+          <title>Module's Error/Warning</title>
+            <searchString>index="*" puppet-agent host=$host$ (daemon.error OR daemon.warning) main | rex field=_raw "(\]\/)(?&lt;Module&gt;[^\/\[]*)" | top limit=100 Module | rename count as "Resource"</searchString>
+	  	    <earliestTime>$time1.earliest$</earliestTime>
+			<latestTime>$time1.latest$</latestTime>
+            <option name="wrap">true</option>
+            <option name="rowNumbers">true</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="drilldown">none</option>
+            <option name="count">10</option>
+        </table>
+        <table id="table2">
+            <title>Module's Activity</title>
+            <searchString>index="*" puppet-agent host=$host$ (daemon.notice OR daemon.info) main changed NOT "is changed" | rex field=_raw "(\]\/)(?&lt;Module&gt;[^\/\[]*)" | top limit=100 Module | rename count as "Resource"</searchString>
+	  	    <earliestTime>$time1.earliest$</earliestTime>
+			<latestTime>$time1.latest$</latestTime>
+            <option name="wrap">true</option>
+            <option name="rowNumbers">true</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="drilldown">none</option>
+            <option name="count">10</option>
+        </table>
+        <table id="table3">
+            <title>Puppet Messages</title>
+            <description>The puppet activities on the selected system</description>
+            <searchString>index=* puppet-agent host=$host$ (daemon.notice OR daemon.info) main changed NOT "is changed" | rex field=_raw "(\]\/)(?&lt;Module&gt;[^\/\[]*)" | rex field=_raw "\(\/.+\)\s(?&lt;Message&gt;[\w\s]+)" | rex field=_raw "\ID\s\d+\s\w+\.(?&lt;Level&gt;\w+)\]" | rex field=_raw "\/Stage\[main\]\/[^\/\[]*\/(?&lt;Resource&gt;[\/a-zA-Z\d\_\-\.\:\[\s]+\])" | append [search index=* host=$host$ puppet-agent (daemon.error OR daemon.warning) main | rex field=_raw "(\]\/)(?&lt;Module&gt;[^\/\[]*)" | rex field=_raw "\(\/.+\)\s(?&lt;Message&gt;[\w\s]+)" | rex field=_raw "\ID\s\d+\s\w+\.(?&lt;Level&gt;\w+)\]" | rex field=_raw "\/Stage\[main\]\/[^\/\[]*\/(?&lt;Resource&gt;[\/a-zA-Z\d\_\-\.\:\[\s]+\])"] | where Module=$field1|s$ | fields+ Level, Message, Resource | table Level, Message, Resource</searchString>
+	  	    <earliestTime>$time1.earliest$</earliestTime>
+			<latestTime>$time1.latest$</latestTime>
+            <option name="wrap">true</option>
+            <option name="rowNumbers">true</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="drilldown">none</option>
+            <option name="count">10</option>
+        </table>
+    </row>
+    <row>
+        <chart>
+            <title>Puppet Runtime over a week</title>
+            <searchString>index=* host=$host$ puppet-agent Finished catalog run in | rex field=_raw "Finished\s\w+\s\w+\s\w+\s(?&lt;seconds&gt;.*)\s\w+" | fields+ seconds, _time | timechart sum(seconds) as Runtime | fillnull Runtime</searchString>
+            <earliestTime>-6d@d</earliestTime>
+            <latestTime>+d@d</latestTime>  
+            <option name="charting.chart">area</option>
+            <option name="charting.drilldown">none</option>
+        </chart>
+        <chart>
+          <title>Puppet Resources over a Week</title>
+            <searchString>index=* host=$host$ puppet-agent daemon.warning main "Skipping because of failed dependencies" | timechart count(sourcetype) as "Skipped" | appendcols [search index=* host=$host$ puppet-agent daemon.error main | timechart count(sourcetype) as "Failed"] | appendcols [search index=* host=$host$ puppet-agent (daemon.notice OR daemon.info) main "refresh of service" | timechart count(sourcetype) as "Restarted"] | appendcols [search index=* host=$host$ puppet-agent (daemon.notice OR daemon.info) main changed | timechart count(sourcetype) as "Applied"] | fillnull value=0 Skipped, Failed, Restarted, Applied</searchString>
+            <earliestTime>-6d@d</earliestTime>
+            <latestTime>+d@d</latestTime>            
+            <option name="charting.chart">area</option>
+            <option name="charting.drilldown">none</option>
+        </chart>
+    </row>
+</form>

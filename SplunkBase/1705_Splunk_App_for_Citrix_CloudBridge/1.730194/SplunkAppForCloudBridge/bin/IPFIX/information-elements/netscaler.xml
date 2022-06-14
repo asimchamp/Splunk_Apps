@@ -1,0 +1,611 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="ipfix.xsl"?>
+<?oxygen RNGSchema="ipfix.rng" type="xml"?>
+<registry xmlns="http://www.iana.org/assignments" id="ipfix">
+    <title>Netscaler information elements</title>
+    <created>2007-05-10</created>
+    <updated>2012-09-20</updated>
+    <note>For the IPFIX schema, please see <xref type="uri" data="http://www.iana.org/assignments/xml-registry/schema/ipfix.xsd"/>.</note>
+
+    <registry id="ipfix-information-elements">
+        <title>Netscaler-specific IPFIX Information Elements</title>
+        <registration_rule>5951</registration_rule>
+        <expert></expert>
+        <xref type="rfc" data="rfc5102"/>
+
+             <record>
+                <name>appName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>152</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>transactionId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>129</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connectionId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>133</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>flowFlags</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>132</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appNameAppId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>151</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connChainId</name>
+                <dataType>octetArray</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>192</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connChainHopCount</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>193</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>roundTripTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>128</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>incarnationNumber</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>150</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appTemplateName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>167</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionGuid</name>
+                <dataType>octetArray</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>200</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>deviceSerialNumber</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>247</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>msiClientCookie</name>
+                <dataType>octetArray</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>248</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaFlags</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>249</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionSetupTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>209</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientIp</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>203</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientType</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>202</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientLauncher</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>208</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientVersion</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>201</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientHostname</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>204</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>userName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>250</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>domainName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>207</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>210</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connectionPriority</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>235</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appStartupDuration</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>236</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>launchMechanism</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>237</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appLaunchTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>239</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appProcessId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>245</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>applicationName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>238</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appModulePath</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>246</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionReconnects</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>214</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaRtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>215</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideRxBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>216</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideTxBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>217</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSidePktsRetran</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>219</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSidePktsRetran</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>220</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideRtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>221</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSideRtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>222</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideJitter</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>243</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSideJitter</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>244</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>networkUpdateStartTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>254</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>networkUpdateEndTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>255</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideSrtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>256</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSideSrtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>259</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideDelay</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>260</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSideDelay</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>261</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>hostDelay</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>262</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSide0WindowCount</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>263</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSide0WindowCount</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>264</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientSideRtoCount</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>265</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverSideRtoCount</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>266</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionUpdateBegin</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>223</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionUpdateEnd</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>224</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId1</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>225</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId1Bytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>226</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId2</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>227</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId2Bytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>228</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId3</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>229</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId3Bytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>230</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId4</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>231</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId4Bytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>232</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId5</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>233</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>channelId5Bytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>234</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appTerminationType</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>240</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>appTerminationTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>241</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionEndTime</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>242</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+    </registry>
+</registry>

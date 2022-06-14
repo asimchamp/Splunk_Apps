@@ -1,0 +1,112 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard refresh="300">
+  <label>RSA Netwitness Administration Decoders</label>
+  <row>
+    <chart>
+      <searchString>sourcetype=netwitness_admin /decoder/stats | timechart limit=0 span=15m max(capture_dropped) by host usenull=f useother=f </searchString>
+      <title>Packet loss per Decoder over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Total Packets Lost</option>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">line</option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" /decoder/stats | timechart limit=0 span=15m avg(pool_packet_capture) as "Pool Packet Capture" by host</searchString>
+      <title>Pool Packet Capture per Decoder over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Pool Packet Capture</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="drilldown">none</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" /decoder/stats | timechart limit=0 span=15m avg(pool_packet_assembler) as "Pool Packet Assembler" by host</searchString>
+      <title>Pool Packet Assembler per Decoder (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Pool Packet Assembler</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" /decoder/stats | timechart limit=0 span=15m avg(assembler_packet_pages) as "Assembler Packet Pages" by host</searchString>
+      <title>Assembler Packet Pages per Decoder over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Assembler Packet Pages</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="drilldown">none</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" /decoder/stats | timechart limit=0 span=15m avg(pool_packet_write) as "Pool Packet Write" by host</searchString>
+      <title>Pool Packet Write per Decoder (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Pool Packet Write</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+  
+  <row>
+    <table>
+      <searchString>sourcetype=netwitness_admin /decoder/stats | stats dc(capture_dropped) as drops min(capture_dropped) as lowest max(capture_dropped) as highest sparkline(max(capture_dropped)) as values by host | eval drops=drops-1 | eval packets_lost=highest-lowest | where drops &gt; 0</searchString>
+      <title>Packets Drop Stats (Last Day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" /decoder/stats | timechart limit=0 span=15m avg(capture_rate) as rate by host</searchString>
+      <title>Capture Rates per Decoder over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Capture Rate</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="drilldown">none</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" /decoder/stats | stats max(capture_rate_max) as Peak(Mbps) by host</searchString>
+      <title>Peak Capture Rate per Decoder (Since Last Restart)</title>
+      <earliestTime>-10m@m</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Decoder</option>
+      <option name="charting.axisTitleY.text">Mbps</option>
+      <option name="charting.chart">bar</option>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">row</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="netwitness_admin" decoder /database/stats |eval poft=strptime(packet_oldest_file_time,"%Y-%b-%d %H:%M:%S") | eval duration=time()-poft | eval days=round(duration/86400) | stats max(meta_oldest_file_time) as oldest_meta max(packet_oldest_file_time) as oldest_packet min(days) as retention_days dc(packet_oldest_file_time) as packet_files_deleted by host | eval packet_files_deleted=packet_files_deleted-1 | appendcols [search sourcetype=netwitness_admin decoder /sys/stats | stats max(cpu) as max_cpu min(cpu) as min_cpu max(running_since) as running_since  by host, hostname | fields host, hostname, max_cpu, min_cpu, running_since]</searchString>
+      <title>Decoder Stats (Last hour)</title>
+      <earliestTime>-1h@m</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+</dashboard>

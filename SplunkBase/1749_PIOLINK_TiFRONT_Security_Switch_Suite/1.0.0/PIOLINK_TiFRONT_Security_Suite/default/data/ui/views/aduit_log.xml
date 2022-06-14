@@ -1,0 +1,24 @@
+<form>
+  <label>Aduit Log</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>@d</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Audit log list</title>
+      <searchString>sourcetype="syslog" AND (category="CONF:CONFIG" OR category="SEC:CONF" OR category="SYS:CONFIG" OR category="CONF:USER" OR category="USER:HISTORY" OR category="CONF:SEC") | table _time, host, equiptype, message, user, from, status, _raw</searchString>
+      <earliestTime>@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">20</option>
+    </table>
+  </row>
+</form>

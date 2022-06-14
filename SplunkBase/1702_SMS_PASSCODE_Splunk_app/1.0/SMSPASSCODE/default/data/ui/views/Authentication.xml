@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Authentication</label>
+  <fieldset>
+    <input type="time">
+      <default>Last 24 hours</default> 
+    </input> 
+    <input type="text" token="Filtername">
+      <label>Login filter</label>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <searchString>`smspasscode-index` source="WinEventLog:SmsCL" EventCode=6001 | search LoginAccount="*$Filtername$*" |timechart count by Authentication_client_type</searchString>
+      <title>Successful logons by authentication client</title>
+      <option name="charting.axisTitleX.text">Date</option>
+      <option name="charting.axisTitleY.text">Logons</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.maximumNumber">""</option>
+      <option name="charting.secondaryAxis.minimumNumber">""</option>
+      <option name="charting.secondaryAxis.scale">""</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">50</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>`smspasscode-index` source="WinEventLog:SmsCL" EventCode=6000 | search LoginAccount="*$Filtername$*" | timechart count</searchString>
+      <title>Authentication failures</title>
+      <option name="charting.axisTitleX.text">Date</option>
+      <option name="charting.axisTitleY.text">Failures</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.maximumNumber">""</option>
+      <option name="charting.secondaryAxis.minimumNumber">""</option>
+      <option name="charting.secondaryAxis.scale">""</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>`smspasscode-index` source="WinEventLog:SmsCL" EventCode=6001 | search LoginAccount="*$Filtername$*" |timechart count by LoginAccount useother=f limit=10</searchString>
+      <title>Authentication success</title>
+      <option name="charting.axisTitleX.text">Date</option>
+      <option name="charting.axisTitleY.text">Logons</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>`smspasscode-index` source="WinEventLog:SmsCL" EventCode=6000 | search LoginAccount="*$Filtername$*" |timechart count by LoginAccount useother=f limit=10</searchString>
+      <title>Authentication failures</title>
+      <option name="charting.axisTitleX.text">User</option>
+      <option name="charting.axisTitleY.text">Authentication failures</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>`smspasscode-index` source="WinEventLog:SmsCL" | search LoginAccount="*$Filtername$*" | timechart count by AuthResult usenull=f | fields _time "Passcode request success" "Authentication success" "Authentication failure"</searchString>
+      <title>Authentication results</title>
+      <option name="charting.axisTitleX.text">Date</option>
+      <option name="charting.axisTitleY.text">Logins</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>`smspasscode-index` source="WinEventLog:SmsCL" EventCode=6000 | search LoginAccount="*$Filtername$*" | timechart count by LoginAccount useother=f limit=10</searchString>
+      <title>Failed Logins over time</title>
+      <option name="charting.chart">column</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>`smspasscode-index` sourcetype="WinEventLog:SmsCL" AuthResult="Authentication success" | search LoginAccount="*$Filtername$*" | chart count by Dispatch_Type</searchString>
+      <title>OTP Authentications succes by dispatch type</title>
+      <option name="charting.chart">pie</option>
+      <option name="count">10</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>`smspasscode-index` sourcetype="WinEventLog:SmsCL" AuthResult="Authentication success" | search LoginAccount="*$Filtername$*" | chart count by Passcode_Type</searchString>
+      <title>Authentications succes by passcode type</title>
+      <option name="charting.chart">pie</option>
+      <option name="count">10</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>`smspasscode-index` sourcetype="WinEventLog:SmsCL" AuthResult="Authentication failure" | search LoginAccount="*$Filtername$*" | chart count by Reason</searchString>
+      <title>Authentication failures by type</title>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+  <row>
+    <single>
+      <searchString>`smspasscode-index` sourcetype="WinEventLog:SmsCL" AuthResult="Authentication success" | search LoginAccount="*$Filtername$*" | chart count</searchString>
+      <title>Authentication success</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </single>
+    <single>
+      <searchString>`smspasscode-index` sourcetype="WinEventLog:SmsCL" AuthResult="Authentication failure" | search LoginAccount="*$Filtername$*" | chart count</searchString>
+      <title>Authentication failures</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </single>
+  </row>
+</form>
