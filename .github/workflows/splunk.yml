@@ -18,6 +18,7 @@ jobs:
       - name: Run a inline script
         run: |
           ls -l
+          du -sh SplunkBase/
         shell: bash
       - name: Run a shell script file
         run: sh ./app_downloader.sh
