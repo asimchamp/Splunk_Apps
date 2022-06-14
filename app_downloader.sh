@@ -153,8 +153,7 @@ do
 
 done
 
-sort $splunk_home/workflow/workflow$workflow_number/merge.txt | uniq -d > $splunk_home/workflow/workflow$workflow_number/1merge_uniq.txt
-sort $splunk_home/workflow/workflow$workflow_number/1merge_uniq.txt | uniq -d >> $splunk_home/workflow/workflow$workflow_number/merge_uniq.txt
+sort $splunk_home/workflow/workflow$workflow_number/merge.txt | uniq -d > $splunk_home/workflow/workflow$workflow_number/merge_uniq.txt
 rm -rf $splunk_home/workflow/workflow$workflow_number/merge.txt $splunk_home/workflow/workflow$workflow_number/1merge_uniq.txt $splunk_home/workflow/workflow$workflow_number/*_app_*
 sed -i 's/404//g' $splunk_home/workflow/workflow$workflow_number/splunk_name.txt
 
