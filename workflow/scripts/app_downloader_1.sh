@@ -17,7 +17,7 @@ splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 
 splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
 
-workflow_number='_2'
+workflow_number='_1'
 
 # Checking the Workflow folder present or not
 workflow_folder=$(ls $splunk_home/ | grep -cw workflow)
