@@ -86,27 +86,42 @@ fi
 
 }
 
-rm -rf $splunk_home/merge.txt $splunk_home/splunk_name.txt
+rm -rf $splunk_home/splunk_name.txt
+
+previous_check_func()
+{
+
+previous_download_app=$(cat $splunk_home/merge_uniq.txt | grep $e | wc -l )
+
+if [ "$download_archive_app" = "1" ];
+   then
+   echo "App Present on old data bsase"
+   
+else
+   app_not_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error: Page not found" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
+   echo "ID=$i" "app_not_found="$app_not_found, >> $splunk_home/1_app_not_found.txt
+   cat $splunk_home/1_app_not_found.txt | grep "404 Error: Page not found" >> $splunk_home/merge.txt
+
+   app_archive=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app has been archived" |  awk -F"." '{print $1}' | cut -c 13-38 )
+   echo "ID=$i" "app_not_found="$app_archive, >> $splunk_home/2_app_archive.txt
+   cat $splunk_home/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/merge.txt
+
+   app_not_available=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app is currently not available" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
+   echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/3_app_not_available.txt
+   cat $splunk_home/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/merge.txt
+
+   app_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print $1}' )
+   app_version=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep 'sb-release-select u-for="download-modal" sb-selector="release-version" sb-target="' | sed -n '1p' | awk -F"=" '{print $4}' | awk -F"\"" '{print $2}' )
+   echo "ID=$i" "app_found="$app_found, "app_version="$app_version >> $splunk_home/splunk_name.txt
+
+fi
+
+}
 
 ########## Checking app avaibility on Splunk Base #################
 for i in $(cat app_id.txt)
 do
-
-app_not_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "404 Error: Page not found" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
-echo "ID=$i" "app_not_found="$app_not_found, >> $splunk_home/1_app_not_found.txt
-cat $splunk_home/1_app_not_found.txt | grep "404 Error: Page not found" >> $splunk_home/merge.txt
-
-app_archive=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app has been archived" |  awk -F"." '{print $1}' | cut -c 13-38 )
-echo "ID=$i" "app_not_found="$app_archive, >> $splunk_home/2_app_archive.txt
-cat $splunk_home/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/merge.txt
-
-app_not_available=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app is currently not available" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
-echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/3_app_not_available.txt
-cat $splunk_home/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/merge.txt
-
-app_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print $1}' )
-app_version=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep 'sb-release-select u-for="download-modal" sb-selector="release-version" sb-target="' | sed -n '1p' | awk -F"=" '{print $4}' | awk -F"\"" '{print $2}' )
-echo "ID=$i" "app_found="$app_found, "app_version="$app_version >> $splunk_home/splunk_name.txt
+   previous_check_func
 
 done
 
@@ -137,6 +152,7 @@ do
    fi
 
 done
+
 
 
 echo "Loop Completed for Download."
