@@ -20,7 +20,7 @@ splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt |
 workflow_number='_1'
 
 # Checking the Workflow folder present or not
-workflow_folder=$(ls $splunk_home/ | grep -cw workfow)
+workflow_folder=$(ls $splunk_home/ | grep -cw workflow)
 
 if [ "$workflow_folder" = "1" ];
    then
@@ -29,7 +29,7 @@ if [ "$workflow_folder" = "1" ];
    else
       echo "workflow Folder not Present."
       mkdir $splunk_home/workflow/
-      echo "workfow Folder Created."
+      echo "workflow Folder Created."
 
 fi
 
@@ -135,7 +135,7 @@ else
    cat $splunk_home/workflow/workflow$workflow_number/2_app_archive.txt | grep "This app has been archived" >> $splunk_home/workflow/workflow$workflow_number/merge.txt
 
    app_not_available=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep "This app is currently not available" | awk -F">" '{print $2}' | awk -F"." '{print $1}' )
-   echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/workflow/workflow$workfow_number/3_app_not_available.txt
+   echo "ID=$i" "app_not_found="$app_not_available, >> $splunk_home/workflow/workflow$workflow_number/3_app_not_available.txt
    cat $splunk_home/workflow/workflow$workflow_number/3_app_not_available.txt | grep "This app is currently not available" >> $splunk_home/workflow/workflow$workflow_number/merge.txt
 
    app_found=$(curl -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i/ | grep -e 'Splunkbase</title>' | awk -F">" '{print $2}' | awk -F"|" '{print $1}' )
