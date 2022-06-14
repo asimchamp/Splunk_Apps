@@ -26,6 +26,8 @@ jobs:
       - name: Run a shell script files
         run: sh ./workflow/scripts/app_downloader_1.sh
         shell: bash
+        env:
+          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
       - uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
