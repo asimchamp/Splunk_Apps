@@ -1,0 +1,25 @@
+<nav>
+    <view name="flashtimeline" default='true' />
+    <collection label="Dashboards">
+        <view source="unclassified" match="board"/>
+    </collection>
+    <collection label="Views">
+        <view source="unclassified" />
+        <divider />
+    </collection>
+    <collection label="Searches &amp; Reports">
+        <collection label="Latency">
+            <saved source="unclassified" match="atency" />
+        </collection>
+        <divider />
+        <collection label="Network Traffic">
+            <saved source="unclassified" match="etwork" />
+        </collection>
+        <divider />
+        <saved source="unclassified" />
+        <divider />
+    </collection>
+    <collection label="Support">
+           <a href="http://www.cloudsecurity.intel.com">Intel Expressway Service Gateway</a>
+    </collection>
+</nav>

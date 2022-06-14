@@ -1,0 +1,49 @@
+<dashboard isVisible="false">
+	<label>Splunk Maps</label>
+	<row>
+        <html>
+		<div>
+			<a href="/app/splunk6overview/simple_dashboards_landing"><h2 align="left">Previous: Simple XML</h2></a>
+		</div>
+	</html>
+	<html>
+		<div>
+			<a href="/app/splunk6overview/framework_landing"><h2 align="right">Next: Web Development</h2></a>
+		</div>
+	</html>
+	</row>
+        <row>
+        <html>
+		<p>Mapping a resource location is just as important as understanding its health and usage. Splunk 6 includes integrated maps
+		that will enable you to display geographic data, GeoIP addresses, and summaries on maps within a dashboard. Maps can easily be
+		integrated with your existing machine data to create compelling visualizations. </p>
+		<p>As part of the Simple XML framework, you can also manage your dashboard settings and underlying search from the panel interface.
+		This flexibility allows you to customize and view your data on the fly. </p>
+            <h1>Using the feature</h1>
+            <div STYLE="margin-left: 20px;">
+		<p>Use the geostats search command to plot markers on a map.  The geostat is a search time command similar to the stats command that summarizes information by latitude and longitude.
+		The map visualization can only be implemented using the map element in simple XML.  The element provides options for zoom levels, where the map is centered as well as cells for mapping.</p>
+	    </div>
+	    <h1>Examples</h1>
+	    <div STYLE="margin-left: 20px;">
+		<p>links to examples and sample code</p>
+		<li><a href="/manager/splunk6overview/data/ui/views/flights_by_airport_maps?action=edit">Code for Simple Map</a></li>
+		<li><a href="/app/splunk6overview/flights_by_airport_maps" >Simple map</a></li>
+		<li><a href="/app/splunk6overview/splunk6_dashboards_maps" >Airports by destination</a></li>
+	    </div>
+	</html>
+	<html>
+		<div>
+			<img src="/static/app/splunk6overview/images/maps_dashboard.png" />
+		</div>
+        </html>
+    </row>
+	<row>
+		<html>
+			<h1>Resources</h1>
+			<a href="/help?location=whatsnew.nativemaps" target="_blank"><h2>Learn More</h2></a>
+			<a href="http://docs.splunk.com/Documentation/Splunk/6.0beta/ReleaseNotes/MeetSplunk" target="_blank"><h2>Intro to Splunk 6 documentation</h2></a>
+		</html>
+	</row>
+</dashboard>
+	

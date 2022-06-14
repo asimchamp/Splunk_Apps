@@ -1,0 +1,625 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Machine Performance</label>
+   <description>This dashboard displays detailed information about machine performance. The terms 'machine' and 'host' are used interchangeably.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_SystemPerformanceSummary</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+            avg(CPUUsagePercent) as AvgCPUUsagePercent
+            avg(IOPercentDiskTime) as AvgIOPercentDiskTime
+            avg(RAMUsagePercent) as AvgRAMUsagePercent
+            avg(NetUtilizationPercent) as AvgNetUtilizationPercent
+            avg(CPURelativeFrequencyPercent) as CPURelativeFrequencyPercent
+            $SearchFilter$
+         | eval AvgCPUUsagePercentRounded=round(AvgCPUUsagePercent,1)
+         | eval AvgIOPercentDiskTimeRounded=round(AvgIOPercentDiskTime,2)
+         | eval AvgRAMUsagePercentRounded=round(AvgRAMUsagePercent,1)
+         | eval AvgNetUtilizationPercentRounded=round(AvgNetUtilizationPercent,1)
+         | eval CPURelativeFrequencyPercentRounded=round(CPURelativeFrequencyPercent, 1)
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Averages for all machines</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AvgCPUUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">CPU usage</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">CPURelativeFrequencyPercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">CPU rel. frequency:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgRAMUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">RAM:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgIOPercentDiskTimeRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Disk:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">AvgNetUtilizationPercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Network:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">%</option>
+         </viz>
+      </panel>
+   </row>
+
+   <search id="Search_Charts">
+      <query>
+         | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+            $Panel31Function1$(CPUUsagePercent) as CPUUsagePercentRaw
+            $Panel32Function1$($Panel32Field1$) as Panel32Raw
+            $Panel41Function1$($Panel41Field1$) as Panel41Raw
+            $Panel42Function1$($Panel42Field1$) as Panel42Raw
+            splitrow
+               host as Host
+            $SearchFilter$
+         | eval "$Panel31Function1$(CPUUsagePercent)" = round(CPUUsagePercentRaw, 1)
+         | eval "$Panel32Function1$($Panel32Field1$)" = round(Panel32Raw, 2)
+         | eval "$Panel41Function1$($Panel41Field1$)" = round(Panel41Raw, 1)
+         | eval "$Panel42Function1$($Panel42Field1$)" = round(Panel42Raw, 3)
+      </query>
+   </search>
+   
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>CPU usage and relative frequency over time</title>
+         <chart id="Chart_Pane21">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+                     avg(CPUUsagePercent) as CPUUsagePercent
+                     avg(CPURelativeFrequencyPercent) as CPURelativeFrequencyPercent
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     $SearchFilter$
+                  | eval "Avg. CPU usage (%)" = round(CPUUsagePercent, 1)
+                  | eval "Avg. CPU relative frequency (%)" = round(CPURelativeFrequencyPercent, 1)
+                  | fields - CPURelativeFrequencyPercent CPUUsagePercent
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"Avg. CPU relative frequency (%)"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Avg. CPU relative frequency (%)"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">CPU usage (%)</option>
+            <option name="charting.axisTitleY2.text">CPU rel. frequency (%)</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+   </row>
+   
+   <!-- Row 3 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>CPU usage (%) per machine (top 10)</title>
+         <input type="dropdown" token="Panel31Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel31Function1$(CPUUsagePercent)"
+                  | fields
+                     Host
+                     "$Panel31Function1$(CPUUsagePercent)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_machine_detail?earliest=$earliest$&latest=$latest$&form.FilterField=shost&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Disk IO per machine (top 10)</title>
+         <input type="dropdown" token="Panel32Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <input type="dropdown" token="Panel32Field1" searchWhenChanged="true">
+            <choice value="IOPercentDiskTime">Percent disk time (%)</choice>
+            <choice value="IOCount">IO r+w count</choice>
+            <choice value="IOCountRead">IO read count</choice>
+            <choice value="IOCountWrite">IO write count</choice>
+            <choice value="IOMB">IO r+w volume (MB)</choice>
+            <choice value="IOMBRead">IO read volume (MB)</choice>
+            <choice value="IOMBWrite">IO write volume (MB)</choice>
+            <choice value="IODurationMs">IO r+w duration (ms)</choice>
+            <choice value="IODurationReadMs">IO read duration (ms)</choice>
+            <choice value="IODurationWriteMs">IO write duration (ms)</choice>
+            <choice value="IOPS">IOPS r+w</choice>
+            <choice value="IOPSRead">IOPS read</choice>
+            <choice value="IOPSWrite">IOPS write</choice>
+            <choice value="IOMBPS">thruput r+w (MB/s)</choice>
+            <choice value="IOLatencyMs">latency r+w (ms)</choice>
+            <choice value="IOLatencyMsRead">latency read (ms)</choice>
+            <choice value="IOLatencyMsWrite">latency write (ms)</choice>
+            <default>IOPercentDiskTime</default>
+            <label>Field:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel32Function1$($Panel32Field1$)"
+                  | fields
+                     Host
+                     "$Panel32Function1$($Panel32Field1$)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_machine_detail?earliest=$earliest$&latest=$latest$&form.FilterField=shost&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 4 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>RAM usage (%) per machine (top 10)</title>
+         <input type="dropdown" token="Panel41Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <input type="dropdown" token="Panel41Field1" searchWhenChanged="true">
+            <choice value="RAMUsageGB">RAM usage (GB)</choice>
+            <choice value="RAMUsagePercent">RAM usage (%)</choice>
+            <default>RAMUsagePercent</default>
+            <label>Field:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel41Function1$($Panel41Field1$)"
+                  | fields
+                     Host
+                     "$Panel41Function1$($Panel41Field1$)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_machine_detail?earliest=$earliest$&latest=$latest$&form.FilterField=shost&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Other metrics per machine (top 10)</title>
+         <input type="dropdown" token="Panel42Function1" id="Input_Panel42Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <input type="dropdown" token="Panel42Field1" id="Input_Panel32Field1" searchWhenChanged="true">
+            <choice value="HandleCount">Handle count</choice>
+            <choice value="NetUtilizationPercent">Network utilization (%)</choice>
+            <choice value="KernelNonPagedMB">Non-paged pool (MB)</choice>
+            <choice value="PagefileTotalSizeGB">Page file size (GB)</choice>
+            <choice value="PagefileUsagePercent">Page file usage (%)</choice>
+            <choice value="PagefileIOPSRead">Page file IOPS read</choice>
+            <choice value="PagefileIOPSWrite">Page file IOPS write</choice>
+            <choice value="KernelPagedMB">Paged pool (MB)</choice>
+            <choice value="ThreadCount">Thread count</choice>
+            <default>NetUtilizationPercent</default>
+            <label>Field:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel42Function1$($Panel42Field1$)"
+                  | fields
+                     Host
+                     "$Panel42Function1$($Panel42Field1$)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_machine_detail?earliest=$earliest$&latest=$latest$&form.FilterField=shost&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Machine performance grouped</title>
+         <input type="dropdown" token="Panel51GroupBy" searchWhenChanged="true">
+            <choice value="AdDomainDns">AD domain DNS</choice>
+            <choice value="AdOu">AD OU</choice>
+            <choice value="AdSite">AD site</choice>
+            <choice value="HwBiosVersion">BIOS version</choice>
+            <choice value="CtxDeliveryGroupName">Citrix delivery group</choice>
+            <choice value="CtxFarmName">Citrix site</choice>
+            <choice value="CtxMachineCatalogName">Citrix machine catalog</choice>
+            <choice value="CPUCoresLogical">CPU cores (logical)</choice>
+            <choice value="CPUCoresPhysical">CPU cores (physical)</choice>
+            <choice value="CPUName">CPU name</choice>
+            <choice value="CPUSockets">CPU sockets</choice>
+            <choice value="CPUMaxMhz">CPU speed (MHz)</choice>
+            <choice value="HwIsVirtualMachine">Hardware: is VM?</choice>
+            <choice value="IsBatteryPresent">Hardware: has battery?</choice>
+            <choice value="HwManufacturer">Hardware manufacturer</choice>
+            <choice value="HwModel">Hardware model</choice>
+            <choice value="OsBuild">OS build number</choice>
+            <choice value="OsName">OS name</choice>
+            <choice value="OsType">OS type</choice>
+            <choice value="OsVersion">OS version number</choice>
+            <choice value="RAMSizeGB">RAM size (GB)</choice>
+            <default>HwModel</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="*">
+                  <set token="Panel51GroupByDisplay">$label$</set>
+                  <unset token="DrilldownFilterBy51"></unset>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel51Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel51Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel51Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel51Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel51Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel51Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel51Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel51Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+                     $Panel51Function1$(CPUUsagePercent) as FuncCPUUsagePercent
+                     $Panel51Function1$(IOPS) as FuncIOPS
+                     $Panel51Function1$(IOPercentDiskTime) as FuncIOPercentDiskTime
+                     sum(IODurationMs) as SumIODurationMs
+                     sum(IOCount) as SumIOCount
+                     $Panel51Function1$(RAMUsageGB) as FuncRAMUsageGB
+                     $Panel51Function1$(RAMUsagePercent) as FuncRAMUsagePercent
+                     $Panel51Function1$(NetUtilizationPercent) as FuncNetUtilizationPercent
+                     $Panel51Function1$(KernelPagedMB) as FuncKernelPagedMB
+                     $Panel51Function1$(KernelNonPagedMB) as FuncKernelNonPagedMB
+                     $Panel51Function1$(HandleCount) as FuncHandleCount
+                     $Panel51Function1$(ThreadCount) as FuncThreadCount
+                     $Panel51Function1$(CPURelativeFrequencyPercent) as CPURelativeFrequencyPercent
+                     latest(_time) as LastSeen
+                     splitrow
+                        $Panel51GroupBy$ as "$Panel51GroupByDisplay$"
+                     $SearchFilter$
+                  | eval "$Panel51Function1Display$ CPU (%)" = round(FuncCPUUsagePercent,1)
+                  | eval "$Panel51Function1Display$ IOPS" = round(FuncIOPS,1)
+                  | eval "$Panel51Function1Display$ % disk time" = round(FuncIOPercentDiskTime,1)
+                  | eval "Avg. IO latency (ms)"=round(SumIODurationMs/SumIOCount,1)
+                  | eval "$Panel51Function1Display$ RAM (GB)" = round(FuncRAMUsageGB,1)
+                  | eval "$Panel51Function1Display$ RAM (%)" = round(FuncRAMUsagePercent,0)
+                  | eval "$Panel51Function1Display$ network (%)" = round(FuncNetUtilizationPercent,1)
+                  | eval "$Panel51Function1Display$ paged pool (MB)" = round(FuncKernelPagedMB,0)
+                  | eval "$Panel51Function1Display$ non-paged pool (MB)" = round(FuncKernelNonPagedMB,0)
+                  | eval "$Panel51Function1Display$ #handles" = round(FuncHandleCount,0)
+                  | eval "$Panel51Function1Display$ #threads" = round(FuncThreadCount,0)
+                  | eval "$Panel51Function1Display$ CPU rel. frequency (%)" = round(CPURelativeFrequencyPercent, 1)
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval sortfield=lower(Host)
+                  | table
+                     "$Panel51GroupByDisplay$"
+                     "$Panel51Function1Display$ CPU (%)"
+                     "$Panel51Function1Display$ IOPS"
+                     "$Panel51Function1Display$ % disk time"
+                     "Avg. IO latency (ms)"
+                     "$Panel51Function1Display$ RAM (GB)"
+                     "$Panel51Function1Display$ RAM (%)"
+                     "$Panel51Function1Display$ network (%)"
+                     "$Panel51Function1Display$ paged pool (MB)"
+                     "$Panel51Function1Display$ non-paged pool (MB)"
+                     "$Panel51Function1Display$ #handles"
+                     "$Panel51Function1Display$ #threads"
+                     "$Panel51Function1Display$ CPU rel. frequency (%)"
+                     "Last seen"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">20</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy51">$click.value$</set>
+            </drilldown>
+         </table>
+
+         <html src="machine_detail_explanation.html">
+         </html>
+      </panel>
+   </row>
+   
+   <!-- Row 6 -->
+   <row depends="$DrilldownFilterBy51$">
+      <panel>
+         <title>Machines in selected group: $Panel51GroupByDisplay$ = $DrilldownFilterBy51$</title>
+         <input type="dropdown" token="Panel61Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel61Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel61Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel61Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel61Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel61Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel61Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel61Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+                     $Panel61Function1$(CPUUsagePercent) as FuncCPUUsagePercent
+                     $Panel61Function1$(IOPS) as FuncIOPS
+                     $Panel61Function1$(IOPercentDiskTime) as FuncIOPercentDiskTime
+                     sum(IODurationMs) as SumIODurationMs
+                     sum(IOCount) as SumIOCount
+                     $Panel61Function1$(RAMUsageGB) as FuncRAMUsageGB
+                     $Panel61Function1$(RAMUsagePercent) as FuncRAMUsagePercent
+                     $Panel61Function1$(NetUtilizationPercent) as FuncNetUtilizationPercent
+                     $Panel61Function1$(KernelPagedMB) as FuncKernelPagedMB
+                     $Panel61Function1$(KernelNonPagedMB) as FuncKernelNonPagedMB
+                     $Panel61Function1$(HandleCount) as FuncHandleCount
+                     $Panel61Function1$(ThreadCount) as FuncThreadCount
+                     $Panel61Function1$(CPURelativeFrequencyPercent) as CPURelativeFrequencyPercent
+                     latest(_time) as LastSeen
+                     splitrow
+                        host as Host
+                     filter $Panel51GroupBy$ is $DrilldownFilterBy51|s$
+                     $SearchFilter$
+                  | eval "$Panel61Function1Display$ CPU (%)" = round(FuncCPUUsagePercent,1)
+                  | eval "$Panel61Function1Display$ IOPS" = round(FuncIOPS,1)
+                  | eval "$Panel61Function1Display$ % disk time" = round(FuncIOPercentDiskTime,1)
+                  | eval "Avg. IO latency (ms)"=round(SumIODurationMs/SumIOCount,1)
+                  | eval "$Panel61Function1Display$ RAM (GB)" = round(FuncRAMUsageGB,1)
+                  | eval "$Panel61Function1Display$ RAM (%)" = round(FuncRAMUsagePercent,0)
+                  | eval "$Panel61Function1Display$ network (%)" = round(FuncNetUtilizationPercent,1)
+                  | eval "$Panel61Function1Display$ paged pool (MB)" = round(FuncKernelPagedMB,0)
+                  | eval "$Panel61Function1Display$ non-paged pool (MB)" = round(FuncKernelNonPagedMB,0)
+                  | eval "$Panel61Function1Display$ #handles" = round(FuncHandleCount,0)
+                  | eval "$Panel61Function1Display$ #threads" = round(FuncThreadCount,0)
+                  | eval "$Panel61Function1Display$ CPU rel. frequency (%)" = round(CPURelativeFrequencyPercent, 1)
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval sortfield=lower(Host)
+                  | table
+                     Host
+                     "$Panel61Function1Display$ CPU (%)"
+                     "$Panel61Function1Display$ IOPS"
+                     "$Panel61Function1Display$ % disk time"
+                     "Avg. IO latency (ms)"
+                     "$Panel61Function1Display$ RAM (GB)"
+                     "$Panel61Function1Display$ RAM (%)"
+                     "$Panel61Function1Display$ network (%)"
+                     "$Panel61Function1Display$ paged pool (MB)"
+                     "$Panel61Function1Display$ non-paged pool (MB)"
+                     "$Panel61Function1Display$ #handles"
+                     "$Panel61Function1Display$ #threads"
+                     "$Panel61Function1Display$ CPU rel. frequency (%)"
+                     "Last seen"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_machine_detail?earliest=$earliest$&latest=$latest$&form.FilterField=shost&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+
+         <html src="machine_detail_explanation_2.html">
+         </html>
+      </panel>
+   </row>
+
+</form>

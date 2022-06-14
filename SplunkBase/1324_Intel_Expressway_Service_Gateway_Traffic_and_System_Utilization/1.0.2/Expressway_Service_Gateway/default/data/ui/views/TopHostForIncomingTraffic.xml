@@ -1,0 +1,39 @@
+<form>
+<label>Top 10 hosts for Incoming traffic</label>
+
+
+<searchTemplate>index=esg_transaction AND WorkflowName!=NULL | soaekv | search /logEntry/body/subEntry/body/transactionStart/workflowName = $suser$ | chart sum(/logEntry/body/subEntry/body/inputServerSummary/requestSize) AS request_Size, sum("/logEntry/body/subEntry/body/invocationAgentSummary[0]/requestSize") AS Invoke0_requestSize, sum("/logEntry/body/subEntry/body/invocationAgentSummary[0]/responseSize") AS Invoke0_responseSize, sum("/logEntry/body/subEntry/body/invocationAgentSummary[1]/requestSize") AS Invoke1_requestSize, sum("/logEntry/body/subEntry/body/invocationAgentSummary[1]/responseSize") AS Invoke1_responseSize, sum(/logEntry/body/subEntry/body/inputServerSummary/responseSize) AS response_Size by "/logEntry/body/subEntry/body/inputServerSummary/protocol/address" | sort 10 -request_Size
+</searchTemplate>
+<fieldset  autoRun="true" >
+  <input type="time">
+  <label>Select Time Range</label>
+    <default>Last 60 minutes</default>
+  </input>
+
+ <input type="dropdown" token="suser">
+  <label>Select Operation</label>
+<populatingSearch fieldForValue="WorkflowName" fieldForLabel="WorkflowName"><![CDATA[index=summary WorkflowName | top WorkflowName ]]></populatingSearch>
+   <default>*</default>
+   <choice value="*">Any</choice>
+   <seed>*</seed>
+ </input>
+  
+</fieldset>
+
+<row>
+  <chart>
+    <title>Bytes sent and received by SOAE for requests</title>
+    <option name="charting.chart">column</option>
+    <option name="charting.axisTitleX.text">top 10 IPs</option>
+    <option name="charting.axisTitleY.text">Bytes</option>
+    <option name="charting.chart.stackMode">stacked</option>
+  </chart>
+</row>
+<row>
+  <table>
+   <title>Raw data</title>
+    <option name="showPager">true</option>
+  </table>
+</row>
+
+</form>

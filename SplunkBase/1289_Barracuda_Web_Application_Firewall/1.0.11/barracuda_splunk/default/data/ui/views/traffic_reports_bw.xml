@@ -1,0 +1,82 @@
+<form>
+  <label>Traffic by Bandwidth</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="unit_name" searchWhenChanged="true">
+      <label>Unit Name:</label>
+      <fieldForLabel>unit_name</fieldForLabel>
+      <fieldForValue>unit_name</fieldForValue>
+      <search ref="TR_search"></search>
+    </input>
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Clients by Bandwidth</title>
+        <search>
+          <query>sourcetype="access" |where unit_name = "$unit_name$" | eval bandwidth=round(bytes_sent/1024,2)| stats sum(bandwidth) BY client_ip| head 15 |rename client_ip As Client_IP |rename sum(bandwidth) AS "Bandwidth Consumed (in KB)"| sort - "Bandwidth Consumed (in KB)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Clients</option>
+        <option name="charting.axisTitleY.text">Bandwidth (KB)</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Services by Bandwidth</title>
+        <search>
+          <query>sourcetype="access" |where unit_name = "$unit_name$" | eval ip_port=app_ip+":"+app_port | eval bandwidth=round(bytes_sent/1024,2)| stats sum(bandwidth) BY ip_port| sort - sum(bandwidth)| head 15 | rename ip_port AS "Service" |rename sum(bandwidth) AS "Bandwidth Consumed (in KB)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Services</option>
+        <option name="charting.axisTitleY.text">Bandwidth (KB)</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top URLs by Bandwidth</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$" | eval bandwidth=round(bytes_sent/1024,2)|stats sum(bandwidth) BY URL |sort - sum(bandwidth) |head 15 | rename sum(bandwidth) AS "Bandwidth Consumed (in KB)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">URLs</option>
+        <option name="charting.axisTitleY.text">Bandwidth (KB)</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Domains by Bandwidth</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$" | eval bandwidth=round(bytes_sent/1024,2)|stats sum(bandwidth) BY host_name | sort - sum(bandwidth) | head 15 | rename sum(bandwidth) AS "Bandwidth Consumed (in KB)" | rename host_name AS "Domain"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Domains</option>
+        <option name="charting.axisTitleY.text">Bandwidth (KB)</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

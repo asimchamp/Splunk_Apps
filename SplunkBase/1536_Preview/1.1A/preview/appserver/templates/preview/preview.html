@@ -1,0 +1,135 @@
+<%inherit file="//layout/base.html" />
+<%namespace name="lib" file="//lib.html" import="*" />
+
+<%def name="js()">
+
+    <script src="${make_url('/static/app/preview/jquery.tools.min.js')}"></script>
+    <script src="${make_url('/static/app/preview/jquery-ui.min.js')}"></script>
+
+    <script>
+        $("#helpdialog").dialog({ autoOpen: false, title:'Quick Help', modal: true, dialogClass: 'helpDialog myDialog', minWidth: 500, width: 700, minHeight: 500  });
+        window.onbeforeunload = gobusy
+        function gobusy(){
+            $('#overlay').show()
+        }
+    </script>
+
+</%def>    
+
+<%def name="css()"> 
+    <%coreCSSFiles = ["/static/css/view.css", "/static/css/skins/default/default.css", "/modules/nav/AccountBar.css", "/static/css/print.css"] %>
+    <%lib:stylesheet_tags files="${coreCSSFiles}" />
+</%def>
+
+<link rel="stylesheet" href="${make_url('/static/app/preview/jquery-ui.css')}" type="text/css" />
+<link rel="stylesheet" href="${make_url('/static/app/preview/app.css')}" type="text/css" />
+
+
+<body>
+
+  <div id="overlay">
+    <div id="loader" ><img src="${make_url('/static/app/preview/images/ajax-loader.gif')}" /></div>
+  </div>
+
+  <div class="appHeaderWrapper">
+    <div class="layoutRow oneColRow splClearfix appHeader">       
+      <div class="SplunkModule AccountBar">
+        <a href="${make_url('/app/launcher/home')|h}" class="splIcon splIcon-close"></a>
+        <div class="appLogoContainer popupAppLogoContainer">
+          <a href="${make_url('/app/launcher/home')|h}" class="appLogo"></a>
+          <h1 style="color:#0A4">${_('Simple Data-Driven Preview')}</h1>
+        </div>
+	<a style="position: absolute; top: 0px; right: 50px; margin: 15px 15px;" onclick='$("#helpdialog").dialog("open");'>help</a>
+	
+      </div>
+    </div>
+  </div>
+
+<!-- display messages -->
+% for mtype, msgs in messages.items():
+   % for msg in msgs:
+         <p class="${mtype|h}">${msg|h}</p>
+   % endfor
+% endfor
+
+<ul>
+<% import json %>
+<form id="event_settings" method="post">
+  ${csrf_hidden_input()}
+  <input type="hidden" name="splunk_session_id" value="${cherrypy.session.id | h}" />  
+  <input type="hidden" name="old_stanzas" value="${json.dumps(stanzas)|h}" />
+  <input type="hidden" name="old_data" value="${data|h}" />
+
+  <label>Raw Data:</label>
+  <textarea style="width:95%" rows="4" xcols="50" name="data" onchange='this.form.submit()'>${"" if data == None else data |h}</textarea>
+
+  <div>
+    <table cellpadding=2>
+      <tr valign=top>
+	<td>
+     <label>Sourcetype:</label>
+      <select name="stanza" onchange='this.form.submit()'>>
+       % for stanzaname,count in stanzas:
+          <% if count==-1: continue %>
+          % if stanzaname == stanza:
+	     <option value="${stanzaname|h}" selected="selected">${stanzaname[:50]|h} (${count|h})</option>
+          % else:
+	     <option value="${stanzaname|h}">${stanzaname[:50]|h} (${count|h})</option>
+          % endif
+       % endfor
+      </select>
+      </td>
+
+
+% if len(settings) > 0:
+	<td>
+   <label>Settings:</label>
+   </td>
+	<td>
+   <div>
+     <ul>
+     <table border=0 cellpadding=1 cellmargins=1>
+       % for key,val in settings.items():
+         <% if key=="count": continue %>
+       <tr>
+         <td align=right><b>${key|h}:</b></td>
+         <td align=left><code> ${val.strip()|h}</code></td>
+       </tr>
+       % endfor
+     </table>
+     </ul>
+   </div>
+   </td>
+% endif
+	</tr>
+</table>
+
+  </div>
+</form>
+
+% if len([e for e in events]) > 0:
+
+   <label>Events:</label>
+   
+   <div class="eventList" id="eventListID" style="width:95%;">
+     <table border=0 width="95%" height="100%" cellpadding=2>
+       <% first = True %>
+       % for event in events:
+       <tr class="event">
+         % if first:
+           <% first = False %>
+         % else:
+             
+         % endif
+         <td><b>${str(event['_time']).replace('T', ' ')|h}</b></td>
+         <td><pre>${event['_raw']|h}</pre></td>
+       </tr>
+       % endfor
+     </table>
+   </div>
+   <br/>
+% endif
+
+</ul>
+
+</body>

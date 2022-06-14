@@ -1,0 +1,492 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Machine Storage</label>
+   <description>This dashboard displays information about disk drives and volumes.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" id="TimeRange1" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_SmbClient</default>
+      </input>
+   </fieldset>
+   
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+            dc(host) as HostCount
+            dc(HwModel) as HwModelCount
+            avg(UsedSpacePercent) as AvgUsedSpacePercent
+            avg(CapacityMB) as AvgCapacityMB
+            filter CapacityMB &gt;= $MinVolumeSizeMB$
+            $SearchFilter$
+         | eval AvgUsedSpacePercent = round (AvgUsedSpacePercent, 0)
+         | eval AvgCapacityGB = round (AvgCapacityMB / 1024, 0)
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+   
+      <panel>
+         <title>Overview</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">HwModelCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Hardware models</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgUsedSpacePercent</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Avg. used space</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgCapacityGB</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Avg. capacity</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">GB</option>
+         </viz>
+      </panel>
+      
+   </row>
+
+   <search id="Search_Single21_1">
+      <query>
+         | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+            latest(FreeMB) as latestFreeMB
+            FILTER IsBootVolume is "1"
+            FILTER FreeMB &lt; $Panel21MinHigh$
+            filter CapacityMB &gt;= $MinVolumeSizeMB$
+            $SearchFilter$
+            dc(host) as HostCount
+      </query>
+   </search>
+   <search id="Search_Single21_2">
+      <query>
+         | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+            latest(FreeMB) as latestFreeMB
+            FILTER IsBootVolume is "0"
+            FILTER MountPoints isNotNull
+            FILTER FreeMB &lt; $Panel21MinHigh$
+            filter CapacityMB &gt;= $MinVolumeSizeMB$
+            $SearchFilter$
+            dc(host) as HostCount
+      </query>
+   </search>
+   
+   <search id="Search_Single22_1">
+      <query>
+         | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+            latest(UsedSpacePercent) as latestUsedSpacePercent
+            FILTER IsBootVolume is "1"
+            FILTER UsedSpacePercent &gt; $Panel22MinHigh$
+            filter CapacityMB &gt;= $MinVolumeSizeMB$
+            $SearchFilter$
+            dc(host) as HostCount
+      </query>
+   </search>
+   <search id="Search_Single22_2">
+      <query>
+         | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+            latest(UsedSpacePercent) as latestUsedSpacePercent
+            FILTER IsBootVolume is "0"
+            FILTER MountPoints isNotNull
+            FILTER UsedSpacePercent &gt; $Panel22MinHigh$
+            filter CapacityMB &gt;= $MinVolumeSizeMB$
+            $SearchFilter$
+            dc(host) as HostCount
+      </query>
+   </search>
+   
+   <!-- Row 2 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Disk capacity (GB)</title>
+         <input type="dropdown" token="Panel21MinHigh" searchWhenChanged="true">
+            <choice value="1024">1 GB</choice>
+            <choice value="2048">2 GB</choice>
+            <choice value="5120">5 GB</choice>
+            <choice value="10240">10 GB</choice>
+            <choice value="15360">15 GB</choice>
+            <choice value="20480">20 GB</choice>
+            <choice value="25600">25 GB</choice>
+            <default>10240</default>
+            <label>Free disk space less than:</label>
+         </input>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+               Search_Single21_1
+            <option name="uberAgent.uberagent-singlevalue.1-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts (boot volume)</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+               Search_Single21_2
+            <option name="uberAgent.uberagent-singlevalue.1-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts (other volumes)</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+         </viz>
+      </panel>
+      
+      <!-- Column 2 -->
+      <panel>
+         <title>Disk capacity (%)</title>
+         <input type="dropdown" token="Panel22MinHigh" searchWhenChanged="true">
+            <choice value="99">1 %</choice>
+            <choice value="98">2 %</choice>
+            <choice value="95">5 %</choice>
+            <choice value="90">10 %</choice>
+            <choice value="85">15 %</choice>
+            <choice value="80">20 %</choice>
+            <choice value="75">25 %</choice>
+            <default>90</default>
+            <label>Free disk space less than:</label>
+         </input>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+               Search_Single22_1
+            <option name="uberAgent.uberagent-singlevalue.1-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts (boot volume)</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+               Search_Single22_2
+            <option name="uberAgent.uberagent-singlevalue.1-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts (other volumes)</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+   
+   <!-- Row 3 -->
+   <row>
+   
+      <!-- Column 1 -->
+      <panel>
+         <title>Lowest free disk capacity by host (GB) (top 10)</title>
+         <input type="dropdown" token="Panel31DriveSelect" searchWhenChanged="true">
+            <choice value="FILTER IsBootVolume is 1">Boot drive only</choice>
+            <choice value="FILTER IsBootVolume is 0">Other drives only</choice>
+            <choice value="FILTER MountPoints is *">All drives</choice>
+            <choice value="FILTER MountPoints is C:\">C:\ only</choice>
+            <choice value="FILTER MountPoints is D:\">D:\ only</choice>
+            <choice value="FILTER MountPoints is E:\">E:\ only</choice>
+            <default>FILTER IsBootVolume is 1</default>
+            <label>Drive selector:</label>
+         </input>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+                     latest(FreeMB) as latestFreeMB
+                     latest(UsedSpacePercent) as latestUsedSpacePercent
+                     latest(CapacityMB) as CapacityMB
+                     splitrow
+                        host as Host
+                     splitrow 
+                        MountPoints
+                     FILTER FileSystem isNot RAW
+                     $Panel31DriveSelect$
+                     filter CapacityMB &gt;= $MinVolumeSizeMB$
+                     $SearchFilter$
+                  | sort limit=10 + latestFreeMB
+                  | eval Path = mvindex (split (MountPoints, ";"), 0)
+                  | eval "Free space (GB)" = round (latestFreeMB / 1024,1)
+                  | eval "Used space (GB)" = round ((CapacityMB * latestUsedSpacePercent / 100) / 1024,1)
+                  | eval "Drive on Host" = "'" + Path + "'" + " on " + Host
+                  | table 
+                     "Drive on Host"
+                     "Used space (GB)"
+                     "Free space (GB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      
+      <!-- Column 2 -->
+      <panel>
+         <title>Lowest free disk capacity by host (%) (top 10)</title>
+         <input type="dropdown" token="Panel32DriveSelect" searchWhenChanged="true">
+            <choice value="FILTER IsBootVolume is 1">Boot drive only</choice>
+            <choice value="FILTER IsBootVolume is 0">Other drives only</choice>
+            <choice value="FILTER MountPoints is *">All drives</choice>
+            <choice value="FILTER MountPoints is C:\">C:\ only</choice>
+            <choice value="FILTER MountPoints is D:\">D:\ only</choice>
+            <choice value="FILTER MountPoints is E:\">E:\ only</choice>
+            <default>FILTER IsBootVolume is 1</default>
+            <label>Drive selector:</label>
+         </input>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+                     latest(UsedSpacePercent) as latestUsedSpacePercent
+                     splitrow
+                        host as Host
+                     splitrow 
+                        MountPoints
+                     FILTER FileSystem isNot RAW
+                     $Panel32DriveSelect$
+                     filter CapacityMB &gt;= $MinVolumeSizeMB$
+                     $SearchFilter$
+                  | sort limit=10 - latestUsedSpacePercent
+                  | eval Path = mvindex (split (MountPoints, ";"), 0)
+                  | eval "Free space (%)" = 100 - latestUsedSpacePercent
+                  | eval "Drive on Host" = "'" + Path + "'" + " on " + Host
+                  | table 
+                     "Drive on Host"
+                     "Free space (%)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      
+   </row>
+   
+   <!-- Row 4 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Disk usage grouped</title>
+         <input type="dropdown" token="Panel41GroupBy" searchWhenChanged="true">
+            <choice value="AdDomainDns">AD domain DNS</choice>
+            <choice value="AdOu">AD OU</choice>
+            <choice value="AdSite">AD site</choice>
+            <choice value="CtxDeliveryGroupName">Citrix delivery group</choice>
+            <choice value="CtxFarmName">Citrix site</choice>
+            <choice value="CtxMachineCatalogName">Citrix machine catalog</choice>
+            <choice value="HwManufacturer">Hardware manufacturer</choice>
+            <choice value="HwModel">Hardware model</choice>
+            <choice value="OsBuild">OS build number</choice>
+            <choice value="OsType">OS type</choice>
+            <choice value="OsVersion">OS version number</choice>
+            <default>HwModel</default>
+            <label>Group by:</label>
+         </input>
+         <input type="dropdown" token="Panel41DriveSelect" searchWhenChanged="true">
+            <choice value="FILTER IsBootVolume is 1">Boot drive only</choice>
+            <choice value="FILTER IsBootVolume is 0">Other drives only</choice>
+            <choice value="FILTER MountPoints is *">All drives</choice>
+            <choice value="FILTER MountPoints is C:\">C:\ only</choice>
+            <choice value="FILTER MountPoints is D:\">D:\ only</choice>
+            <choice value="FILTER MountPoints is E:\">E:\ only</choice>
+            <default>FILTER IsBootVolume is 1</default>
+            <label>Drive selector:</label>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+                     avg(UsedSpacePercent) as avgUsedSpacePercent
+                     avg(FreeMB) as avgFreeMB
+                     avg(CapacityMB) as avgCapacityMB
+                     dc(host) as "#Hosts"
+                     splitrow
+                        $Panel41GroupBy$
+                     FILTER FileSystem isNot RAW
+                     filter MountPoints is *
+                     filter CapacityMB &gt;= $MinVolumeSizeMB$
+                     $Panel41DriveSelect$
+                     $SearchFilter$
+                  | sort - avgUsedSpacePercent
+                  | eval "Avg. free space (GB)" = round (avgFreeMB / 1024, 1)
+                  | eval "Avg. free space (%)" = round (100 - avgUsedSpacePercent, 1)
+                  | eval "Avg. capacity (GB)" = round (avgCapacityMB / 1024, 1)
+                  | join type=outer $Panel41GroupBy$
+                  [
+                     | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+                        latest(IsDirtyNumber) as IsDirtyNumber
+                        latest(IsBootVolumeNumber) as IsBootVolumeNumber
+                        splitrow
+                           $Panel41GroupBy$
+                        splitrow
+                           host
+                        splitrow
+                           MountPoints
+                        $Panel41DriveSelect$
+                        filter CapacityMB &gt;= $MinVolumeSizeMB$
+                        $SearchFilter$
+                     | stats
+                        sum(IsDirtyNumber) as "#Chkdsk req."
+                        sum(IsBootVolumeNumber) as "#Boot volumes"
+                        count(eval(IsBootVolumeNumber = 0)) as "#Other drives"
+                        by
+                        $Panel41GroupBy$
+                     | fields
+                        + $Panel41GroupBy$ "#Chkdsk req." "#Boot volumes" "#Other drives"
+                  ]
+                  | table
+                     $Panel41GroupBy$
+                     "#Hosts"
+                     "Avg. free space (GB)"
+                     "Avg. free space (%)"
+                     "Avg. capacity (GB)"
+                     "#Chkdsk req."
+                     "#Boot volumes"
+                     "#Other drives"
+               </query>
+            </search>
+            <option name="count">25</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+   
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Mounted volumes table</title>
+         <input type="dropdown" token="Panel51HostFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Host:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel51DriveSelect" searchWhenChanged="true">
+            <choice value="FILTER IsBootVolume is 1">Boot drive only</choice>
+            <choice value="FILTER IsBootVolume is 0">Other drives only</choice>
+            <choice value="FILTER MountPoints is *">All drives</choice>
+            <choice value="FILTER MountPoints is C:\">C:\ only</choice>
+            <choice value="FILTER MountPoints is D:\">D:\ only</choice>
+            <choice value="FILTER MountPoints is E:\">E:\ only</choice>
+            <default>FILTER MountPoints is *</default>
+            <label>Drive selector:</label>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+                                       values(IsBootVolume) as "Is boot volume"
+                                       values(IsDirty) as "Chkdsk req."
+                                       values(FileSystem) as "File system"
+                                       latest(UsedSpacePercent) as "Used Space (%)"
+                                       latest(UsedSpacePercent) as latestUsedSpacePercent
+                                       latest(FreeMB) as latestFreeMB
+                                       latest(CapacityMB) as CapacityMB
+                                       values(PartitionStyle) as "Partition style"
+                                       splitrow
+                                          host as Host
+                                       splitrow
+                                          MountPoints as Path
+                                       splitrow
+                                          DiskNumbers
+                                       filter host in ($Panel51HostFilter$)
+                                       $Panel51DriveSelect$
+                                       filter CapacityMB &gt;= $MinVolumeSizeMB$
+                                       $SearchFilter$
+                                    | eval "Free space (GB)" = round (latestFreeMB / 1024, 1)
+                                    | eval "Free space (%)" = round (100 - latestUsedSpacePercent, 1)
+                                    | eval "Used space (GB)" = round (CapacityMB * latestUsedSpacePercent / 100 / 1024, 1)
+                                    | rename DiskNumbers AS DiskNumber 
+                                    | join type=outer Host, DiskNumber
+                                    [
+                                       | pivot `uA_DM_System_DiskInventory` System_DiskInventory
+                                          values(Name) as "Device name"
+                                          values(IsRemovable) as "Is removable"
+                                          values(IsWritable) as "Is writeable"
+                                          splitrow 
+                                             host as Host
+                                          splitrow 
+                                             DiskNumber
+                  	                     filter host in ($Panel51HostFilter$)
+                                          $SearchFilter$
+                                       | fields
+                                          + Host DiskNumber "Device name" "Is removable" "Is writeable"
+                                    ]
+                                    | table
+                                       Host
+                                       "Path"
+                                       "Free space (GB)"
+                                       "Used space (GB)"
+                                       "Free space (%)"
+                                       "Device name"
+                                       "File system"
+                                       "Partition style"
+                                       "Is boot volume"
+                                       "Chkdsk req."
+                                       "Is removable"
+                                       "Is writeable"
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+   
+   <!-- Config row -->
+   <row>
+   
+      <panel>
+         <title>Dashboard configuration</title>
+         <input id="NumbersOnly_MinVolumeSizeMB" type="text" token="MinVolumeSizeMB" searchWhenChanged="true">
+            <default>250</default>
+            <label>Ignore volumes smaller than (MB):</label>
+         </input>
+      </panel>
+      
+   </row>
+   
+</form>

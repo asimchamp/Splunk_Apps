@@ -1,0 +1,411 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Machine Network Configuration</label>
+   <description>This dashboard displays network configuration information about the endpoints monitored with uberAgent.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d@d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_NetworkConfigInformation</default>
+      </input>
+   </fieldset>
+   
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+            dc(NetworkConfigInterfaceTypeDisplayName) as InterfaceNames            
+            dc(NetworkConfigFriendlyName) as NetworkAdapters
+            dc(NetworkConfigDnsSuffix) as NetworkDnsSuffixes
+            dc(NetworkConfigSsid) as NetworkSsids            
+            $SearchFilter$
+      </query>
+   </search>
+   
+   <!-- Row 1 -->   
+   <row>
+      <panel>
+         <title>Network configurations</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">NetworkDnsSuffixes</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Network DNS suffixes:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">NetworkSsids</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Network SSIDs:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">NetworkAdapters</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Network adapters:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">InterfaceNames</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Interface types:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+   <!-- Row 2 -->
+   <row>
+      <panel>
+         <title>Interface type usage over time</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     dc(host) as host
+                     splitrow
+                        _time
+                     splitcol
+                        NetworkConfigInterfaceTypeDisplayName
+                     filter NetworkConfigInterfaceTypeDisplayName is "*"
+                     $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">right</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   <!-- Row 3 --> 
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Interface types (top 10)</title>
+         <chart id="Chart_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     dc(host) as "Host count per interface type"
+                     splitrow
+                        NetworkConfigInterfaceTypeDisplayName as "Interface Type"
+                        filter NetworkConfigInterfaceTypeDisplayName is "*"
+                     $SearchFilter$
+                  | sort limit=10 - "Host count per interface type"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      <panel>
+         <title>Network adapters (top 10)</title>
+         <chart id="Chart_Panel32">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     dc(host) as "Host count per network adapter"
+                     splitrow
+                        NetworkConfigFriendlyName as "Network adapter"
+                        filter NetworkConfigFriendlyName is "*"
+                     $SearchFilter$
+                  | sort limit=10 - "Host count per network adapter"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   <!-- Row 4 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Network SSIDs (top 10)</title>
+         <chart id="Chart_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     dc(host) as "Host count per network SSID"
+                     splitrow
+                        NetworkConfigSsid as "Network SSID"
+                     $SearchFilter$
+                  | sort limit=10 - "Host count per network SSID"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      <!-- Column 2 -->
+      <panel>
+         <title>Network DNS suffixes (top 10)</title>
+         <chart id="Chart_Panel42">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     dc(host) as "Host count per network DNS suffix"
+                     splitrow
+                        NetworkConfigDnsSuffix as "Network DNS suffix"
+                     $SearchFilter$
+                  | sort limit=10 - "Host count per network DNS suffix"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Network configurations grouped</title>
+         <input type="dropdown" token="Panel51GroupBy" searchWhenChanged="true">
+            <choice value="NetworkConfigInterfaceTypeDisplayName">Interface type</choice>
+            <choice value="NetworkConfigFriendlyName">Network adapter</choice>
+            <choice value="NetworkConfigDnsSuffix">Network DNS suffix</choice>
+            <choice value="NetworkConfigSsid">Network SSID</choice>
+            <default>NetworkConfigInterfaceTypeDisplayName</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="*">
+                  <set token="Panel51GroupByDisplay">$label$</set>
+                  <unset token="DrilldownFilterBy51"></unset>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     dc(host) as "#Hosts"
+                     dc(NetworkConfigFriendlyName) as "#Network adapters"
+                     dc(NetworkConfigDnsSuffix) as "#Network DNS suffixes"
+                     dc(NetworkConfigSsid) as "#Network SSIDs"
+                     dc(NetworkConfigInterfaceTypeDisplayName) as "#Interface types"
+                     dc(NetworkConfigIPv4) as "#IPv4 addresses"
+                     dc(NetworkConfigIPv6) as "#IPv6 addresses"
+                     splitrow 
+                        $Panel51GroupBy$ as "$Panel51GroupByDisplay$"
+                     $SearchFilter$
+                  | eval sortfield=lower('$Panel51GroupByDisplay$')
+                  | sort limit=0 sortfield
+                  | table
+                     "$Panel51GroupByDisplay$"
+                     "#Hosts"
+                     "#Network adapters"
+                     "#Network DNS suffixes"
+                     "#Network SSIDs"
+                     "#Interface types"
+                     "#IPv4 addresses"
+                     "#IPv6 addresses"
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy51">$click.value$</set>
+               <unset token="DrilldownFilterBy1Host"></unset>
+            </drilldown>
+         </table>
+         <html src="machine_networkconfig_explanation.html">
+         </html>
+      </panel>
+   </row>
+   
+   <!-- Row 6 -->
+   <row depends="$DrilldownFilterBy51$">
+      <panel>
+         <title>Machines in selected group: $Panel51GroupByDisplay$ = $DrilldownFilterBy51$</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     latest(NetworkConfigFriendlyName) as "Network adapter"
+                     latest(NetworkConfigDescription) as "Network adapter description"
+                     latest(NetworkConfigDnsSuffix) as "Network DNS suffix"
+                     latest(NetworkConfigInterfaceTypeDisplayName) as "Interface type"
+                     values(NetworkConfigIPv4) as "IPv4 address(es)"
+                     values(NetworkConfigIPv6) as "IPv6 address(es)"
+                     latest(NetworkConfigIsConnectedToInternet) as ConnectedToInternet
+                     latest(NetworkConfigMACAddress) as "MAC address"
+                     latest(NetworkConfigSsid) as "Network SSID"
+                     latest(NetworkConfigWiFiAuthenticationDisplayName) as "WiFi authentication"
+                     latest(NetworkConfigWiFiTypeDisplayName) as "WiFi type"
+                     avg(NetworkConfigWiFiSignalQuality) as avgNetworkConfigWiFiSignalQuality
+                     splitrow
+                        host as Host
+                     splitrow
+                        NetworkConfigDescription
+                     $SearchFilter$
+                     filter $Panel51GroupBy$ is $DrilldownFilterBy51|s$
+                     | eval "Internet connectivity" = if(ConnectedToInternet="1","Yes","No")
+                     | eval "WiFi signal quality" = round(avgNetworkConfigWiFiSignalQuality,1)
+                     | eval sortfield=lower(Host)
+                     | sort limit=0 sortfield
+                     | table
+                        Host
+                        "Network adapter"
+                        "Network adapter description"
+                        "Network DNS suffix"
+                        "Network SSID"
+                        "Interface type"
+                        "IPv4 address(es)"
+                        "IPv6 address(es)"
+                        "MAC address"
+                        "Internet connectivity"
+                        "WiFi type"
+                        "WiFi authentication"
+                        "WiFi signal quality"
+               </query>
+            </search>
+           <option name="count">50</option>
+           <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy1Host">$row.Host$</set>
+                <set token="DrilldownFilterBy2NetworkAdapter">$row.Network adapter$</set>
+            </drilldown>
+         </table>
+         <html src="machine_networkconfig_explanation_2.html">
+         </html>
+      </panel>
+   </row>
+   
+   <!-- Row 7 -->
+   <row depends="$DrilldownFilterBy1Host$">
+      <panel>
+         <title>Network adapter $DrilldownFilterBy2NetworkAdapter$ for machine $DrilldownFilterBy1Host$ over time</title>
+         <chart>
+            <title>Usage</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     count($Panel51GroupBy$) as Count$Panel51GroupBy$
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     filter host is $DrilldownFilterBy1Host$
+                     filter NetworkConfigFriendlyName is $DrilldownFilterBy2NetworkAdapter|s$
+                  | eventstats max(Count$Panel51GroupBy$) as MaxEvents
+                  | eval Usage = round(Count$Panel51GroupBy$ / MaxEvents * 100,0)
+                  | table
+                     _time
+                     Usage
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart>
+            <title>Internet connectivity</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     count(NetworkConfigIsConnectedToInternet) as CountNetworkConfigIsConnectedToInternet
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     filter host is $DrilldownFilterBy1Host|s$
+                     filter NetworkConfigFriendlyName is $DrilldownFilterBy2NetworkAdapter|s$
+                  | eventstats max(CountNetworkConfigIsConnectedToInternet) as MaxEvents
+                  | eval "Internet connectivity" = round(CountNetworkConfigIsConnectedToInternet / MaxEvents * 100,0)
+                  | table
+                     _time
+                     "Internet connectivity"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart>
+            <title>WiFi signal quality</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                     avg(NetworkConfigWiFiSignalQuality) as "WiFi signal quality"
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     filter host is $DrilldownFilterBy1Host|s$
+                     filter NetworkConfigFriendlyName is $DrilldownFilterBy2NetworkAdapter|s$
+                  | table
+                     _time
+                     "WiFi signal quality"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+</form>

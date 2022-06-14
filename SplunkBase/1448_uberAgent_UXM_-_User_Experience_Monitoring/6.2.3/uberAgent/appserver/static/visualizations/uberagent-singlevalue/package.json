@@ -1,0 +1,22 @@
+{
+   "name": "uberagent-singlevalue",
+   "version": "1.0.0",
+   "description": "uberAgent single-value visualization.",
+   "main": "visualization.js",
+   "scripts": {
+      "build": "$SPLUNK_HOME/bin/splunk cmd node ./node_modules/webpack/bin/webpack.js",
+      "devbuild": "$SPLUNK_HOME/bin/splunk cmd node ./node_modules/webpack/bin/webpack.js --progress",
+      "watch": "$SPLUNK_HOME/bin/splunk cmd node ./node_modules/webpack/bin/webpack.js -d --watch --progress"
+   },
+   "author": "vast limits",
+   "license": "MIT",
+   "devDependencies": {
+      "webpack": "^4.x",
+      "webpack-cli": "^3.x"
+   },
+   "dependencies": {
+      "jquery": "latest",
+      "underscore": "latest"
+   },
+   "private": true
+}

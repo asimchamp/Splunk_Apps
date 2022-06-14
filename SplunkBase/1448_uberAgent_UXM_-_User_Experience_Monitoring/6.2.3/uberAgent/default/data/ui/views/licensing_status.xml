@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, licensing_status.js" stylesheet="main.css, licensing_status.css">
+
+   <label>Licensing Status</label>
+   <description>This dashboard displays information about the licensing status of uberAgent. It can only display information about licenses that are in use. If you have licenses on your machines that are not currently used they will not appear here.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         index=`uberAgent_index`
+            sourcetype=uberAgent:License:LicenseInfo
+            LicensingState=licensed
+            LicensingModel=device
+            LicensingModelDetail=server
+         | dedup LicenseId
+         | stats
+            sum(LicenseCountTotal) as ServerLicensesTotal
+         | appendcols
+         [
+         search index=`uberAgent_index`
+            sourcetype=uberAgent:License:LicenseInfo
+            LicensingState=licensed
+            LicensingModel=device
+            LicensingModelDetail=server
+         | dedup host
+         | stats
+            count(host) as ServerLicensesConsumed
+         ]
+         | appendcols
+         [
+         search index=`uberAgent_index`
+            sourcetype=uberAgent:License:LicenseInfo
+            LicensingState=licensed
+            LicensingModel=device
+            LicensingModelDetail=client
+         | dedup LicenseId
+         | stats
+            sum(LicenseCountTotal) as ClientLicensesTotal
+         ]
+         | appendcols
+         [
+         search index=`uberAgent_index`
+            sourcetype=uberAgent:License:LicenseInfo
+            LicensingState=licensed
+            LicensingModel=device
+            LicensingModelDetail=client
+         | dedup host
+         | stats
+            count(host) as ClientLicensesConsumed
+         ]
+         | appendcols
+         [
+         search index=`uberAgent_index`
+            sourcetype=uberAgent:License:LicenseInfo
+            LicensingState=licensed
+            LicensingModel=user
+         | dedup LicenseId
+         | stats
+            sum(LicenseCountTotal) as UserLicensesTotal
+         ]
+         | appendcols
+         [
+         search index=`uberAgent_index`
+            sourcetype="uberAgent:session:sessiondetail"
+            SessionID != 0
+         | eval SessionUserLower=lower(SessionUser)
+         | stats
+            dc(SessionUserLower) as UniqueUsers
+         ]
+      </query>
+   </search>
+
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Server licenses</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">ServerLicensesTotal</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Total server licenses:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">ServerLicensesConsumed</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Consumed server licenses:</option>
+         </viz>
+      </panel>
+
+      <panel>
+         <title>Client licenses</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">ClientLicensesTotal</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Total client licenses:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">ClientLicensesConsumed</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Consumed client licenses:</option>
+         </viz>
+      </panel>
+
+      <panel>
+         <title>User licenses</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">UserLicensesTotal</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Total user licenses:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">UniqueUsers</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Unique users:</option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>Unlicensed machines</title>
+         <table>
+            <search>
+               <query>
+                  index=`uberAgent_index`
+                     sourcetype=uberAgent:License:LicenseInfo
+                     LicensingState=unlicensed
+                  | chart
+                     latest(_time) as _time
+                     by host
+                  | rename host as "Unlicensed machines"
+                  | table "Unlicensed machines"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+</form>

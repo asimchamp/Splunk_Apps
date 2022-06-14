@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, session_0_detail.js" stylesheet="main.css">
+
+   <label>Session 0</label>
+   <description>This dashboard displays detailed information about session 0 on all machines. Sesssion 0 is the session that is used for services and user-mode drivers.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Session_SessionDetail_Session0</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Session0` Session_SessionDetail_Session0
+            avg(SessionCPUUsagePercent) as AvgSessionCPUUsagePercent
+            avg(SessionIOPS) as AvgSessionIOPS
+            avg(SessionWorkingSetMB) as AvgSessionWorkingSetMB
+            avg(SessionNetKBPS) as AvgSessionNetKBPS
+            $SearchFilter$
+         | eval AvgSessionCPUUsagePercentRounded=round(AvgSessionCPUUsagePercent,1)
+         | eval AvgSessionIOPSRounded=round(AvgSessionIOPS,2)
+         | eval AvgSessionWorkingSetMBRounded=round(AvgSessionWorkingSetMB,1)
+         | eval AvgSessionNetKBPSRounded=round(AvgSessionNetKBPS,2)
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Averages for all sessions</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AvgSessionCPUUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">CPU:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">AvgSessionWorkingSetMBRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">RAM:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">MB</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgSessionIOPSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Disk:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">IOPS</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgSessionNetKBPSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Network:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">KB/s</option>
+         </viz>
+      </panel>
+   </row>
+
+   <search id="Search_Charts">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Session0` Session_SessionDetail_Session0
+            $Panel21Function1$(SessionCPUTimeS) as "$Panel21Function1$(SessionCPUTimeS)"
+            $Panel22Function1$(SessionIOCount) as "$Panel22Function1$(SessionIOCount)"
+            $Panel31Function1$(SessionIOMB) as "$Panel31Function1$(SessionIOMB)"
+            $Panel32Function1$(SessionWorkingSetMB) as "$Panel32Function1$(SessionWorkingSetMB)"
+            splitrow
+               host as Host
+            $SearchFilter$
+      </query>
+   </search>
+   
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>CPU time per session 0 (top 10)</title>
+         <input type="dropdown" token="Panel21Function1" id="Input_Panel21Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>sum</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel21">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel21Function1$(SessionCPUTimeS)"
+                  | fields
+                     "Host"
+                     "$Panel21Function1$(SessionCPUTimeS)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>IO count per session 0 (top 10)</title>
+         <input type="dropdown" token="Panel22Function1" id="Input_Panel22Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>sum</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel22">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel22Function1$(SessionIOCount)"
+                  | fields
+                     "Host"
+                     "$Panel22Function1$(SessionIOCount)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+   </row>
+
+   
+   <!-- Row 3 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>IO volume per session 0 (top 10)</title>
+         <input type="dropdown" token="Panel31Function1" id="Input_Panel31Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>sum</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel31">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel31Function1$(SessionIOMB)"
+                  | fields
+                     "Host"
+                     "$Panel31Function1$(SessionIOMB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>RAM per session 0 (top 10)</title>
+         <input type="dropdown" token="Panel32Function1" id="Input_Panel32Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel32">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel32Function1$(SessionWorkingSetMB)"
+                  | fields
+                     "Host"
+                     "$Panel32Function1$(SessionWorkingSetMB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <input type="dropdown" token="Panel41Function1" id="Input_Panel41Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel41Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel41Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel41Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel41Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel41Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel41Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel41Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Session0` Session_SessionDetail_Session0
+                     $Panel41Function1$(SessionProcessCount) as FuncSessionProcessCount
+                     $Panel41Function1$(SessionCPUUsagePercent) as FuncSessionCPUUsagePercent
+                     $Panel41Function1$(SessionIOPS) as FuncSessionIOPS
+                     $Panel41Function1$(SessionIOMB) as FuncSessionIOMB
+                     $Panel41Function1$(SessionWorkingSetMB) as FuncSessionWorkingSetMB
+                     $Panel41Function1$(SessionNetKBPS) as FuncSessionNetKBPS
+                     latest(_time) as LastSeen
+                     latest(SessionLogonTime) as SessionLogonTime
+                     sum(SessionIODurationMs) as SumSessionIODurationMs
+                     sum(SessionIOCount) as SumSessionIOCount
+                     splitrow
+                        host as Host
+                     $SearchFilter$
+                  | eval "$Panel41Function1Display$ #processes" = round(FuncSessionProcessCount,0)
+                  | eval "$Panel41Function1Display$ CPU (%)" = round(FuncSessionCPUUsagePercent,1)
+                  | eval "$Panel41Function1Display$ IOPS" = round(FuncSessionIOPS,1)
+                  | eval "$Panel41Function1Display$ IO volume (MB)" = round(FuncSessionIOMB,2)
+                  | eval "$Panel41Function1Display$ RAM (MB)" = round(FuncSessionWorkingSetMB,0)
+                  | eval "$Panel41Function1Display$ network (KB/s)" = round(FuncSessionNetKBPS,1)
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Avg. IO latency (ms)"=round(SumSessionIODurationMs/SumSessionIOCount,1)
+                  | eval "Startup time"=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval sortfield=lower('Startup time')
+                  | table
+                     Host
+                     "Startup time"
+                     "Last seen"
+                     "$Panel41Function1Display$ #processes"
+                     "$Panel41Function1Display$ CPU (%)"
+                     "$Panel41Function1Display$ IOPS"
+                     "$Panel41Function1Display$ IO volume (MB)"
+                     "Avg. IO latency (ms)"
+                     "$Panel41Function1Display$ RAM (MB)"
+                     "$Panel41Function1Display$ network (KB/s)"
+                     sortfield
+                  | sort limit=0 -sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+
+      <html src="session_0_detail_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+</form>

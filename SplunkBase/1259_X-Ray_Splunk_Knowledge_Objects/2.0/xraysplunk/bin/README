@@ -1,0 +1,13 @@
+The script to generate the knowledge object lookup will be run by Splunk automatically.
+
+By default, the script runs every 2 hours, but you can change that in the Splunk Manager (or by changing the settings in inputs.conf).
+
+If you don't want to wait for an updated copy of your knowledge objects, then just run
+
+read_conf_files.py
+
+The script does not take any arguments. It will take around 15 minutes to run on a medium-sized system.
+To check on the last execution of the script, look in the logs subdirectory.
+
+The script DOES NOT follow symbolic links. This is to prevent it from "wandering" into other directories on the server. Some
+apps, like the pdfserver, use symbolic links to include system libraries, etc. The script will not examine these. 

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Config</label>
+  <row>
+    <table>
+      <searchString>eventtype=sitescope_daily sis_monitor="License Usage Monitor" | head 1 | table sis_total_points_avail, sis_total_points_consumed| rename sis_total_points_avail AS "SiteScope Total Points Available" | rename sis_total_points_consumed AS "SiteScope Total Points Consumed"</searchString>
+      <title>SiteScope License Details</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <searchString>eventtype=sitescope_server_stats "Used Memory" | timechart span=1m avg(sis_used_memory) by host</searchString>
+      <title>SiteScope Used Memory</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.chart">line</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+</dashboard>

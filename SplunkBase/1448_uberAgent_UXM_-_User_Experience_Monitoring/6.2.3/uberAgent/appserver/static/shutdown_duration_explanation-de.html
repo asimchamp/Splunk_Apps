@@ -1,0 +1,30 @@
+<div class="TableCaptionSSI PaddingSSI">
+   <a id="ExplanationLink">Erklärung der Daten in der Tabelle</a>
+
+   <div id="Explanation" class="hidden">
+      <p>
+         <dl>
+            <dt>Time</dt>
+            <dd>Die Zeit, zu der der Vorgang des Herunterfahrens begann.</dd>
+            <dt>Host</dt>
+            <dd>Name des Computers, der heruntergefahren wurde.</dd>
+            <dt>Total shutdown</dt>
+            <dd>Gesamtdauer des Herunterfahrens. Dies ist die Summe aus <em>User sessions</em>, <em>System session</em> und <em>Kernel</em>.</dd>
+            <dt>User sessions</dt>
+            <dd>Der für das Beenden der Benutzersitzungen benötigte Zeitraum. In dieser Phase erhalten alle laufenden Anwendungen Benachrichtigungen über das geplante Herunterfahren. Durch nicht reagierende Anwendungen kann diese Phase verlängert werden. Dies Phase enthält <em>User profiles</em> und <em>User policy</em>.</dd>
+            <dt>User profiles</dt>
+            <dd>Die für das Entladen der Benutzerprofile benötigte Zeit.</dd>
+            <dt>User policy</dt>
+            <dd>Die für Logoff-Skripte benötigte Zeit.</dd>
+            <dt>System session</dt>
+            <dd>Die für das Beenden der Sitzung 0 benötigte Zeit. Dies schließt ein <em>Services (pre-shutdown)</em> und <em>Services</em>.</dd>
+            <dt>Services (pre-shutdown)</dt>
+            <dd>Der Zeitraum, in dem Dienste sich beenden, die sich für Pre-Shutdown-Benachrichtigungen registriert haben.</dd>
+            <dt>Services</dt>
+            <dd>Die Zeit für das Beenden aller anderen Dienste.</dd>
+            <dt>Kernel</dt>
+            <dd>Dauer des Beendens des Kernels inklusive aller Treiber.</dd>
+         </dl>
+      </p>
+    </div>
+</div>

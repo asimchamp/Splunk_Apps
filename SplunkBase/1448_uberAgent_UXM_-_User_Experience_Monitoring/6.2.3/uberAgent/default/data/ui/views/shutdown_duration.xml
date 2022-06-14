@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, shutdown_duration.js" stylesheet="main.css, shutdown_duration.css">
+
+   <label>Shutdown Duration</label>
+   <description>This dashboard displays information about the duration of system shutdowns. The events that are processed here are generated only when a delay occurs. The data displayed here does not necessarily reflect typical shutdown processes.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>OnOffTransition_ShutdownDetail</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_OnOffTransition_ShutdownDetail` OnOffTransition_ShutdownDetail
+            avg(TotalShutdownTimeMs) as AvgTotalShutdownTimeMs
+            avg(UserSessionTimeMs) as AvgUserSessionTimeMs
+            avg(SystemSessionsTimeMs) as AvgSystemSessionsTimeMs
+            avg(KernelTimeMs) as AvgKernelTimeMs
+            $SearchFilter$
+         | eval AvgTotalShutdownTimeSRounded=round(AvgTotalShutdownTimeMs/1000,2)
+         | eval AvgUserSessionTimeSRounded=round(AvgUserSessionTimeMs/1000,2)
+         | eval AvgSystemSessionsTimeSRounded=round(AvgSystemSessionsTimeMs/1000,2)
+         | eval AvgKernelTimeSRounded=round(AvgKernelTimeMs/1000,2)
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Averages for all shutdowns</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AvgTotalShutdownTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Total shutdown:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">AvgUserSessionTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">User sessions:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgSystemSessionsTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">System session:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgKernelTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Kernel:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">s</option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+      <panel>
+         <title>Shutdown duration over time</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_OnOffTransition_ShutdownDetail` OnOffTransition_ShutdownDetail
+                     count(OnOffTransition_ShutdownDetail) as EventCount
+                     sum(TotalShutdownTimeMs) as SumTotalShutdownTimeMs
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     eval(round(sum(SumTotalShutdownTimeMs)/sum(EventCount)/1000,2)) as "Avg. shutdown duration (s)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">sec.</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <table id="Table_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_OnOffTransition_ShutdownDetail` OnOffTransition_ShutdownDetail
+                     latest(_time) as Time
+                     avg(UserPolicyTimeMs) as AvgUserPolicyTimeMs
+                     avg(UserProfilesTimeMs) as AvgUserProfilesTimeMs
+                     avg(SystemSessionsTimeMs) as AvgSystemSessionsTimeMs
+                     avg(PreShutdownNotificationsTimeMs) as AvgPreShutdownNotificationsTimeMs
+                     avg(ServicesTimeMs) as AvgServicesTimeMs
+                     avg(KernelTimeMs) as AvgKernelTimeMs
+                     splitrow
+                        host as Host
+                     splitrow
+                        TotalShutdownTimeMs
+                     splitrow
+                        UserSessionTimeMs
+                     $SearchFilter$
+                  | eval "Total shutdown (s)" = round(TotalShutdownTimeMs/1000,2)
+                  | eval "User sessions (s)" = round(UserSessionTimeMs/1000,2)
+                  | eval "User profiles (s)" = round(AvgUserProfilesTimeMs/1000,2)
+                  | eval "User policy (s)" = round(AvgUserPolicyTimeMs/1000,2)
+                  | eval "System session (s)" = round(AvgSystemSessionsTimeMs/1000,2)
+                  | eval "Services (pre-shutdown) (s)" = round(AvgPreShutdownNotificationsTimeMs/1000,2)
+                  | eval "Services (s)" = round(AvgServicesTimeMs/1000,2)
+                  | eval "Kernel (s)" = round(AvgKernelTimeMs/1000,2)
+                  | eval Time = strftime (strptime (Time, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | sort - Time
+                  | fields
+                     Time
+                     Host
+                     "Total shutdown (s)"
+                     "User sessions (s)"
+                     "User profiles (s)"
+                     "User policy (s)"
+                     "System session (s)"
+                     "Services (pre-shutdown) (s)"
+                     "Services (s)"
+                     "Kernel (s)"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+
+         <html src="shutdown_duration_explanation.html">
+         </html>
+      </panel>
+   </row>
+
+</form>

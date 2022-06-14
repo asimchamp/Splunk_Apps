@@ -1,0 +1,136 @@
+<view template="dashboard.html">
+  <label>Mood Radiator - Intro and Set up</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="SideviewUtils" layoutPanel="appHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+  
+  <!-- Provide a brief into as to what this page is -->
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">&lt;h1&gt;Information Behind the Mood Radiator&lt;/h1&gt;
+      &lt;p&gt;
+      This page is a run down of how the Mood Radiator is set up and how to configure and change with your needs.
+      The Anonymous Mood Radiator was set up as part of Experian Hackday 2 in 2013, by Yogita Desai, Manikutty Joy, Sone Chen, Peter Hallows and Vince Sesto.
+      The Anonymous Mood Radiator is not a supported application, but we can provide limited assistance if you need any further help
+      &lt;/p&gt;
+      
+      
+      &lt;h2&gt;Basic System Information&lt;/h2&gt;
+      
+      &lt;p&gt;
+      Input(Google Form) => Processing(Python Script to key value pair information) => Output(Splunk Dashboard)
+      &lt;/p&gt;
+      
+      &lt;h3&gt;Input(Google Form)&lt;/h3&gt;
+      
+      &lt;p&gt;
+      The input for the mood radiator is set up using google forms, which load directly into a google docs spreadsheet
+      &lt;/p&gt;
+      
+      &lt;h3&gt;Processing&lt;/h3&gt;
+      
+      &lt;p&gt;
+      Run on the splunk server we use a simple python script which uses googlecl to download the google docs spreadsheet in csv form.
+      Although we could have loaded the csv file directly into splunk we further manipulated this data to add extra information from the form and place it into a key value pair format.
+      The python script used to manipulate the data is in the bin directory of the app.     
+      &lt;/p&gt;
+      
+      &lt;h3&gt;Output&lt;/h3&gt;
+      
+      &lt;p&gt;
+      The key value pair log file is then loaded into an index via splunk.
+      The data is displayed in a dashboard showing mood graphs for a selected project and below an overall mood over time.     
+      
+      &lt;/p&gt;
+      
+    </param>
+  </module>
+  
+
+  <!-- How to Set this up from scratch -->
+  <module name="StaticContentSample" layoutPanel="panel_row2_col1">
+    <param name="text">&lt;h1&gt;Setting up the Mood Radiator&lt;/h1&gt;
+      &lt;p&gt;
+      Hopefully by following the steps below you will be able to set this up.
+      The information below assumes you are running Splunk on a linux server.
+      &lt;/p&gt;
+      
+      &lt;h2&gt;Step 1 - Set up your Google Forms&lt;/h2&gt;
+      
+      &lt;p&gt;
+      Make sure you have a google drive account and set up a new form that will collect the information for you.
+      The form you create will be placed in a spreadsheet that is attached to the form.
+      Try to limit changes that you make to the form as these will then be changed in the spreadsheet causing changes when you try to import the data into splunk.      
+      More information on google forms can be found <![CDATA[ <a href="http://support.google.com/drive/bin/answer.py?hl=en&answer=87809">here.</a>]]>
+      &lt;/p&gt;
+      
+      &lt;p&gt;
+      Please keep in mind that any changes that are made to this spreadsheet will need to be made to the script that we have mirroring and putting into key value format.
+      We have set this up with the following format:
+      &lt;/p&gt;
+      &lt;ol&gt;
+      &lt;li&gt;Timestamp&lt;/li&gt;
+      &lt;li&gt;Project(Dropdown list)&lt;/li&gt;
+      &lt;li&gt;How do you feel about the following[Overall Project](Column Select5, Very sad, Confused, Neutral, Happy, Very Happy)&lt;/li&gt;
+      &lt;li&gt;Comments(Text Entry)&lt;/li&gt;
+      &lt;li&gt;How do you feel about the following[Team Colaboration](Column Select5, Very sad, Confused, Neutral, Happy, Very Happy)&lt;/li&gt;
+      &lt;li&gt;How do you feel about the following[Meeting Deadlines](Column Select5, Very sad, Confused, Neutral, Happy, Very Happy)&lt;/li&gt;
+      &lt;li&gt;How do you feel about the following[Tools and Process](Column Select5, Very sad, Confused, Neutral, Happy, Very Happy)&lt;/li&gt;
+      &lt;li&gt;How do you feel about the following[Leadership support](Column Select5, Very sad, Confused, Neutral, Happy, Very Happy)&lt;/li&gt;
+      &lt;/ol&gt;
+      
+      &lt;p&gt;
+      I have placed an example of the output in csv format with the python script to parse the data.
+      &lt;/p&gt;
+          
+      
+      &lt;h2&gt;Step 2 - Install GoogleCL&lt;/h2&gt;
+      
+      &lt;p&gt;
+      To allow the spreadsheet from google to be downloaded onto the splunk server, the script that performs the task uses a linux command line tool called googlecl.
+      For more information on googlecl go to the following <![CDATA[ <a href="http://support.google.com/drive/bin/answer.py?hl=en&answer=87809">link.</a>]]>      
+      
+      Test googlecl is running correctly with something like the following from the command line:
+      
+      <![CDATA[<br>google docs get <spreadsheet_name> . --format=csv ]]>
+      &lt;/p&gt;
+      
+      &lt;h2&gt;Step 3 - Ensure the Parsing Script is Set for Your Environment&lt;/h2&gt;
+      
+      &lt;p&gt;
+      The script download and parse the data to allow splunk to undex is located in the bin directory of the app.
+      This is set to run from cron, usually every 5 minutes or so.
+      The following is an explaination of each line advised what changes you may need to make.      
+      &lt;/p&gt;
+      &lt;ul&gt;
+      &lt;li&gt;Line 8 is the name of the file that is being downloaded from Google.&lt;/li&gt;
+      &lt;li&gt;Line 9 is the output file that splunk will index.&lt;/li&gt;
+      &lt;li&gt;Line 19 is a dictionary mapping the mood with a numerical value to allow splunk to give an average value.&lt;/li&gt;
+      &lt;li&gt;Line 27 is the googlecl command that is used to download the spreadsheet in csv format.&lt;/li&gt;
+      &lt;li&gt;Line 36, this is the count file, which allows the script to know if new information has been added...If you start again this value needs to go back to 1&lt;/li&gt;
+      &lt;li&gt;Lines 49 - 71, checks for new data, reads the data, maps the mood to a value and then prints the new entry into the output file&lt;/li&gt;
+      &lt;li&gt;Line 77 - 80, updates the number of lines in the csv file for the next parse.&lt;/li&gt;
+      &lt;/ul&gt;
+      
+      &lt;h2&gt;Step 4 - Run the App&lt;/h2&gt;
+      
+      &lt;p&gt;
+      If all goes well, with the example data that is provided in the app you should be able to run the app and see some data available.
+      The app is set to index the data pointing to a moodLog sourcetype...Good Luck!
+      &lt;/p&gt;
+      
+      
+      
+    </param>
+  </module>
+  
+  
+</view>

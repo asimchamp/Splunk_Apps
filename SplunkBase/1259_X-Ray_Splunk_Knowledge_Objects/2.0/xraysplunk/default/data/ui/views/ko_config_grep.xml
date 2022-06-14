@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Search Configurations for a Regular Expression</label>
+  <searchTemplate><![CDATA[ | confgrep rex="$regex$"
+                  | sort file_path line_count
+                  | table line_text file_path line_count 
+                  | `long_line_breaker(line_text)`
+                  | rename file_path as "Location" line_count as "Line Number" line_text as "Text Found" ]]>
+  </searchTemplate>
+
+  <fieldset>
+    <input type="text" token="regex">
+      <label>Regular Expression to Find</label>
+    </input>
+  </fieldset>
+
+  <row>
+    <table>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+
+    <row>
+    <html>
+      This searches all of the Splunk .conf and .xml files for the regular expression that you specify.
+    </html>
+  </row>
+</form>

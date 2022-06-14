@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html" stylesheet="host.css">
+    <label>Host</label>
+    <module name="AccountBar" layoutPanel="appHeader"/>
+    <module name="AppBar" layoutPanel="navigationHeader"/>
+    <module name="Message" layoutPanel="messaging">
+        <param name="filter">*</param>
+        <param name="clearOnJobDispatch">False</param>
+        <param name="maxSize">1</param>
+    </module>
+    <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+    <module name="Message" layoutPanel="navigationHeader">
+        <param name="filter">splunk.search.job</param>
+        <param name="clearOnJobDispatch">True</param>
+        <param name="maxSize">1</param>
+        <param name="level">warn</param>
+    </module>
+    
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row1_col1_grp1">
+        <param name="intention">
+            <param name="name">stringreplace</param>
+            <param name="arg">
+                <param name="hostname">
+                    <param name="default"></param>
+                </param>
+            </param>
+        </param>
+
+        <param name="replacementMap">
+            <param name="arg">
+                <param name="hostname">
+                    <param name="value"></param>
+                </param>
+            </param>
+        </param>
+
+        <param name="field">hostname</param>
+        <param name="label">Host: </param>
+        
+        <module name="HiddenSearch" autoRun="false" layoutPanel="panel_row1_col1_grp2">
+            <param name="search">
+                `servervirt_index` eventtype=servervirt:host:* hyp_hostname="$hostname$" |
+                head 1 |
+                fields hyp_memory |
+                eval memGB=`toGB(hyp_memory)`." GB"
+            </param>
+            
+            <module name="SingleValue" layoutPanel="panel_row1_col1_grp1">
+                <param name="beforeLabel">Memory: </param>
+                <param name="field">memGB</param>
+            </module>
+        </module>
+        
+        <module name="TimeRangePicker" autoRun="false" layoutPanel="panel_row1_col1_grp3">
+            <param name="default">Last 4 Hours</param>
+            <param name="searchWhenChanged">True</param>
+            
+            <module name="HiddenSearch" autoRun="false" layoutPanel="panel_row1_col1_grp1">
+                <param name="search">
+                    `servervirt_index` eventtype=servervirt:vm:* vm_host="$hostname$" |
+                    fields vm_id |
+                    stats dc(vm_id) as numVMs
+                </param>
+                
+                <module name="SingleValue" layoutPanel="panel_row1_col1_grp1">
+                    <param name="beforeLabel">Number of resident VMs: </param>
+                    <param name="field">numVMs</param>
+                </module>
+            </module>
+            
+            <module name="HiddenSearch">
+                <param name="search">
+                    eventtype=servervirt:host:* cpu_count="*" hyp_hostname="$hostname$" |
+                    head 1 |
+                    fields hyp_hostname cpu_count |
+                    rename hyp_hostname as vm_host cpu_count as pCPU |
+                    join type=inner vm_host [search eventtype=servervirt:vm:* | dedup vm_id | fields vm_cpu_count, vm_host | stats sum(vm_cpu_count) as vCPU by vm_host ] |
+                    eval avgcpu=round(vCPU/pCPU,2) |
+                    rangemap field=avgcpu ok=0-`alerts-high_vCPU_to_pCPU` default=critical |
+                    table vm_host, pCPU, vCPU, avgcpu, range
+                </param>
+                
+                <module name="SingleValue" layoutPanel="panel_row1_col1_grp1">
+                    <param name="classField">range</param>
+                    <param name="beforeLabel">Average vCPU/pCPU: </param>
+                    <param name="field">avgcpu</param>
+                    <param name="afterLabel">
+                        <![CDATA[<a class="tooltip" href="#"><div class="help_icon after" style="clear: left"></div><span class="custom help"><img src="/static/app/SplunkAppForServerVirt/help.png" alt="Help" height="48" width="48" /><em>vCPU/pCPU - Virtual CPU to Physical CPU Ratio</em>This metric shows how many virtual CPUs are assigned to each physical CPU on average.  Too many virtual CPUs assigned to a single physical CPU can impact performance.</span></a>]]>
+                    </param>
+                </module>
+            </module>
+            
+            <module name="HiddenSearch" layoutPanel="panel_row2_col1" autoRun="false">
+                <param name="search">
+                    `servervirt_index`
+                        (eventtype=servervirt:performance:*:host:processor instance!="_Total") OR
+                        (eventtype=servervirt:performance:*:host:network counter!="Bytes Total/sec")  OR
+                        (eventtype=servervirt:performance:*:host:memory)
+                        hyp_hostname="$hostname$" |
+                    fillnull value=NULL instance |
+                    fields counter instance Value instance |
+                    stats count by _time counter instance Value
+                </param>
+                
+                <module name="HiddenPostProcess" group="Processor Utilization" layoutPanel="panel_row2_col1" autoRun="false">
+                    <param name="search">
+                        | search counter="% Processor Time" |
+                        eval instance_name="CPU ".instance |
+                        timechart max(Value) by instance_name useother=false limit=0
+                    </param>
+
+                    <module name="JobProgressIndicator" />
+                    <module name="HiddenChartFormatter">
+                        <param name="charting.chart">line</param>
+                        <param name="charting.chart.nullValueMode">connect</param>
+                        <param name="charting.legend.placement">right</param>
+                        <param name="charting.axisTitleY.text">%</param>
+                        <param name="charting.axisY.minimumNumber">0</param>
+                        <param name="charting.axisY.maximumNumber">100</param>
+                        <param name="charting.axisTitleX.text"> </param>
+                        <module name="JSChart">
+                            <param name="width">100%</param>
+                            <module name="ConvertToDrilldownSearch">
+                                <module name="ViewRedirector">
+                                    <param name="viewTarget">flashtimeline</param>
+                                </module>
+                            </module>
+                        </module>
+                        <module name="ViewRedirectorLink">
+                            <param name="viewTarget">flashtimeline</param>
+                        </module>
+                    </module>
+
+                </module>
+                
+                <module name="HiddenPostProcess" layoutPanel="panel_row2_col2" group="Available Memory" autoRun="True">
+                    <param name="search">
+                      | search counter="Available Bytes" |
+                      eval MB=`toMB(Value)` |
+                      timechart max(MB) by hyp_hostname
+                    </param>
+                    <module name="JobProgressIndicator" />
+                      <module name="HiddenChartFormatter">
+                        <param name="charting.chart">line</param>
+                        <param name="charting.chart.nullValueMode">connect</param>
+                        <param name="charting.legend.placement">none</param>
+                        <param name="charting.axisTitleX.text"> </param>
+                        <param name="charting.axisTitleY.text">MB</param>
+                        <param name="charting.axisY.minimumNumber">0</param>
+                        <param name="charting.axisTitleX.text"> </param>
+                        <module name="JSChart">
+                          <param name="width">100%</param>
+                          <module name="NullModule" group="blah">
+                          </module>
+                        </module>
+                        <module name="ViewRedirectorLink">
+                          <param name="viewTarget">flashtimeline</param>
+                        </module>
+                      </module>
+                  </module>
+                
+                <module name="HiddenPostProcess" group="Network Utilization" layoutPanel="panel_row2_col3" autoRun="false">
+                    <param name="search">
+                        | search counter="Bytes */sec" |
+                        timechart max(Value) by instance useother=false limit=0
+                    </param>
+                    
+                    <module name="JobProgressIndicator" />
+                    <module name="HiddenChartFormatter">
+                        <param name="charting.chart">line</param>
+                        <param name="charting.chart.nullValueMode">connect</param>
+                        <param name="charting.legend.placement">right</param>
+                        <param name="charting.axisTitleY.text"> </param>
+                        <param name="charting.axisTitleX.text"> </param>
+                        <module name="JSChart">
+                            <param name="width">100%</param>
+                            <module name="ConvertToDrilldownSearch">
+                                <module name="ViewRedirector">
+                                    <param name="viewTarget">flashtimeline</param>
+                                </module>
+                            </module>
+                        </module>
+                        <module name="ViewRedirectorLink">
+                            <param name="viewTarget">flashtimeline</param>
+                        </module>
+                    </module>
+                    
+                </module>
+                
+            </module>
+
+            <module name="HiddenSearch" autoRun="false" layoutPanel="panel_row3_col1" group="Resident Virtual Machines">
+                <param name="search">
+                    eventtype=servervirt:vm:* vm_power_state="Running" vm_host="$hostname$" |
+                    dedup vm_id |
+                    table vm_name, sourcetype, vm_host, guestOS, vm_toolstack_version |
+                    rename vm_name as "VM Name", vm_host as "Hostname", guestOS as "OS", vm_toolstack_version AS "Toolstack Version" |
+                    sort "VM Name" by Hostname
+                </param>
+                <module name="StaticContentSample" layoutPanel="panel_row3_col1">
+                    <param name="text"><![CDATA[<img src="/static/app/SplunkAppForServerVirt/info.gif" class="info_icon" />]]> Click on a row below to view more details about the virtual machine.</param>
+                </module>
+                <module name="JobProgressIndicator"  />
+                    
+                <module name="Paginator" layoutPanel="panel_row3_col1">
+                    <param name="count">10</param>
+                    <param name="entityName">results</param>
+                    
+                    <module name="SimpleResultsTable">
+                        <param name="displayMenu">true</param>
+                        <param name="drilldown">row</param>
+                        <param name="displayRowNumbers">False</param>
+                        <module name="NullModule" />
+                    </module>
+                    <module name="ViewRedirectorLink">
+                        <param name="viewTarget">flashtimeline</param>
+                    </module>
+                
+                </module> <!-- End Paginator -->
+
+            </module> <!-- End Hidden Search -->
+                
+        </module> <!-- End TimeRangePicker -->
+        
+    </module> <!-- End ExtendedFieldSearch -->
+    
+</view>

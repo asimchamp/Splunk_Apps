@@ -1,0 +1,34 @@
+<style type="text/css">
+#note
+	{
+		width:8%;
+		display: inline-block;
+		font-size:12px;
+		font-weight:bold;
+	}
+#ports
+	{
+		width: 10.5em;
+		margin-bottom: 5px;
+	}
+</style>
+
+<%namespace name="lib" file="//lib.html" import="*"/>
+
+%if (ports):
+	%if (obj):
+		<label  id="note">${obj}</label>
+	% endif
+	<select  id="ports" >
+		<option value="None" selected>None</option>
+		% for entry in ports:
+			<option value="${entry['id']}">${entry['name']}</option>
+		% endfor
+	</select> 
+%else:
+	%if (obj):
+		<label>No<b> ${obj}</b> are enabled. Enable at least one from the <i>Setup</i> menu. </label>
+	% endif
+% endif
+
+

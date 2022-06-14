@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Security</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+  
+  <row>
+	<chart>
+		<title>Attacks</title>
+		<searchTemplate>sourcetype="DASP4" (alert_id="4.1.*" OR alert_id="4.2.*") | replace "4.1.*" with "HTTP" in alert_id | replace "4.2.*" with "XML" in alert_id | timechart count by alert_id</searchTemplate>
+		<option name="charting.chart">line</option>
+		<option name="charting.primaryAxisTitle.text">Time</option> 
+		<option name="charting.secondaryAxisTitle.text"># of Attacks</option>	  
+    </chart>
+  </row>
+  <row>
+	<chart>
+		<title>Security Modules</title>
+		<searchTemplate>sourcetype="DASP4" (alert_id="4.1.*" OR alert_id="4.2.*") | stats count by alert_message</searchTemplate>      
+		<option name="charting.chart">pie</option>		
+
+    </chart>
+    <chart>
+		<title>Top 10 Target Applications</title>
+		<searchTemplate>sourcetype="DASP4" (HTTP_response_code="407" OR HTTP_response_code="413" OR HTTP_response_code="400" OR HTTP_response_code="403" OR HTTP_response_code="406"  OR HTTP_response_code="408"  OR HTTP_response_code="409"  OR HTTP_response_code="414"  OR HTTP_response_code="417") | stats count AS "Number of Attacks" by application | sort 10 "Number of Attacks" desc</searchTemplate>      
+		<option name="charting.chart">bar</option>
+		<option name="charting.legend.placement">none</option>
+
+    </chart>    
+  </row>
+  <row>
+    <chart>      
+		<title>Top 10 Sources</title>
+		<searchTemplate>sourcetype="DASP4" (alert_id="4.1.*" OR alert_id="4.2.*") | stats count AS "Number of Attacks" by source_ip | sort 10 "Number of Attacks" desc | rename "source_ip" AS "Source"</searchTemplate>
+		<option name="charting.chart">bar</option>
+		<option name="charting.secondaryAxisTitle.text"># of Attacks</option>
+
+	</chart>
+    <table>
+		<title>Attacks Sources per Country</title>
+		<searchTemplate>sourcetype="DASP4" alert_id=4* | fields source_ip | iplocation | stats count(source_ip) AS "# Attacks" by Country</searchTemplate>      
+
+    </table>
+  </row>
+</form>

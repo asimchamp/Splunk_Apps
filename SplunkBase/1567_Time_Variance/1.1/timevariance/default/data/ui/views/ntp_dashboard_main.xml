@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>NTP Dashboard Main</label>
+  <row>
+    <table>
+      <searchString>index=timevariance | multikv | stats values(jitter) as Jitter, values(st) as Stratum, values(delay) as Delay, values(offset) as Offset by host</searchString>
+      <title>Table of Servers</title>
+      <earliestTime>rt-15m</earliestTime>
+      <latestTime>rt</latestTime>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>index=timevariance | multikv | where isint(when) | where when &gt; poll | dedup host | table host </searchString>
+      <title>Server out of sync</title>
+      <earliestTime>rt-15m</earliestTime>
+      <latestTime>rt</latestTime>
+      <option name="afterLabel">are out of sync.</option>
+      <option name="beforeLabel">Servers:</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <chart>
+      <searchString>index=timevariance | multikv | where isint(when) | where "when" &gt; "poll" | dedup host | stats count(host)</searchString>
+      <title>Number of servers out of sync</title>
+      <earliestTime>rt-15m</earliestTime>
+      <latestTime>rt</latestTime>
+      <option name="charting.chart">fillerGauge</option>
+      <option name="charting.chart.style">minimal</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchName>Remote NTP Server Breakdown</searchName>
+      <title>Remote NTP Server Breakdown</title>
+      <option name="charting.chart">pie</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchName>Real Time NTP Health by Host</searchName>
+      <title>NTP Health Real Time Last 5 Minutes</title>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.secondaryAxis.scale">log</option>
+    </chart>
+  </row>
+</dashboard>

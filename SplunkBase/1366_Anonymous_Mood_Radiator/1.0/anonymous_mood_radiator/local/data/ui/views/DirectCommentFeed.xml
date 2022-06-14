@@ -1,0 +1,207 @@
+<view template="dashboard.html">
+  <label>Mood Radiator - Comments Feed</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="SideviewUtils" layoutPanel="appHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+  
+  <!-- Provide a brief into as to what this page is -->
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">&lt;h1&gt;View Real Time Comments from Mood Radiator&lt;/h1&gt;
+      The list of comments provided below are directly from the web form, as a direct feed on users feelings at the moment.
+    </param>
+  </module>
+  
+  <!-- Adding a base search  -->
+  <module name="HiddenSearch" layoutPanel="panel_row2_col1" autoRun="true">
+    <param name="search">sourcetype="moodLog" NOT comments="" 
+      | table your_mood timestamp comments project
+      | head 1
+      | fields + your_mood timestamp comments project
+    </param>
+    <param name="earliest">-30d</param>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row2_col1">
+      <param name="search">
+        table timestamp
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row2_col1">
+      <param name="search">
+        table project
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row2_col1">
+      <param name="search">
+        table comments
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+  </module>
+  
+  
+  <!-- Adding a base search  -->
+  <module name="HiddenSearch" layoutPanel="panel_row3_col1" autoRun="true">
+    <param name="search">sourcetype="moodLog" NOT comments="" 
+      | table your_mood timestamp comments project
+      | head 2
+      | tail 1
+      | fields + your_mood timestamp comments project
+    </param>
+    <param name="earliest">-30d</param>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row3_col1">
+      <param name="search">
+        table timestamp
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row3_col1">
+      <param name="search">
+        table project
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row3_col1">
+      <param name="search">
+        table comments
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+  </module>
+  
+  
+    <!-- Adding a base search  -->
+  <module name="HiddenSearch" layoutPanel="panel_row4_col1" autoRun="true">
+    <param name="search">sourcetype="moodLog" NOT comments="" 
+      | table your_mood timestamp comments project
+      | head 3
+      | tail 1
+      | fields + your_mood timestamp comments project
+    </param>
+    <param name="earliest">-30d</param>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row4_col1">
+      <param name="search">
+        table timestamp
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row4_col1">
+      <param name="search">
+        table project
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row4_col1">
+      <param name="search">
+        table comments
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+  </module>
+  
+  
+    <!-- Adding a base search  -->
+  <module name="HiddenSearch" layoutPanel="panel_row5_col1" autoRun="true">
+    <param name="search">sourcetype="moodLog" NOT comments="" 
+      | table your_mood timestamp comments project
+      | head 4
+      | tail 1
+      | fields + your_mood timestamp comments project
+    </param>
+    <param name="earliest">-30d</param>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row5_col1">
+      <param name="search">
+        table timestamp
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row5_col1">
+      <param name="search">
+        table project
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row5_col1">
+      <param name="search">
+        table comments
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+  </module>
+  
+  
+    <!-- Adding a base search  -->
+  <module name="HiddenSearch" layoutPanel="panel_row6_col1" autoRun="true">
+    <param name="search">sourcetype="moodLog" NOT comments="" 
+      | table your_mood timestamp comments project
+      | rangemap field=your_mood green=5-6 yellow=3-4 red=1-2 
+      | head 5
+      | tail 1
+      | fields + your_mood timestamp comments project
+    </param>
+    <param name="earliest">-30d</param>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row6_col1">
+      <param name="search">
+        table timestamp
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row6_col1">
+      <param name="search">
+        table project
+      </param>
+      
+      <module name="SingleValue"></module>
+    </module>
+    
+    <module name="HiddenPostProcess" layoutPanel="panel_row6_col1">
+      <param name="search">
+        table comments
+      </param>
+      
+      <module name="SingleValue">
+        <param name="classField">range</param>
+      </module>
+    </module>
+  </module>
+  
+  
+</view>
+  
+ 

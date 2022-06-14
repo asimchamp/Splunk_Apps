@@ -1,0 +1,2127 @@
+
+/*
+ *  Glorious Splunk Skin
+ *
+ */
+ 
+ 
+
+
+/* Basic Typography
+---------------------------------*/
+body, td {
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:11px;
+    color: #111;
+}
+
+input, textarea, select, optgroup {
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:12px;
+    color: #111;
+}
+
+h1 {
+    font-size: 18px;
+    font-weight: normal;
+    color:#333;
+}
+h2 {
+    font-size: 12px;
+    font-weight:bold;
+    color: #333;  
+}
+h3 {
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+h4 {
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;  
+}
+
+/* font styles */
+.splFont-mono {
+    font-family: Consolas,Monaco,Courier New,monospace;
+}
+
+.SearchBar textarea {
+    font-size: 12px;
+}
+.SearchBar textarea:focus {
+	outline: 0;
+}
+
+/* link colors 
+---------------------------------*/
+a {
+    color: #1a7996;
+}
+a.disabled {
+    color:#999;
+}
+
+/* panel-specific font colors 
+---------------------------------*/
+.appHeaderWrapper {
+    color: #666;
+}
+.appHeaderWrapper a {
+    color: #CCC;   	
+} 
+
+.appHeaderWrapper a.help {
+    background: url(../../../img/skins/default/icon-help-12.png) no-repeat left center;
+    _background: url(../../../img/skins/default/icon-help-12-black-ie6.png) no-repeat left center; /* for ie 6 */
+    display: block;
+    padding-left: 16px;
+    float: left;
+}
+
+
+/* Application Header 
+_________________________________*/
+/* app header wrapper */
+/* - this can be used to set a background for the entire header area.  */
+.appHeaderWrapper {
+    background: #ededed /*url(/static/img/skins/default/bg_appHeaderWrapper.png) repeat-x;*/;
+}
+/* application header */
+.appHeader {
+    /* height:100px;  // to change the height of the header area, add a height property here.  */
+}
+
+/* change the app logo here.  set the height/width for your image, as well as the path to the image */
+.appLogo {
+    height: 43px; 
+    width: 80px;
+    background: url(/static/img/skins/default/splunk_logo_black.png) no-repeat 0 0;
+    _background: url(/static/img/skins/default/splunk_logo_black.gif) no-repeat 0 0;
+}
+
+/* 
+use this to display the name of the app. 
+use line-height to adjust alignment with logo. if
+if the name of the app is in the logo,  set this to display: none;  
+*/
+.appHeaderWrapper h1 {
+    color:#333;
+    line-height: 43px;
+}
+
+
+/* background colors
+---------------------------------*/
+
+/* default page color */
+body, .splBackground-default, .graphArea, .resultsArea,  
+.reportSecondPanel, .reportThirdPanel, .sidebarCollapsed,
+.SearchBar .saTypeaheadWrapper {
+    background-color: #FFF;
+}
+
+/* primary background - applies to search controls and primary action panels */
+.viewHeader, .mainSearchControls, .splSearchControls-inline,
+.SearchBar .saHelpWrapper {
+    background-color: #edede7;
+}
+
+/* secondary background - sidebar, other panels */
+.splBackground-secondary, .sidebarExpanded {
+    background-color:#e5f2f5;
+}
+
+/* Specific overrides */
+.layoutCellInner .ResultsHeader .splHeader, .layoutCellInner .ResultsHeader .splHeader-secondary {
+    background: transparent none;
+}
+
+
+/* headers 
+---------------------------------*/
+.splHeader-primary {
+    background-image:url(/static/img/skins/default/bg_reversegradient_28.png);
+    background-repeat:repeat-x;
+}
+
+.splHeader-secondary {
+    background-image:url(/static/img/skins/default/overlay_reversegradient_light_28.png);
+    background-repeat:repeat-x;
+}
+
+
+.splHeader h2 {
+
+}
+
+.splHeader-secondary {
+    background-color: #E5F2F5;
+    _background-position: 0px -111px;
+}
+/* navigation bar */
+.splHeader-navigation {
+    background-image: none;
+    _background-image: none;
+}
+
+.splHeader h2 a {
+    font-weight:normal;   
+}
+
+/* Specific overrides */
+.TitleBar .splHeader, .FieldPickerPopup .splHeader-primary {
+    background-color: #edede7;
+    background-image: none;
+}
+
+.FlashTimeline .splHeader-primary {
+    background: #fff url(/static/img/skins/default/bg_innertopshadow_28.png) repeat-x;
+}
+
+
+
+/* borders 
+---------------------------------*/
+* {
+    border-color: #ccc;
+}
+
+/* Dashboards 
+_______________________________*/
+
+/* dashboard headers */
+
+body.splTemplate-dashboard {
+    background-color: #EDEDE7;
+}
+.splHeader-dashboard {
+    background-image: none;
+}
+.splHeader-dashboard {
+    background-color: transparent;
+}
+.splHeader-dashboard h2, 
+.dashboardContent .ServerSideInclude h2,
+.dashboardContent .GenericHeader h3 {
+    font-size:12px;
+    color: #333;
+    font-weight:bold;
+    background-color: transparent;
+}
+/* rounded box for dashboard modules */
+.dashboardCell {
+    background: #fff;
+    border-style: solid;
+    border-width: 1px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: #ccc 0 0 5px;
+    _background-image: none;
+}
+
+.dashboardContent .SimpleResultsTableResults, .dashboardContent .EventsViewer {
+    background-image: none;
+    background: transparent;
+}
+
+/* form elements
+_________________________________*/
+fieldset legend {
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+}
+fieldset legend span{
+    color: #000;
+    font-size: 10px;
+    font-weight: normal;
+}
+input, textarea, select {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+}
+label {
+    font-size: 12px;
+}
+label.disabledLabel {
+    color:#666;
+}
+select option[disabled] {
+    color:#999;
+}
+input.readonly {
+    background-color: #999;
+}
+p.exampleText {
+    color: #666;
+}
+p.fieldsetHelpText {
+    color: #666;
+}
+input[disabled]{
+background-color: #f0f0f0;
+color: #333;
+padding-left: 0;
+}
+
+/* tables
+------------------------------*/
+table.splTable {
+    border-color: #999;   
+}
+table.splTable th {
+    border-color: #999;
+}
+table.splTable th a {
+    color: #000;
+}
+table.splTable td {
+    border-color: #CCC;
+}
+.empty_results {
+	background: #E5F2F5;
+	border: 0px !important;
+	font-size: 12px;
+	font-weight: normal !important;
+	padding: 10px !important;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	color: #666 !important;
+}
+
+/* sorting */
+.splSortNone, .splSortAsc, .splSortDesc {
+    background-image: url(/static/img/skins/default/splIcons.gif);
+	background-position: -67px -446px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}    
+.splSortDesc {
+	background-position: -67px -365px;
+}
+.splSortDesc:hover {
+	background-position: -67px -385px;	
+}
+.splSortAsc{
+	background-position: -67px -385px;
+}
+.splSortAsc:hover {
+    background-position: -67px -366px;
+}
+
+/* global elements
+---------------------------------*/
+.splPipe {
+    color:#999;    
+}
+.splDivider {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;   
+}
+#loading  {
+    background-color:#333;
+    color:#fff;
+}  /* I smell a refactor here... */
+#loadingmessage {
+    font-size:18px;
+    background: url(/static/img/skins/default/loading_white.gif) no-repeat 0 0; 
+}
+.popupLoading {
+    background: url(/static/img/skins/default/loading_white.gif) no-repeat 0 20px; 
+    font-size:18px;
+}
+.mouseoverHighlight, .mouseoverHighlight td {
+    background-color:#f5e998;
+}
+
+.searchFieldGhost {
+    border-color: #333;
+}
+.widgeterror { color: red; font-weight: bold; }
+
+.resultStatusMessage {
+    color: #666;
+}
+
+/* the color of the histogram bar. border-right-color = fill */
+div.FlashTimeline {
+    border-right-color: #333;
+}
+
+/* percentage bar graph 
+_________________________________*/
+.splBarGraph {
+    background: #edede7; 
+}
+.splBarGraphBar {
+    background: #333 url(/static/img/skins/default/overlay_gradient_28.png) repeat-x; 
+}
+.splBarGraphValue {
+    
+} 
+
+.graphLoading {
+    padding-bottom: 5px;
+}
+
+/* popups 
+---------------------------------*/
+
+.popupContainer {
+    border-color: #666;
+    -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+    -webkit-box-shadow: #222 0 0 8px;
+}
+
+.wizardPopup .popupContent iframe {
+    width:400px;
+    border:none;
+    display: block;
+}
+
+.fieldValuePopup {
+    border-color: #666;
+    -moz-box-shadow: none; /* needs dropshadow for others than ff3.5 and safari 4, removing this one and adding the jank normal dropshadow from menu*/
+    -webkit-box-shadow: none;
+    border: none;
+}
+.fieldValuePopup .fieldValuePopupInner {
+    border:1px solid #CCC;   
+}
+
+/* fieldpicker popup */
+.fieldLayers .popupContainer {
+    border-color: #ccc;
+}
+
+
+
+/* popup header bar */
+.splHeader-popup {
+    background: #000 url(/static/img/skins/default/overlay_gradient_28.png) repeat-x 0 0; 
+    _background: #000 url(/static/img/skins/default/backgrounds_ie6.gif) repeat-x 0 -450px;        
+}
+.splHeader-popup h2 {
+    color:#FFF; 
+    font-size:14px;  
+}
+
+.splHeader-popup, .splHeader-popup h2 {
+	cursor: move;
+}
+
+/* popup content */
+.popupContent {
+    background-color: #FFF;
+}
+
+.popupContent .error, .wizard .error {
+    font-size: 12px;
+    background: #af4444;
+	margin: 10px;
+	margin-bottom: 0px;
+	
+    -moz-border-radius:4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
+}
+
+/* popup footer (button container) */
+.popupFooter {
+    background: #edede7 url(/static/img/skins/default/overlay_topInnerShadow_35.png) repeat-x; 
+    _background: #000 url(/static/img/skins/default/backgrounds_ie6.gif) repeat-x 0 -231px;               
+}
+
+/* Field Value popup-specific styles */
+
+.fieldValuePopup h3 em {
+    font-size:11px;
+}
+.fieldValuePopup table th.fieldName {
+    font-weight: normal;    
+}
+
+.fieldValuePopup table td, .fieldValuePopup table th {
+    color:#333;
+    border-bottom-style: dotted;
+    border-bottom-width: 1px;
+}
+
+.fieldValuePopup table tr.fieldNameHeaderRow th {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.fieldValuePopup table tr.fieldNameHeaderRow td {
+    font-weight:bold;
+    color:#000;   
+    border-bottom: none;
+}
+.fieldValuePopup p.reportLinks,
+.fieldValuePopup div.reportLinks,
+{
+    -moz-border-radius: 4px;
+}
+
+/* overlays and shadows
+---------------------------------*/
+.splOverlay, .splOverlay-white {
+    background-color: #000;    
+    opacity:0.7;
+    filter:alpha(opacity=70);
+}
+.splOverlay-white {
+    background-color:#FFF;  
+}
+
+.splShadow {
+    background: url(/static/img/skins/default/shadow_soft.png) no-repeat bottom right;
+    -moz-border-radius-bottomleft: 16px;
+    -moz-border-radius-topright: 17px;
+    -webkit-border-top-right-radius: 17px;
+    -webkit-border-bottom-left-radius: 17px;
+    _background: none;
+}
+
+/* buttons 
+---------------------------------*/
+
+.splButton-primary, .splButton-secondary {
+    background: url(/static/img/skins/default/overlay_gloss_28.png) repeat-x left -2px;
+    color: #FFF;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:12px;
+    border: none; 
+    /* corner rounding for good browsers */
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    _background-image: none;
+}
+.splButton-primary {
+    background-color: #333;
+}
+.splButton-primary:hover, .splButton-primary:focus {
+    background-color: #5e8d3d;   
+}
+.splButton-secondary {
+    background-color:#999;   
+}
+.splButton-secondary:hover, .splButton-secondary:focus {
+    background-color: #808080;   
+}
+
+/* Splunk search button */
+
+/* search button */
+input.searchButton {
+    background-color: #333;
+    background-image: url(/static/img/skins/default/search_button.png);
+    /* white > */
+    background-position: -40px 0px;
+    /* black > -- uncomment for black arrow. --
+    background-position: -40px 0px;
+    */
+    /* corner rounding for good browsers */
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;   
+    
+    _background-image: url('/static/img/skins/default/green_search_button.png');
+    _background-repeat: no-repeat;
+    _background-position: 0px -74px; 
+}
+
+/* button wrapper */
+.splButtonWrapper {
+    border-top-width:1px;
+    border-top-style:solid;   
+}
+
+/* icons 
+---------------------------------*/
+.splIcon {
+    background-image: url(/static/img/skins/default/splIcons.gif);
+    background-color: #999;
+}
+
+/*-- external link icon --*/
+.spl-icon-external-link-xsm {
+	background: transparent url(/static/img/skins/default/icon-external-xsm.png) no-repeat 0 0;
+	_background: transparent url(/static/img/skins/default/icon-external-xsm-ie6.png) no-repeat 0 0;
+	background-position: 0% 50%;
+}
+.spl-icon-external-link-xsm  {
+	display:inline-block;
+	padding-left: 12px;
+	margin-left: 5px;
+}
+.spl-icon-external-link-xsm.inline-icon {
+	margin-left: 0px;
+}
+
+/*-- sidebar collapse icon --*/
+.splIcon-sidebar-open { background-position: 0px -60px; }
+.splIcon-sidebar-open:hover { background-position: -20px -60px;}
+.splIcon-sidebar-closed { background-position: 0px -80px; }
+
+/*-- zoom in/out buttons --*/
+.splIcon-zoom-in, .splIcon-zoom-out {
+    -webkit-border-radius: 6px;
+    border-radius: 5px;
+}
+html>/**/body .splIcon-zoom-in, html>/**/body .splIcon-zoom-out, x:-moz-any-link, x:default { /* do rounding for ff3, not ff2 */
+    -moz-border-radius: 5px;
+}
+.splIcon-zoom-in { background-position: 0px -40px; }
+.splIcon-zoom-out { background-position: 0px -20px; }
+.splIcon-zoom-in:hover { background-position: -20px -40px; }
+.splIcon-zoom-out:hover { background-position: -20px -20px; }
+
+/*-- linear and log scale buttons --*/
+.splIcon-logscale, .splIcon-linscale {
+    background-image: url(/static/img/skins/default/splIcons.gif);
+    border:1px solid transparent;
+    _border:1px solid #FFF;   
+}
+.splIcon-logscale { background-position: 0px -280px; }
+.splIcon-linscale { background-position: 0px -300px; }
+.splIcon-logscale:hover { background-position: -20px -280px; }
+.splIcon-linscale:hover { background-position: -20px -300px; }
+
+/*-- clear buttons --*/
+.splIcon-clear {
+    -webkit-border-radius: 6px;
+    border-radius: 5px;
+    background-position: 0px 0px;   
+}
+html>/**/body .splIcon-clear, x:-moz-any-link, x:default { /* do rounding for ff3, not ff2 */
+    -moz-border-radius: 5px;
+}
+.splIcon-clear:hover { background-position: -20px 0px; }
+
+/*-- close icons --*/
+.splIcon-close { background-position: 0px 0px; }
+.splIcon-close:hover { background-position: -20px 0px; }
+
+/*-- arrow icons --*/
+.splIcon-arrow-n, .splIcon-arrow-e, .splIcon-arrow-s, .splIcon-arrow-w {
+    -webkit-border-radius: 6px;
+    border-radius: 5px;  
+    background-color: #999;
+}
+html>/**/body .splIcon-arrow-n, html>/**/body .splIcon-arrow-s, html>/**/body .splIcon-arrow-e, 
+html>/**/body .splIcon-arrow-w, x:-moz-any-link, x:default { /* do rounding for ff3, not ff2 */
+    -moz-border-radius: 5px;
+}
+
+/*-- results view buttons --*/
+.splIcon-events-list, .splIcon-events-table, .splIcon-results-table {
+    background-image: url(/static/img/skins/default/splIcons.gif);
+}
+.splIcon-events-list { background-position: 0px -180px; }
+.splIcon-events-table { background-position: 0px -200px; }
+.splIcon-results-table { background-position: 0px -220px; }
+.splIcon-events-list:hover { background-position: -20px -180px; }
+.splIcon-events-table:hover { background-position: -20px -200px; }
+.splIcon-results-table:hover { background-position: -20px -220px; }
+
+/* triangles */
+/* Note: to separate color from implementation, we're using a numbering system to differentiate colors.  
+   1=grey,2=white,3=green,4=black,5=blue.  If the icon sprite changes, the number mapping to colors would be different */
+
+/* state interaction
+_________________________________*/
+
+.fatal, .error, .warn, .info, .persistent {
+    background: url(/static/img/skins/default/overlay_gradient_28.png) repeat top left;
+    _background: #000 none;
+    font-weight: bold;
+}
+.fatal {
+    background-color: #a62f2f;
+    color: #fff;
+}
+.error {
+   background-color: #a62f2f; /* #c07a16; */
+   color: #fff; 
+}
+.warn {
+   background-color: #ffee91; 
+   color: #000; 
+}
+.info {
+   background-color: #e8f8ff;
+   color: #000;
+}
+.persistent {
+   background-color: #ffee91;
+   color: #000; 
+}
+
+.text_list {
+	padding:3em 4em;
+	/*position:absolute;
+	right:3em;*/
+	color:#333;
+	font-size:150%;
+}
+
+.text_list li {
+	padding:1em 1em;
+	list-style:none;
+}
+
+.text_list li:before { content:'✔ '; float:left; display:block; height:2em; margin-right:1em;}
+
+/* menu classes 
+---------------------------------*/
+
+.splIcon {
+	background-color:transparent !important;
+	background-image:url("splIcons.gif");
+	margin-left:2px;
+}
+
+.text {
+	margin:2em;
+}
+.splMenu {
+    font-size: 11px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* primary menu - white */
+.splMenu-primary, .splMenu-primary a {
+    color: #333;
+}
+.splMenu-primary li.disabled a {
+    color:#999;
+}   
+.splMenu-primary ul {
+    background-color: #FFF;
+}
+.splMenu-primary .actionsMenuDivider {
+}
+
+.actionsMenu {
+	margin-top:3px;
+}
+
+/* primary menu hover styles */
+.splMenu-primary li:hover {
+    background: #f3ecbb;    
+}
+.splMenu-primary ul li.htmlBlock:hover {
+    background-color: transparent;
+}
+
+/* secondary menu - black */
+.splMenu-secondary, .splMenu-secondary a {
+    color: #CCC;
+}
+.splMenu-secondary li.disabled a {
+    color:#999;
+}   
+.splMenu-secondary ul {
+    color:#000;
+    background-color: #dadada;
+    -webkit-border-radius: 4px;
+    -webkit-border-top-left-radius: 0;
+    -moz-border-radius: 4px;
+    -moz-border-radius-topleft: 0;
+    border-radius: 4px;
+    border-top-left-radius: 0;
+    
+}
+
+/* primary menu hover styles */
+.splMenu-secondary li:hover {
+    background-color: #000;
+    color:#fff;
+}
+
+.splMenu-secondary li:hover a{
+    color:#fff !important;
+}
+
+
+
+.splMenu-secondary a:hover {
+    color: #FFF;   
+}
+.splMenu-secondary ul li.htmlBlock:hover {
+    background-color: transparent;
+}
+
+/* Tab styles
+-------------------------------*/
+
+.tabsWrapper {
+    background-color: #bdbdb7;
+}
+ul.tabs li {
+    background: #666 url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat 0 -68px;
+}
+ul.tabs li a {
+    background: #666 url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat right -102px;
+    color: #FFF;
+    font-size: 12px;
+}
+/* on state */
+ul.tabs li.selected {
+    background-color: #FFF;
+    background: #FFF url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat 0 0;
+}
+ul.tabs li.selected a {
+    color: #333;
+    background: #FFF url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat right -34px;
+}
+
+/* jquery ui styles 
+_______________________________*/
+
+/* datepicker styles */
+.ui-datepicker {
+    border: 1px solid #ccc;
+    background: #FFF;
+}
+.ui-datepicker a {
+    color: #333;
+}
+.ui-datepicker-inline {
+    border-style: solid;
+    border-width: 1px;
+}
+.ui-datepicker-header {
+    background: #edede7 url(/static/img/skins/default/overlay_gradient_28.png) repeat-x scroll 0 -5px;
+    _background: #edede7 url(/static/img/skins/default/backgrounds_ie6.gif) repeat-x scroll 0 -5px;
+} 
+.ui-datepicker-header a {
+    background-image: url(/static/img/skins/default/splIcons.gif);
+    background-repeat: no-repeat;
+}
+.ui-datepicker-prev {
+    background-position: -67px -418px;
+}
+.ui-datepicker-next {
+    background-position: -67px -398px;
+}
+.ui-datepicker-current-day {
+    background-color: #a8c479;
+}
+
+/* resizable styles */
+.ui-resizable-s { 
+    background:#cdcdc7 url(/static/img/skins/default/bg_resizer.gif) center no-repeat !important;  
+    _font-size:0;
+}
+
+/* TimeSpinner styles */
+.TimeSpinner {
+	border: 1px solid #ccc;
+}
+
+/***********************************
+    Module styles 
+************************************/
+
+/* Dev note: putting these in here for now, figuring out what refactoring can be done later */
+
+
+/*** Gandalf ***/
+
+/* TimeRangeBinning */
+.TimeRangeBinning .trbToggle {
+    font-size:12px;
+}
+.TimeRangeBinning .trbToggle span.splIcon-triangle {
+    background-position: -87px -407px;
+    background-color: transparent;
+}
+.TimeRangeBinning .trbOn span.splIcon-triangle {
+    background-position: -87px -367px;
+}
+
+/*** Jobs ***/
+
+/* Job Status */
+.JobStatus {
+
+}
+
+
+.JobStatus .output .splHeader {
+}
+
+.JobStatus .output .scanned,
+.JobStatus .output .results {
+    font-style:normal;
+    font-size:12px;
+}
+.JobStatus .output .running h2,
+.JobStatus .output .runningReport h2,
+.JobStatus .output .finalizing h2 {
+    background: url(/static/img/skins/default/loader.gif) left no-repeat;
+}
+
+.JobStatus .output .complete h2 {
+    background: url(/static/img/skins/default/icon_complete.png) left no-repeat;
+    _background-image: url(/static/img/skins/default/icon_complete_ie6.png);
+}
+
+/* link icons */
+
+.JobStatus .output ul li {
+/*     background: url(/static/img/skins/default/bg_hash_grey.gif) no-repeat 0 6px; */
+    line-height: normal;
+    padding: 0 0 0 -1px;
+    _background-image: none;
+}
+
+.JobStatus .output ul li:hover {
+}
+
+.JobStatus a {
+    margin: 0;
+    padding: 0 5px 0 23px;
+    color: #000;
+    display: block;
+    line-height: 28px;
+
+}
+
+.JobStatus a.alertwizard {
+    background: url(/static/img/skins/default/icon_alert.png) 5px 7px no-repeat;
+    _background-image: url(/static/img/skins/default/icon_alert_ie6.png);
+}
+
+.JobStatus a.dashboardwizard {
+    background: url(/static/img/skins/default/icon_dashboard.png) 5px 7px no-repeat;
+    _background: url(/static/img/skins/default/icon_dashboard_ie6.png) 5px 7px no-repeat;
+}
+
+.JobStatus a.savewizard {
+    background: url(/static/img/skins/default/icon_save.png) 5px 6px no-repeat;
+}
+
+.JobStatus a.save {
+    background: url(/static/img/skins/default/icon_save.png) 5px 7px no-repeat;
+}
+
+.JobStatus a.background {
+    background: url(/static/img/skins/default/button_background.png) 5px 7px no-repeat;   
+    _background-image: url(/static/img/skins/default/button_background_ie6.png);
+}
+
+.JobStatus a.finalize {
+    background: url(/static/img/skins/default/button_complete.png) 5px 7px no-repeat; 
+    _background-image: url(/static/img/skins/default/button_complete_ie6.png);   
+}
+
+.JobStatus a.pause, .JobStatus a.unpause {
+    background: url(/static/img/skins/default/button_pause.png) 5px 7px no-repeat;   
+    _background-image: url(/static/img/skins/default/button_pause_ie6.png);   
+}
+
+.JobStatus a.unpause {
+    background: url(/static/img/skins/default/button_play.png) 5px 7px no-repeat;   
+    _background-image: url(/static/img/skins/default/button_play_ie6.png);   
+}
+
+.JobStatus a.cancel {
+    background: url(/static/img/skins/default/button_cancel.png) 5px 7px no-repeat;    
+    _background-image: url(/static/img/skins/default/button_cancel_ie6.png); 
+}
+
+.JobStatus a.resultsLink {
+    background: url(/static/img/skins/default/icon_graph.png) 5px 6px no-repeat;    
+}
+
+/* IE6 removal of gradient overlays */
+.JobStatus .splHeader {
+   _background-image: none;   
+}
+
+.JobStatus .autoPauseTip {
+    color: #800;
+}
+.JobStatus .autoPauseTip a {
+    color: #1a7996;
+}
+
+/*** Nav ***/
+
+/* AppBar */
+ul.appBarNav li a:hover,
+ul.appBarNav li a.menuOpen {
+    background: url(/static/img/skins/default/overlay_white_28.png) repeat-x 0 0;
+    _background: url(/static/img/skins/default/backgrounds_ie.gif) repeat-x 0 -727px; 
+}
+ul.appBarNav li a {
+    font-size: 11px;
+    font-weight: bold;
+}
+.AppBar .splMenu-primary ul li.splUserCreated {
+    background-image: url(/static/img/skins/default/splIcons.gif);
+    background-repeat: no-repeat;
+    background-position: -3px -536px;   
+}
+
+.AppBar {
+	background-image:url("footer_logo.png");
+	background-position:94% 0;
+	background-repeat:no-repeat;
+}
+/* BreadCrumb */
+.BreadCrumb {
+    font-size:14px;
+}
+.BreadCrumb .gt {
+    color:#888;   
+}
+
+/* TitleBar */
+.TitleBar div.menuOpen {
+    background-color: #CCC;
+}
+.TitleBar h2 em {
+    font-style:normal; /* wtf? */
+}
+.TitleBar .splPipe {
+    font-size:12px; 
+}
+.TitleBar .splHeader {
+	border:none;
+}
+
+/*** Results header ***/
+h2 .timeRangeStr {
+    font-weight: normal;
+}
+
+/*** Message ***/
+.Message ol {
+    font-size: 0px;
+    line-height: 1;
+}
+.Message ol li {
+    font-size: 11px;
+    line-height:28px;
+}
+
+/*** Paginator ***/
+
+.Paginator a, .Paginator .disabled:hover {
+    border-style: solid;
+    border-width: 1px;
+    border-color: transparent;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    _border-width:0px;
+}
+
+.Paginator .active a, .Paginator .active a:hover {
+    background-color: #999;
+    border-color: #999;
+    color: #fff;
+}
+
+.Paginator a:hover {
+    border-color: #ccc;
+    text-decoration:none;
+}
+
+.Paginator .previous, .Paginator .next {
+    color:#999;
+}
+
+
+/*** Prototypes ***/
+
+/* SimpleEventsViewer */
+
+.SimpleEventsViewer {
+    background-color:#fff;
+}
+.SimpleEventsViewer span.searchTermHighlight {
+    background-color:#f5e998;
+}
+.SimpleEventsViewer .eventFields {
+    color: LightSlateGrey;
+}
+.SimpleEventsViewer .eventFields .value {
+    color: #000;
+}
+
+/*** Results ***/
+
+/* EventsViewer */
+
+.EventsViewer, .SimpleResultsTableResults {
+}
+
+.EventsViewerScroller {
+    border-top-style: solid;
+    border-top-width: 1px;
+}
+.EventsViewer .header {
+	font-weight:normal;
+	font-size:11px;
+	color:#333;
+}
+.EventsViewer .header em {
+	font-weight:bold;
+	font-style:normal;
+}
+
+.EventsViewer .tb {
+	border:1px solid red;
+}
+.EventsViewer .tb h2 {
+	font-size:11px;
+	font-weight:bold;
+}
+.EventsViewer .tb h3 {
+	font-size:10px;
+	font-weight:bold;
+}
+.EventsViewer .tb td:first-child {
+	color:#666;
+}
+.EventsViewer .default .pos {
+	font-style:normal;
+	font-size:11px;
+	color:#bbb;
+}
+.EventsViewer .default .time {
+	font-style:normal;
+	font-size:11px;
+	color:#666;
+}
+.EventsViewer .default .audit {
+    font-style:normal;
+    display:block;
+    padding:2px 0px 4px 20px;
+    color:#666;        
+}
+/* BEGIN NOTICE: decoration_audit_ class names currently have no indirection, do not change! */
+.EventsViewer .default .decoration_audit_valid {
+    background:url(/static/img/skins/default/audit_valid.gif) no-repeat;    
+}
+.EventsViewer .default .decoration_audit_gap {
+    background:url(/static/img/skins/default/audit_gap.gif) no-repeat;
+}
+.EventsViewer .default .decoration_audit_tampered {
+    background:url(/static/img/skins/default/audit_tampered.gif) no-repeat;
+}
+.EventsViewer .default .decoration_audit_cantvalidate {
+    background:url(/static/img/skins/default/audit_cantvalidate.gif) no-repeat;     
+}
+/* END NOTICE: decoration_audit_ class names currently have no indirection, do not change! */
+.EventsViewer .default .event {
+	font-family:Consolas, Monaco, Courier New, monospace;
+	font-size: 12px;
+	color:#333;
+}
+.EventsViewer .default .a, .EventsViewer .default .h, .EventsViewer .default .fields .v:hover, .EventsViewer .default .fields .tg:hover, .EventsViewer .default .time:hover {
+	background-color:#f5e998;
+}
+.EventsViewer .default .showinline {
+	color:#4D9BB3;
+}
+.EventsViewer .default .fields li {
+	color:#778899;
+}
+.EventsViewer .default .fields em {
+	font-style:normal;
+}
+.EventsViewer .default .fields .k {
+	color:#999;
+}
+.EventsViewer .default .fields .v {
+	color:#333;
+}
+.EventsViewer .default .fields .tg {
+	color:#999;
+	font-style:italic;
+}
+.EventsViewer .default .fields .fm {
+	background: url(/static/img/skins/default/splIcons.gif) no-repeat -67px -364px;	
+	color:#FFF;
+}
+.EventsViewer .default .actions {
+    background-position: -23px -323px;
+    background-color:#999; 
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border: 1px solid #999;
+}
+.EventsViewer .default .actions:hover {
+	background-color: #666;
+	border-color: #666;
+}
+/* BEGIN: tag field popup styles */
+.tagfieldpopup {
+	background:#FFF;
+}
+.tagfieldpopup input {
+	font-size:11px;
+	color:#333;
+}
+
+
+
+/* FancyChartTypeFormatter */
+.FancyChartTypeFormatter .chartTypeTitle {
+    font-size: 12px;
+}
+.FancyChartTypeFormatter .chartTypeActivator {
+    border-style: solid;
+    border-width: 1px;
+    background: url(/static/img/skins/default/overlay_gradient_28.png) repeat-x 0 0;
+}
+.FancyChartTypeFormatter .chartTypeActivator span {
+    background: url(/static/img/skins/default/arrows.gif) no-repeat 0 0 ;
+}
+.FancyChartTypeFormatter .chartTypeMenu ul {
+    background-color:#FFF;
+    border-style: solid;
+    border-width: 1px;   
+}
+.FancyChartTypeFormatter .chartTypeMenu li:hover {
+    background-color: #f3ecbb;
+}   
+.FancyChartTypeFormatter .chartTypeActivator a,
+.FancyChartTypeFormatter .chartTypeMenu li a {
+    color:#333;
+    text-decoration:none;
+    font-size:12px;
+    background-image:url(/static/img/skins/default/chart_type_icons.gif); 
+    background-repeat:no-repeat;
+    background-position: 5px -45px;  
+}
+.FancyChartTypeFormatter .chartTypeMenu li.column a,
+.FancyChartTypeFormatter .chartTypeActivator a.column {
+    background-position: 5px 3px;
+}
+.FancyChartTypeFormatter .chartTypeMenu li.line a,
+.FancyChartTypeFormatter .chartTypeActivator a.line {
+    background-position: 5px -45px;
+}
+.FancyChartTypeFormatter .chartTypeMenu li.area a,
+.FancyChartTypeFormatter .chartTypeActivator a.area {
+    background-position: 5px -94px;
+}
+.FancyChartTypeFormatter .chartTypeMenu li.bar a,
+.FancyChartTypeFormatter .chartTypeActivator a.bar {
+    background-position: 5px -144px;
+}
+
+/* FlashTimeline */
+/*
+  background-color -> controls bgcolor
+  border-left-color -> controls foregroundColor
+  color -> controls fontColor
+  border-right-color -> controls seriesColor
+*/
+
+
+/**********************************
+Flash timeline and charts
+***********************************/
+
+div.FlashTimeline {
+    color: #000;
+    border-left-color: #CCC;
+    border-right-color: #333;
+}
+
+/* FlashTimeline */
+/*
+  background-color -> controls bgcolor
+  border-left-color -> controls foregroundColor
+  color -> controls fontColor
+  border-right-color -> controls seriesColor
+*/
+div.FlashTimeline {
+    background-color: #fff;
+    border-left-color: #000;
+    color: #333;
+}
+
+div.FlashTimeline h2 {
+    font-weight: normal;
+    font-size: 11px;
+}
+div.FlashTimeline a.logScaleSelected span,
+div.FlashTimeline a.linScaleSelected span {
+    border: 1px solid #999;
+    background-color: #999;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
+div.FlashTimeline a.logScale:hover .splIcon-logscale { background-position: -20px -280px; }
+div.FlashTimeline a.linScale:hover .splIcon-linscale { background-position: -20px -300px; }
+
+div.FlashTimeline a.logScaleSelected span,
+div.FlashTimeline a.logScaleSelected:hover span.splIcon-logscale {
+    background-position: -40px -280px;
+}
+div.FlashTimeline a.linScaleSelected span,
+div.FlashTimeline a.linScaleSelected:hover span.splIcon-linscale {
+    background-position: -40px -300px;
+}
+  
+.FlashWrapperContainer {
+    padding-bottom: 7px;
+    _padding-bottom:0;
+} 
+
+
+/* FlashChart */
+/*
+  background-color -> controls bgcolor
+  border-left-color -> controls foregroundColor
+  color -> controls fontColor
+*/
+div.FlashChart {
+    background-color: #fff;
+    border-left-color: #000;
+    color: #000;
+}
+
+/* MultiFieldViewer + SuggestedFieldViewer */
+.MultiFieldViewer .fieldTabs .mouseoverHighlight,
+.MultiFieldViewer .fieldTabs .selected,
+.SuggestedFieldViewer .fieldTabs .mouseoverHighlight,
+.SuggestedFieldViewer .fieldTabs .selected {
+    background-color:#C2D4DA;
+}
+
+.MultiFieldViewer .fieldTabs .mouseoverHighlight a,
+.SuggestedFieldViewer .fieldTabs .mouseoverHighlight a {
+    background-image: url(/static/img/skins/default/graph_icon.png);
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+
+.inlineFieldHeader h4 {
+    font-weight: normal;
+}
+
+/* Count */
+.Count label, .Count select {
+    font-size: 11px;
+}
+
+/* EnablePreview */
+.pageControls .EnablePreview label {
+    font-size:11px;   
+}
+
+/* ResultsActionsButtons */
+.ResultsActionButtons .saveButton span p.splIcon {
+    background-position: -27px -367px;
+}
+
+/* SimpleResultsTable */
+table.simpleResultsTable td.pos,
+table.simpleResultsTable th.pos {
+    color: #bbb;
+    border: none;
+}
+table.simpleResultsTable td.lowValue {
+    border: 1px solid blue;
+}
+table.simpleResultsTable td.highValue {
+    border: 1px solid red;
+}
+
+/* SingleValue */
+.SingleValueHolder {
+    background-color: #ccc;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+    background-image:url(/static/img/skins/default/overlay_gradient_50.png);
+    background-repeat: repeat-x;
+    _background-image: none;
+    
+}
+.SingleValue .severe {
+       background-color: #bb2121;
+       color: #fff;
+}
+.SingleValue .high {
+       background-color: #e67918;
+       color: #fff;
+}
+.SingleValue .elevated {
+       background-color: #e9da34;
+       color: #000;
+}
+.SingleValue .guarded {
+       background-color: #4da6df;
+       color: #fff;
+}
+.SingleValue .low {
+       background-color: #72c72d;
+       color: #fff;
+}
+.SingleValue .None {
+       background-color: #999;
+       color: #fff;
+}
+
+/*** Search ***/
+
+/* Field Picker */
+
+.FieldPickerPopup .fpUpdateFields, .FieldPickerPopup .fpUpdateFieldsUpdate {
+    color: #E5F2F5;
+}
+.FieldPickerPopup li.fpSelFieldsNotPresent {
+    color:#999;
+}
+.FieldPickerPopup .fpAddTermCell span.splIcon-arrow-e {
+    background-color:  #333;
+}
+.FieldPickerPopup li.fpSelFieldsNotPresent span {
+    background-color: #CCC;   
+}
+.FieldPickerPopup .fpFilterFields label {
+    font-weight: bold;
+    font-size: 11px;
+}
+.FieldPickerPopup .fpFieldListContainerOuter {
+    _background: url(/static/img/skins/default/field_list_header.png) repeat-x 0 0;
+}
+.FieldPickerPopup .fpFieldListContainerOuter thead tr {
+    background-position: left -5px;
+}
+.FieldPickerPopup .fpFieldListContainerOuter th span {
+    background-color: transparent;
+    background-position:  -67px -441px;
+}
+.FieldPickerPopup .fpFieldListContainerOuter 
+.headerSortUp span {
+    background-position:  -67px -379px;
+}
+.FieldPickerPopup .fpFieldListContainerOuter th.headerSortDown span {
+    background-position:  -67px -360px;
+}
+.FieldPickerPopup .fpFieldList tr.fieldSelected td.fpFieldTerm {
+    color:#999;
+}
+.FieldPickerPopup .fpFieldList tr.fieldSelected td.fpAddTermCell span {
+    background-color: #CCC;
+}
+
+.fpFieldList .splHeader {
+    background-image: url(/static/img/skins/default/overlay_gradient_28.png);
+    _background-image: none;
+}
+
+
+
+/* adding this class on hover via jquery, handles row highlighting and graph icon */
+.FieldPickerPopup .fpFieldList tbody tr:hover, .FieldPickerPopup .fpFieldList tbody tr.mouseoverHighlight {
+    background-color: #f5e998;
+}
+.FieldPickerPopup .fpFieldList tbody tr:hover .fpFieldListSecond a,
+.FieldPickerPopup .fpFieldList tbody tr.mouseoverHighlight .fpFieldListSecond a {
+    background: url(/static/img/skins/default/graph_icon.png) no-repeat center right;
+}
+
+/* TimeRangePicker */
+.TimeRangePicker .timeRangeActivatorWrapper {
+    background-image: url(/static/img/skins/default/overlay_topgradient_white.png);
+    background-repeat: repeat-x; 
+    background-color:#d5d5d1;
+    _background-image:url(/static/img/skins/default/backgrounds_ie6.gif);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px; 
+}
+.trpCustomDateTime .rangeType {
+    border-bottom: 1px solid #CCC;
+}
+.trpCustomDateTime input.disabled {
+    background-color: #DDD;
+    border-color:#DDD;
+    color:#666;
+}
+.trpCustomDateTime .earliestDateTime,
+.trpCustomDateTime .latestDateTime {
+    border: 1px solid #ccc;
+}
+.trpCustomDateTime .dateTimeDisabled {
+    background-color: #DDD;
+    border-color:#DDD;
+    color:#666;
+}
+.trpCustomDateTime .dateTimeDisabled input {
+    background:transparent;
+}
+.trpCustomDateTime input.customDate {
+    border: none;
+    background: transparent;
+}
+.trpCustomDateTime div.outputString {
+    background-color: #ddd;
+    border: 1px solid #ddd;
+    color:#333;
+}
+
+
+/* SearchBar */
+.SearchBar .searchFieldWrapperInner {
+    border-style: solid;
+    border-width: 1px;
+}
+.SearchBar .assistantContainer {
+	background-color: #FFF;
+	border-style: solid;
+    border-width: 1px;
+	border-top: none;
+}
+.SearchBar .assistantActivator {
+    background-color:#333;
+    background-image: url(/static/img/skins/default/overlay_gradient_28.png);
+    _background-image: none;
+    background-repeat: repeat-x;
+}
+.SearchBar .assBar {
+    background-position: 0 0;
+}
+.SearchBar .assTab {
+    background-position: -4px 0px; 
+}
+.SearchBar .assTab span.splIcon-triangle {
+    background-position: -27px -367px; 
+}
+.SearchBar .saRow h4 {
+    color: #333;
+}
+
+.SearchBar .saKeywords .keywordSelected, .saKeywords li:hover {
+    background-color: #f5e998;
+}
+
+
+.SearchBar .saHelpWrapper {
+    background-image: url(/static/img/skins/default/overlay_innerleftshadow.png);
+    _background-image: none;
+}
+
+
+
+
+
+.splSearchControls-inline {
+background-image: url(/static/img/skins/default/overlay_bottomgradient_soft.png);
+background-repeat: repeat-x;
+background-position: bottom;
+_background-image: none;
+}
+
+/*** Report builder ***/
+
+.report_builder_format_report .viewHeader {
+    background-color: transparent;
+    border: 0;
+}
+
+.report_builder_format_report .JobStatus {
+    border: 0;
+}
+.ShowHideHeader {
+    border-top-width: 1px;
+    border-top-style: solid;
+}
+
+
+#ShowHideHeader_1_3_0 {
+}
+
+.splView-report_builder_format_report .panel_row4_col {
+    background: url(/static/img/skins/default/bg_innerbottomshadow_28.png) repeat-x bottom;
+}
+
+/*** Advanced charting ***/
+
+.splView-charting .ResultsHeader .splHeader-primary {
+    background-image: none;
+}
+
+/*** Switchers ***/
+
+/* ButtonSwitcher */
+.ButtonSwitcher ul li.selected .splIcon-events-list {
+    background-position: -40px -180px;   
+}
+.ButtonSwitcher ul li.selected .splIcon-events-table {
+    background-position: -40px -200px;
+}
+.ButtonSwitcher ul li.selected .splIcon-results-table {
+    background-position: -40px -220px;  
+}
+.ButtonSwitcher ul li.disabled {
+    opacity:0.25;
+}
+
+.ButtonSwitcher ul li {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #fff;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;   
+}
+
+.ButtonSwitcher ul li.selected, .ButtonSwitcher ul li.selected:hover {
+    border: 1px solid #999;
+    background-color: #999;
+    
+}
+
+.ButtonSwitcher ul li:hover {
+    border-style: solid;
+    border-width: 1px;
+}
+
+
+
+/* Link Switcher */
+.LinkSwitcher a {
+    font-size: 12px;
+}
+.LinkSwitcher ul li.selected a {
+    color:#333;
+    font-weight: bold;
+    text-decoration:none;
+}
+
+/* ShowHideHeader */
+.ShowHideHeader div.secondary {
+    background-image: none;
+}
+.ShowHideHeader h2 span.splIcon-triangle,
+.FlashTimeline h2 span.splIcon-triangle {
+    background-position: -67px -367px;   
+}
+.ShowHideHeader div.secondary h2 {
+    font-size: 11px;
+    font-weight: normal;
+}
+.ShowHideHeader div.secondary h2 span.splIcon-triangle {
+    background-position: -87px -367px;
+}
+.ShowHideHeader div.secondary h2:hover {
+    text-decoration:underline;
+}
+.ShowHideHeader h2.closed span.splIcon-triangle,
+.FlashTimeline h2.closed span.splIcon-triangle {
+    background-position:  -67px -407px;
+}
+.ShowHideHeader div.secondary h2.closed span.splIcon-triangle {
+    background-position: -87px -407px ;
+}
+
+/* TabSwitcher */
+.TabSwitcher {
+    background-color: #bdbdb7;
+}
+.TabSwitcher ul li {
+    background: #666 url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat 0 -68px;
+}
+.TabSwitcher ul li a {
+    font-size: 12px;
+    background: #666 url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat right -102px;
+    color: #FFF;
+}
+.TabSwitcher ul li.selected {
+    background-color: #FFF;
+    background: #FFF url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat 0 0;
+}
+.TabSwitcher ul li.selected a {
+    color: #333;
+    background: #FFF url(/static/img/skins/default/tab_switcher_rounded_corners.gif) no-repeat right -34px;
+}
+
+/* progress bar */
+
+.JobProgressIndicator .splBarGraph {
+    background-image:url(/static/img/skins/default/overlay_innershadow_4.png);
+    _background-image: none;
+}
+
+.JobProgressIndicator .splBarGraphBar {
+    background-image:url(/static/img/skins/default/overlay_gradient_4.png);
+    _background-image: none;
+}
+
+
+/**********************************
+hacks
+***********************************/
+
+/* safari focus outline  */
+/*
+*:focus {outline: 0;}
+*/
+
+
+a { color: #333 !important; }
+.appBarNav li a:hover {
+	background: none !important;
+	text-decoration:underline !important;
+}
+.auxLinks { display: none; }
+
+
+.splMenu .innerMenuWrapper {
+	border:1px solid #888;
+}
+.splMenu .innerMenuWrapper {
+	background:#ccc;
+	color:#888;
+}
+
+.splMenu ul li a:hover {
+	color:#888;
+	color:#fff;
+}
+
+
+.warn { display:none !important; }
+
+.appLogo {
+    height: 43px; 
+    width:  43px;
+    padding-right: 5px;
+    margin-top:5px;
+    float: left;
+    background: url(appLogo.png) no-repeat 0 0;
+    _background: url(appLogo.gif) no-repeat 0 0;
+}
+
+.appHeaderWrapper h1 {
+    font-family:,'JuraDemiBold','Verdana',Arial,Helvetica,sans-serif !important;
+    font-size:300%;
+}
+
+.viewHeader {
+  float:right;
+  margin-top:-3.5em;
+  margin-right:0.5em;
+}
+
+
+.viewHeader span.splPipe,
+.viewHeader h2 { display:none; }
+
+.splFooter {
+  min-width:60px;
+  min-height:60px;
+  margin:1.3em 1em 0 0;
+  float:right;
+  clear:both;
+  background: #111 url("footer_logo.png") bottom right no-repeat;
+  padding-right: 80px;
+}
+
+.SingleValue .severe {
+       background-color: #bb2121;
+       color: #fff !important;
+}
+.SingleValue .high {
+       background-color: #e67918;
+       color: #fff !important;
+}
+.SingleValue .elevated {
+       background-color: #e9da34;
+       color: #000 !important;
+}
+.SingleValue .guarded {
+       background-color: #4da6df;
+       color: #fff !important;
+}
+.SingleValue .low {
+       background-color: #72c72d;
+       color: #fff !important;
+}
+.SingleValue .None {
+       background-color: #999;
+       color: #fff !important;
+}
+
+.SingleValue .blue {
+       background-color: #3399ff;
+       color: #fff !important;
+}
+
+.SingleValue .severe a {
+       color: #fff !important;
+}
+.SingleValue .high a {
+       color: #fff !important;
+}
+.SingleValue .elevated a {
+       color: #000 !important;
+}
+.SingleValue .guarded a {
+       color: #fff !important;
+}
+.SingleValue .low a {
+       color: #fff !important;
+}
+.SingleValue .None a {
+       color: #fff !important;
+}
+
+.SingleValue .blue a {
+       color: #fff !important;
+}
+/*.JobProgressIndicator , .barGraphWrapper { display:none !important; }*/
+
+.dashboardCell { min-height:10px !important; }
+
+.text {
+	width:45%;
+	margin:0;
+	color:#333;	font-style:italic; text-align:justify;
+	float:right; margin-right:1em; margin-top:-1em;
+	display:none;
+}
+
+/*.splView-status .firstCell .SearchSelectLister { float:left; margin-right:2em !important;}
+.splView-status .firstCell .SubmitButton button { margin-top:2px; }*/
+
+.splView-Informes_sistemas_sumarizado .firstCell .TimeRangePicker,
+.splView-Informes_sistemas_sumarizado .firstCell .SearchSelectLister,
+.splView-Informes_sistemas_sumarizado .firstCell .SubmitButton,
+.splView-Informes_SLAs .firstCell .TimeRangePicker,
+.splView-Informes_SLAs .firstCell .SearchSelectLister,
+.splView-Informes_SLAs .firstCell .SubmitButton,
+.splView-Informes_ITIL .firstCell .TimeRangePicker,
+.splView-Informes_ITIL .firstCell .SearchSelectLister,
+.splView-Informes_ITIL .firstCell .SubmitButton,
+.splView-Informes_sistemas .firstCell .TimeRangePicker,
+.splView-Informes_sistemas .firstCell .SearchSelectLister,
+.splView-Informes_sistemas .firstCell .SubmitButton,
+.splView-Informes_notificaciones .firstCell .TimeRangePicker,
+.splView-Informes_notificaciones .firstCell .SearchSelectLister,
+.splView-Informes_notificaciones .firstCell .SubmitButton,
+.splView-informes_ejecutivos .firstCell .TimeRangePicker,
+.splView-informes_ejecutivos .firstCell .SearchSelectLister,
+.splView-informes_ejecutivos .firstCell .SubmitButton,
+.splView-Informes_Capacity_Planning .firstCell .TimeRangePicker,
+.splView-Informes_Capacity_Planning .firstCell .SearchSelectLister,
+.splView-Informes_Capacity_Planning .firstCell .SubmitButton,
+.splView-Informes_capacity .firstCell .TimeRangePicker,
+.splView-Informes_capacity .firstCell .SearchSelectLister,
+.splView-Informes_capacity .firstCell .SubmitButton,
+.splView-status .firstCell .SearchSelectLister,
+.splView-status .firstCell .StaticRadio,
+.splView-status .firstCell .SubmitButton
+
+{
+	margin:0.5em 0 -0.5em 0;
+	float:left !important; margin-right:3em !important;
+}
+
+.splView-Informes_sistemas_sumarizado .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_sistemas_sumarizado .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_sistemas_sumarizado .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_sistemas_sumarizado .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-Informes_sistemas .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_sistemas .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_sistemas .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_sistemas .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-Informes_SLAs .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_SLAs .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_SLAs .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_SLAs .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-Informes_ITIL .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_ITIL .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_ITIL .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_ITIL .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-Informes_capacity .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_capacity .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_capacity .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_capacity .panel_row1_col .dashboardCell
+{
+        background:transparent; border-color:transparent !important;
+        -webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-Informes_Capacity_Planning .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_Capacity_Planning .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_Capacity_Planning .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_Capacity_Planning .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-Informes_notificaciones .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-Informes_notificaciones .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-Informes_notificaciones .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-Informes_notificaciones .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+.splView-informes_ejecutivos .panel_row1_col .SearchSelectLister select { width:20em; }
+.splView-informes_ejecutivos .panel_row1_col label { font-weight:700; margin-right:0.2em }
+.splView-informes_ejecutivos .panel_row1_col .SubmitButton { float:right !important; margin-right:0.1em !important }
+.splView-informes_ejecutivos .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+
+.splView-alerts .panel_row1_col .SearchSelectLister,
+.splView-notifications .panel_row1_col .SearchSelectLister { float:left !important; margin-right:1em;}
+
+.splView-alerts .panel_row1_col .SearchSelectLister select,
+.splView-notifications .panel_row1_col .SearchSelectLister select,
+.splView-status .panel_row1_col .SearchSelectLister select { width:18em }
+
+.splView-alerts .panel_row1_col .StaticRadio,
+.splView-notifications .panel_row1_col .StaticRadio,
+.splView-status .panel_row1_col .StaticRadio  {  font-weight:00; }
+
+.splView-alerts .panel_row1_col label,
+.splView-notifications .panel_row1_col label,
+.splView-status .panel_row1_col label { font-size:90%; font-weight:700; margin-right:0.2em }
+
+.splView-alerts .panel_row1_col .SubmitButton,
+.splView-notifications .panel_row1_col .SubmitButton,
+.splView-status .panel_row1_col .SubmitButton  { float:right !important; margin-right:0.1em !important }
+
+.splView-alerts .panel_row1_col .dashboardCell,
+.splView-notifications .panel_row1_col .dashboardCell,
+.splView-status .panel_row1_col .dashboardCell
+{
+	background:transparent; border-color:transparent !important;
+	-webkit-box-shadow:none; -moz-box-shadow:none; box-shadow:none
+}
+
+.splView-alerts .panel_row1_col .ServerSideInclude,
+.splView-notifications .panel_row1_col .ServerSideInclude,
+.splView-status .panel_row1_col .ServerSideInclude { float:left; margin-right:15%; }
+
+.splView-alerts .panel_row1_col .TimeRangePicker,
+.splView-notifications .panel_row1_col .TimeRangePicker { float:left;}
+
+.NotReallyASplunkModule.StaticRadio { min-height:60px; float:left }
+.shot { text-align:center; }
+
+.layout {
+	padding-bottom:40px;
+	background:transparent url("footer_logo.png") 98% 100% no-repeat;
+}
+.NotReallyASplunkModule *, .NotReallyASplunkModule label {
+	color:#aaa !important;
+}
+
+.informative {
+	float:left;
+	color:#aaa!important;
+	font-size:x-small;
+	margin-top:0;
+	margin-bottom:0;
+	padding:0;
+}
+
+.text_list {
+	padding:0.5em;
+	margin:2.5em 2em 1em 1em;
+	width:35%;
+}
+
+.text_list ul {
+	margin-top:3em;
+}
+
+.small_text {
+	font-size:98%;
+}
+
+/*
+    ColorBox Core Style:
+    The following CSS is consistent between example themes and should not be altered.
+*/
+#colorbox, #cboxOverlay, #cboxWrapper{position:absolute; top:0; left:0; z-index:9999; overflow:hidden;}
+#cboxOverlay{position:fixed; width:100%; height:100%;}
+#cboxMiddleLeft, #cboxBottomLeft{clear:left;}
+#cboxContent{position:relative;}
+#cboxLoadedContent{overflow:auto;}
+#cboxTitle{margin:0;}
+#cboxLoadingOverlay, #cboxLoadingGraphic{position:absolute; top:0; left:0; width:100%; height:100%;}
+#cboxPrevious, #cboxNext, #cboxClose, #cboxSlideshow{cursor:pointer;}
+.cboxPhoto{float:left; margin:auto; border:0; display:block; max-width:none;}
+.cboxIframe{width:100%; height:100%; display:block; border:0;}
+#colorbox, #cboxContent, #cboxLoadedContent{box-sizing:content-box;}
+
+/* 
+    User Style:
+    Change the following styles to modify the appearance of ColorBox.  They are
+    ordered & tabbed in a way that represents the nesting of the generated HTML.
+*/
+#cboxOverlay{background:url(images/overlay.png) repeat 0 0;}
+#colorbox{}
+    #cboxTopLeft{width:21px; height:21px; background:url(images/controls.png) no-repeat -101px 0;}
+    #cboxTopRight{width:21px; height:21px; background:url(images/controls.png) no-repeat -130px 0;}
+    #cboxBottomLeft{width:21px; height:21px; background:url(images/controls.png) no-repeat -101px -29px;}
+    #cboxBottomRight{width:21px; height:21px; background:url(images/controls.png) no-repeat -130px -29px;}
+    #cboxMiddleLeft{width:21px; background:url(images/controls.png) left top repeat-y;}
+    #cboxMiddleRight{width:21px; background:url(images/controls.png) right top repeat-y;}
+    #cboxTopCenter{height:21px; background:url(images/border.png) 0 0 repeat-x;}
+    #cboxBottomCenter{height:21px; background:url(images/border.png) 0 -29px repeat-x;}
+    #cboxContent{background:#fff; overflow:hidden;}
+        .cboxIframe{background:#fff;}
+        #cboxError{padding:50px; border:1px solid #ccc;}
+        #cboxLoadedContent{margin-bottom:28px;}
+        #cboxTitle{position:absolute; bottom:4px; left:0; text-align:center; width:100%; color:#949494;}
+        #cboxCurrent{position:absolute; bottom:4px; left:58px; color:#949494;}
+        #cboxSlideshow{position:absolute; bottom:4px; right:30px; color:#0092ef;}
+        #cboxPrevious{position:absolute; bottom:0; left:0; background:url(images/controls.png) no-repeat -75px 0; width:25px; height:25px; text-indent:-9999px;}
+        #cboxPrevious:hover{background-position:-75px -25px;}
+        #cboxNext{position:absolute; bottom:0; left:27px; background:url(images/controls.png) no-repeat -50px 0; width:25px; height:25px; text-indent:-9999px;}
+        #cboxNext:hover{background-position:-50px -25px;}
+        #cboxLoadingOverlay{background:url(images/loading_background.png) no-repeat center center;}
+        #cboxLoadingGraphic{background:url(images/loading.gif) no-repeat center center;}
+        #cboxClose{position:absolute; bottom:0; right:0; background:url(images/controls.png) no-repeat -25px 0; width:25px; height:25px; text-indent:-9999px;}
+        #cboxClose:hover{background-position:-25px -25px;}
+
+/*
+  The following fixes a problem where IE7 and IE8 replace a PNG's alpha transparency with a black fill
+  when an alpha filter (opacity change) is set on the element or ancestor element.  This style is not applied to or needed in IE9.
+  See: http://jacklmoore.com/notes/ie-transparency-problems/
+*/
+.cboxIE #cboxTopLeft,
+.cboxIE #cboxTopCenter,
+.cboxIE #cboxTopRight,
+.cboxIE #cboxBottomLeft,
+.cboxIE #cboxBottomCenter,
+.cboxIE #cboxBottomRight,
+.cboxIE #cboxMiddleLeft,
+.cboxIE #cboxMiddleRight {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF);
+}
+
+/*
+  The following provides PNG transparency support for IE6
+  Feel free to remove this and the /ie6/ directory if you have dropped IE6 support.
+*/
+.cboxIE6 #cboxTopLeft{background:url(images/ie6/borderTopLeft.png);}
+.cboxIE6 #cboxTopCenter{background:url(images/ie6/borderTopCenter.png);}
+.cboxIE6 #cboxTopRight{background:url(images/ie6/borderTopRight.png);}
+.cboxIE6 #cboxBottomLeft{background:url(images/ie6/borderBottomLeft.png);}
+.cboxIE6 #cboxBottomCenter{background:url(images/ie6/borderBottomCenter.png);}
+.cboxIE6 #cboxBottomRight{background:url(images/ie6/borderBottomRight.png);}
+.cboxIE6 #cboxMiddleLeft{background:url(images/ie6/borderMiddleLeft.png);}
+.cboxIE6 #cboxMiddleRight{background:url(images/ie6/borderMiddleRight.png);}
+
+.cboxIE6 #cboxTopLeft,
+.cboxIE6 #cboxTopCenter,
+.cboxIE6 #cboxTopRight,
+.cboxIE6 #cboxBottomLeft,
+.cboxIE6 #cboxBottomCenter,
+.cboxIE6 #cboxBottomRight,
+.cboxIE6 #cboxMiddleLeft,
+.cboxIE6 #cboxMiddleRight {
+    _behavior: expression(this.src = this.src ? this.src : this.currentStyle.backgroundImage.split('"')[1], this.style.background = "none", this.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src=" + this.src + ", sizingMethod='scale')");
+}
+
+
+.splMenu-secondary ul {
+	border:none !important;
+}
+
+.splButtonGroup {
+	border-radius:0;
+	-moz-border-radius:0;
+	-webkit-border-radius:0;
+}
+
+.splButton-tertiary:hover {
+	background:#000 !important;
+}
+.splButton-tertiary {
+	border-radius:4px !important;
+	-moz-border-radius:4px !important;
+	-webkit-border-radius:4px !important;
+	background:#333 !important;
+	margin:0 4px !important;
+	width:30px;
+	border:none !important;
+}
+
+table {
+	float:left;
+}
+
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper span {
+	color:#fff;
+}
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper {
+	background-color:#333;
+}
+
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper:hover {
+	background:#000;
+}
+
+table.mainSearchControlsTable .SearchBar .searchFieldWrapper {
+	border-color:#333;
+	background-color:#333;
+}
+
+.nextSteps .splButton-primary.save:hover {
+	background:#000;
+}
+.nextSteps .splButton-primary.save,
+.nextSteps .splButton-primary.create
+{
+	background:#333;
+	margin-right:4px;
+	color:#fff;
+	width:30px;
+}
+
+
+.nextSteps .splButton-primary.save span.splButtonIcon,
+.nextSteps .splButton-primary.create span.splButtonIcon
+{
+	display:block;
+}
+.nextSteps .splButton-primary.save span,
+.nextSteps .splButton-primary.create span {
+	display:none;
+}
+
+
+

@@ -1,0 +1,502 @@
+<endpoint name="data/inputs/snmp">
+  <header>SNMP</header>
+  <breadcrumb>
+    <parent hidecurrent="False">datainputstats</parent>
+    <name>SNMP</name>
+  </breadcrumb>
+  <elements>
+    <element name="sourceFields" type="fieldset">
+      <view name="list"/>
+      <view name="edit"/>
+      <view name="create"/>
+      <elements>
+        <element name="name" label="SNMP Input Name">
+          <view name="list"/>
+          <view name="create"/>
+        </element>
+
+        <element name="spl-ctrl_encrypted_credentials" type="helpstring" label="Encrypting Credentials">
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="helpText"><![CDATA[
+
+    If you require an encrypted credential in your configuration , then you can enter it on the App's setup page<br>
+        <br>
+        Then in your configration below refer to it in the format <code>{encrypted:somekey}</code><br>
+        <br>
+        Where <code>somekey</code> is any value you choose to enter on the setup page to reference your credential.<br>
+    ]]></key>
+        
+    </element>
+
+        <element name="activation_key" label="Activation Key">
+          <view name="list"/>
+          <view name="create"/>
+          <view name="edit"/>
+          <key name="exampleText">Visit &lt;a href="http://www.baboonbones.com/#activation" target="_blank"&gt;http://www.baboonbones.com/#activation&lt;/a&gt; to obtain a non-expiring key</key>
+        </element>
+        <element name="log_level" type="select" label="Log Level">
+            <view name="edit" />
+            <view name="create" />
+            <options>
+                <opt value="NOTSET" label="NOTSET" />
+                <opt value="DEBUG" label="DEBUG" />
+                <opt value="INFO" label="INFO" />
+                <opt value="WARNING" label="WARNING" />
+                <opt value="ERROR" label="ERROR" />
+                <opt value="CRITICAL" label="CRITICAL" />
+            </options>
+            <key name="exampleText">Modular Input script Python logging level for messages written to $SPLUNK_HOME/var/log/splunk/snmpmodinput_app_modularinput.log , defaults to 'INFO'</key>
+        </element>
+        
+        <element name="snmp_mode" type="select" label="SNMP Mode">
+					<onChange>
+
+						<key name="_action">showonly</key>
+						<group_set>
+							<group name="attributes" />
+							<group name="traps" />
+						</group_set>
+						<key name="attributes">attributes</key>
+						<key name="traps">traps</key>
+									
+					</onChange>
+					 <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The SNMP mode to run this stanza in</key>
+          <options>
+            <opt value="attributes" label="Poll Attributes"/> 
+            <opt value="traps" label="Listen For Traps"/>                 
+          </options>
+				</element>
+				
+      
+
+        <element name="use_system_python" type="checkbox" label="Use System Python ?">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Whether or not to use a System Python runtime vs Splunk's built in Python runtime. Defaults to false. You only really need to use a System Python for SNMP v3 applications where you've installed the pycryptodomex package dependency</key>
+        </element>
+
+        <element name="system_python_path" type="textfield" label="System Python Path">
+
+          <view name="edit" />
+          <view name="create" />
+          <key name="exampleText">Defaults to /usr/bin/python</key>
+        </element>
+
+        <element name="run_process_checker" type="checkbox" label="Run Process Checker ?">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Whether or not to autonomously manage the script's running state. This is used in case Splunk doesn't properly stop running snmp.py processes.Defaults to true. </key>
+        </element>
+
+        <element name="ipv6" type="checkbox" label="IP Version 6">
+      
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Whether or not this is an IP version 6 address. Defaults to false.</key>
+        </element>
+        <element name="snmp_version" type="select" label="SNMP Version">
+					<onChange>
+
+						<key name="_action">showonly</key>
+						<group_set>
+							<group name="version_1_2c" />
+							<group name="version_3" />
+						</group_set>
+						<key name="1">version_1_2c</key>
+						<key name="2C">version_1_2c</key>
+						<key name="3">version_3</key>					
+					</onChange>
+					 <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The SNMP Version , 1  / 2C / 3 . Defaults to 2C</key>
+          <options>
+            <opt value="2C" label="2C"/> 
+            <opt value="1" label="1"/>
+            <opt value="3" label="3"/>                  
+          </options>
+				</element>
+				
+        
+        <element name="version_1_2c" type="fieldset">
+					
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+        <element name="communitystring" type="textfield" label="Community String">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Community String used for SNMP version 1 and 2C authentication.Defaults to "public"</key>
+        </element>
+        </elements>
+				</element>
+				
+        <element name="version_3" type="fieldset">
+					
+					<view name="edit" />
+					<view name="create" />
+					<elements>
+        <element name="v3_securityName" type="textfield" label="SNMPv3 USM username">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">SNMPv3 USM username</key>
+        </element>
+
+        <element name="v3_securityEngineId" type="textfield" label="SNMPv3 Engine ID">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">HEX value of the Engine ID ie: 8000000001020304</key>
+        </element>
+        
+        <element name="v3_authKey" type="textfield" label="SNMPv3 Authorization Key">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">SNMPv3 secret authorization key used within USM for SNMP PDU authorization. Setting it to a non-empty value implies MD5-based PDU authentication (defaults to usmHMACMD5AuthProtocol) to take effect. Default hashing method may be changed by means of further Authorization Protocol parameter</key>
+        </element>
+        
+        <element name="v3_privKey" type="textfield" label="SNMPv3 Encryption Key">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">SNMPv3 secret encryption key used within USM for SNMP PDU encryption. Setting it to a non-empty value implies MD5-based PDU authentication (defaults to usmHMACMD5AuthProtocol) and DES-based encryption (defaults to usmDESPrivProtocol) to take effect. Default hashing and/or encryption methods may be changed by means of further Authorization Protocol and/or Encryption Protocol parameters. </key>
+        </element>
+        
+        <element name="v3_authProtocol" type="select" label="SNMPv3 Authorization Protocol">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">May be used to specify non-default hash function algorithm.</key>
+       <options>
+						<opt value="usmHMACMD5AuthProtocol" label="usmHMACMD5AuthProtocol(default)" />
+						<opt value="usmHMACSHAAuthProtocol" label="usmHMACSHAAuthProtocol" />
+						<opt value="usmNoAuthProtocol" label="usmNoAuthProtocol" />
+					</options>
+          </element>
+        				
+        
+        <element name="v3_privProtocol" type="select" label="SNMPv3 Encryption Key Protocol">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">May be used to specify non-default ciphering algorithm.</key>
+       <options>
+						<opt value="usmDESPrivProtocol" label="usmDESPrivProtocol(default)" />
+						<opt value="usmAesCfb128Protocol" label="usmAesCfb128Protocol" />
+						<opt value="usm3DESEDEPrivProtocol" label="usm3DESEDEPrivProtocol" />
+						<opt value="usmAesCfb192Protocol" label="usmAesCfb192Protocol" />
+						<opt value="usmAesCfb256Protocol" label="usmAesCfb256Protocol" />
+						<opt value="usmNoPrivProtocol" label="usmNoPrivProtocol" />
+					</options>
+          </element>
+        
+        </elements>
+				</element>
+       
+       <element name="mibs" type="fieldset">
+					<key name="legend">Custom MIBs</key>
+					<view name="edit" />
+					<view name="create" />
+         
+					<elements>
+					 
+        <element name="mib_names" type="textfield" label="MIB Names">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Comma delimited list of MIB names to be applied ie: IF-MIB,DNS-SERVER-MIB,BRIDGE-MIB.&lt;br/&gt;&lt;br/&gt;Many industry standard MIBs ship with the Modular Input.&lt;br/&gt;You can see which MIBs are available by default by looking in &lt;b&gt;SPLUNK_HOME/etc/apps/snmp_ta/bin/mibs/pysnmp_mibs&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Any custom MIB text files can be dumped in the &lt;b&gt;SPLUNK_HOME/etc/apps/snmp_ta/bin/mibs/user_plaintext_mibs&lt;/b&gt; directory and they will be automatically compiled to Python modules at runtime.</key>
+        </element>
+        
+        </elements>
+		</element>
+
+    <element name="handler" type="fieldset">
+          <key name="legend">Custom Response Handling</key>
+          <view name="edit" />
+          <view name="create" />
+                                       
+          <elements>
+          
+        <element name="response_handler" type="textfield" label="Response Handler">
+
+          <view name="edit" />
+          <view name="create" />
+          <key name="exampleText">Python classname of custom response handler in &lt;b&gt;SPLUNK_HOME/etc/apps/snmp_ta/bin/responsehandlers.py&lt;/b&gt; , defaults to DefaultResponseHandler</key>
+        </element>
+        <element name="response_handler_args" type="textfield" label="Response Handler Arguments">
+
+          <view name="edit" />
+          <view name="create" />
+          <key name="exampleText">Response Handler arguments string ,  key=value,key2=value2</key>
+        </element>
+      
+      </elements>
+    </element>
+		
+        
+       
+				
+        <element name="attributes" type="fieldset">
+					<key name="legend">SNMP Attribute polling settings</key>
+					<view name="edit" />
+					<view name="create" />
+          <view name="list"/>
+                                        
+					<elements>
+        <element name="destination" type="textfield" label="Destination">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">IP or hostname of the device you would like to query, or a comma delimited list</key>
+        </element>
+        
+        <element name="port" type="textfield" label="Port">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The SNMP port. Defaults to 161</key>
+        </element>
+        
+        
+        <element name="object_names" type="textfield" label="Object Names List">
+         
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">1 or more Objects Names , comma delimited , in either textual(iso.org.dod.internet.mgmt.mib-2.system.sysDescr.0) or numerical(1.3.6.1.2.1.1.3.0) format.&lt;br/&gt;&lt;br/&gt; By default a GET operation will be executed.&lt;br/&gt;&lt;br/&gt; If you require bulk operations such as traversing a subtree , then select 1 of the SNMP Walking options below.</key>
+        </element>
+
+        
+	
+        <element name="do_bulk_get" type="checkbox" label="Perform a SNMPWALK using GETBULK">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">GETBULK is generally more efficient (less requests) , but can also return more data in the response PDU</key>
+          
+        </element>
+        <element name="do_get_subtree" type="checkbox" label="Perform a SNMPWALK using GETNEXT">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">GETNEXT fires off more requests , but will return less data in the response PDU</key>
+          
+        </element>
+
+        <element name="non_repeaters" type="textfield" label="Non Repeaters (for GETBULK operations)">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The number of objects that are only expected to return a single GETNEXT instance, not multiple instances. Defaults to 0.</key>
+        </element>
+        <element name="max_repetitions" type="textfield" label="Max Repetitions (for GETBULK operations)">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">The number of objects that should be returned for all the repeating OIDs.Defaults to 25.</key>
+        </element>
+
+        <element name="lexicographic_mode" type="checkbox" label="Lexicographic Mode (for all SNMP Walking operations)">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Walk SNMP agent’s MIB till the end (if checked), otherwise (if not checked) stop iteration when all response MIB variables leave the scope of initial MIB variables in the OID list. Default is false.</key>
+        </element>
+
+        <element name="split_bulk_output" type="checkbox" label="Split Bulk Results">
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Whether or not to split up bulk output into individual events. Defaults to false.</key>
+        </element>
+
+
+        <element name="snmpinterval" type="textfield" label="Interval">
+          <view name="list"/>
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">How often to run the SNMP query (in seconds). Defaults to 60 seconds</key>
+        </element>
+
+         <element name="retries" type="textfield" label="Automatic Retries">
+        
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">Number of times to automatically retry polling before giving up. Defaults to 5</key>
+        </element>
+
+        <element name="timeout" type="textfield" label="Timeout">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">SNMP attribute polling timeout (in seconds). Defaults to 1 second. NOTE: timer resolution is about 0.5 seconds</key>
+        </element>
+        
+        </elements>
+    </element>
+
+     
+        
+        <element name="traps" type="fieldset">
+					<key name="legend">SNMP Trap listener settings</key>
+					<view name="edit" />
+					<view name="create" />
+          <view name="list"/>
+                                        
+					<elements>
+        <element name="trap_host" type="textfield" label="TRAP listener host">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">TRAP listener host. Defaults to localhost.&lt;b&gt;IMPORTANT&lt;/b&gt; : Ensure that you set this to the Hostname or IP that the trap client is sending to.</key>
+        </element>
+        <element name="trap_port" type="textfield" label="TRAP listener port">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">TRAP listener port. Defaults to 162. Ensure that you have the necessary OS user permissions for port values 0-1024</key>
+        </element>
+        <element name="trap_rdns" type="checkbox" label="Reverse DNS lookup of trap sources.">
+          
+          <view name="edit"/>
+          <view name="create"/>
+          <key name="exampleText">TRAP Generating Host reverse DNS lookup. Forces host field to the DNS lookup if available insted of IP address. Defaults to false. Be aware may cause large DNS lookup volume</key>
+        </element>
+         </elements>
+    </element>
+        
+      </elements>
+    </element>
+
+    
+    
+    <element name="sourcetypeFields" type="fieldset">
+                      <view name="list"/>
+                      <view name="edit"/>
+                      <view name="create"/>
+                      <elements>
+                        <element name="spl-ctrl_sourcetypeSelect" type="select" label="Set sourcetype">
+                          <onChange>
+                            <!-- <key name="auto">NONE</key> -->
+                            <key name="_action">showonly</key>
+                            <group_set>
+                              <group name="sourcetype"/>
+                              <group name="spl-ctrl_from_list"/>
+                            </group_set>
+                            <key name="sourcetype">sourcetype</key>
+                            <key name="spl-ctrl_from_list">spl-ctrl_from_list</key>
+                          </onChange>
+                          <options>
+                            <!-- <opt value="auto" label="Automatic"/> -->
+                            <opt value="spl-ctrl_from_list" label="From list"/>
+                            <opt value="sourcetype" label="Manual"/>
+                          </options>
+                          <view name="edit"/>
+                          <view name="create"/>
+                          <!-- <key name="exampleText">Set to automatic and Splunk will classify and assign sourcetype automatically. Unknown sourcetypes will be given a placeholder name.</key> -->
+                          <key name="processValueEdit">[[ e for e in ['sourcetype'] if form_defaults.get(e) ][0]]</key>
+                          <key name="processValueAdd">[[ e for e in ['sourcetype'] if form_defaults.get(e) ][0]]</key>
+                        </element>
+                        <element name="sourcetype" type="textfield" label="Source type">
+                          <view name="list"/>
+                          <view name="edit"/>
+                          <view name="create"/>
+                          <key name="exampleText">If this field is left blank, the default value of snmp_ta will be used for the source type.</key>
+                          <key name="processValueList">_('snmp_ta') if (value==None or value=='') else value</key> 
+                          <key name="submitValueAdd">form_data.get('spl-ctrl_from_list') if form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list' else value if ( form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' and value!=None and value!='' ) else _('snmp_ta')</key>
+                          <key name="submitValueEdit">form_data.get('spl-ctrl_from_list') if form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list' else value if ( form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' and value!=None and value!='' ) else _('snmp_ta')</key>
+                          
+                          <key name="labelList">Source type</key>
+                        </element>
+                        <element name="spl-ctrl_from_list" type="select" label="Select source type from list">
+    <view name="edit"/>
+                          <view name="create"/>
+                  <key name="exampleText">Splunk classifies all common data types automatically, but if you're looking for something specific, you can find more source types in the <![CDATA[<a href="../../../apps/remote">Splunkbase apps browser</a>]]> or online at <![CDATA[<a href="http://www.splunkbase.com/" target="_blank">www.splunkbase.com</a>]]>.</key>
+                          <key name="requiredIfVisible" />
+                          <key name="dynamicOptions" type="dict">
+                            <key name="keyName">title</key>
+                            <key name="keyValue">title</key>
+                            <key name="splunkSource">/saved/sourcetypes</key>
+                            <key name="splunkSourceParams" type="dict">
+                              <key name="count">-1</key>
+                              <key name="search">'pulldown_type=true'</key>
+                            </key>
+                            <key name="prefixOptions" type="list">
+                                <item type="list">
+                                    <item></item>
+                                    <item>Choose...</item>
+                                </item>
+                            </key>
+                          </key>
+                        </element>
+                      </elements>
+                      <key name="legend">Source type</key>
+                      <key name="helpText">Set sourcetype field for all events from this source.</key>
+                    </element>
+                            
+                            
+	<element name="spl-ctrl_EnableAdvanced" type="checkbox" label="More settings" class="spl-mgr-advanced-switch">
+        <view name="edit"/>
+        <view name="create"/>
+          <onChange>
+              <key name="_action">showonly</key>
+              <key name="0">NONE</key>
+              <key name="1">ALL</key>
+              <group_set>
+                <group name="advanced"/>
+              </group_set>
+          </onChange>
+    </element>
+	<element name="advanced" type="fieldset" class="spl-mgr-advanced-options">
+        <view name="edit"/>
+        <view name="create"/>
+        <elements>
+		    <element name="hostFields" type="fieldset">
+		      <key name="legend">Host</key>
+		      <view name="list"/>
+		      <view name="edit"/>
+		      <view name="create"/>
+		      <elements>
+		        <element name="host" type="textfield" label="Host field value">
+		          <view name="edit"/>
+		          <view name="create"/>
+		        </element>
+		      </elements>
+		    </element>  
+		    <element name="indexField" type="fieldset">
+		      <key name="legend">Index</key>
+		      <key name="helpText">Set the destination index for this source.</key>
+		      <view name="list"/>
+		      <view name="edit"/>
+		      <view name="create"/>
+		      <elements>
+		        <element name="index" type="select" label="Index">
+		          <view name="list"/>
+		          <view name="edit"/>
+		          <view name="create"/>
+		          <key name="dynamicOptions" type="dict">
+		            <key name="keyName">title</key>
+		            <key name="keyValue">title</key>
+		            <key name="splunkSource">/data/indexes</key>
+		            <key name="splunkSourceParams" type="dict">
+		              <key name="search">'isInternal=false disabled=false'</key>
+		              <key name="count">-1</key>
+                  <key name="datatype">'all'</key>
+		            </key>
+		          </key>
+		        </element>
+		      </elements>
+		    </element>
+		</elements>
+	</element>
+	<element name="eai:acl.app" label="App">
+      <view name="list"/>
+      <key name="processValueList">entity['eai:acl']['app'] or ""</key>
+    </element>
+
+  </elements>
+</endpoint>

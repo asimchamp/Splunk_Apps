@@ -1,0 +1,136 @@
+<form>
+  <label>Alfresco SOLR Cache</label>
+  <fieldset autoRun="true">
+    <input type="dropdown" token="host">
+      <label>Choose SOLR Server</label>
+      <prefix>host="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <populatingSearch fieldForValue="host" fieldForLabel="host" earliest="-1d@d" latest="now"><![CDATA[| metadata type=hosts index=alfresco | dedup host | table host]]></populatingSearch>
+    </input>
+    <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Cache Hit Ratio</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoCacheHitRatio) as "Alfresco Cache", avg(authorityCacheHitRatio) as "Authority Cache", avg(alfrescoPathCacheHitRatio) as "Alfresco Path Cache", avg(documentCacheHitRatio) as "Document Cache", avg(fieldCacheHitRatio) as "Field Cache", avg(fieldValueCacheHitRatio) as "Field Value Cache", avg(filterCacheHitRatio) as "Filter Cache", avg(queryResultsCacheHitRatio) as "Query Results Cache"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Total Cache Hits</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoCacheHits) as "Alfresco Cache", avg(authorityCacheHits) as "Authority Cache", avg(alfrescoPathCacheHits) as "Alfresco Path Cache", avg(documentCacheHits) as "Document Cache", avg(fieldCacheHits) as "Field Cache", avg(fieldValueCacheHits) as "Field Value Cache", avg(filterCacheHits) as "Filter Cache", avg(queryResultsCacheHits) as "Query Results Cache"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Cache Inserts</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoCacheInserts) as "Alfresco Cache", avg(authorityCacheInserts) as "Authority Cache", avg(alfrescoPathCacheInserts) as "Alfresco Path Cache", avg(documentCacheInserts) as "Document Cache", avg(fieldCacheInserts) as "Field Cache", avg(fieldValueCacheInserts) as "Field Value Cache", avg(filterCacheInserts) as "Filter Cache", avg(queryResultsCacheInserts) as "Query Results Cache"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Cache Size</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoCacheSize) as "Alfresco Cache", avg(authorityCacheSize) as "Authority Cache", avg(alfrescoPathCacheSize) as "Alfresco Path Cache", avg(documentCacheSize) as "Document Cache", avg(fieldCacheSize) as "Field Cache", avg(fieldValueCacheSize) as "Field Value Cache", avg(filterCacheSize) as "Filter Cache", avg(queryResultsCacheSize) as "Query Results Cache"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Cache Lookups</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoCacheLookups) as "Alfresco Cache", avg(authorityCacheLookups) as "Authority Cache", avg(alfrescoPathCacheLookups) as "Alfresco Path Cache", avg(documentCacheLookups) as "Document Cache", avg(fieldCacheLookups) as "Field Cache", avg(fieldValueCacheLookups) as "Field Value Cache", avg(filterCacheLookups) as "Filter Cache", avg(queryResultsCacheLookups) as "Query Results Cache"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Cache Evictions</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoCacheEvictions) as "Alfresco Cache", avg(authorityCacheEvictions) as "Authority Cache", avg(alfrescoPathCacheEvictions) as "Alfresco Path Cache", avg(documentCacheEvictions) as "Document Cache", avg(fieldCacheEvictions) as "Field Cache", avg(fieldValueCacheEvictions) as "Field Value Cache", avg(filterCacheEvictions) as "Filter Cache", avg(queryResultsCacheEvictions) as "Query Results Cache"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+</form>

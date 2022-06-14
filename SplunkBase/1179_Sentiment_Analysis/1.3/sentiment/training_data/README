@@ -1,0 +1,21 @@
+
+These two dataset are small subsets of IMDB and Twitter data.  
+
+For best results in sentiment analysis, train on the same type of
+content that it will be run.  Therefore, if you have or can generate
+your own training data from your data, you will get the best results.
+
+Each dataset must have two top-level directories [train/, test/]
+corresponding to the training and test sets. Each should EITHER have:
+
+  * a subdirectory of the rating expected/desired (e.g., 1/ 2/ 3/ ...)
+    with text files with those ratings inside.  Each text file will be
+    processed as a separate document.  This is how the IMDB data is
+    layed out.
+
+OR 
+
+  * a set of text files with the rating for a name (e.g., 1.txt, 2.txt ...).  
+    Each line of the text file is treated as a separate document.
+    This is how the twitter data is layed out.
+

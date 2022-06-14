@@ -1,0 +1,197 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Citrix ADC Inventory</label>
+   <description>This dashboard displays inventory information about the Citrix ADCs monitored with uberAgent. uberAgent collects inventory data from the primary as well as secondary Citrix ADC.</description>
+
+   <fieldset autoRun="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time range:</label>
+      <default>
+        <earliest>-1d@d</earliest>
+        <latest>now</latest>
+      </default>
+      <change>
+         <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+         <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+         <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+      </change>
+    </input>
+    <input type="dropdown" token="CitrixADCFilterString" searchWhenChanged="true">
+         <choice value="*">All</choice>
+         <default>*</default>
+         <label>Citrix ADC:</label>
+         <fieldForLabel>HostName</fieldForLabel>
+         <fieldForValue>HostName</fieldForValue>
+         <allowCustomValues>false</allowCustomValues>
+         <search>
+            <query>
+               | pivot `uA_DM_CitrixADC_ApplianceInventory` CitrixADC_ApplianceInventory
+                  splitrow HostName
+               | eval sortfield = lower (HostName)
+               | sort sortfield
+               | table
+                  HostName
+            </query>
+         </search>
+    </input>
+  </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_CitrixADC_ApplianceInventory` CitrixADC_ApplianceInventory
+            dc(HwDescription) as HwDescription
+            dc(HostName) as HostName
+            dc(Version) as Version
+            dc(License) as "License type"
+            dc(Model) as "License model"
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Inventory overview</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">HostName</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Citrix ADCs:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">HwDescription</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Hardware models:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">Version</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Firmware versions:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">License type</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#License types:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">License model</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">#License models:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Hardware models (top 10)</title>
+         <chart id="Chart_Panel21">
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixADC_ApplianceInventory` CitrixADC_ApplianceInventory
+                     dc(HostName) as "HW count"
+                     splitrow
+                        HwDescription as "HW model"
+                     filter HostName is $CitrixADCFilterString|s$
+                  | sort limit=10 - "HW count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Firmware versions (top 10)</title>
+         <chart id="Chart_Panel22">
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixADC_ApplianceInventory` CitrixADC_ApplianceInventory
+                     dc(HostName) as "FW count"
+                     splitrow
+                        Version as "Firmware version"
+                     filter HostName is $CitrixADCFilterString|s$
+                  | sort limit=10 - "FW count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Inventory data grouped</title>
+         <input type="dropdown" token="Panel31GroupBy" searchWhenChanged="true">
+            <choice value="HwDescription">Hardware model</choice>
+            <choice value="Version">Firmware version</choice>
+            <choice value="License">License type</choice>
+            <choice value="Model">License model</choice>
+            <default>HwDescription</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="*">
+                  <set token="Panel31GroupByDisplay">$label$</set>
+                  <unset token="DrilldownFilterBy31"></unset>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixADC_ApplianceInventory` CitrixADC_ApplianceInventory
+                     dc(HostName) as "#Hosts"
+                     dc(HwDescription) as "#Hardware models"
+                     dc(Version) as "#Firmware versions"
+                     dc(License) as "#License types"
+                     dc(Model) as "#License models"
+                     splitrow
+                        $Panel31GroupBy$ as "$Panel31GroupByDisplay$"
+                     filter HostName is $CitrixADCFilterString|s$
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy31">$click.value$</set>
+            </drilldown>
+         </table>
+      <html src="citrixadc_inventory_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row depends="$DrilldownFilterBy31$">
+      <panel>
+         <title>Citrix ADCs in selected group: $Panel31GroupByDisplay$ = $DrilldownFilterBy31$</title>
+         <table>
+            <search>
+               <query>
+                    | pivot `uA_DM_CitrixADC_ApplianceInventory` CitrixADC_ApplianceInventory
+                     latest(HwDescription) as "Hardware model"
+                     latest(Version) as "Firmware version"
+                     latest(License) as "License type"
+                     latest(Model) as "License model"
+                     splitrow
+                        HostName as "Host name"
+                     filter HostName is $CitrixADCFilterString|s$
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_citrixadc_inventory?earliest=$earliest$&latest=$latest$&form.CitrixADCFilterString=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+      <html src="citrixadc_inventory_explanation_2.html" depends="$DrilldownFilterBy31$">
+      </html>
+      </panel>
+   </row>
+</form>

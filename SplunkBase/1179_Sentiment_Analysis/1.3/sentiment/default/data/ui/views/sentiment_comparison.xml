@@ -1,0 +1,70 @@
+<form>
+ <label>Sentiment Comparison Dashboard</label>
+
+
+ <fieldset autoRun="true">
+  <input type="text" token="basesearch" >
+      <label>Search:</label>
+      <default>*</default>
+  </input>
+
+   <input type="text" token="key1" >
+      <label>Keyword1:</label>
+      <default>*</default>
+  </input>
+  <input type="text" token="key2" >
+      <label>Keyword2:</label>
+      <default>*</default>
+  </input>
+    
+  <input type="dropdown" token="model">
+      <label>Select Model:</label>
+      <choice>twitter</choice>
+      <choice>imdb</choice>
+      <default>imdb</default>
+  </input>
+
+  <input type="dropdown" token="srcfield">
+      <label>Select Opinion Field:</label>
+      <populatingSearch fieldForValue="column" fieldForLabel="column">
+         <![CDATA[* | head 100 | stats count(*) as * | transpose | rename "row 1" as count | sort 50 - count | search count>10 ]]>
+      </populatingSearch>
+      <choice>_raw</choice>
+      <default>_raw</default>
+  </input>
+
+
+  <input type="time" />
+</fieldset>
+  
+ <row>
+   <chart>
+          <title>Overall Sentiment of Keyword1</title>
+          <searchTemplate>
+                  $basesearch$ $key1$| sentiment $model$ $srcfield$| eval sentiment=if(sentiment==1.0, "Positive", "Negative") | top sentiment 
+          </searchTemplate>
+          <option name="charting.chart">pie</option>         
+   </chart>    
+   <chart>
+          <title>Overall Sentiment of Keyword2</title>
+          <searchTemplate>
+                  $basesearch$ $key2$| sentiment $model$ $srcfield$| eval sentiment=if(sentiment==1.0, "Positive", "Negative") | top sentiment 
+          </searchTemplate>
+          <option name="charting.chart">pie</option>         
+   </chart>    
+  </row>
+<row>
+   <chart>
+          <title>Sentiment over Time</title>
+          <searchTemplate>
+                  $basesearch$ ($key1$ OR $key2$)| sentiment $model$ $srcfield$| eval category=if(searchmatch("$srcfield$=\"*$key1$*\" $srcfield$=\"*$key2$*\""), "both", if(searchmatch("$srcfield$=\"*$key1$*\""), "$key1$", "$key2$")) |timechart avg(sentiment) by category
+          </searchTemplate>
+          <option name="charting.chart">line</option>
+          <option name="charting.primaryAxisTitle.text">Time</option>
+          <option name="charting.secondaryAxisTitle.text">Sentiment</option>
+          <option name="charting.legend.placement">right</option>
+   </chart>    
+  </row>
+
+
+</form>

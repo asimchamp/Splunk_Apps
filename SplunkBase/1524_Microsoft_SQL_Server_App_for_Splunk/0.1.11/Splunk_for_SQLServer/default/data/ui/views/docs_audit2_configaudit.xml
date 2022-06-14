@@ -1,0 +1,45 @@
+<dashboard isVisible="false">
+	<label>Configuring Audit on your SQL Server</label>
+
+	<row>
+		<html>
+<p>Prior to configuring an audit specification, you need to configure an audit destination.  In these instructions,
+we will configure an audit specification to the Windows Security Log.  Ensure you have <a href="/app/Splunk_for_SQLServer/docs_audit1_enableseclog">enabled
+the SQL Server to write to the Windows Security Log</a> prior to enabling an audit destination.</p>
+
+<ol>
+	<li>Open the Microsoft SQL Management Studio and connect to your database server as a serveradmin.</li>
+	<li>In the Object Explorer, select your server and expand Security.</li>
+	<li>Right click on Audits and select New Audit...</li>
+	<li>In the Audit Name field, enter a suitable name (for example, LogToSplunk).</li>
+	<li>In the Audit Destination field, select Security Log.  If you are on a developer system running Windows 7 or Windows 8, select Application Log instead.  The security log is not available to you.</li>
+	<li>Click on OK.</li>
+</ol>
+
+<p>Once you have configured an audit destination, you can enable an audit specification.  The audit specifications
+can be done on a per-database or per-server basis and are stored within the master database.  In cases where
+the database is clustered, audit specifications only have to be configured once.</p>
+
+<p>In this audit specification, we will configure an audit for server logins.</p>
+
+<ol>
+	<li>Open the Microsoft SQL Management Studio and connect to your database server as a serveradmin.</li>
+	<li>In the Object Explorer, select your server and expand Security.</li>
+	<li>Right click on Server Audit Specification and select New Server Audit Specification...</li>
+	<li>Give your audit specification a suitable name (for example, ServerLogonAudit).</li>
+	<li>In the Audit field, select the audit destination you created in Step 4.</li>
+	<li>In Row 1, select Audit Action Type=FAILED_LOGIN_GROUP.</li>
+	<li>In Row 2, select Audit Action Type=SUCCESSFUL_LOGIN_GROUP.</li>
+	<li>Click on OK to save the Server Audit Specification.</li>
+	<li>Right click on your newly created Server Audit Specification and select Enable Server Audit Specification.</li>
+	<li>Click on Close in the window that appears.</li>
+	<li>Right click on your audit destination object and select Enable Audit.</li>
+	<li>Click on Close in the window that appears.</li>
+</ol>
+
+<p>If you have installed the Splunk Technology Add-on for Windows, you will now see WinEventLog:Security events with
+an EventCode=33205 flow into your Splunk indexer when a user logs into the database.</p>
+
+		</html>
+	</row>
+</dashboard>

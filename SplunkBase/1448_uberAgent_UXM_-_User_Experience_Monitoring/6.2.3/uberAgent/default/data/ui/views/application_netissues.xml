@@ -1,0 +1,601 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, application_netissues.js" stylesheet="main.css">
+
+   <label>Application Network Issues</label>
+   <description>This dashboard displays information about reconnections, retransmissions and failed TCP network connections. It can be used to identify application misconfigurations, missing firewall rules or network and service outages.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Application_NetworkConnectFailure</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Application_NetworkConnectFailure` Application_NetworkConnectFailure
+            count(Application_NetworkConnectFailure) as FailureCount
+            dc(NetTargetRemoteAddress) as TargetCount
+            dc(NetTargetRemotePort) as PortCount
+            dc(AppName) as AppCount
+            $SearchFilter$
+         | appendcols
+         [
+         | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+            sum(NetTargetConnectCount) as SumNetTargetConnectCount
+            sum(NetTargetReconnectCount) as SumNetTargetReconnectCount
+            sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+            sum(NetTargetSendCount) as SumNetTargetSendCount
+            sum(NetTargetReceiveCount) as SumNetTargetReceiveCount
+            sum(NetTargetSendJitterCount) as SumNetTargetSendJitterCount
+            sum(NetTargetSendJitterMs) as SumNetTargetSendJitterMs
+            $SearchFilter$
+         | join type=outer
+         [
+            | pivot `uA_DM_Application_NetworkConnectFailure` Application_NetworkConnectFailure
+               count(Application_NetworkConnectFailure) as SumApplicationNetworkConnectFailureCount
+               filter NetTargetProtocols is TCP
+               $SearchFilter$
+         ]
+         | eval ConnectAvailability = 100 - round ((SumApplicationNetworkConnectFailureCount + SumNetTargetReconnectCount) / (SumApplicationNetworkConnectFailureCount + SumNetTargetConnectCount) * 100, 3)
+         | eval TransmitAvailability = 100 - round (SumNetTargetRetransmitCount / SumNetTargetSendCount * 100, 3)
+         | eval NetworkAvailability =  round ((ConnectAvailability + TransmitAvailability) / 2, 2)
+         | eval PacketLoss = round ((100 / (SumNetTargetRetransmitCount + SumNetTargetSendCount)) * SumNetTargetRetransmitCount, 2)
+         | eval Jitter = round (SumNetTargetSendJitterMs / SumNetTargetSendJitterCount , 1)
+         ]
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Overview</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">NetworkAvailability</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Network availability:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">PacketLoss</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Packet loss:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">Jitter</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Jitter:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">ms</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">FailureCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Failed connections:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">TargetCount</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">#Target hosts with conn. failures:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">PortCount</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">#Target ports with conn. failures:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">AppCount</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">#Apps with conn. failures:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+   
+      <panel>
+         <title>Issues grouped over time</title>
+         <input type="dropdown" token="Panel21GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <choice value="NetTargetSourceAddress">Source IP</choice>
+            <choice value="NetTargetSourcePort">Source Port</choice>
+            <choice value="host">Source host</choice>
+            <choice value="NetTargetRemoteNameAddress">Target host</choice>
+            <choice value="NetTargetRemotePort">Target port</choice>
+            <choice value="User">User</choice>
+            <default>$Tokenlink_Panel21$</default>
+            <label>Group by:</label>
+         </input>
+         <input type="dropdown" token="Panel21SourceIPFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Source IP:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel21SourcePortFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Source Port:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel21TargetHostFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Target host:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel21PortFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Target port:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <chart>
+            <title>Connection failures</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_NetworkConnectFailure` Application_NetworkConnectFailure
+                     count(Application_NetworkConnectFailure) as FailureCount
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     splitcol
+                        $Panel21GroupBy$
+                        numcols 10
+                        showother 1
+                     filter NetTargetRemoteNameAddress is $Panel21TargetHostFilter|s$
+                     filter NetTargetRemotePort = $Panel21PortFilter$
+                     filter NetTargetSourceAddress is $Panel21SourceIPFilter|s$
+                     filter NetTargetSourcePort is $Panel21SourcePortFilter|s$
+                     filter $Panel21GroupBy$ isNotNull
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum("*") as "*"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">count</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart>
+            <title>Reconnects &amp; retransmits</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     sum(NetTargetRetransmitCount) as "#Retransmits"
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     splitcol
+                        $Panel21GroupBy$
+                        numcols 4
+                        showother 1
+                     filter NetTargetRemoteNameAddress is $Panel21TargetHostFilter|s$
+                     filter NetTargetRemotePort = $Panel21PortFilter$
+                     filter NetTargetSourceAddress is $Panel21SourceIPFilter|s$
+                     filter NetTargetSourcePort is $Panel21SourcePortFilter|s$
+                     filter $Panel21GroupBy$ isNotNull
+                     $SearchFilter$
+                  | rename * as "* #Retransmits"
+                  | rename "_time #Retransmits" as _time
+                  | join type=left _time
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                       sum(NetTargetReconnectCount) as "#Reconnects"
+                       splitrow
+                          _time
+                          period $PivotPeriodAutoTimechart$
+                       splitcol
+                          $Panel21GroupBy$
+                          numcols 4
+                          showother 1
+                       filter NetTargetRemoteNameAddress is $Panel21TargetHostFilter|s$
+                       filter NetTargetRemotePort = $Panel21PortFilter$
+                       filter NetTargetSourceAddress is $Panel21SourceIPFilter|s$
+                       filter NetTargetSourcePort is $Panel21SourcePortFilter|s$
+                       filter $Panel21GroupBy$ isNotNull
+                       $SearchFilter$
+                     | rename * as "* #Reconnects"
+                     | rename "_time #Reconnects" as _time
+                     | fields + "*"
+                  ]
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum("*") as "*"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">count</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart>
+            <title>Packet loss</title>
+            <search>
+               <query>
+                  <![CDATA[
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendCount) as SumNetTargetSendCount
+                        sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+                        splitrow
+                           _time
+                           period $PivotPeriodAutoTimechart$
+                        splitrow
+                           $Panel21GroupBy$
+                        filter NetTargetRemoteNameAddress is $Panel21TargetHostFilter|s$
+                        filter NetTargetRemotePort = $Panel21PortFilter$
+                        filter NetTargetSourceAddress is $Panel21SourceIPFilter|s$
+                        filter NetTargetSourcePort is $Panel21SourcePortFilter|s$
+                        filter $Panel21GroupBy$ isNotNull
+                        filter NetTargetRetransmitCount > 0
+                        $SearchFilter$
+                     | timechart
+                        `uberAgent_dynamic_span`
+                        eval(round((100 / (sum (SumNetTargetRetransmitCount) + sum(SumNetTargetSendCount))) * sum(SumNetTargetRetransmitCount), 2)) as PacketLossPercent by $Panel21GroupBy$
+                  ]]>
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      
+   </row>
+   
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Issues grouped (top 100)</title>
+         <input type="dropdown" token="Panel31GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <choice value="NetTargetSourceAddress">Source IP</choice>
+            <choice value="NetTargetSourcePort">Source port</choice>
+            <choice value="host">Source host</choice>
+            <choice value="NetTargetRemoteNameAddress">Target host</choice>
+            <choice value="NetTargetRemotePort">Target port</choice>
+            <choice value="User">User</choice>
+            <default>$Tokenlink_Panel31$</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="*">
+                  <set token="Panel31GroupByDisplay">$label$</set>
+                  <unset token="DrilldownFilterBy31"></unset>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel31SourceIPFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Source IP:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel31SourcePortFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Source Port:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel31TargetHostFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Target host:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel31PortFilter" searchWhenChanged="true">
+            <choice value="*">All</choice>
+            <default>*</default>
+            <label>Target port:</label>
+            <allowCustomValues>true</allowCustomValues>
+         </input>
+         <input type="dropdown" token="Panel31SortBy" searchWhenChanged="true">
+            <choice value="#Failed connects">#Failed connects</choice>
+            <choice value="#Sends">#Sends</choice>
+            <choice value="#Receives">#Receives</choice>
+            <choice value="#Successful connects">#Successful connects</choice>
+            <choice value="#Reconnects">#Reconnects</choice>
+            <choice value="#Retransmits">#Retransmits</choice>
+            <choice value="TCP send packet loss (%)">TCP send packet loss (%)</choice>
+            <default>#Failed connects</default>
+            <label>Sort by:</label>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_NetworkConnectFailure` Application_NetworkConnectFailure
+                     count(Application_NetworkConnectFailure) as CountApplication_NetworkConnectFailure
+                     values(AppName) as AppNames
+                     values(ProcName) as ProcName
+                     values(User) as Users
+                     splitrow
+                        $Panel31GroupBy$
+                     filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                     filter NetTargetRemotePort = $Panel31PortFilter$
+                     filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                     filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                     $SearchFilter$
+                  | append
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendCount) as SumNetTargetSendCount
+                        sum(NetTargetReceiveCount) as SumNetTargetReceiveCount
+                        sum(NetTargetConnectCount) as SumNetTargetConnectCount
+                        sum(NetTargetReconnectCount) as SumNetTargetReconnectCount
+                        sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+                        values(AppName) as AppNames
+                        values(ProcName) as ProcName
+                        values(User) as Users
+                        splitrow
+                           $Panel31GroupBy$
+                        filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                        filter NetTargetRemotePort = $Panel31PortFilter$
+                        filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                        filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                        $SearchFilter$
+                  ]
+                  | stats
+                     sum(CountApplication_NetworkConnectFailure) as "#Failed connects"
+                     sum(SumNetTargetConnectCount) as "#Successful connects"
+                     sum(SumNetTargetReconnectCount) as "#Reconnects"
+                     sum(SumNetTargetRetransmitCount) as "#Retransmits"
+                     sum(SumNetTargetSendCount) as "#Sends"
+                     sum(SumNetTargetReceiveCount) as "#Receives"
+                     dc(AppName) as "#Applications"
+                     dc(ProcName) as "#Processes"
+                     dc(User) as "#Users"
+                     by
+                        $Panel31GroupBy$
+                  | search
+                     "#Failed connects" > 0 OR "#Reconnects" > 0 OR "#Retransmits" > 0
+                  | eval "TCP send packet loss (%)" = round(coalesce ((100 / ('#Retransmits' + '#Sends')) * '#Retransmits', 0), 2)
+                  | rename $Panel31GroupBy$ as "$Panel31GroupByDisplay$"
+                  | sort limit=100 - "$Panel31SortBy$"
+                  | fillnull
+                  | table
+                     "$Panel31GroupByDisplay$"
+                     "#Failed connects"
+                     "#Successful connects"
+                     "#Reconnects"
+                     "#Retransmits"
+                     "#Sends"
+                     "#Receives"
+                     "TCP send packet loss (%)"
+                     "#Applications"
+                     "#Processes"
+                     "#Users"
+               </query>
+            </search>
+            <option name="count">20</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy31">$click.value$</set>
+            </drilldown>
+         </table>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row depends="$DrilldownFilterBy31$">
+      <panel>
+         <title>Targets with issues: $Panel31GroupByDisplay$ = $DrilldownFilterBy31$</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_NetworkConnectFailure` Application_NetworkConnectFailure
+                     count(Application_NetworkConnectFailure) as "#Failed connects"
+                     values(NetTargetSourcePort) as "Source ports"
+                     splitrow
+                        NetTargetSourceAddress
+                     splitrow
+                        NetTargetRemoteNameAddress
+                     splitrow
+                        NetTargetRemotePort
+                     filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                     filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                     filter NetTargetRemotePort = $Panel31PortFilter$
+                     filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                     filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                     $SearchFilter$
+                  | append
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendCount) as "#Sends"
+                        sum(NetTargetReceiveCount) as "#Receives"
+                        sum(NetTargetConnectCount) as "#Successful connects"
+                        sum(NetTargetReconnectCount) as "#Reconnects"
+                        sum(NetTargetRetransmitCount) as "#Retransmits"
+                        splitrow
+                           NetTargetSourceAddress
+                        splitrow
+                           NetTargetRemoteNameAddress
+                        splitrow
+                           NetTargetRemotePort
+                     filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                     filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                     filter NetTargetRemotePort = $Panel31PortFilter$
+                     filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                     filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                     $SearchFilter$
+                  ]
+                  | stats
+                     sum("#Failed connects") as "#Failed connects"
+                     sum("#Successful connects") as "#Successful connects"
+                     sum("#Reconnects") as "#Reconnects"
+                     sum("#Retransmits") as "#Retransmits"
+                     sum("#Sends") as "#Sends"
+                     sum("#Receives") as "#Receives"
+                     values("Source ports") as "Source ports"
+                     by
+                        NetTargetSourceAddress
+                        NetTargetRemoteNameAddress
+                        NetTargetRemotePort
+                  | search
+                     "#Failed connects" > 0 OR "#Reconnects" > 0 OR "#Retransmits" > 0
+                  | eval "TCP send packet loss (%)" = round(coalesce ((100 / ('#Retransmits' + '#Sends')) * '#Retransmits', 0), 2)
+                  | sort limit=100 - "$Panel31SortBy$"
+                  | rename NetTargetSourceAddress as "Source IP"
+                  | rename NetTargetRemoteNameAddress as "Target host"
+                  | rename NetTargetRemotePort as "Target port"
+                  | fillnull
+                  | table
+                     "Source IP"
+                     "Source ports"
+                     "Target host"
+                     "Target port"
+                     "#Failed connects"
+                     "#Successful connects"
+                     "#Reconnects"
+                     "#Retransmits"
+                     "#Sends"
+                     "#Receives"
+                     "TCP send packet loss (%)"
+               </query>
+            </search>
+            <option name="drilldown">none</option>
+         </table>
+         
+         <chart>
+            <title>Connection failures, reconnects &amp; retransmits</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_NetworkConnectFailure` Application_NetworkConnectFailure
+                     count(Application_NetworkConnectFailure) as "#Failed connects"
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                     filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                     filter NetTargetRemotePort = $Panel31PortFilter$
+                     filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                     filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                     $SearchFilter$
+                  | append
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetReconnectCount) as "#Reconnects"
+                        sum(NetTargetRetransmitCount) as "#Retransmits"
+                        splitrow
+                           _time
+                           period $PivotPeriodAutoTimechart$
+                        filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                        filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                        filter NetTargetRemotePort = $Panel31PortFilter$
+                        filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                        filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                        $SearchFilter$
+                  ]
+                  | search
+                     "#Failed connects" > 0 OR "#Reconnects" > 0 OR "#Retransmits" > 0
+                  | fillnull
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum("#Failed connects") as "#Failed connects"
+                     sum("#Reconnects") as "#Reconnects"
+                     sum("#Retransmits") as "#Retransmits"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">count</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart>
+            <title>Packet loss</title>
+            <search>
+               <query>
+                  <![CDATA[
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendCount) as SumNetTargetSendCount
+                        sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+                        splitrow
+                           _time
+                           period $PivotPeriodAutoTimechart$
+                        filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                        filter NetTargetRemoteNameAddress is $Panel31TargetHostFilter|s$
+                        filter NetTargetRemotePort = $Panel31PortFilter$
+                        filter NetTargetSourceAddress is $Panel31SourceIPFilter|s$
+                        filter NetTargetSourcePort is $Panel31SourcePortFilter|s$
+                        $SearchFilter$
+                     | timechart
+                        `uberAgent_dynamic_span`
+                        eval(round((100 / (sum (SumNetTargetRetransmitCount) + sum(SumNetTargetSendCount))) * sum(SumNetTargetRetransmitCount), 2)) as "TCP send packet loss (%)"
+                  ]]>
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+</form>

@@ -1,0 +1,80 @@
+/* Force a one-third two-thirds view for the total experience score row as there are only two panels */
+
+#Panel11{
+  width:33.3333% !important;
+}
+#Panel12{
+  width:66.6666% !important;
+}
+
+/* Different colors for the headlines of the individual score panels */
+
+#Panel21 .dashboard-panel, #Panel23 .dashboard-panel, #Panel81 .dashboard-panel {
+  background:silver !important;
+}
+
+#Panel22 .dashboard-panel {
+  background:gainsboro !important;
+}
+
+/* Scores in red have a white font that disappears on mouse-over. Hence always use a black font in colored tables.*/
+
+td.numeric.color-formatted {
+  color: rgb(0,0,0) !important;
+}
+
+/* Force single trellis views to a lesser height to remove unnecessary whitespace */
+
+div[id^="vlSingleTrellis260px_"] [data-view="views/shared/ReportVisualizer"] {
+  height: 260px !important;
+}
+
+/* Force link input to a lesser height to remove unnecessary whitespace 
+Also, put label and input in one row. */
+div[id^="vlInputLinkPanel6_"].input.input-link {
+   height: 37px !important; /* Normally 57px */
+   display: flex !important;
+   width: auto !important;
+}
+
+div[id^="vlInputLinkPanel6_"].input.input-link label {
+   padding-right: 10px;
+   padding-top: 5px;
+}
+
+div[id^="vlInputLinkPanel6_"].splunk-view.splunk-linklist.splunk-choice-input div.splunk-choice-input-message {
+   line-height: 0px !important;
+}
+
+#BtnGoToSingleDashboard {
+  text-align: center;
+  cursor: pointer;
+  font-size:14px;
+  color: #fff;
+  padding:10px 10px;
+  outline: none;
+  background-color: #318796;
+  border: none;
+  border-radius:5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+#BtnGoToSingleDashboard:hover {
+  background-color: #77C4CF;
+}
+
+#BtnGoToSingleDashboard:active {
+  background-color: #77C4CF;
+  transform: translateY(4px);
+}
+
+#Panel81imgToggle1 {
+  margin-bottom: 4px;
+}
+
+#Panel81imgToggle1:active {
+  transform: translateY(4px);
+}

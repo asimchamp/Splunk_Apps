@@ -1,0 +1,795 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, single_application_detail.js" stylesheet="main.css, single_application_detail.css">
+
+   <label>Single Application Performance</label>
+   <description>This dashboard displays detailed information about a specific application's performance.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>CommonWithUserAppName</default>
+      </input>
+   </fieldset>
+   
+   <search id="Search_AllowedIndexesFilter">
+        <query>
+            | tstats count WHERE index=`uberAgent_index` by index | table index | mvcombine delim="," index | nomv index
+        </query>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="AllowedIndexesFilter">filter SourceIndex in ($result.index$)</set>
+        </progress>
+    </search>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+            values(AppName) as AppName
+            values(ProcName) as ProcName
+            sum(ProcCPUPercent) as ProcCPUPercent
+            sum(ProcIOPS) as ProcIOPS
+            sum(ProcWorkingSetMB) as ProcWorkingSetMB
+            splitrow
+               time as _time
+            splitrow
+               host
+            $SearchFilter$
+         | stats
+            values(AppName) as AppNames
+            values(ProcName) as ProcNames
+            avg(ProcCPUPercent) AS AvgProcCPUPercent
+            Avg(ProcIOPS) AS AvgProcIOPS
+            avg(ProcWorkingSetMB) as AvgProcWorkingSetMB
+         | eval ProcNames=mvjoin(ProcNames, ", ")
+         | eval AvgProcCPUPercentRounded=round(AvgProcCPUPercent,1)
+         | eval AvgProcIOPSRounded=round(AvgProcIOPS,1)
+         | eval AvgProcWorkingSetMBRounded=round(AvgProcWorkingSetMB,0)
+         | eval AppNames = mvjoin(AppNames, ", ")
+         | appendcols
+         [
+         | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+            sum(NetTargetSendLatencyCount) AS SumNetTargetSendLatencyCount
+            sum(NetTargetSendDurationMs) AS SumNetTargetSendDurationMs
+            $SearchFilter$
+         | eval AvgNetSendLatencyMsRounded=round(SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+            sum(UIDelayMs) as SumUIDelayMs
+            $SearchFilter$
+         | eval SumUIDelayS = round(SumUIDelayMs/1000,1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+            sum(StartupTimeS) as SumStartupTimeS
+            $SearchFilter$
+         | eval SumStartupTimeSRounded = round(SumStartupTimeS,1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            count(SessionFgAppName) as CountSessionFgAppName
+            splitrow
+               SessionFgAppName
+         | eventstats sum(CountSessionFgAppName) as EventCount
+         | eval FgPercentage=round(CountSessionFgAppName/EventCount*100,1)
+         | search SessionFgAppName="$FilterExpression$"
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Application_Errors` Application_Errors
+            count(ErrorType) as ErrorCount
+            $SearchFilter$
+         ]
+      </query>
+   </search>
+
+   <search id="Search_Score_Base">
+      <query>
+         | pivot uberAgent_Score Score_Application
+            avg(app_cpu) as app_cpu
+            avg(app_ram) as app_ram
+            avg(app_diskio) as app_diskio
+            avg(app_networkavailability) as app_networkavailability
+            avg(app_errors) as app_errors
+            avg(app_uidelay) as app_uidelay
+            avg(app_networklatency) as app_networklatency
+            avg(app_score) as app_score
+         splitrow 
+            _time period minute
+         $SearchFilter$
+         $AllowedIndexesFilter$
+         | timechart span=30m
+            eval(round(avg(app_cpu),1)) as CPU
+            eval(round(avg(app_ram),1)) as RAM
+            eval(round(avg(app_diskio),1)) as "Disk IO"
+            eval(round(avg(app_networkavailability),1)) as "Network availability"
+            eval(round(avg(app_errors),1)) as "App errors"
+            eval(round(avg(app_uidelay),1)) as "UI delay"
+            eval(round(avg(app_networklatency),1)) as "Network latency"
+            eval(round(avg(app_score),1)) as Score
+      </query>
+   </search>
+
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AppNames</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Application:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">ProcNames</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Processes:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AvgProcCPUPercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Avg. CPU:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">AvgProcWorkingSetMBRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Avg. RAM:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">MB</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgProcIOPSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Avg. disk:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">IOPS</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgNetSendLatencyMsRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Avg. net latency:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">ms</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">SumUIDelayS</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Total UI wait time:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">SumStartupTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">Total Startup duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">FgPercentage</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">Foreground app:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.8-field">ErrorCount</option>
+            <option name="uberAgent.uberagent-singlevalue.8-title">App errors:</option>
+            <option name="uberAgent.uberagent-singlevalue.8-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+   
+   <!-- Row 2 -->
+   <row depends="$ShowApplicationScore$">
+    <panel id="panel_application_score">
+      <title>Application score</title>
+      <single>
+        <search base="Search_Score_Base">
+          <query>
+              | table _time Score
+          </query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+        <option name="rangeValues">[4,7]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel id="panel_application_score_breakdown">
+    <title>Component scores</title>
+      <chart>
+        <search base="Search_Score_Base">
+          <query> 
+              | table _time CPU RAM "Disk IO" "Network availability" "App errors" "UI delay" "Network latency"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">10.0</option>
+        <option name="charting.axisY.minimumNumber">0.0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.mode">standard</option>
+      </chart>
+    </panel>
+  </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Users</title>
+         <table id="Table_Panel21">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     sum(ProcCPUPercent) as ProcCPUPercent
+                     sum(ProcIOPS) as ProcIOPS
+                     sum(ProcWorkingSetMB) as ProcWorkingSetMB
+                     splitrow
+                        time as _time
+                     splitrow
+                        ProcUser as User
+                     $SearchFilter$
+                  | stats
+                     avg(ProcCPUPercent) AS AvgProcCPUPercent
+                     Avg(ProcIOPS) AS AvgProcIOPS
+                     avg(ProcWorkingSetMB) as AvgProcWorkingSetMB
+                     by
+                        User
+                  | eval UserUpper=upper(User)
+                  | eval "Avg. CPU (%)"=round(AvgProcCPUPercent,1)
+                  | eval "Avg. disk IOPS"=round(AvgProcIOPS,1)
+                  | eval "Avg. RAM (MB)"=round(AvgProcWorkingSetMB,0)
+                  | sort User
+                  | table
+                     User
+                     "Avg. CPU (%)"
+                     "Avg. disk IOPS"
+                     "Avg. RAM (MB)"
+               </query>
+            </search>
+            <option name="count">15</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_application_detail_explanation.html">
+         </html>
+      </panel>
+
+      <panel>
+         <title>Hosts</title>
+         <table id="Table_Panel22">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     sum(ProcCPUPercent) as ProcCPUPercent
+                     sum(ProcIOPS) as ProcIOPS
+                     sum(ProcWorkingSetMB) as ProcWorkingSetMB
+                     splitrow
+                        time as _time
+                     splitrow
+                        host
+                     $SearchFilter$
+                  | stats
+                     avg(ProcCPUPercent) AS AvgProcCPUPercent
+                     Avg(ProcIOPS) AS AvgProcIOPS
+                     avg(ProcWorkingSetMB) as AvgProcWorkingSetMB
+                     by
+                        host
+                  | eval Host = host
+                  | eval "Avg. CPU (%)"=round(AvgProcCPUPercent,1)
+                  | eval "Avg. disk IOPS"=round(AvgProcIOPS,1)
+                  | eval "Avg. RAM (MB)"=round(AvgProcWorkingSetMB,0)
+                  | sort Host
+                  | table
+                     Host
+                     "Avg. CPU (%)"
+                     "Avg. disk IOPS"
+                     "Avg. RAM (MB)"
+               </query>
+            </search>
+            <option name="count">15</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_application_detail_explanation_2.html">
+         </html>
+      </panel>
+   </row>
+
+   
+   <!-- Row 4 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Network</title>
+         <input type="dropdown" token="Panel31Series1" id="Input_Panel31Series1" searchWhenChanged="true">
+            <choice value="DataVolume">Data volume</choice>
+            <choice value="SendReceiveCount">Send &amp; receive</choice>
+            <choice value="ReconnectRetransmitCount">Reconnect &amp; retransmit</choice>
+            <default>DataVolume</default>
+            <label>Series 1:</label>
+            <change>
+               <condition value="DataVolume">
+                  <set token="Panel31Series1PivotLine1">sum(NetTargetSendMB) as NetTargetSendMB</set>
+                  <set token="Panel31Series1PivotLine2">sum(NetTargetReceiveMB) as NetTargetReceiveMB</set>
+                  <set token="Panel31Series1TimechartLine1Display">Send volume (MB)</set>
+                  <set token="Panel31Series1TimechartLine2Display">Receive volume (MB)</set>
+                  <set token="Panel31Series1TimechartLine1">eval(round(sum(NetTargetSendMB)/dc(Panel31GroupByField),3)) as "$Panel31Series1TimechartLine1Display$"</set>
+                  <set token="Panel31Series1TimechartLine2">eval(round(sum(NetTargetReceiveMB)/dc(Panel31GroupByField),3)) as "$Panel31Series1TimechartLine2Display$"</set>
+                  <set token="Panel31Series1Axis">Data volume (MB)</set>
+               </condition>
+               <condition value="SendReceiveCount">
+                  <set token="Panel31Series1PivotLine1">sum(NetTargetSendCount) as NetTargetSendCount</set>
+                  <set token="Panel31Series1PivotLine2">sum(NetTargetReceiveCount) as NetTargetReceiveCount</set>
+                  <set token="Panel31Series1TimechartLine1Display">Send count</set>
+                  <set token="Panel31Series1TimechartLine2Display">Receive count</set>
+                  <set token="Panel31Series1TimechartLine1">eval(round(sum(NetTargetSendCount)/dc(Panel31GroupByField),3)) as "$Panel31Series1TimechartLine1Display$"</set>
+                  <set token="Panel31Series1TimechartLine2">eval(round(sum(NetTargetReceiveCount)/dc(Panel31GroupByField),3)) as "$Panel31Series1TimechartLine2Display$"</set>
+                  <set token="Panel31Series1Axis">Count</set>
+               </condition>
+               <condition value="ReconnectRetransmitCount">
+                  <set token="Panel31Series1PivotLine1">sum(NetTargetReconnectCount) as NetTargetReconnectCount</set>
+                  <set token="Panel31Series1PivotLine2">sum(NetTargetRetransmitCount) as NetTargetRetransmitCount</set>
+                  <set token="Panel31Series1TimechartLine1Display">Reconnect count</set>
+                  <set token="Panel31Series1TimechartLine2Display">Retransmit count</set>
+                  <set token="Panel31Series1TimechartLine1">eval(round(sum(NetTargetReconnectCount)/dc(Panel31GroupByField),3)) as "$Panel31Series1TimechartLine1Display$"</set>
+                  <set token="Panel31Series1TimechartLine2">eval(round(sum(NetTargetRetransmitCount)/dc(Panel31GroupByField),3)) as "$Panel31Series1TimechartLine2Display$"</set>
+                  <set token="Panel31Series1Axis">Count</set>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel31Series2" id="Input_Panel31Series2" searchWhenChanged="true">
+            <choice value="TCPSendLatency">TCP send latency</choice>
+            <default>TCPSendLatency</default>
+            <label>Series 2:</label>
+            <change>
+               <condition value="TCPSendLatency">
+                  <set token="Panel31Series2PivotLine1">sum(NetTargetSendLatencyCount) as NetTargetSendLatencyCount</set>
+                  <set token="Panel31Series2PivotLine2">sum(NetTargetSendDurationMs) as NetTargetSendDurationMs</set>
+                  <set token="Panel31Series2TimechartLine1Display">Avg. send latency (ms)</set>
+                  <set token="Panel31Series2TimechartLine1">eval(round(sum(NetTargetSendDurationMs)/sum(NetTargetSendLatencyCount),1)) as "$Panel31Series2TimechartLine1Display$"</set>
+                  <set token="Panel31Series2Axis">Latency (ms)</set>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel31GroupBy" id="Input_Panel31GroupBy" searchWhenChanged="true">
+            <choice value="NoGrouping">Totals</choice>
+            <choice value="Host">Per host</choice>
+            <choice value="User">Per user</choice>
+            <choice value="HostUser">Per user@host</choice>
+            <default>Host</default>
+            <label>Show values:</label>
+            <change>
+               <condition value="NoGrouping">
+                  <set token="Panel31GroupByPivotLine"></set>
+                  <set token="Panel31GroupByFieldsCombined">"DummyValue"</set>
+               </condition>
+               <condition value="Host">
+                  <set token="Panel31GroupByPivotLine">splitrow host</set>
+                  <set token="Panel31GroupByFieldsCombined">host</set>
+               </condition>
+               <condition value="User">
+                  <set token="Panel31GroupByPivotLine">splitrow User</set>
+                  <set token="Panel31GroupByFieldsCombined">User</set>
+               </condition>
+               <condition value="HostUser">
+                  <set token="Panel31GroupByPivotLine">splitrow host splitrow User</set>
+                  <set token="Panel31GroupByFieldsCombined">host . ";" . User</set>
+               </condition>
+            </change>
+         </input>
+         <chart id="Chart_Pane31">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     $Panel31Series1PivotLine1$
+                     $Panel31Series1PivotLine2$
+                     $Panel31Series2PivotLine1$
+                     $Panel31Series2PivotLine2$
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $Panel31GroupByPivotLine$
+                     $SearchFilter$
+                  | eval Panel31GroupByField = $Panel31GroupByFieldsCombined$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     $Panel31Series1TimechartLine1$
+                     $Panel31Series1TimechartLine2$
+                     $Panel31Series2TimechartLine1$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"$Panel31Series2TimechartLine1Display$"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"$Panel31Series2TimechartLine1Display$"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">$Panel31Series1Axis$</option>
+            <option name="charting.axisTitleY2.text">$Panel31Series2Axis$</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      
+      <!-- Column 2 -->
+      <panel>
+         <title>Performance</title>
+         <input type="dropdown" token="Panel32Series1" id="Input_Panel32Series1" searchWhenChanged="true">
+            <choice value="RAM">RAM usage</choice>
+            <choice value="IOCount">IO count</choice>
+            <choice value="IOVolume">IO volume</choice>
+            <choice value="IOPS">IOPS</choice>
+            <choice value="GpuMem">GPU memory (MB)</choice>
+            <default>RAM</default>
+            <label>Series 1:</label>
+            <change>
+               <condition value="RAM">
+                  <set token="Panel32Series1PivotLine1">sum(ProcWorkingSetMB) as ProcWorkingSetMB</set>
+                  <set token="Panel32Series1PivotLine2"></set>
+                  <set token="Panel32Series1TimechartLine1Display">Avg. RAM (MB)</set>
+                  <set token="Panel32Series1TimechartLine2Display"></set>
+                  <set token="Panel32Series1TimechartLine1">eval(round(sum(ProcWorkingSetMB)/count(ProcWorkingSetMB)*dc(Panel32GroupByFieldTotalEntities)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine1Display$"</set>
+                  <set token="Panel32Series1TimechartLine2"></set>
+                  <set token="Panel32Series1Axis">RAM (MB)</set>
+               </condition>
+               <condition value="GpuMem">
+                  <set token="Panel32Series1PivotLine1">sum(ProcGpuMemMB) as ProcGpuMemMB</set>
+                  <set token="Panel32Series1PivotLine2"></set>
+                  <set token="Panel32Series1TimechartLine1Display">Avg. GPU memory (MB)</set>
+                  <set token="Panel32Series1TimechartLine2Display"></set>
+                  <set token="Panel32Series1TimechartLine1">eval(round(sum(ProcGpuMemMB)/count(ProcGpuMemMB)*dc(Panel32GroupByFieldTotalEntities)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine1Display$"</set>
+                  <set token="Panel32Series1TimechartLine2"></set>
+                  <set token="Panel32Series1Axis">GPU memory (MB)</set>
+               </condition>
+               <condition value="IOCount">
+                  <set token="Panel32Series1PivotLine1">sum(ProcIOReadCount) as ProcIOReadCount</set>
+                  <set token="Panel32Series1PivotLine2">sum(ProcIOWriteCount) as ProcIOWriteCount</set>
+                  <set token="Panel32Series1TimechartLine1Display">IO read count</set>
+                  <set token="Panel32Series1TimechartLine2Display">IO write count</set>
+                  <set token="Panel32Series1TimechartLine1">eval(round(sum(ProcIOReadCount)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine1Display$"</set>
+                  <set token="Panel32Series1TimechartLine2">eval(round(sum(ProcIOWriteCount)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine2Display$"</set>
+                  <set token="Panel32Series1Axis">IO count</set>
+               </condition>
+               <condition value="IOVolume">
+                  <set token="Panel32Series1PivotLine1">sum(ProcIOReadMB) as ProcIOReadMB</set>
+                  <set token="Panel32Series1PivotLine2">sum(ProcIOWriteMB) as ProcIOWriteMB</set>
+                  <set token="Panel32Series1TimechartLine1Display">IO read volume (MB)</set>
+                  <set token="Panel32Series1TimechartLine2Display">IO write volume (MB)</set>
+                  <set token="Panel32Series1TimechartLine1">eval(round(sum(ProcIOReadMB)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine1Display$"</set>
+                  <set token="Panel32Series1TimechartLine2">eval(round(sum(ProcIOWriteMB)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine2Display$"</set>
+                  <set token="Panel32Series1Axis">IO volume (MB)</set>
+               </condition>
+               <condition value="IOPS">
+                  <set token="Panel32Series1PivotLine1">sum(ProcIOPSRead) as ProcIOPSRead</set>
+                  <set token="Panel32Series1PivotLine2">sum(ProcIOPSWrite) as ProcIOPSWrite</set>
+                  <set token="Panel32Series1TimechartLine1Display">IOPS read</set>
+                  <set token="Panel32Series1TimechartLine2Display">IOPS write</set>
+                  <set token="Panel32Series1TimechartLine1">eval(round(sum(ProcIOPSRead)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine1Display$"</set>
+                  <set token="Panel32Series1TimechartLine2">eval(round(sum(ProcIOPSWrite)/dc(Panel32GroupByField),3)) as "$Panel32Series1TimechartLine2Display$"</set>
+                  <set token="Panel32Series1Axis">IOPS</set>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel32Series2" id="Input_Panel32Series2" searchWhenChanged="true">
+            <choice value="CpuPercent">CPU usage (%)</choice>
+            <choice value="IOLatency">IO latency</choice>
+            <choice value="GpuCompute">GPU compute (%)</choice>
+            <default>CpuPercent</default>
+            <label>Series 2:</label>
+            <change>
+               <condition value="CpuPercent">
+                  <set token="Panel32Series2PivotLine1">sum(ProcCPUPercent) as ProcCPUPercent</set>
+                  <set token="Panel32Series2PivotLine2"></set>
+                  <set token="Panel32Series2TimechartLine1Display">Avg. CPU (%)</set>
+                  <set token="Panel32Series2TimechartLine1">eval(round(sum(ProcCPUPercent)/count(ProcCPUPercent)*dc(Panel32GroupByFieldTotalEntities)/dc(Panel32GroupByField),3)) as "$Panel32Series2TimechartLine1Display$"</set>
+                  <set token="Panel32Series2Axis">CPU (%)</set>
+               </condition>
+               <condition value="GpuCompute">
+                  <set token="Panel32Series2PivotLine1">sum(ProcGpuComputePercent) as ProcGpuComputePercent</set>
+                  <set token="Panel32Series2PivotLine2"></set>
+                  <set token="Panel32Series2TimechartLine1Display">Avg. GPU compute (%)</set>
+                  <set token="Panel32Series2TimechartLine1">eval(round(sum(ProcGpuComputePercent)/count(ProcGpuComputePercent)*dc(Panel32GroupByFieldTotalEntities)/dc(Panel32GroupByField),3)) as "$Panel32Series2TimechartLine1Display$"</set>
+                  <set token="Panel32Series2Axis">GPU compute (%)</set>
+               </condition>
+               <condition value="IOLatency">
+                  <set token="Panel32Series2PivotLine1">sum(ProcIOCount) as ProcIOCount</set>
+                  <set token="Panel32Series2PivotLine2">sum(ProcIODurationMs) as ProcIODurationMs</set>
+                  <set token="Panel32Series2TimechartLine1Display">Avg. IO latency (ms)</set>
+                  <set token="Panel32Series2TimechartLine1">eval(round(sum(ProcIODurationMs)/sum(ProcIOCount),1)) as "$Panel32Series2TimechartLine1Display$"</set>
+                  <set token="Panel32Series2Axis">Latency (ms)</set>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel32GroupBy" id="Input_Panel32GroupBy" searchWhenChanged="true">
+            <choice value="NoGrouping">Totals</choice>
+            <choice value="Host">Per host</choice>
+            <choice value="User">Per user</choice>
+            <choice value="HostUser">Per user@host</choice>
+            <default>Host</default>
+            <label>Show values:</label>
+            <change>
+               <condition value="NoGrouping">
+                  <set token="Panel32GroupByFieldsCombined">"DummyValue"</set>
+               </condition>
+               <condition value="Host">
+                  <set token="Panel32GroupByFieldsCombined">host</set>
+               </condition>
+               <condition value="User">
+                  <set token="Panel32GroupByFieldsCombined">User</set>
+               </condition>
+               <condition value="HostUser">
+                  <set token="Panel32GroupByFieldsCombined">host . ";" . User</set>
+               </condition>
+            </change>
+         </input>
+         <chart id="Chart_Panel32">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     $Panel32Series1PivotLine1$
+                     $Panel32Series1PivotLine2$
+                     $Panel32Series2PivotLine1$
+                     $Panel32Series2PivotLine2$
+                     splitrow
+                        time as _time
+                     splitrow
+                        host
+                     splitrow
+                        User
+                     $SearchFilter$
+                  | eval Panel32GroupByFieldTotalEntities = host . ";" . User
+                  | eval Panel32GroupByField = $Panel32GroupByFieldsCombined$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     $Panel32Series1TimechartLine1$
+                     $Panel32Series1TimechartLine2$
+                     $Panel32Series2TimechartLine1$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"$Panel32Series2TimechartLine1Display$"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"$Panel32Series2TimechartLine1Display$"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">$Panel32Series1Axis$</option>
+            <option name="charting.axisTitleY2.text">$Panel32Series2Axis$</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Network connections</title>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     latest(NetTargetRemoteAddress) as "Target IP"
+                     sum(NetTargetSendCount) as SumNetTargetSendCount
+                     sum(NetTargetReceiveCount) as SumNetTargetReceiveCount
+                     sum(NetTargetConnectCount) as SumNetTargetConnectCount
+                     sum(NetTargetReconnectCount) as SumNetTargetReconnectCount
+                     sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+                     sum(NetTargetSendMB) as SumNetTargetSendMB
+                     sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                     sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                     sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                     dc(host) as "Host count"
+                     dc(ProcUser) as "User count"
+                     splitrow
+                        NetTargetRemoteNameAddressPort AS "Target"
+                     splitrow
+                        NetTargetProtocols AS Protocols
+                     $SearchFilter$
+                  | eval "Send count"=round(SumNetTargetSendCount,0)
+                  | eval "Receive count"=round(SumNetTargetReceiveCount,0)
+                  | eval "Connect count"=round(SumNetTargetConnectCount,0)
+                  | eval "Reconnect count"=round(SumNetTargetReconnectCount,0)
+                  | eval "Retransmit count"=round(SumNetTargetRetransmitCount,0)
+                  | eval "Send volume (MB)"=round(SumNetTargetSendMB,1)
+                  | eval "Receive volume (MB)"=round(SumNetTargetReceiveMB,1)
+                  | eval "Avg. send latency (ms)"=round(SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+                  | eval sortfield=lower(Target)
+                  | table
+                     Target
+                     "Target IP"
+                     Protocols
+                     "Send count"
+                     "Receive count"
+                     "Connect count"
+                     "Reconnect count"
+                     "Retransmit count"
+                     "Send volume (MB)"
+                     "Receive volume (MB)"
+                     "Avg. send latency (ms)"
+                     "Host count"
+                     "User count"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_application_detail_explanation_3.html">
+         </html>
+      </panel>
+   </row>
+   <row>
+        <panel>
+            <title>Application crashes</title>
+            <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_Errors` Application_Errors
+                     count(ErrorType) as "#Crashes"
+                     values(AppName) as "App name(s)"
+                     values(User) as "User(s)"
+                     values(host) as "Host(s)"
+                     avg(ProcLifetimeMs) as AvgProcLifetimeMs
+                     splitrow
+                        ProcName as "Process name"
+                     splitrow
+                        ProcVersion as "Process version(s)"
+                     splitrow
+                        ExceptionCode as "Exception code(s)"
+                     splitrow
+                        ModuleName as "Faulting module(s)"
+                     filter ErrorTypeName is "Crash"
+                     $SearchFilter$
+                  | eval "Avg. process lifetime [s]" = round(AvgProcLifetimeMs/1000,1)
+                  | eval sortfield=lower('App name')
+                  | table
+                     "Process name"
+                     "Process version(s)"
+                     "App name(s)"
+                     "#Crashes"
+                     "User(s)"
+                     "Host(s)"
+                     "Exception code(s)"
+                     "Faulting module(s)"
+                     "Avg. process lifetime [s]"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+         <html src="application_errors_explanation.html">
+         </html>
+        </panel>
+   </row>
+   <row>
+        <panel>
+            <title>Application hangs</title>
+            <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_Errors` Application_Errors
+                     count(ErrorType) as "#Hangs"
+                     values(AppName) as "App name(s)"
+                     values(HangType) as "Hang type(s)"
+                     values(User) as "User(s)"
+                     values(host) as "Host(s)"
+                     avg(ProcLifetimeMs) as AvgProcLifetimeMs
+                     splitrow
+                        ProcName as "Process name"
+                     splitrow
+                        ProcVersion as "Process version(s)"
+                     filter ErrorTypeName is "Hang"
+                     $SearchFilter$
+                  | eval "Avg. process lifetime [s]" = round(AvgProcLifetimeMs/1000,1)
+                  | eval sortfield=lower('App name')
+                  | table
+                     "Process name"
+                     "Process version(s)"
+                     "App name(s)"
+                     "Hang type(s)"
+                     "#Hangs"
+                     "User(s)"
+                     "Host(s)"
+                     "Avg. process lifetime [s]"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+
+         <html src="application_errors_explanation_2.html">
+         </html>
+        </panel>
+   </row>
+   <row>
+        <panel>
+            <title>Application UI unresponsiveness/delay</title>
+            <table>
+                <search>
+                    <query>
+                        | pivot `uA_DM_Application_UIDelay` Application_UIDelay 
+                            sum(UIDelayS) as FuncUIDelayS 
+                            count(UIDelayMs) as "Unresponsiveness count" 
+                            sum(HasFocusNumber) as "Focus count" 
+                            values(ProcessName) as "Process name(s)" 
+                            dc(host) as "Host count" 
+                            dc(User) as "User count" 
+                            splitrow 
+                                AppName as "App name"  
+                            $SearchFilter$  
+                        | eval "Sum app UI unresponsiveness (s)" = round(FuncUIDelayS,1) 
+                        | eval sortfield=lower('App name') 
+                        | table 
+                            "App name" 
+                            "Process name(s)" 
+                            "Sum app UI unresponsiveness (s)" 
+                            "Unresponsiveness count" 
+                            "Focus count" 
+                            "User count" 
+                            "Host count" 
+                            sortfield 
+                        | sort limit=0 sortfield 
+                        | fields - sortfield 
+                    </query>
+                </search>
+                <option name="count">10</option>
+                <option name="drilldown">none</option>
+            </table>
+            <html src="application_ui_delays_explanation.html">
+            </html>
+        </panel>
+   </row>
+</form>

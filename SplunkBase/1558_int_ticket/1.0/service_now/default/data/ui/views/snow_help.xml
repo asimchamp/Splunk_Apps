@@ -1,0 +1,21 @@
+<view autoCancelInterval="90" isVisible="true" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+  <label>ServiceNow: Help</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+  <module name="Message" layoutPanel="navigationHeader">
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+    <param name="level">warn</param>
+  </module>
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">&lt;iframe src="/static/app/service_now/snow_help.htm" style="width:100%; height: 400px;"&gt;&lt;/iframe&gt;</param>
+    <module name="Gimp"/>
+  </module>
+</view>

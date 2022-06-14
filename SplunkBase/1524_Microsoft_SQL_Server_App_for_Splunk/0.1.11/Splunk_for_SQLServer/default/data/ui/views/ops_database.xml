@@ -1,0 +1,131 @@
+<form isVisible="false">
+	<label>SQL Database Information</label>
+
+	<fieldset autoRun="true" submitButton="true">
+		<input type="dropdown" token="ServerInstance">
+			<label>Server Instance</label>
+			<prefix>ServerInstance="</prefix>
+			<suffix>"</suffix>
+			<populatingSearch fieldForValue="SIVal" fieldForLabel="ServerInstance" earliest="-10m" latest="now">
+| inputlookup SQLInstanceInformation 
+| eval SIVal=replace(ServerInstance,"\\\\","\\\\")
+| stats count by ServerInstance,SIVal
+			</populatingSearch>
+		</input>
+		<!-- JIRA MSSQL-53 - Cascading Fieldsets needed -->
+		<input type="dropdown" token="DatabaseName">
+			<label>Database</label>
+			<prefix>Name="</prefix>
+			<suffix>"</suffix>
+			<populatingSearch fieldForValue="Name" fieldForLabel="Name" earliest="-10m" latest="now">| inputlookup SQLDatabaseInformation | search $ServerInstance$ | stats count by Name</populatingSearch>
+		</input>
+	</fieldset>
+
+	<row>
+		<table>
+			<title>Database Information</title>
+			<searchTemplate>
+| inputlookup SQLDatabaseInformation | search $DatabaseName$ $ServerInstance$
+| stats values(host) as Hosts, values(Owner) as Owner, values(DatabaseGuid) as DatabaseGuid, values(LastBackupDate) as LastBackupDate, values(LastDifferentialBackupDate) as LastDifferentialBackupDate, values(LastLogBackupDate) as LastLogBackupDate, values(AutoGrow) as AutoGrow, values(AutoShrink) as AutoShrink, values(AutoGrowSetting) as AutoGrowSetting by Name,ServerInstance
+| table Hosts, Owner, DatabaseGuid, LastBackupDate, LastDifferentialBackupDate, LastLogBackupDate, AutoGrow, AutoGrowSetting, AutoShrink
+| transpose 10
+			</searchTemplate>
+			<earliestTime>-10m</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="showPager">false</option>
+		</table>
+		<chart>
+			<title>Disk Space Usage (MB) (Last 24 hours)</title>
+			<searchTemplate>
+eventtype=mssql-databasehealth
+| lookup SQLDatabaseInformation DatabaseGuid OUTPUT Name,ServerInstance
+| search $DatabaseName$ $ServerInstance$
+| eval Data=DataSpaceUsage/1024
+| eval Index=IndexSpaceUsage/1024
+| eval Log=LogSize
+| timechart max(Data) as Data, max(Index) as Index, max(Log) as Log
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">area</option>
+			<option name="charting.chart.stackMode">stacked</option>
+			<option name="charting.chart.nullValueMode">zero</option>
+		</chart>
+		<chart>
+			<title>Disk Usage (Now)</title>
+			<searchTemplate>
+eventtype=mssql-databasehealth
+| lookup SQLDatabaseInformation DatabaseGuid OUTPUT Name,ServerInstance
+| search $DatabaseName$ $ServerInstance$
+| stats latest(Size) as Size,latest(SpaceAvailable) as SpaceAvailable
+| eval Size = Size * 1024
+| eval perc = ((Size - SpaceAvailable) / Size) * 100
+| table perc
+			</searchTemplate>
+			<earliestTime>-10m</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">fillerGauge</option>
+			<option name="charting.chart.rangeValues">[0,70,90,100]</option>
+			<option name="charting.chart.usePercentageRange">true</option>
+			<option name="charting.chart.usePercentageValue">true</option>
+		</chart>
+	</row>
+
+	<row>
+		<chart>
+			<title>Active Connections (Last 24 hours)</title>
+			<searchTemplate>
+eventtype=mssql-databasehealth
+| lookup SQLDatabaseInformation DatabaseGuid OUTPUT Name,ServerInstance
+| search $DatabaseName$ $ServerInstance$
+| timechart max(ActiveConnections) as Connections
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">line</option>
+			<option name="charting.chart.nullValueMode">zero</option>
+		</chart>
+		<chart>
+			<title>Transaction Rate (Last 24 hours)</title>
+			<searchTemplate>
+eventtype=perfmon-mssql-databases counter="*Transaction*"
+| eval Name=instance
+| lookup SQLDatabaseInformation host,Name OUTPUT ServerInstance
+| search $DatabaseName$ $ServerInstance$
+| timechart max(Value) by counter
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">line</option>
+			<option name="charting.chart.nullValueMode">connect</option>
+		</chart>
+	</row>
+
+	<row>
+		<chart>
+			<title>I/O Throughput (Last 24 hours)</title>
+			<searchTemplate>
+eventtype=perfmon object="LogicalDisk" NOT (instance="_Total") (counter="Disk Read Bytes/sec" OR counter="Disk Write Bytes/sec") 
+| join type=inner host,instance [ inputlookup SQLDatabaseInformation | search $ServerInstance$ $DatabaseName$ | table LogicalDisk,host | rename LogicalDisk as instance ] 
+| timechart max(Value) by counter
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">line</option>
+			<option name="charting.chart.nullValueMode">zero</option>
+		</chart>
+		<chart>
+			<title>I/O Latency (Last 24 hours)</title>
+			<searchTemplate>
+eventtype=perfmon object="LogicalDisk" NOT (instance="_Total") (counter="Avg. Disk sec/Read" OR counter="Avg. Disk sec/Write") 
+| join type=inner host,instance [ inputlookup SQLDatabaseInformation | search $ServerInstance$ $DatabaseName$ | table LogicalDisk,host | rename LogicalDisk as instance ] 
+| timechart avg(Value) by counter
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">line</option>
+			<option name="charting.chart.nullValueMode">zero</option>
+		</chart>		
+	</row>
+
+</form>

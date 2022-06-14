@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Knowledge Object Lookup by Name and Type</label>
+  <searchTemplate>| inputlookup lookup_ko | where match(name,"(?i)$ko$") AND match(level,"$app$")  | search type="$type$"
+                  | fields name level type path
+                  | sort name level type
+                  | table name type level path
+                  | rename name as "Knowledge Object" type as "Type" level as "Level" path as "Located in File"
+  </searchTemplate>
+
+  <fieldset>
+    <input type="text" token="ko">
+      <label>Search for Knowledge Object</label>
+    </input>
+    <input type="dropdown" token="type">
+      <label>Type</label>
+         <choice value="*">Any</choice>
+         <populatingSearch fieldForValue="type" fieldForLabel="type"><![CDATA[| inputlookup lookup_ko | stats count by type]]></populatingSearch>
+    </input>
+		<input type="dropdown" token="app">
+      <label>App</label>
+         <choice value=".*">Any</choice>
+         <populatingSearch fieldForValue="appName" fieldForLabel="appName"><![CDATA[| inputlookup lookup_ko | rex field=level "app:(?<appName>\S+)" | stats count by appName ]]></populatingSearch>
+    </input>
+  </fieldset>
+
+  <row>
+    <table>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+
+    <row>
+    <html>
+      You may enter
+      <li>the exact name of the knowledge object,</li>
+      <li>part of the name of the object, or </li>
+      <li>a regular expression</li>
+      <br/>
+      The simple wildcard (*) does not work for this search.<br/>
+      The search is case-insensitive.
+    </html>
+  </row>
+</form>

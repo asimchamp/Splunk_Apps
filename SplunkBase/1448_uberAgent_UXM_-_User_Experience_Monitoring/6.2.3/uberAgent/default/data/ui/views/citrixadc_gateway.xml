@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form version="1.1" script="main.js" stylesheet="main.css, citrixadc_gateway.css">
+  
+  <label>Citrix ADC Gateway Performance</label>
+  <description>This dashboard displays information about gateways on Citrix ADCs monitored with uberAgent. uberAgent only collects performance data from the primary Citrix ADC.</description>
+
+  <fieldset autoRun="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time range:</label>
+      <default>
+        <earliest>-1h</earliest>
+        <latest>now</latest>
+      </default>
+      <change>
+         <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+         <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+         <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+      </change>
+    </input>
+    <input type="dropdown" token="CitrixADCFilterString" searchWhenChanged="true">
+         <choice value="*">All</choice>
+         <default>*</default>
+         <label>Citrix ADC:</label>
+         <fieldForLabel>HostName</fieldForLabel>
+         <fieldForValue>HostName</fieldForValue>
+         <allowCustomValues>false</allowCustomValues>
+         <search>
+            <query>
+               | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+                  splitrow HostName
+               | eval sortfield = lower (HostName)
+               | sort sortfield
+               | table
+                  HostName
+            </query>
+         </search>
+    </input>
+  </fieldset>
+  
+  <!-- Row 1 -->
+  <row>
+    <panel>
+        <title>ICA &amp; VPN usage over time</title>
+         <chart>
+            <search>
+                <query>
+                    | pivot `uA_DM_CitrixADC_AppliancePerformance` CitrixADC_AppliancePerformance
+                        avg(ICAOnlySessions) as "ICA sessions"
+                        avg(ICAOnlyConnections) as "ICA connections"
+                        avg(SmartAccessSessions) as "VPN sessions"
+                        avg(SmartAccessICAConnections) as "VPN ICA connections"
+                        splitrow
+                            _time 
+                            period $PivotPeriodAutoSolo$
+                        filter HostName is $CitrixADCFilterString|s$
+                </query>
+            </search>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">1</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="height">250</option>
+         </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Data volume over time</title>
+      <chart>
+        <search>
+          <query>
+               | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+                 sum(RequestResponseRateMB) as RequestResponseRateMB
+                 splitrow
+                   _time 
+                   period $PivotPeriodAutoTimechart$
+                 splitrow
+                   HostName
+                 splitrow
+                   vServerName
+                 filter HostName is $CitrixADCFilterString|s$
+               | eval "Gateway@CitrixADC" = vServerName . "@" . HostName 
+               | eventstats
+                  avg(RequestResponseRateMB) as RequestResponseRateMB
+                    by _time 
+                    by "Gateway@CitrixADC"
+               | timechart 
+                  `uberAgent_dynamic_span`
+                  sum(RequestResponseRateMB) as "Data volume (MB)" by "Gateway@CitrixADC"
+               | rename VALUE_* as *
+            </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Data volume (MB)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  
+  <!-- Row 2 -->
+  <row>
+    <panel>
+      <title>Citrix ADC Gateway table</title>
+      <table>
+        <search>
+          <query>
+                  | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+                    latest(HostName) as "Citrix ADC"
+                    latest(PrimaryIpAddress) as "IP address"
+                    latest(PrimaryPort) as Port
+                    latest(Type) as Type
+                    latest(State) as State
+                    latest(AuthLDAPPolicies) as "#LDAP policies"
+                    latest(AuthRadiusPolicies) as "#Radius policies"
+                    latest(AuthSAMLPolicies) as "#SAML policies"
+                    latest(SessionPolicies) as "#Session policies"
+                    latest(ResponderPolicies) as "#Responder policies"
+                    latest(RewritePolicies) as "#Rewrite policies"
+                    splitrow
+                       vServerName as Gateway
+                  filter HostName is $CitrixADCFilterString|s$
+                  | eval "#LDAP policies" = split('#LDAP policies',";")
+                  | eval "#Radius policies" = split('#Radius policies',";")
+                  | eval "#SAML policies" = split('#SAML policies',";")
+                  | eval "#Session policies" = split('#Session policies',";")
+                  | eval "#Responder policies" = split('#Responder policies',";")
+                  | eval "#Rewrite policies" = split('#Rewrite policies',";")
+                  | sort Gateway
+                  | eventstats
+                     dc("#LDAP policies") as "#LDAP policies" 
+                     dc("#Radius policies") as "#Radius policies"
+                     dc("#SAML policies") as "#SAML policies"
+                     dc("#Session policies") as "#Session policies"
+                     dc("#Responder policies") as "#Responder policies"
+                     dc("#Rewrite policies") as "#Rewrite policies"
+                        by Gateway
+                  | eval "#LDAP policies" = if(isnull('#LDAP policies'),0,'#LDAP policies')
+                  | eval "#Radius policies" = if(isnull('#Radius policies'),0,'#Radius policies')
+                  | eval "#SAML policies" = if(isnull('#SAML policies'),0,'#SAML policies')
+                  | eval "#Session policies" = if(isnull('#Session policies'),0,'#Session policies')
+                  | eval "#Responder policies" = if(isnull('#Responder policies'),0,'#Responder policies')
+                  | eval "#Rewrite policies" = if(isnull('#Rewrite policies'),0,'#Rewrite policies')
+               </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="DrilldownFilterBy21">$click.value$</set>
+        </drilldown>
+      </table>
+      <html src="citrixadc_gateway_explanation.html">
+      </html>
+      <chart depends="$DrilldownFilterBy21$">
+        <title>$DrilldownFilterBy21$: Data volume over time</title>
+        <search>
+          <query>
+              | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+                 sum(RequestBytesRate) as RequestBytesRate
+                 sum(ResponseBytesRate) as ResponseBytesRate
+                 splitrow
+                  _time 
+                  period $PivotPeriodAutoTimechart$
+                 filter vServerName is $DrilldownFilterBy21|s$
+              | eval RequestMBRate = round(RequestBytesRate/1024/1024,1)
+              | eval ResponseMBRate = round(ResponseBytesRate/1024/1024,1)
+              | stats 
+                 avg(RequestMBRate) as RequestMBRate
+                 avg(ResponseMBRate) as ResponseMBRate
+                   by _time
+              | timechart
+                 `uberAgent_dynamic_span`
+                 sum(RequestMBRate) as "Receive volume (MB)"
+                 sum(ResponseMBRate) as "Send volume (MB)"
+            </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">collapsed</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.fields">"Send data volume (MB)"</option>
+        <option name="charting.axisY2.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.overlayFields">"Receive data volume (MB)"</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+      <chart depends="$DrilldownFilterBy21$">
+        <title>$DrilldownFilterBy21$: Availability over time</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+               latest(State) as State
+               splitrow
+                _time 
+                period $PivotPeriodAutoSolo$
+               filter vServerName is $DrilldownFilterBy21|s$
+            | eval State = case(lower(State)=="up",100,isnotnull(State),0)
+            | table
+              _time
+              State
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.includeZero">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+      <table depends="$DrilldownFilterBy21$" id="Table_Panel21">
+        <title>$DrilldownFilterBy21$: Basic settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+               latest(PrimaryIpAddress) as "IP address"
+               latest(PrimaryPort) as Port
+               latest(Type) as Type
+               latest(State) as State
+               latest(SessionTimeout) as "Session timeout"
+               latest(STAs) as "Secure Ticket Authorities"
+               latest(PortalTheme) as "Portal theme"
+            filter vServerName is $DrilldownFilterBy21|s$
+            | transpose
+            | sort column
+            | rename
+               column as Property
+               "row 1" as Data
+          </query>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+      </table>
+      <table depends="$DrilldownFilterBy21$" id="Table_Panel31">
+        <title>$DrilldownFilterBy21$: Bound policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+               latest(AuthLDAPPolicies) as "LDAP policies"
+               latest(AuthRadiusPolicies) as "Radius policies"
+               latest(AuthSAMLPolicies) as "SAML policies"
+               latest(SessionPolicies) as "Session policies"
+               latest(ResponderPolicies) as "Responder policies"
+               latest(RewritePolicies) as "Rewrite policies"
+            filter vServerName is $DrilldownFilterBy21|s$
+            | eval "LDAP policies" = split('LDAP policies', ";")
+            | eval "Radius policies" = split('Radius policies', ";")
+            | eval "SAML policies" = split('SAML policies', ";")
+            | eval "Session policies" = split('Session policies', ";")
+            | eval "Secure Ticket Authorities" = split('Secure Ticket Authorities', ";")
+            | eval "Responder policies" = split('Responder policies', ";")
+            | eval "Rewrite policies" = split('Rewrite policies', ";")
+            | eval "LDAP policies" = if(isnull('LDAP policies'),"",'LDAP policies')
+            | eval "Radius policies" = if(isnull('Radius policies'),"",'Radius policies')
+            | eval "SAML policies" = if(isnull('SAML policies'),"",'SAML policies')
+            | eval "Session policies" = if(isnull('Session policies'),"",'Session policies')
+            | eval "Responder policies" = if(isnull('Responder policies'),"",'Responder policies')
+            | eval "Rewrite policies" = if(isnull('Rewrite policies'),"",'Rewrite policies')
+            | transpose
+            | sort column
+            | rename
+               column as Property
+               "row 1" as Data
+          </query>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+      </table>
+      <table depends="$DrilldownFilterBy21$" id="Table_Panel41">
+        <title>$DrilldownFilterBy21$: Security settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+               latest(SSL2) as "SSL 2"
+               latest(SSL3) as "SSL 3"
+               latest(TLS1) as "TLS 1"
+               latest(TLS11) as "TLS 1.1"
+               latest(TLS12) as "TLS 1.2"
+               latest(TLS13) as "TLS 1.3"
+               latest(HSTS) as "Strict Transport Security"
+               latest(HSTSMaxAge) as "Strict Transport Security: max age"
+               latest(HSTSInclSubdom) as "Strict Transport Security: include subdomains"
+               latest(DiffieHellman) as "Diffie-Hellman"
+               latest(Ciphers) as Ciphers
+               latest(CipherSuites) as "Cipher suites"
+               latest(Certificates) as Certificates
+               latest(SSLProfile) as "SSL profile"
+               filter vServerName is $DrilldownFilterBy21|s$
+            | eval Ciphers = split(Ciphers, ";")
+            | eval "Cipher suites" = split('Cipher suites', ";")
+            | transpose
+            | sort column
+            | rename
+               column as Property
+               "row 1" as Data
+          </query>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

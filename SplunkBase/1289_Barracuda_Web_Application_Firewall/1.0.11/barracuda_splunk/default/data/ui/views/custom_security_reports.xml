@@ -1,0 +1,74 @@
+<form>
+  <label>Severity Reports</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="unit_name" searchWhenChanged="true">
+      <label>Unit Name:</label>
+      <fieldForLabel>unit_name</fieldForLabel>
+      <fieldForValue>unit_name</fieldForValue>
+      <search ref="WF_search"></search>
+    </input>
+    <input type="dropdown" token="service_setting">
+      <label>Service:</label>
+      <fieldForLabel>ip_port</fieldForLabel>
+      <fieldForValue>ip_port</fieldForValue>
+      <search>
+        <query>sourcetype="firewall" |search unit_name = "$unit_name$"| eval ip_port = app_ip +":"+ app_port | chart count over ip_port</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Attacks Severity - Count</title>
+        <search>
+          <query>sourcetype="firewall" Attack_Description !=NULL | where unit_name = "$unit_name$" | eval ip_port = app_ip +":"+ app_port | where ip_port = "$ip_port$" |lookup attack_lookup Attack_Description OUTPUT Attack_Severity | stats count BY Attack_Severity</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Attacked Parameters</title>
+        <search>
+          <query>sourcetype="firewall" | where unit_name = "$unit_name$" |eval ip_port = app_ip +":"+ app_port | where ip_port = "$ip_port$"| `Attacked_Parameter`| where parameter != "NULL" |timechart count BY parameter</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Attacks</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Attacks Severity - Timechart</title>
+        <search>
+          <query>sourcetype="firewall" Attack_Description !=NULL | where unit_name = "$unit_name$"| eval ip_port = app_ip +":"+ app_port | where ip_port = "$ip_port$" | lookup attack_lookup Attack_Description OUTPUT Attack_Severity |timechart count BY Attack_Severity</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Attacks</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

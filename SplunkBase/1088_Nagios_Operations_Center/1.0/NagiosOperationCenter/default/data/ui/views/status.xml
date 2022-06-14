@@ -1,0 +1,159 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true"  template="dashboard.html">
+	<label>Status</label>
+	<module name="AccountBar" layoutPanel="appHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">splunk.search.job</param>
+		<param name="clearOnJobDispatch">True</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="TitleBar" layoutPanel="viewHeader">
+		<param name="actionsMenuFilter">dashboard</param>
+	</module>
+
+
+	<module name="HiddenSearch" layoutPanel="panel_row1_col1" autoRun="True">
+		<module name="ServerSideInclude">
+			<param name="src">static_filter.html</param>
+		</module>
+
+		<module name="SubmitButton">
+			<param name="allowSoftSubmit">True</param>
+			<param name="label">Search</param>
+
+			<module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Hot CRITICAL Alerts" autoRun="True">
+				<param name="search">
+					<![CDATA[
+					index="nagios_status" | where last_hard_state=2 | stats count | rangemap field=count severe=0-10000
+					]]>
+				</param>
+				<param name="earliest">-15m</param>
+				<param name="latest">now</param>
+				<param name="groupLabel">Hot CRITICAL Alerts</param>
+				<module name="ViewstateAdapter">
+					<param name="suppressionList"/>
+					<module name="HiddenFieldPicker">
+						<param name="strictMode">True</param>
+						<module name="JobProgressIndicator">
+							<module name="SingleValue">
+								<param name="classField">range</param>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+			<module name="HiddenSearch" layoutPanel="panel_row2_col2" group="Hot WARNING Alerts" autoRun="True">
+				<param name="search">
+					<![CDATA[
+					index="nagios_status" | where last_hard_state=1 | stats count | rangemap field=count elevated=0-10000
+					]]>
+				</param>
+				<param name="earliest">-15m</param>
+				<param name="latest">now</param>
+				<param name="groupLabel">Hot WARNING Alerts</param>
+				<module name="ViewstateAdapter">
+					<param name="suppressionList"/>
+					<module name="HiddenFieldPicker">
+						<param name="strictMode">True</param>
+						<module name="JobProgressIndicator">
+							<module name="SingleValue">
+								<param name="classField">range</param>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+			<module name="HiddenSearch" layoutPanel="panel_row2_col3" group="Hot UNKNOWN Alerts" autoRun="True">
+				<param name="search">
+					<![CDATA[
+					index="nagios_status" | where last_hard_state=3 | stats count | rangemap field=count blue=0-10000
+					]]>
+				</param>
+				<param name="earliest">-15m</param>
+				<param name="latest">now</param>
+				<param name="groupLabel">Hot UNKNOWN Alerts</param>
+				<module name="ViewstateAdapter">
+					<param name="suppressionList"/>
+					<module name="HiddenFieldPicker">
+						<param name="strictMode">True</param>
+						<module name="JobProgressIndicator">
+							<module name="SingleValue">
+								<param name="classField">range</param>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+
+			<module name="HiddenSearch" layoutPanel="panel_row4_col1" group="Hot Alerts" autoRun="True">
+				<param name="search">
+					<![CDATA[
+					index="nagios_status" | where last_hard_state!=0 | eval seconds=(time()-last_hard_state_change) | eval my_days=floor(seconds/86400) | eval my_hours=floor(seconds / 3600 - my_days * 24) | eval my_minutes = floor (seconds / 60 - my_hours * 60 - my_days *  1440) | eval my_seconds = floor(seconds - my_days * 86400 - my_hours * 3600 - my_minutes * 60) | strcat my_days "d " my_hours "h " my_minutes "m " my_seconds "s" Time | rename service_description as Service | rename host_name as Hostname | sort num(seconds) | eval State=case(last_hard_state=0,"OK",last_hard_state="1","WARNING",last_hard_state=2,"CRITICAL",last_hard_state=3,"UNKNOWN") | table Time,Service,Hostname,State
+					]]>
+				</param>
+				<param name="earliest">-15m</param>
+				<param name="latest">now</param>
+				<param name="groupLabel">Hot Alerts</param>
+				<module name="ViewstateAdapter">
+					<param name="suppressionList">
+						<item>drilldown</item>
+					</param>
+					<module name="HiddenFieldPicker">
+						<param name="strictMode">True</param>
+						<module name="JobProgressIndicator">
+							<module name="EnablePreview">
+								<param name="enable">True</param>
+								<param name="display">False</param>
+
+								<module name="Paginator">
+									<param name="count">10</param>
+									<param name="entityName">results</param>
+									<param name="maxPages">10</param>
+
+									<module name="SimpleResultsTable">
+										<param name="drilldown">row</param>
+										<param name="allowTransformedFieldSelect">True</param>
+										<module name="ConvertToDrilldownSearch">
+											<module name="ViewRedirector">
+												<param name="viewTarget">flashtimeline</param>
+											</module>
+										</module>
+									</module>
+								</module>
+								<module name="ViewRedirectorLink">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+
+			<module name="HiddenSearch" layoutPanel="panel_row5_col1" group="Hot Log" autoRun="True">
+				<param name="search">
+					<![CDATA[
+					index="nagios_action" (ALERT OR NOTIFICATION)
+					]]>
+				</param>
+				<param name="groupLabel">Hot Log</param>
+				<param name="earliest">-3d</param>
+				<param name="latest">now</param>
+
+				<module name="ViewstateAdapter">
+					<param name="suppressionList"/>
+					<module name="HiddenFieldPicker">
+						<param name="strictMode">True</param>
+						<module name="JobProgressIndicator">
+							<module name="EventsViewer"/>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+</view>

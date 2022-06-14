@@ -1,0 +1,32 @@
+<nav>
+    <view name="flashtimeline"/>
+ 	<view name="summary" default='true'/>
+    <collection label="Operations">
+        <view name="host_overview"/>
+        <view name="mdex_pool_overview"/>
+        <view name="baseline_updates"/>
+        <view name="forge"/>
+        <view name="dgidx"/>
+        <view source="unclassified" match="dashboard"/>
+    </collection>
+    <collection label="Site Analytics">
+        <view name="site_overview"/>
+        <view name="requests_overview"/>
+        <collection label="Click Rates">
+            <view name="click_rates_overview"/>
+            <view name="click_rate_analyzer"/>
+        </collection>        
+    </collection>    
+<!--    <collection label="Views">
+        <view source="unclassified" />
+        <divider />
+    </collection>
+    <collection label="Searches &amp; Reports">
+        <collection label="Reports">
+            <saved source="unclassified" match="report" />
+        </collection>
+        <divider />
+        <saved source="unclassified" />
+    </collection>
+-->
+</nav>

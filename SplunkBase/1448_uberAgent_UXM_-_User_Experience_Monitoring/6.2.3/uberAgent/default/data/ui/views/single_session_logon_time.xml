@@ -1,0 +1,376 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, single_session_logon_time.js" stylesheet="main.css, single_session_logon_time.css">
+
+   <label>Single Logon</label>
+   <description>This dashboard displays all available information about one specific logon.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+            latest(User) as User
+            latest(host) as Host
+            latest(SessionID) as SessionID
+            values(SessionLogonTime) as SessionLogonTime
+            values(SiteName) as SiteName
+            values(LogonServer) as LogonServer
+            sum(TotalLogonTimeMs) as TotalLogonTimeMs
+            sum(PreLogonInitTimeMs) as PreLogonInitTimeMs
+            sum(ProfileLoadTimeMs) as ProfileLoadTimeMs
+            sum(GroupPolicyTotalProcessingTimeMs) as GroupPolicyTotalProcessingTimeMs
+            sum(ADLogonScriptTimeMs) as ADLogonScriptTimeMs
+            sum(GroupPolicyLogonScriptTimeMs) as GroupPolicyLogonScriptTimeMs
+            sum(ShellStartupTimeMs) as ShellStartupTimeMs
+            sum(DcDiscoveryTimeMs) as DcDiscoveryTimeMs
+            latest(LoopbackMode) as LoopbackMode
+            splitrow
+               SessionGUID
+            filter SessionGUID is $FilterSessionGuid|s$
+         | join type=outer SessionGUID 
+            [
+               | pivot `uA_DM_Logoff_LogoffDetail` Logoff_LogoffDetail
+                  latest(SessionEndTime) as SessionEndTime
+                  splitrow
+                     SessionGUID
+               | fields + SessionGUID SessionEndTime
+            ]
+         | eval LogonTime = strftime (strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+         | eval TotalDurationS = round (TotalLogonTimeMs/1000,2)
+         | eval SessionEnd = if(isnull(SessionEndTime), "n/a", strftime(strptime(SessionEndTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S"))
+         | eval PreLogonInitTimeS = coalesce (round(PreLogonInitTimeMs/1000,2), "n/a")
+         | eval UserProfileS = coalesce (round (ProfileLoadTimeMs/1000,2), "n/a")
+         | eval GroupPolicyS = coalesce (round (GroupPolicyTotalProcessingTimeMs/1000,2), "n/a")
+         | eval AdLogonScriptS = coalesce (round (ADLogonScriptTimeMs/1000,2), "n/a")
+         | eval GpLogonScriptS = coalesce (round (GroupPolicyLogonScriptTimeMs/1000,2), "n/a")
+         | eval ShellStartS = coalesce (round (ShellStartupTimeMs/1000,2), "n/a")
+         | eval DcDiscoveryTimeS = coalesce (round (DcDiscoveryTimeMs/1000,2), "n/a")
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">User</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">User:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">Host</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Host:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">SessionID</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Session ID:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">LogonTime</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Logon time:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">SessionEnd</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Session end:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">TotalDurationS</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">Logon duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel">s</option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <title>Main phases</title>
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">PreLogonInitTimeS</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Pre logon init:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">UserProfileS</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">User profile:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">GroupPolicyS</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Group policy:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AdLogonScriptS</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">AD logon script:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">GpLogonScriptS</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">GP logon script:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">ShellStartS</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">Shell start:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel">s</option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <title>Active Directory</title>
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">SiteName</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Site:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">LogonServer</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Authenticating DC:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">DcDiscoveryTimeS</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">DC discovery:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">LoopbackMode</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">GP loopback mode:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Processing time per logon phase</title>
+         <chart>
+            <search base="Search_Single">
+               <query>
+                  rename
+                     UserProfileS as "User profile"
+                     GroupPolicyS as "Group policy"
+                     AdLogonScriptS as "AD logon script"
+                     GpLogonScriptS as "GP logon script"
+                     ShellStartS as "Shell start"
+                  | fields
+                     "User profile"
+                     "Group policy"
+                     "AD logon script"
+                     "GP logon script"
+                     "Shell start"
+                  | fields - _timediff
+                  | transpose
+                  | rename
+                     column as "Logon phase"
+                     "row 1" as "Duration per phase (s)"
+                  | sort - "Duration per phase (s)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+   </row>
+
+   <search id="Search_Row3">
+      <query>
+         | pivot `uA_DM_Logon_GroupPolicyCSEDetail` Logon_GroupPolicyCSEDetail
+            latest(CseDurationS) as CseDurationS
+            latest(CseGPONames) as CseGPONames
+            latest(CseReturnCode) as CseReturnCode
+            splitrow
+               CseName
+            filter SessionGUID is $FilterSessionGuid|s$
+         | eval CseGPONames=split(CseGPONames, ";")
+         | table
+            CseName
+            CseDurationS
+            CseGPONames
+            CseReturnCode
+         | rename
+            CseName as "CSE Name"
+            CseDurationS as "Duration (s)"
+            CseGPONames as "GPOs"
+            CseReturnCode as "Return code"
+      </query>
+   </search>
+            
+   <!-- Row 3 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Group Policy CSEs and GPOs</title>
+         <html src="single_session_logon_time_1.html">
+         </html>
+         <table id="Table_Panel21">
+            <search base="Search_Row3">
+               <query>
+                  sort "CSE Name"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Group Policy CSE processing time</title>
+         <html src="single_session_logon_time_2.html">
+         </html>
+         <chart>
+            <search base="Search_Row3">
+               <query>
+                  sort - "Duration (s)"
+                  | fields
+                     "CSE Name"
+                     "Duration (s)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>Logon process performance</title>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_LogonProcesses` Process_LogonProcesses
+                     latest(ProcName) as ProcName
+                     latest(ProcID) as ProcID
+                     latest(ProcParentName) as ProcParentName
+                     latest(ProcParentID) as ProcParentID
+                     latest(AppName) as Application
+                     latest(LogonProcType) as Type
+                     latest(ProcCmdline) as "Command line"
+                     latest(ProcCPUTimeMs) as "CPU time (ms)"
+                     latest(ProcWorkingSetMB) as "RAM (MB)"
+                     latest(ProcIOCount) as "IO count"
+                     latest(TotalLogonDurationMs) as TotalLogonDurationMs
+                     splitrow
+                        ProcStartTimeRelativeMs
+                     splitrow
+                        ProcLifetimeMs
+                     splitrow
+                        SortOrder
+                     filter SessionGUID is $FilterSessionGuid|s$
+                  | eval "Name (ID)" = ProcName + " (" + ProcID + ")"
+                  | eval "Parent (ID)" = ProcParentName + " (" + ProcParentID + ")"
+                  | eval Lifetime = ProcStartTimeRelativeMs + ";" + ProcLifetimeMs + ";" + TotalLogonDurationMs + ";" + Type
+                  | sort SortOrder
+                  | table
+                     Lifetime
+                     Type
+                     "Name (ID)"
+                     "Parent (ID)"
+                     Application
+                     "Command line"
+                     "CPU time (ms)"
+                     "RAM (MB)"
+                     "IO count"
+               </query>
+            </search>
+            <option name="count">100</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+   <search id="Search_Row5">
+      <query>
+         | pivot `uA_DM_Process_LogonProcesses` Process_LogonProcesses
+            count(Process_LogonProcesses) as "#Processes"
+            sum(ProcCPUTimeMs) as "CPU time (ms)"
+            sum(ProcWorkingSetMB) as "RAM (MB)"
+            sum(ProcIOCount) as "IO count"
+            splitrow
+               LogonProcType as Type
+            filter SessionGUID is $FilterSessionGuid|s$
+         | where (NOT isnull('CPU time (ms)')) OR (NOT isnull('RAM (MB)')) OR (NOT isnull('IO count'))
+      </query>
+   </search>
+   
+   <!-- Row 5 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Logon performance per process type</title>
+         <table id="Table_Panel51">
+            <search base="Search_Row5">
+               <query>
+                  table
+                  Type
+                  "#Processes"
+                  "CPU time (ms)"
+                  "RAM (MB)"
+                  "IO count"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Logon performance per process type: CPU</title>
+         <chart>
+            <search base="Search_Row5">
+               <query>
+                  | fields
+                     Type
+                     "CPU time (ms)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 6 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Logon performance per process type: RAM</title>
+         <chart>
+            <search base="Search_Row5">
+               <query>
+                  | fields
+                     Type
+                     "RAM (MB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Logon performance per process type: disk</title>
+         <chart>
+            <search base="Search_Row5">
+               <query>
+                  | fields
+                     Type
+                     "IO count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+</form>

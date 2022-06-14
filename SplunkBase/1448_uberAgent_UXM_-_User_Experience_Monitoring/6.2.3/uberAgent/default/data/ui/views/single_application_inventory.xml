@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Single Application Inventory</label>
+   <description>This dashboard displays the installed versions of a specific application over time. It also shows detailed information about each installation. Please note that inventory information is only collected once per 24 hour period by default.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-7d@d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Application_ApplicationInventory</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Application_ApplicationInventory` Application_ApplicationInventory
+            values(Publisher) as Publisher
+            values(DisplayName) as DisplayName
+            dc(DisplayVersion) as VersionCount
+            filter DisplayName is $FilterDisplayName|s$
+            $SearchFilter$
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">Publisher</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Publisher:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">DisplayName</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Application:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">VersionCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Versions:</option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Inventory count per version over time</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_ApplicationInventory` Application_ApplicationInventory
+                     dc(host) as "Inventory count"
+                     splitrow
+                        _time
+                        period day
+                     splitcol
+                        DisplayVersion
+                     filter DisplayName is $FilterDisplayName|s$
+                     $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">right</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>All installations of this application</title>
+         <table id="Table_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_ApplicationInventory` Application_ApplicationInventory
+                     latest(InstallDate) as "Installation date"
+                     latest(Language) as Language
+                     latest(InstallLocation) as "Installation location"
+                     latest(IsMsiPackage) as IsMsiPackage
+                     latest(IsMachineInstall) as IsMachineInstall
+                     splitrow
+                        host as Host
+                     splitrow
+                        DisplayVersion as Version
+                     filter DisplayName is $FilterDisplayName|s$
+                     $SearchFilter$
+                  | eval "MSI package" =if (IsMsiPackage=1,"yes","no")
+                  | eval "Installation scope" = if (IsMachineInstall=1,"machine","user")
+                  | eval sortfield=lower('Host')
+                  | sort limit=0 sortfield
+                  | table
+                     Host
+                     Version
+                     "Installation date"
+                     Language
+                     "MSI package"
+                     "Installation scope"
+                     "Installation location"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+
+      <html src="single_application_inventory_explanation.html">
+      </html>
+      </panel>
+   </row>
+   
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>All machines where the application is not installed</title>
+         <table id="Table_Panel32">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_MachineInventory` System_MachineInventory
+                     latest(HwIsVirtualMachine) as IsVirtual
+                     latest(OsName) as "Operating system"
+                     latest(OsType) as "Machine type"
+                     latest(IsBatteryPresent) as IsLaptop
+                     splitrow host
+                     $SearchFilter$
+                     | join type=outer host
+                     [
+                        | pivot `uA_DM_Application_ApplicationInventory` Application_ApplicationInventory
+                          values(DisplayName) as AppNames
+                          splitrow host
+                          filter DisplayName is $FilterDisplayName|s$
+                          $SearchFilter$
+                        | fields + host AppNames
+                     ]
+                     | where isnull(AppNames)
+                     | eval "Is virtual machine?" = if (IsVirtual=1,"Yes","No")
+                     | eval "Has battery?" = if (IsLaptop=1,"Yes","No")
+                     | eval sortfield = lower('host')
+                     | sort limit=0 sortfield
+                     | rename host as Host
+                     | table 
+                        Host
+                        "Operating system" 
+                        "Machine type" 
+                        "Has battery?" 
+                        "Is virtual machine?"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+
+      <html src="single_application_inventory_explanation_2.html">
+      </html>      
+      </panel>
+   </row>
+
+</form>

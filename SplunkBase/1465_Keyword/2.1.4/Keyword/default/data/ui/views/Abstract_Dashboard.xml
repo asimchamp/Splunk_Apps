@@ -1,0 +1,44 @@
+<form stylesheet="nav_hutch.css" version="1.1">
+  <label>Abstract: Search Multi-Line Events</label>
+  <search id="baseSearch">
+    <query>index=$indexes$ $keyword_field$ |abstract maxlines=$maxlines$ maxterms=$maxterms$</query>
+  </search>
+  <fieldset>     
+    <html><h5>Note: Drilldown on sourcetype, not on the raw data</h5></html>
+    <input type="multiselect" token="indexes" searchWhenChanged="true">
+      <label>Choose index(s)</label>
+      <choice value="*">All</choice>
+      <search>
+	<query> |eventcount summarize=false index=* | dedup index | fields index|rename index as title| search NOT title=splunklogger NOT title=history NOT title=summary | table title </query>
+      </search>
+      <fieldForLabel>Index</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <delimiter> OR index= </delimiter>
+    </input>
+      <input type="text" token="keyword_field">
+          <label>Enter keyword (e.g. exception) to find</label>
+      </input>
+      <input type="text" token="maxlines">
+            <label>MaxLines/Event</label>
+	    <initialValue>25</initialValue>
+	    <default>25</default>
+      </input>
+      <input type="text" token="maxterms">
+            <label>MaxTerms/Event</label>
+	    <initialValue>100</initialValue>
+	    <default>100</default>
+      </input>
+      <input type="time" />
+  </fieldset>
+ <row>
+      <table>
+          <title>Abstract of multi-line events matching keyword(s)</title>
+	  <search base="baseSearch">
+	    <query>|table _time, sourcetype, _raw</query>
+	  </search>
+	  <option name="count">20</option>
+	  <option name="showPager">true</option>
+      </table>
+ </row>
+
+</form>

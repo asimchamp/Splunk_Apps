@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, single_session_logoff_time.js" stylesheet="main.css, single_session_logoff_time.css">
+
+   <label>Single Logoff</label>
+   <description>This dashboard displays all available information about one specific logoff.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Logoff_LogoffDetail` Logoff_LogoffDetail
+            latest(User) as User
+            latest(host) as Host
+            latest(SessionID) as SessionID
+            values(SessionLogoffTime) as SessionLogoffTime
+            sum(TotalLogoffTimeMs) as TotalLogoffTimeMs
+            sum(ProfileUnloadTimeMs) as ProfileUnloadTimeMs
+            sum(GroupPolicyLogoffScriptTimeMs) as GroupPolicyLogoffScriptTimeMs
+            filter SessionGUID is $FilterSessionGuid|s$
+         | eval LogoffTime = strftime (strptime(SessionLogoffTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+         | eval TotalDurationS = round (TotalLogoffTimeMs/1000,2)
+         | eval UserProfileS = coalesce (round (ProfileUnloadTimeMs/1000,2), "n/a")
+         | eval GpLogoffScriptS = coalesce (round (GroupPolicyLogoffScriptTimeMs/1000,2), "n/a")
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">User</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">User:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">Host</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Host:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">SessionID</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Session ID:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">LogoffTime</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Logoff time:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">TotalDurationS</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Logoff duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">UserProfileS</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">User profile:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">GpLogoffScriptS</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">GP logoff script:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-afterLabel">s</option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Logoff process performance</title>
+         <table id="Table_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_LogoffProcesses` Process_LogoffProcesses
+                     latest(ProcName) as ProcName
+                     latest(ProcID) as ProcID
+                     latest(ProcParentName) as ProcParentName
+                     latest(ProcParentID) as ProcParentID
+                     latest(AppName) as Application
+                     latest(LogoffProcType) as Type
+                     latest(ProcCmdline) as "Command line"
+                     latest(ProcIOCount) as "IO count"
+                     latest(TotalLogoffDurationMs) as TotalLogoffDurationMs
+                     splitrow
+                        ProcStartTimeRelativeMs
+                     splitrow
+                        ProcLifetimeMs
+                     splitrow
+                        SortOrder
+                     filter SessionGUID is $FilterSessionGuid|s$
+                  | eval "Name (ID)" = ProcName + " (" + ProcID + ")"
+                  | eval "Parent (ID)" = ProcParentName + " (" + ProcParentID + ")"
+                  | eval Lifetime = ProcStartTimeRelativeMs + ";" + ProcLifetimeMs + ";" + TotalLogoffDurationMs + ";" + Type
+                  | sort SortOrder
+                  | table
+                     Lifetime
+                     Type
+                     "Name (ID)"
+                     "Parent (ID)"
+                     Application
+                     "Command line"
+                     "IO count"
+               </query>
+            </search>
+            <option name="count">100</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+</form>

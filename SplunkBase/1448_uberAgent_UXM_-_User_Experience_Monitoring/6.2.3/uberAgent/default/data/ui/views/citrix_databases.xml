@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Citrix Virtual Apps and Desktops Databases</label>
+   <description>This dashboard displays detailed information about Citrix Virtual Apps and Desktops databases. It requires uberAgent to be installed on at least one delivery controller per site (Citrix Virtual Apps and Desktops 7.6 or newer). Supports on-premises installations only.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="SiteFilterString" searchWhenChanged="true">
+         <choice value="*">All</choice>
+         <default>*</default>
+         <label>Site:</label>
+         <allowCustomValues>false</allowCustomValues>
+         <fieldForLabel>SiteName</fieldForLabel>
+         <fieldForValue>SiteGuid</fieldForValue>
+         <search>
+            <query>
+               | pivot `uA_DM_Citrix_Machines` Citrix_Machines
+                  first(SiteName) as SiteName
+                  splitrow 
+                     SiteGuid
+               | eval sortfield = lower (SiteName)
+               | sort sortfield
+               | table
+                  SiteName
+                  SiteGuid
+            </query>
+         </search>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+            values(ServerAddress) as ServerAddress
+            values(MirrorServerAddress) as MirrorServerAddress
+            values(Name) as Name
+            filter SiteGuid is $SiteFilterString|s$
+         | eval ServerAddressLower = lower(ServerAddress)
+         | eval MirrorServerAddressLower = lower(MirrorServerAddress)
+         | eval NameLower = lower(Name)
+         | stats
+            dc(ServerAddressLower) as DatabaseServerCount
+            dc(MirrorServerAddressLower) as MirrorServerAddressCount
+            dc(NameLower) as DatabaseCount
+         | appendcols
+         [
+         | pivot `uA_DM_Citrix_Machines` Citrix_Machines
+            dc(SiteGuid) as SiteCount
+            filter SiteGuid is $SiteFilterString|s$
+         ]
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Overview</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">SiteCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Sites:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">DatabaseServerCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Database servers:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">MirrorServerAddressCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Mirror database servers:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">DatabaseCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Databases:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <panel>
+         <title>Databases</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+                     latest(ServerAddress) as "Database Server"
+                     latest(MirrorServerAddress) as MirrorServerAddress
+                     splitrow 
+                        SiteName as "Citrix Site Name"
+                     splitrow 
+                        Name as "Database Name"
+		               filter SiteGuid is $SiteFilterString|s$
+		            | eval "Mirror Database Server" = if(isnull(MirrorServerAddress), "n/a", MirrorServerAddress)   
+                  | table
+                     "Citrix Site Name"
+                     "Database Name"
+                     "Database Server"
+                     "Mirror Database Server"
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Data volume</title>
+         <chart id="Chart_Panel31">
+            <title>Data volume (top 10)</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+                     values(ServerAddress) as ServerAddress
+                     splitrow
+                        host
+                     filter SiteGuid is $SiteFilterString|s$
+                  | eval ServerAddressSplitNamedInstance = split(ServerAddress, "\\")
+                  | eval ServerAddressSplitNamedPort = split(mvindex(ServerAddressSplitNamedInstance,0), ",")
+                  | eval ServerAddressServername = trim(mvindex(ServerAddressSplitNamedPort,0))
+                  | eval NetTargetRemoteNameAddress = lower(ServerAddressServername)
+                  | join type=outer NetTargetRemoteNameAddress host
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendMB) as SumNetTargetSendMB
+                        sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                        splitrow
+                           NetTargetRemoteNameAddress
+                        splitrow 
+                           host
+                        filter NetTargetRemotePort = *
+                        filter NetTargetProtocols is TCP
+                        filter AppName isNotNull
+                        filter AppName is "*Citrix*" 
+                     | eval "Send volume (MB)"=round(SumNetTargetSendMB,1)
+                     | eval "Receive volume (MB)"=round(SumNetTargetReceiveMB,1)
+                     | fields + 
+                        host
+                        NetTargetRemoteNameAddress
+                        "Send volume (MB)"
+                        "Receive volume (MB)"
+                  ]
+                  | eval "Host@Database Connection" = host . "@" . 'ServerAddress'
+                  | sort limit=10 - "Send+Receive volume (MB)"
+                  | fields
+                     "Host@Database Connection"
+                     "Send volume (MB)"
+                     "Receive volume (MB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart id="Chart_Panel32">
+            <title>Data volume over time</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+                     values(ServerAddress) as ServerAddress
+                     splitrow
+                        host
+                     splitrow 
+                        _time 
+                        period $PivotPeriodAutoTimechart$
+                     filter SiteGuid is $SiteFilterString|s$
+                  | eval ServerAddressSplitNamedInstance=split(ServerAddress, "\\")
+                  | eval ServerAddressSplitNamedPort=split(mvindex(ServerAddressSplitNamedInstance,0), ",")
+                  | eval ServerAddressServername=trim(mvindex(ServerAddressSplitNamedPort,0))
+                  | eval NetTargetRemoteNameAddress= lower(ServerAddressServername)
+                  | join type=outer NetTargetRemoteNameAddress host _time
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendMB) as SumNetTargetSendMB
+                        sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                        splitrow
+                           NetTargetRemoteNameAddress
+                        splitrow
+                           host
+                        splitrow
+                           _time
+                           period $PivotPeriodAutoTimechart$
+                        filter NetTargetRemotePort = *
+                        filter NetTargetProtocols is TCP
+                        filter AppName isNotNull
+                        filter AppName is "*Citrix*"
+                     | eval "Host@Database Connection" = host . "@" . 'NetTargetRemoteNameAddress'
+                     | fields + 
+                        host
+                        "Host@Database Connection"
+                        NetTargetRemoteNameAddress
+                        SumNetTargetSendMB
+                        SumNetTargetReceiveMB
+                  ]
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum(SumNetTargetSendMB) as "Send volume (MB)"
+                     sum(SumNetTargetReceiveMB) as "Receive volume (MB)"
+                     by "Host@Database Connection"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Latency</title>
+         <chart id="Chart_Panel33">
+            <title>Average latency (top 10)</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+                     values(ServerAddress) as ServerAddress
+                     splitrow
+                        host
+                     filter SiteGuid is $SiteFilterString|s$
+                  | eval ServerAddressSplitNamedInstance=split(ServerAddress, "\\")
+                  | eval ServerAddressSplitNamedPort=split(mvindex(ServerAddressSplitNamedInstance,0), ",")
+                  | eval ServerAddressServername=trim(mvindex(ServerAddressSplitNamedPort,0))
+                  | eval NetTargetRemoteNameAddress= lower(ServerAddressServername)
+                  | join type=outer NetTargetRemoteNameAddress host
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendLatencyCount) AS SumNetTargetSendLatencyCount
+                        sum(NetTargetSendDurationMs) AS SumNetTargetSendDurationMs
+                        splitrow
+                           NetTargetRemoteNameAddress
+                        splitrow 
+                           host
+                        filter NetTargetRemotePort = *
+                        filter NetTargetProtocols is TCP
+                        filter AppName isNotNull
+                        filter AppName is "*Citrix*" 
+                     | where SumNetTargetSendLatencyCount>10
+                     | eval "Avg. TCP send latency (ms)"=round(SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+                     | fields + 
+                        host
+                        NetTargetRemoteNameAddress
+                        "Avg. TCP send latency (ms)"
+                  ]
+                  | eval "Host@Database Connection" = host . "@" . 'ServerAddress'
+                  | sort limit=10 - "Avg. TCP send latency (ms)"
+                  | fields
+                     "Host@Database Connection"
+                     "Avg. TCP send latency (ms)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart id="Chart_Panel34">
+            <title>Average latency over time</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+                     values(ServerAddress) as ServerAddress
+                     splitrow
+                        host
+                     splitrow 
+                        _time 
+                        period $PivotPeriodAutoTimechart$
+                     filter SiteGuid is $SiteFilterString|s$
+                  | eval ServerAddressSplitNamedInstance=split(ServerAddress, "\\")
+                  | eval ServerAddressSplitNamedPort=split(mvindex(ServerAddressSplitNamedInstance,0), ",")
+                  | eval ServerAddressServername=trim(mvindex(ServerAddressSplitNamedPort,0))
+                  | eval NetTargetRemoteNameAddress= lower(ServerAddressServername)
+                  | join type=outer NetTargetRemoteNameAddress host _time
+                  [
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                     sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                     splitrow
+                        NetTargetRemoteNameAddress
+                     splitrow
+                        host
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     filter NetTargetRemotePort = *
+                     filter NetTargetProtocols is TCP
+                     filter AppName isNotNull
+                     filter AppName is "*Citrix*"
+                  | eval "Host@Database Connection" = host . "@" . 'NetTargetRemoteNameAddress'
+                  | fields + 
+                     host
+                     "Host@Database Connection"
+                     NetTargetRemoteNameAddress
+                     SumNetTargetSendLatencyCount
+                     SumNetTargetSendDurationMs
+                  ]
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     eval(round(sum(SumNetTargetSendDurationMs)/sum(SumNetTargetSendLatencyCount),1)) as "Avg. TCP send latency (ms)"
+                     by "Host@Database Connection"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 4 -->
+   <row>
+
+      <panel>
+         <title>Database server networking</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Citrix_Databases` Citrix_Databases
+                     latest(ServerAddress) as ServerAddress
+                     latest(MirrorServerAddress) as MirrorServerAddress
+                     latest(SiteName) as "Citrix Site Name"
+                     splitrow 
+                        host
+                     filter SiteGuid is $SiteFilterString|s$
+                  | eval ServerAddressSplitNamedInstance=split(ServerAddress, "\\")
+                  | eval ServerAddressSplitNamedPort=split(mvindex(ServerAddressSplitNamedInstance,0), ",")
+                  | eval ServerAddressServername=trim(mvindex(ServerAddressSplitNamedPort,0))
+                  | eval NetTargetRemoteNameAddress= lower(ServerAddressServername)
+                  | join type=outer NetTargetRemoteNameAddress host
+                  [
+                     | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                        sum(NetTargetSendCount) as SumNetTargetSendCount
+                        sum(NetTargetReceiveCount) as SumNetTargetReceiveCount
+                        sum(NetTargetConnectCount) as SumNetTargetConnectCount
+                        sum(NetTargetReconnectCount) as SumNetTargetReconnectCount
+                        sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+                        sum(NetTargetSendMB) as SumNetTargetSendMB
+                        sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                        sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                        sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                        latest(NetTargetRemoteNameAddressPort) as NetTargetRemoteNameAddressPort
+                        splitrow
+                           NetTargetRemoteNameAddress
+                        splitrow host
+                        filter NetTargetRemotePort = *
+                        filter NetTargetProtocols is TCP
+                        filter AppName is "*Citrix*" 
+                     | eval "Database Server:Port" = NetTargetRemoteNameAddressPort
+                     | eval "#Sends"=round(SumNetTargetSendCount,0)
+                     | eval "#Receives"=round(SumNetTargetReceiveCount,0)
+                     | eval "#Connects"=round(SumNetTargetConnectCount,0)
+                     | eval "#Reconnects"=round(SumNetTargetReconnectCount,0)
+                     | eval "#Retransmits"=round(SumNetTargetRetransmitCount,0)
+                     | eval "Send volume (MB)"=round(SumNetTargetSendMB,1)
+                     | eval "Receive volume (MB)"=round(SumNetTargetReceiveMB,1)
+                     | eval "Avg. TCP send latency (ms)"=round(SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+                     | fields + 
+                        host
+                        NetTargetRemoteNameAddress
+                        "Database Server:Port"
+                        "#Sends"
+                        "#Receives"
+                        "#Connects"
+                        "#Reconnects"
+                        "#Retransmits"
+                        "Avg. TCP send latency (ms)"
+                        "Send volume (MB)"
+                        "Receive volume (MB)"
+                  ]
+                  | eval "Database Server:Port" = coalesce('Database Server:Port', "n/a")
+                  | eval "#Sends" = coalesce('#Sends', "n/a")
+                  | eval "#Receives" = coalesce('#Receives', "n/a")
+                  | eval "#Connects" = coalesce('#Connects', "n/a")
+                  | eval "#Reconnects" = coalesce('#Reconnects', "n/a")
+                  | eval "#Retransmits" = coalesce('#Retransmits', "n/a")
+                  | eval "Send volume (MB)" = coalesce('Send volume (MB)', "n/a")
+                  | eval "Receive volume (MB)" = coalesce('Receive volume (MB)', "n/a")
+                  | eval "Avg. TCP send latency (ms)" = coalesce('Avg. TCP send latency (ms)', "n/a")
+                  | rename ServerAddress AS "Database Connection"
+                  | rename host AS "Controller name"
+                  | table
+                     "Controller name"
+                     "Citrix Site Name"
+                     "Database Connection"
+                     "Database Server:Port"
+                     "#Sends"
+                     "#Receives"
+                     "#Connects"
+                     "#Reconnects"
+                     "#Retransmits"
+                     "Avg. TCP send latency (ms)"
+                     "Send volume (MB)"
+                     "Receive volume (MB)"
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+</form>

@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Alerts</label>
+  <row>
+    <single>
+      <searchString>eventtype=sitescope_alert  | stats count</searchString>
+      <title>SiteScope Alert Count</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </single>
+  </row>
+  <row>
+    <table>
+      <searchString>eventtype=sitescope_alert  | stats sparkline(count,1d) AS "Sparkline Count", count by sis_alert_name  | rename sis_alert_name AS "SiteScope Alert Name"| sort - count</searchString>
+      <title>Top SiteScope Alerts</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">50</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+    <table>
+      <searchString>eventtype=sitescope_alert  | stats sparkline(count,1d) AS "Sparkline Count",count by sis_alert_group | rename sis_alert_group AS "SiteScope Alert Group" | sort - count</searchString>
+      <title>Top SiteScope Alert Groups</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">50</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>eventtype=sitescope_alert | makemv delim="," sis_alert_to | stats sparkline(count,1d) AS "Sparkline Count",count by sis_alert_to | rename sis_alert_to AS "SiteScope Alert Email" | rename sis_alert_to AS "Email Address" | sort - count</searchString>
+      <title>Top SiteScope Alert Recipients</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">50</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <searchString>eventtype=sitescope_alert | timechart span=1h count </searchString>
+      <title>SiteScope Alert Count Timechart</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+</dashboard>

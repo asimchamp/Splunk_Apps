@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Failed Buckets</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 30 days</default>
+    </input>
+  </fieldset>
+  
+  <row>
+    <table>
+      <title>Errors &amp; Failures</title>
+      <searchTemplate>
+        `shuttl_error`
+        | table `shuttl_failed_buckets_table_format`
+      </searchTemplate>
+      <option name="showPager">true</option>
+    </table>
+  </row>
+
+</form>

@@ -1,0 +1,81 @@
+.tooltip {
+        color: #000000;
+        outline: none;
+        cursor: help;
+        text-decoration: none;
+        position: relative;
+}
+.tooltip .help_icon {
+    background-image: url(help_icon.png);
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    float: left;
+    vertical-align: middle;
+}
+
+.tooltip .help_icon.after {
+    float: none;
+    margin-left: 5px;
+    vertical-align: top;
+}
+
+.tooltip span {
+        margin-left: -999em;
+        position: absolute;
+        font-size: 11px;
+}
+.tooltip:hover span {
+        border-radius: 5px 5px;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px; 
+        box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+        -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+        -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+        position: absolute;
+        left: 1em; top: 2em;
+        z-index: 99;
+        margin-left: 0;
+        width: 250px;
+        text-decoration: none;
+}
+.tooltip:hover img {
+        border: 0;
+        margin: -10px 0 0 -55px;
+        float: left;
+        position: absolute;
+}
+.tooltip:hover em {
+        font-weight: bold;
+        display: block;
+        padding: 0.2em 0 0.6em 0;
+}
+
+.tooltip .classic { padding: 0.8em 1em; }
+.tooltip .custom { padding: 0.5em 0.8em 0.8em 2em; }
+* html a:hover { background: transparent; }
+.tooltip .classic {background: #FFFFAA; border: 1px solid #FFAD33; }
+.tooltip .critical { background: #FFCCAA; border: 1px solid #FF3334;	}
+.tooltip .help { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+.tooltip .info { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+.tooltip .warning { background: #FFFFAA; border: 1px solid #FFAD33; }
+
+.info_icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 3px;
+}
+
+.ico_hyperv {
+    background-image: url(ico_hyperv_16.png);
+    background-repeat: no-repeat;
+    background-position: 0px;
+    padding-left: 22px !important;
+}
+
+.ico_xenserver{
+    background-image: url(ico_xenserver_16.png);
+    background-repeat: no-repeat;
+    background-position: 0px;
+    padding-left: 22px !important;
+}

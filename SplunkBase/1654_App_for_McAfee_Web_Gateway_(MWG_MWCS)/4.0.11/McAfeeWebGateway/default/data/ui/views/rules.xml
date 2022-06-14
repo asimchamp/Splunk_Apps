@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>Rules</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <search id="baseSearch">
+    <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user action bytes_in bytes_out rule url t_rule_engine t_externals duration rules_fired rules_evaluated embeddings</query>
+  </search>
+  <row>
+    <table>
+      <title>Top Rules</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields rule | top rule limit=20</query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">10</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <title>Block Rules Overview</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ action="blocked" | fields rule | timechart count by rule limit=20</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>Top Block Rules</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ action="blocked" | fields rule | top rule limit=20</query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">10</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Rule Complexity/Performance</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields rules_fired rules_evaluated t_rule_engine | stats median(rules_fired) AS "#fired, avg",perc95(rules_fired) AS fired95, max(rules_fired) AS "#fired, max", median(rules_evaluated) AS "#evaluated, avg",perc95(rules_evaluated) AS eval95, max(rules_evaluated) AS "#evaluated, max", median(t_rule_engine) AS "spent in RuleEngine, avg, ms",perc95(t_rule_engine) AS RE95,max(t_rule_engine) AS "spent in RuleEngine, max, ms" | eval fired95=round(fired95) | eval eval95=round(eval95) | eval "% fired"=round(fired95/eval95*100) | eval RE95=round(RE95) | rename RE95 AS "spent in RuleEngine, 95%, ms" fired95 AS "#fired, 95%" eval95 AS "#evaluated, 95%" </query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">10</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Slowest Rule Execution</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ t_rule_engine > 50 | fields url embeddings duration bytes_in bytes_out t_externals t_rule_engine | table url, embeddings, duration, bytes_in, bytes_out, t_externals, t_rule_engine | sort - t_rule_engine | head</query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">10</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <title>Time in Rule Engine Distribution</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields t_rule_engine | chart count over t_rule_engine</query>
+      </search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.drilldown">none</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.layout.splitSeries">0</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Time in Rule Engine over Time</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields t_rule_engine | eval latency=case(t_rule_engine &lt; 5, "A",t_rule_engine &lt; 20, "B",t_rule_engine &lt; 50,"C",t_rule_engine &lt; 100,"D", t_rule_engine >= 100,"E")| timechart count by latency | rename "A" AS "0-5ms" "B" AS "5-20ms" "C" AS "20-50ms" "D" AS "50-100ms" "E" AS "&gt;100ms"</query>
+      </search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.drilldown">none</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.fieldColors">{"0-5ms": 0x66ff00, "5-20ms": 0xccff00, "20-50ms": 0xffcc00, "50-100ms": 0xff5500, "&gt;100ms": 0xff0000}</option>
+    </chart>
+  </row>
+</form>

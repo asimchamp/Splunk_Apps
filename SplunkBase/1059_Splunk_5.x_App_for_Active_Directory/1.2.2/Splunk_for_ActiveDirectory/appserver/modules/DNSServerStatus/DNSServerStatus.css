@@ -1,0 +1,113 @@
+/*
+ * DNSServerStatus CSS File
+ */
+#DNSServerStatusWrapper {
+}
+ 
+#DNSServerStatusWrapper table {
+ 	width: 			100%;
+}
+ 
+#DNSServerStatusWrapper table tr.divider {
+ 	line-height: 	8px;
+ 	height: 		8px;
+}
+
+#DNSServerStatusWrapper table tr.hline {
+	line-height:	1px;
+	height:			1px;
+	border-top:		1px solid #333;
+}
+
+#DNSServerStatusWrapper table tr {
+ 	line-height: 	20px;
+ 	height: 		20px;
+ 	vertical-align:	middle;
+}
+
+#DNSServerStatusWrapper table tr td.col1 {
+ 	font-family:	Tahoma, Geneva, sans-serif;
+ 	font-size:		14px;
+ 	color:			black;
+	width: 			50%;
+ 	font-weight:	bold;
+ 	color:			#333333;
+}
+
+#DNSServerStatusWrapper table tr td.services {
+ 	font-family:	Tahoma, Geneva, sans-serif;
+ 	font-size:		14px;
+ 	color:			black;
+	width: 			50%;
+ 	font-weight:	bold;
+ 	color:			#333333;
+ 	vertical-align:	top;
+}
+
+table.svc_table tr td.svc_name {
+	width: 			60%;
+	font-family:	Tahoma, Geneva, sans-serif;
+	font-size:		12px;
+	height:			24px;
+	vertical-align:	middle;
+}
+
+table.svc_table tr td.svc_status {
+	width:			40%;
+	font-family:	Tahoma, Geneva, sans-serif;
+	font-size:		12px;
+	height:			24px;
+}
+ 
+#DNSServerStatusWrapper table tr td.col2 {
+ 	font-family:	Tahoma, Geneva, sans-serif;
+ 	font-size:		14px;
+ 	color:			black;
+	width:			50%;
+}
+
+#DNSServerStatusWrapper table tr td.col2 a:link,
+#DNSServerStatusWrapper table tr td.col2 a:visited {
+ 	font-family:	Tahoma, Geneva, sans-serif;
+ 	font-size:		14px;
+ 	color:			black;
+	width:			50%;
+}
+
+#DNSServerStatusWrapper table tr td.col2 a:hover,
+#DNSServerStatusWrapper table tr td.col2 a:active {
+ 	font-family:	Tahoma, Geneva, sans-serif;
+ 	font-size:		14px;
+ 	color:			#2B9969;
+	width:			50%;
+}
+
+#DNSServerStatusWrapper span.imageTrue {
+	background: 	url('DNSServerStatus/img/tick.png');
+	float:			left;
+	display:		block;
+	width: 			16px;
+	height: 		16px;
+}
+
+#DNSServerStatusWrapper span.imageFalse {
+	background: 	url('DNSServerStatus/img/cross.png');
+	float:			left;
+	display:		block;
+	width: 			16px;
+	height: 		16px;
+}
+
+#DNSServerStatusWrapper span.imageServiceUp {
+	background: 	url('DNSServerStatus/img/tick.png');
+	display:		block;
+	width: 			16px;
+	height: 		16px;
+}
+
+#DNSServerStatusWrapper span.imageServiceDown {
+	background: 	url('DNSServerStatus/img/cross.png');
+	display:		block;
+	width: 			16px;
+	height: 		16px;
+}

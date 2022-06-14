@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>IAM Authentication</label>
+  	<searchTemplate>sourcetype=beeware bw_log_class = IAM bw_ibox_name="$bw_ibox_name$" | fields bw_ibox_name iam_result iam_username icx_src_ip iam_target</searchTemplate>    
+    <fieldset autoRun="true">
+        <input type="dropdown" token="bw_ibox_name">
+   <label> filter by ibox </label>
+   <populatingSearch fieldForValue="bw_ibox_name" fieldForLabel="bw_ibox_name"><![CDATA[sourcetype=beeware AND (bw_eventlogs_class="USERS" OR bw_eventlogs_class="APPLY" OR bw_eventlogs_class="SYSTEM" OR bw_eventlogs_class="ENGINE" OR bw_eventlogs_class="UPDATE") | table bw_ibox_name | dedup bw_ibox_name]]></populatingSearch>
+    <choice value="*">All</choice>
+</input>
+
+        <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+
+  <row>
+    <single>
+      <searchPostProcess> search (iam_result ="*_FAILURE" OR iam_result="*_REJECT") | stats count as result | rangemap field=result low=0-15 elevated=20-50 default=severe </searchPostProcess>
+      <title>Rejected authentications</title>
+    </single>
+    <single>
+      <searchPostProcess> search iam_result ="*_SUCCESS" | stats count as result </searchPostProcess>
+      <title>Successfull authentications</title>
+    </single>
+	<single>
+    <searchPostProcess> search iam_result ="*_DISCONNECT" | stats count as result | rangemap field=result low=0-15 elevated=20-50 default=severe</searchPostProcess>
+		<title>Forced disconnections</title>
+    </single>
+  </row>
+
+  <row>
+    <table>
+      <searchPostProcess> table _time bw_ibox_name icx_src_ip iam_target iam_username iam_result | rename bw_ibox_name as ibox iam_result as message iam_username as username icx_src_ip as "source ip" iam_target as target</searchPostProcess> 
+        <option name="count">10</option>
+      <title>10 last messages</title>
+    </table>
+  </row>
+
+   <row>
+    <table>
+      <searchPostProcess> search (iam_result ="*_FAILURE" OR iam_result="*_REJECT") | stats count(icx_src_ip) as Hits by icx_src_ip | rename icx_src_ip as ip | sort -Hits </searchPostProcess> 
+        <option name="count">10</option>      
+        <option name="dataOverlayMode">heatmap</option>
+      <title>Failed authentications attemps by IP</title>
+    </table>
+
+        <table>
+      <searchPostProcess>search (iam_result ="*_FAILURE" OR iam_result="*_REJECT") | stats count(iam_username) as Hits by iam_username | rename iam_username as username | sort -Hits </searchPostProcess>
+        <option name="dataOverlayMode">heatmap</option>
+      <title>Failed authentications attemps by username</title>
+    </table>
+   </row>
+
+</form>

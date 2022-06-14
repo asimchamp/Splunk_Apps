@@ -1,0 +1,123 @@
+<view template="dashboard.html">
+  <label>Last 7 days</label>
+
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+
+    <module name="HiddenSearch" layoutPanel="viewHeader" autoRun="True">
+    <param name="search">sourcetype=beeware AND bw_log_source != "Event Logs" | fields bw_tunnel_name bw_log_class bw_eventlogs_class iam_result icx_src_ip icx_trap icx_target_url icx_target_www icx_target_page</param>
+    	<param name="earliest">rt-7d@s</param>
+	    <param name="latest">rt</param>
+    <module name="SubmitButton">
+      <param name="visible">False</param>
+      <param name="allowSoftSubmit">True</param>
+      <param name="updatePermalink">True</param>
+      <param name="label">Search</param>
+      <module name="HiddenPostProcess" layoutPanel="panel_row1_col1" group="Targeted tunnels" autoRun="True">
+        <param name="groupLabel">Targeted tunnels</param>
+        <param name="search"> table bw_tunnel_name | dedup bw_tunnel_name | stats count  </param>
+        <module name="ViewstateAdapter">
+          <param name="suppressionList"/>
+          <module name="HiddenFieldPicker">
+            <param name="strictMode">True</param>
+            <module name="JobProgressIndicator">
+              <module name="SingleValue">
+                <module name="Gimp"/>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+      <module name="HiddenPostProcess" layoutPanel="panel_row1_col2" group="Security warnings" autoRun="True">
+        <param name="groupLabel">Attacks blocked</param>
+        <param name="search"> search (bw_log_class=BLOCKED OR (bw_log_class="BLOCKED INTERNAL" AND bw_eventlogs_class!="HEADER*") OR bw_log_class=ALERT ) | stats count(bw_log_class) as result | rangemap field=result low=0-15 elevated=20-50 default=severe </param>
+        <module name="ViewstateAdapter">
+          <param name="suppressionList"/>
+          <module name="HiddenFieldPicker">
+            <param name="strictMode">True</param>
+            <module name="JobProgressIndicator">
+              <module name="SingleValue">
+                <module name="Gimp"/>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+      <module name="HiddenPostProcess" layoutPanel="panel_row1_col3" group="IAM authentications alerts" autoRun="True">
+        <param name="groupLabel">IAM authentications alerts</param>
+        <param name="search"> search (iam_result ="*_FAILURE" OR iam_result="*_REJECT") | stats count as result | rangemap field=result low=0-15 elevated=20-50 default=severe </param>
+        <module name="ViewstateAdapter">
+          <param name="suppressionList"/>
+          <module name="HiddenFieldPicker">
+            <param name="strictMode">True</param>
+            <module name="JobProgressIndicator">
+              <module name="SingleValue">
+                <module name="Gimp"/>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+
+        <module name="HiddenPostProcess" layoutPanel="panel_row3_col1" group="10 last attacks" autoRun="True">
+        <param name="search"> search  bw_log_class=BLOCKED OR (bw_log_class="BLOCKED INTERNAL" AND bw_eventlogs_class!="HEADER*") | table _time bw_tunnel_name icx_src_ip icx_trap icx_target_url | rename  bw_tunnel_name as tunnel icx_src_ip as "source ip" icx_trap as "attack" icx_target_url as "target url" | sort -_time</param>
+          <param name="groupLabel">10 last attacks</param>
+          <module name="ViewstateAdapter">
+            <param name="suppressionList">
+              <item>count</item>
+            </param>
+            <module name="HiddenFieldPicker">
+              <param name="strictMode">True</param>
+              <module name="JobProgressIndicator"/>
+              <module name="Paginator">
+                <param name="entityName">results</param>
+                <param name="count">10</param>
+                <module name="EnablePreview">
+                  <param name="display">False</param>
+                  <param name="enable">True</param>
+                  <module name="SimpleResultsTable">
+                    <param name="entityName">results</param>
+                    <param name="drilldown">row</param>
+                    <param name="count">10</param>
+                    <param name="allowTransformedFieldSelect">False</param>
+                    <module name="Gimp"/>
+                    <module name="ConvertToDrilldownSearch">
+                      <module name="ViewRedirector">
+                        <param name="viewTarget">flashtimeline</param>
+                      </module>
+                    </module>
+                  </module>
+                  <module name="ViewRedirectorLink">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+            </module>
+          </module>
+        </module>
+
+    </module>
+   </module>
+  <module name="HiddenSearch" group="" autoRun="True" layoutPanel="messaging">
+    <param name="search">sourcetype=beeware AND bw_log_source != "Event Logs" bw_log_class=BLOCKED OR bw_log_class=ALERT | search icx_src_ip!=192.168.0.0/16 icx_src_ip!=10.0.0.0/8 icx_src_ip!=172.16.0.0/20 |  stats count by icx_src_ip | eval count_label="Attack" | eval iterator="icx_src_ip" | eval iterator_label="Source IP" |  eval zoom = "zoom=\"250%\" zoom_x=\"0%\" zoom_y=\"-75%\""| eval movie_color="#FF0000" | eval output_file="7d_threat_data.xml" | eval app="beeware" | lookup geoip clientip as icx_src_ip | mapit</param>
+    	<param name="earliest">rt-7d@s</param>
+	    <param name="latest">rt</param>
+
+<module name="JobProgressIndicator"/>
+</module>
+
+      <module name="LinkSwitcher" group="Attacks blocked by Beeware" layoutPanel="viewHeader">
+    <param name="mode">independent</param>
+    <param name="label"> </param>
+    <module name="ServerSideInclude" group="Last 7 days" layoutPanel="viewHeader">
+    <param name="src">7d_map.html</param>
+  </module>
+
+</module>
+
+</view>

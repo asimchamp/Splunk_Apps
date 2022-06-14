@@ -1,0 +1,47 @@
+<form>
+  <label>Product Overview</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>1381363200</earliestTime>
+        <latestTime>1381968000</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <searchString>| pivot GlassWherehouse DI sum(cprice) AS "Product Revenue" max(cprice) AS "Product Average Price" SPLITROW productBrandList AS "Product BrandList" SPLITROW productName AS "Product" FILTER pageID is confirmationPage TOP 500 sum(cprice)</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisX.minimumNumber">10</option>
+      <option name="charting.axisY.minimumNumber">10</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.chart">scatter</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>Brands Purchases</title>
+      <searchString>| pivot GlassWherehouse DI sum(cprice) AS "Sum of Purchase" avg(cprice) AS "Average Purchase Price" count(DI) AS "Purchases" SPLITROW productBrandList AS "Brands" FILTER pageID is confirmationPage TOP 100 sum(cprice)</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

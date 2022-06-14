@@ -1,0 +1,24 @@
+<dashboard>
+ <label>Farm Errors</label>
+ 
+ <row>
+  <html>
+<p>This dashboard shows any errors that were encountered during the inventory gathering.  The most common error
+will be permission denied, which indicates that the user that is running the inventory script is not allowed to
+access specific content.  The error message provides the detail necessary to correct the problem.</p>
+  </html>
+ </row>
+ <row>
+  <table>
+   <searchString>
+eventtype=mssharepoint-inventory Type="Error"
+| stats latest(_time) as _time by FarmId, Location, Id, Url, Exception, Code, Message
+   </searchString>
+   <earliestTime>-24h@h</earliestTime>
+   <latestTime>now</latestTime>
+   <drilldown>
+    <link>/app/Splunk_for_Sharepoint/ops_farmdetail?form.Id=$row.FarmId$</link>
+   </drilldown>
+  </table>
+ </row>
+</dashboard>

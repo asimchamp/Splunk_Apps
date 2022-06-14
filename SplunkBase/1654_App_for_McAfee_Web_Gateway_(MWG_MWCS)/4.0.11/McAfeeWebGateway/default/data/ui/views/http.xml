@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>HTTP</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <row>
+    <chart>
+      <title>Timechart HTTP Method</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields http_method | timechart count by http_method</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>HTTP Method Statistics</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields http_method | top http_method</query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">100</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>HTTP Request Headers Statistics</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | rex "rqhlv=\"(?&lt;req_headers>[^\"]+)\"" | makemv delim="," req_headers | rex field=req_headers "^(?&lt;req_header>[^ :]+)" | eval req_header=lower(req_header) | fields req_header | top req_header limit=100</query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+  <row>
+    <table>
+      <title>HTTP Response Headers Statistics</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | rex "rsphlv=\"(?&lt;resp_headers>[^\"]+)\"" | makemv delim="," resp_headers | rex field=resp_headers "^(?&lt;resp_header>[^ :]+)" | eval resp_header=lower(resp_header) | fields resp_header | top resp_header limit=100</query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+
+</form>

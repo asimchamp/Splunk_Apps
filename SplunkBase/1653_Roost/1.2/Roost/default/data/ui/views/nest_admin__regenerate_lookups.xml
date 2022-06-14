@@ -1,0 +1,32 @@
+<dashboard>
+  <label>Nest Admin - Regenerate Lookups</label>
+  <description/>
+  <row>
+    <panel>
+      <table>
+        <title>Device Lookup - 24h Regenerate</title>
+        <searchString>earliest=-24h@h `nest_device_lookup_gen`</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Structure Lookup - 24h Regenerate</title>
+        <searchString>earliest=-24h@h `nest_structure_lookup_gen`</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

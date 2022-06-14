@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>Authentication</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <row>
+    <table>
+      <title>Top SRC IP by Failed Auth</title>
+      <search>
+        <query>`index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq, dc(user) AS "#Users", dc(dest) AS #dest, dc(http_user_agent) AS #user_agent by src | eval FailedReq%=round(AuthReq/TotalReq*100) | search FailedReq% &gt; 30  |sort - FailedReq%,TotalReq | head 100 </query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top User-Agents by Failed Auth</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq, dc(src) AS "#IPs", dc(user) AS "#Users", dc(dest) AS #dest by http_user_agent | eval FailedReq%=round(AuthReq/TotalReq*100) | search FailedReq% &gt; 30|sort - FailedReq%,TotalReq | head 100 </query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top Destination Hosts by Failed Auth</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq, dc(src) AS "#IPs", dc(user) AS "#Users", dc(http_user_agent) AS #user_agent by dest|eval FailedReq%=round(AuthReq/TotalReq*100) |search FailedReq% &gt; 30 | sort - FailedReq%,TotalReq | head 100 </query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top User-Agents + IPs by Failed Auth</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq, dc(dest) AS #dest by http_user_agent, src | eval FailedReq%=round(AuthReq/TotalReq*100) | search FailedReq% &gt; 30 | sort - FailedReq%,TotalReq,User_Agent,src | head 100 </query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top User-Agents + DestHost by Failed Auth</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq, dc(src) AS "#IPs", dc(user) AS "#Users" by http_user_agent, dest | eval FailedReq%=round(AuthReq/TotalReq*100) | search FailedReq% &gt; 30 | sort - FailedReq%,TotalReq,User_Agent,src | head 100 </query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top IPs + DestHost by Failed Auth</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq, dc(http_uesr_agent) AS #user_agent by src, dest | eval FailedReq%=round(AuthReq/TotalReq*100) | search FailedReq% &gt; 30 | sort - FailedReq%, TotalReq, src | head 100 </query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Top IPs + User-Agent + DestHost by Failed Auth</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields user src dest http_user_agent status | stats count(eval(status=407)) as AuthReq, count as TotalReq by src,http_user_agent,dest | eval FailedReq%=round(AuthReq/TotalReq*100) | search FailedReq% &gt; 30 | sort - FailedReq%, TotalReq, src | head 100 </query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Multiple Logins from diff IPs</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ user!="-" user!="*$" | fields user src dest http_user_agent status | stats dc(src) AS #src, values(src) AS src, dc(http_user_agent) AS #user_agent by user | search #src &gt; 1 |sort -#src | head 100</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Multiple Usernames coming from a single IP</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ user!="-" user!="*$" | fields user src dest http_user_agent status | stats dc(user) AS #user, values(user) AS user, dc(http_user_agent) AS #user_agent by src | search #user &gt; 1 | sort -#user| head 100</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Auth Method Statistics</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ authentication_method=* | fields user src dest http_user_agent status authentication_method | stats count, dc(user) AS #user, values(user) AS user, dc(http_user_agent) AS #user_agent, dc(src) AS #src by authentication_method | sort -count </query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+
+</form>

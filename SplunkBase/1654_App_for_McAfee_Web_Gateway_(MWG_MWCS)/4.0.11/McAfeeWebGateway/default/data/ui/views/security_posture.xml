@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>Security Posture</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+      <input type="checkbox" token="h" searchWhenChanged="true"  >
+       <label>Show Help</label>
+       <choice value=""></choice>
+      </input>
+
+
+  </fieldset>
+
+  <row>
+    <panel depends="$h$">
+     <html>
+      <style>
+        table, th, td {
+          border: 1px solid black;
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 5px;
+        }
+</style>
+      <p>More than 95% of Web Traffic is encrypted and cannot be scanned for unwanted content and malware. Even with enabled HTTPS Scanner some connections are tunneled or excluded from scanning. The Media Type filter tries to determine the true media type based on "magic bytes" to detect potentially dangerous content like executables and macros which sometimes pretends to be innocent files. Additionally the Opener Filter must to be applied to be able to check inside archives and composite objects like office documents, ISO images etc. Various technics like file encyption, obfuscation, splitting into small parts any many others exist to bypass filters. Following charts and tables show scan coverage and filter's status.</p>
+      <p>Let's see what proxy can see depending of activated filters. In the following example a request to https://www.example.com/get_file?id=123 returns a zip file which contains several exe, a Word document and a malware executable with a .dat extenstion. The server sent a payload with a general Content-Type: application/octet-stream header. Let's assume the malware file is unknown to AV scanner.
+        <table>
+          <tr><td>Active Filters</td><td>URL</td><td>Media Type</td><td>Additional Info</td></tr>
+          <tr><td>Without HTTPS Scanner</td><td>CONNECT www.example.com:443</td><td>unknown</td><td>only minimal metadata information is available, no content scan, no AV scan is possible</td></tr>
+          <tr><td>With HTTPS Scanner</td><td>https:///www.example.com/get_file?id=123</td><td>application/octet-stream</td><td>full access to metadata (headers). For information about the payload need to rely on Content-Type header, which can be too generic or faked</td></tr>
+          <tr><td>HTTPS Scanner + Media Type Filter</td><td>https:///www.example.com/get_file?id=123</td><td>application/zip</td><td>Content Type can be determined using "magic bytes" of the payload itself, ignoring file extension (that is not always available or can be faked, like in this example) and the value of the Content-Type header</td></tr>
+          <tr><td>HTTPS Scanner + Media Type Filter + Opener</td><td>https:///www.example.com/get_file?id=123</td><td>application/zip with several application/executable and application/vnd.openxmlformats-officedocument.wordprocessingml.document inside it</td><td>
+              <ul><li>Number of embeddings: 3</li>
+              <li>Embedding Level: 1</li>
+              <li>Magic Bytes Mismatch: 1</li></ul>
+          </td></tr>
+        </table>        
+       </p>
+     </html>
+    </panel>
+  </row>
+
+  <row>
+   <panel>
+    <chart>
+      <title>Content Scan is possible</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields src dest url_protocol tunnel_enabled ssl_client_context_is_applied | eval content_scan_possible=CASE(url_protocol="http", "yes", tunnel_enabled="true", "no", ssl_client_context_is_applied="true", "yes", 1=1, "unknown" ) | fields content_scan_possible | stats count by content_scan_possible</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.fieldColors">{"unknown": 0xdddddd, "yes": 0x66ff00, "no": 0xff0000}</option>
+    </chart>
+   </panel>
+  </row>
+  <row>
+   <panel>
+
+
+    <single>
+     <title>HTTPS Scanner enabled? (last 24h)</title>
+      <search>
+       <query>|tstats count where `index_and_sourcetype` earliest=-24h@h latest=now by PREFIX(cntx) | stats count | eval count=if(count > 0 , "Yes" , "No")</query>
+      </search>
+      <earliest>-24h@h</earliest>
+      <latest>now</latest>
+     </single>
+  </panel>
+  <panel>
+   <single>
+     <title>Media Type Filter enabled? (last 24h)</title>
+      <search>
+       <query>|tstats count where `index_and_sourcetype` earliest=-24h@h latest=now by PREFIX(mte=) | stats count | eval count=if(count > 0 , "Yes" , "No")</query>
+      </search>
+      <earliest>-24h@h</earliest>
+      <latest>now</latest>
+     </single>
+   </panel>
+   <panel>
+    <single>
+     <title>Opener enabled? (last 24h)</title>
+      <search>
+       <query>|tstats count where `index_and_sourcetype` earliest=-24h@h latest=now by PREFIX(emb=) | stats count | eval count=if(count > 0 , "Yes" , "No")</query>
+      </search>
+      <earliest>-24h@h</earliest>
+      <latest>now</latest>
+     </single>
+
+
+   </panel>
+  </row>
+ 
+
+</form>

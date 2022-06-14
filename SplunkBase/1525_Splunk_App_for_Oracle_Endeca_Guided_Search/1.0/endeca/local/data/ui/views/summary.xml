@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Summary</label>
+  <row>
+    <chart>
+      <searchName>Average Navigation and Search Throughput Last 15 Minutes</searchName>
+      <title>Avg Navigation and Search Throughput Last 15 Min (ops/sec)</title>
+      <option name="charting.chart">radialGauge</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <searchName>Average Dimension Search Throughput Last 15 Minutes</searchName>
+      <title>Avg Dimension Search Throughput Last 15 Min (ops/sec)</title>
+      <option name="charting.chart">radialGauge</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <searchName>Average Record Detail Throughput Last 15 Minutes</searchName>
+      <title>Avg Record Detail Throughput Last 15 Min (ops/sec)</title>
+      <option name="charting.chart">radialGauge</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchName>Total Requests Over Time by Type</searchName>
+      <title>Total Requests Over Time by Type</title>
+      <option name="charting.chart">column</option>
+    </chart>
+    <chart>
+      <searchName>Average Total Request Time by Host</searchName>
+      <title>Average Total Request Time by Host</title>
+      <option name="charting.chart">line</option>
+    </chart>
+  </row>
+</dashboard>

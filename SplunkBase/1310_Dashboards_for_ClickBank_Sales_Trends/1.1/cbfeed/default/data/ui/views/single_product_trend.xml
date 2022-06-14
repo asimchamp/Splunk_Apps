@@ -1,0 +1,74 @@
+<form>
+  <label>Single Product Drilldown</label>
+  <fieldset>
+   <html>
+      <p>
+         Enter a Product ID in the field below to return Gravity and Popularity Rank trending over time. Product details will be displayed at the bottom of the page.
+      </p>
+   </html>
+   
+   <!-- the default is a text box, with no seed value; if user does not input
+      a value, then the $username$ token in searchTemplate will be removed -->
+  <!-- define master search template, with replacement tokens delimited with $ -->
+<input type="text" token="id">
+	<label>Product Id</label>
+	<default>USTRIP</default>
+	<seed>USTRIP</seed>
+</input>
+
+        <input type="time">
+	<default>Last 7 days</default>
+	</input>
+
+</fieldset>
+  <row>
+ <chart>
+      <title>Gravity Trend</title>
+<searchTemplate>
+    index=cbfeed * Id="$id$" | eval mday=strftime(_time,"%d") | dedup Id mday | timechart avg(Gravity) by Id
+  </searchTemplate>
+      <option name="charting.axisTitleY.text">Gravity</option>
+      <option name="charting.chart">line</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">False</option>
+      <option name="maxLines">10</option>
+      <option name="segmentation">outer</option>
+      <option name="softWrap">true</option>
+    </chart>
+  </row>
+  <row>
+ <chart>
+      <title>Product Popularity Trend</title>
+<searchTemplate>
+    index=cbfeed * Id="$id$" | eval mday=strftime(_time,"%d") | dedup Id mday | timechart avg(PopularityRank) by Id
+  </searchTemplate>
+      <option name="charting.axisTitleY.text">Popularity Rank</option>
+      <option name="charting.chart">line</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">False</option>
+      <option name="maxLines">10</option>
+      <option name="segmentation">outer</option>
+      <option name="softWrap">true</option>
+    </chart>
+  </row>
+  <row>
+     <table>
+     <title>Product Description</title>
+     <searchTemplate>
+index=cbfeed * | streamstats dc(_time) as distinct_times | head (distinct_times == 1) | search Id="$id$" | dedup Id | table PercentPerSale, PercentPerRebill, AverageEarningsPerSale, InitialEarningsPerSale, TotalRebillAmt,Referred,Commission,ActivateDate     
+</searchTemplate>
+  <option name="displayRowNumbers">0</option>
+  </table>
+  </row>
+  <row>
+     <single>
+     <title>Product Description</title>
+     <searchTemplate>
+	index=cbfeed * | streamstats dc(_time) as distinct_times | head (distinct_times == 1) | search Id="$id$" | dedup Id | table Description
+     </searchTemplate>
+  </single>
+  </row>
+
+
+</form>
+

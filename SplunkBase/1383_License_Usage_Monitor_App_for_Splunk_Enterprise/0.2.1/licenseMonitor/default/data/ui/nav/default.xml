@@ -1,0 +1,27 @@
+<nav>
+    <!-- <view name="flashtimeline" default='true' /> -->
+    <view name='license_dashboard' default='true' />
+    <collection label="Forwarder Analysis">
+      <view name='missing_forwarders' />
+      <view name='forwarder_analysis' />
+    </collection>
+    <!--
+    <collection label="Dashboards">
+        <view source="unclassified" match="dashboard"/>
+        <divider />
+    </collection>
+    -->
+    <!--
+    <collection label="Views">
+        <view source="unclassified" />
+        <divider />
+    </collection>
+    -->
+    <collection label="Searches and Reports">
+        <collection label="Reports">
+            <saved source="unclassified" match="report" />
+        </collection>
+        <divider />
+        <saved source="unclassified" />
+    </collection>
+</nav>

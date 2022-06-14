@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>Media Types</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="dropdown" token="max_lines" searchWhenChanged="true">
+      <default>5</default>
+      <valuePrefix>max_lines="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="10">10</choice>
+      <choice value="20">20</choice>
+      <choice value="100">100</choice>
+      <choice value="1000">1000</choice>
+      <label>Max lines per Row</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <search id="baseSearchTopMT">
+    <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | eval content_type=coalesce(media_type_ensured, media_types_not_ensured, http_content_type) | makemv delim="," content_type  | eval content_type=if(media_type_ensured = "text/plain" , if( http_content_type IN ("text/javascript", "application/javascript", "application/json", "text/css", "text/html", "application/x-javascript"), http_content_type, content_type), content_type) |  eval content_type=if(isnull(content_type) AND status=204 AND bytes_in &lt; 250, "204_no_content", content_type) | eval content_type=if(isnull(content_type), "unknown", content_type) |  fields bytes_in content_type | stats count sum(bytes_in) AS bytes_in by content_type </query>
+  </search>
+  <search id="baseSearchExeMacroMismatchEncrypted">
+    <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ contains_exe=* OR contains_encrypted=* OR contains_macro=* OR magic_bytes_mismatch=true | fields http_content_type media_type_ensured media_types_not_ensured bytes_in bytes_out http_user_agent category web_reputation file_name url contains_exe contains_encrypted contains_macro magic_bytes_mismatch | eval content_type=coalesce(media_type_ensured, media_types_not_ensured, http_content_type) | makemv delim="," content_type  | eval content_type=if(media_type_ensured = "text/plain" , if( http_content_type IN ("text/javascript", "application/javascript", "application/json", "text/css", "text/html", "application/x-javascript"), http_content_type, content_type), content_type) |  eval content_type=if(isnull(content_type) AND status=204 AND bytes_in &lt; 250, "204_no_content", content_type) | eval content_type=if(isnull(content_type), "unknown", content_type) </query>
+  </search>
+
+
+  <row>
+    <chart>
+      <title>Media Types</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | eval content_type=coalesce(media_type_ensured, media_types_not_ensured, http_content_type) | makemv delim="," content_type  | eval content_type=if(media_type_ensured = "text/plain" , if( http_content_type IN ("text/javascript", "application/javascript", "application/json", "text/css", "text/html", "application/x-javascript"), http_content_type, content_type), content_type) |  eval content_type=if(isnull(content_type) AND status=204 AND bytes_in &lt; 250, "204_no_content", content_type) | eval content_type=if(isnull(content_type), "unknown", content_type) |  fields content_type | timechart count by content_type</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">log</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top Media Types by Volume</title>
+      <search base="baseSearchTopMT">
+        <query> fields - count | sort -bytes_in | head 10 </query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">log</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+    <chart>
+      <title>Top Media Types by Hits</title>
+      <search base="baseSearchTopMT">
+        <query> fields - bytes_in | sort -count | head 10</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">log</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>EXE Uploads/Downloads</title>
+      <search base="baseSearchExeMacroMismatchEncrypted">
+        <query>search contains_exe=* | stats count dc(src) AS #src dc(http_user_agent) AS #http_user_agent values(action) AS action values(category) AS categories values(bytes_in) AS bytes_in values(bytes_out) AS bytes_out values(web_reputation) AS web_reputation values(file_name) AS file_name by url | eval file_name_count=(mvcount(file_name)) | eval more=file_name_count - $max_lines$ |eval file_name=if(file_name_count &gt; $max_lines$, mvappend(mvindex(file_name,1,$max_lines$), more . " more.."), file_name) | fields - more, file_name_count  </query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Macro Uploads/Downloads</title>
+      <search base="baseSearchExeMacroMismatchEncrypted">
+        <query>search contains_macro=* | stats count dc(src) AS #src dc(http_user_agent) AS #http_user_agent values(action) AS action values(category) AS categories values(bytes_in) AS bytes_in values(bytes_out) AS bytes_out values(web_reputation) AS web_reputation values(file_name) AS file_name by url | eval file_name_count=(mvcount(file_name)) | eval more=file_name_count - $max_lines$ |eval file_name=if(file_name_count &gt; $max_lines$, mvappend(mvindex(file_name,1,$max_lines$), more . " more.."), file_name) | fields - more, file_name_count </query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>EXE and Macro Uploads/Downloads with Magic Bytes Mismatch</title>
+      <search base="baseSearchExeMacroMismatchEncrypted">
+        <query>search magic_bytes_mismatch=true  http_content_type!="application/octet-stream" contains_exe=* OR contains_macro=* | stats count dc(src) AS #src dc(http_user_agent) AS #http_user_agent values(action) AS action values(category) AS categories values(bytes_in) AS bytes_in values(bytes_out) AS bytes_out values(web_reputation) AS web_reputation values(http_content_type) AS http_content_type values(file_name) AS file_name by url | eval file_name_count=(mvcount(file_name)) | eval more=file_name_count - $max_lines$ |eval file_name=if(file_name_count &gt; $max_lines$, mvappend(mvindex(file_name,1,$max_lines$), more . " more.."), file_name) | fields - more, file_name_count </query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Encrypted Files</title>
+      <search base="baseSearchExeMacroMismatchEncrypted">
+        <query>search contains_encrypted=* | stats count dc(src) AS #src dc(http_user_agent) AS #http_user_agent values(action) AS action values(category) AS categories values(bytes_in) AS bytes_in values(bytes_out) AS bytes_out values(web_reputation) AS web_reputation values(file_name) AS file_name by url | eval file_name_count=(mvcount(file_name)) | eval more=file_name_count - $max_lines$ |eval file_name=if(file_name_count &gt; $max_lines$, mvappend(mvindex(file_name,1,$max_lines$), more . " more.."), file_name) | fields - more, file_name_count </query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">20</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+
+
+</form>

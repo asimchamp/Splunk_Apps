@@ -1,0 +1,347 @@
+<view template="dashboard.html" stylesheet="dashboard2.css">
+  <label>CloudForms Dashboard</label>
+  <module name="AccountBar" layoutPanel="appHeader" />
+  <module name="AppBar" layoutPanel="navigationHeader" />
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+  <!--
+        Global index summary counts
+    -->
+<module name="GenericHeader" layoutPanel="panel_row1_col1">
+    <param name="label">CloudForms Dashboard</param>
+  </module>
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">This dashboard provides an overview of your Red Hat Cloud Form deployment. You can customize the dashboard based on User, Cloud Resource Provider, or AppForm </param>
+  </module>
+  <module name="TimeRangePicker" layoutPanel="panel_row1_col1" autoRun="True">
+    <param name="selected">Last 24 Hours</param>
+    <param name="searchWhenChanged">True</param>
+ 
+
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row3_col1_grp2">
+      <param name="label">User: </param>
+      <param name="field">owner</param>
+      <param name="replacementMap">
+        <param name="arg">
+          <param name="owner">
+            <param name="value"/>
+          </param>
+        </param>
+      </param>
+      <param name="intention">
+        <param name="name">stringreplace</param>
+        <param name="arg">
+          <param name="owner">
+            <param name="default"/>
+            <param name="prefix">owner="</param>
+            <param name="suffix">"</param>
+            <param name="fillOnEmpty">false</param>
+          </param>
+        </param>
+      </param>
+
+
+
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row3_col1_grp3">
+      <param name="label">Cloud Resource Provider: </param>
+      <param name="field">provider</param>
+      <param name="replacementMap">
+        <param name="arg">
+          <param name="provider">
+            <param name="value"/>
+          </param>
+        </param>
+      </param>
+      <param name="intention">
+        <param name="name">stringreplace</param>
+        <param name="arg">
+          <param name="provider">
+            <param name="default"/>
+            <param name="prefix">provider="</param>
+            <param name="suffix">"</param>
+            <param name="fillOnEmpty">false</param>
+          </param>
+        </param>
+      </param>
+
+
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row3_col1_grp4">
+      <param name="label">AppForm ID: </param>
+      <param name="field">deployment_id</param>
+      <param name="replacementMap">
+        <param name="arg">
+          <param name="deployment_id">
+            <param name="value"/>
+          </param>
+        </param>
+      </param>
+      <param name="intention">
+        <param name="name">stringreplace</param>
+        <param name="arg">
+          <param name="deployment_id">
+            <param name="default"/>
+            <param name="prefix">deployment_id="</param>
+            <param name="suffix">"</param>
+            <param name="fillOnEmpty">false</param>
+          </param>
+        </param>
+      </param>
+
+            <module name="HiddenSearch" group="Usage Statistics" layoutPanel="panel_row2_col1" autoRun="True">
+              <param name="search">sourcetype="Redhat:CloudForm:Events" $owner$ $deployment_id$ $provider$ action=all_stopped OR action=all_running |   eval start_epoch=strptime(start_fulltime, "%Y-%m-%d %H:%M:%S %Z")  | eval term_epoch=strptime(term_fulltime, "%Y-%m-%d %H:%M:%S %Z") | eval duration=round(start_epoch-term_epoch,2) |  stats count by duration start_epoch pool term_epoch deployment_id provider owner | join type=outer deployment_id [search sourcetype="Redhat:CloudForm:Events" | stats dc(instance_id) as Instances by deployment_id ]</param>
+              <module name="ViewRedirectorLink" layoutPanel="panel_row1_col1">
+                <param name="viewTarget">flashtimeline</param>
+                <param name="label">View Full Report</param>
+              </module>
+              <module name="JobProgressIndicator"></module>
+
+           <module name="HiddenPostProcess" group="Usage Statistics" layoutPanel="panel_row2_col1_grp1" autoRun="True">
+              <param name="search">|stats dc(owner) as users | eval range="user"</param>
+              <module name="SingleValue">
+                <param name="field">users</param>
+                <param name="beforeLabel">Users:</param>
+                <param name="classField">range</param>
+                <param name="format">count</param>
+              </module>
+            </module>
+
+        <module name="HiddenPostProcess" group="Usage Statistics" layoutPanel="panel_row2_col1_grp2" autoRun="True">
+              <param name="search">|stats dc(deployment_id) as deployment_id | eval range="pool"</param>
+              <module name="SingleValue">
+                <param name="field">deployment_id</param>
+                <param name="beforeLabel">App Forms:</param>
+                <param name="classField">range</param>
+                <param name="format">count</param>
+              </module>
+            </module>
+
+
+        <module name="HiddenPostProcess" group="Usage Statistics" layoutPanel="panel_row2_col1_grp3" autoRun="True">
+              <param name="search">|stats dc(provider) as providers | eval range="provider"</param>
+              <module name="SingleValue">
+                <param name="field">providers</param>
+                <param name="beforeLabel">Cloud Resource Providers:</param>
+                <param name="classField">range</param>
+                <param name="format">count</param>
+              </module>
+            </module>
+
+        <module name="HiddenPostProcess" group="Usage Statistics" layoutPanel="panel_row2_col1_grp4" autoRun="True">
+              <param name="search">|stats sum(Instances) as Instances | eval range="instances"</param>
+              <module name="SingleValue">
+                <param name="field">Instances</param>
+                <param name="beforeLabel">Instances:</param>
+                <param name="classField">range</param>
+                <param name="format">count</param>
+              </module>
+            </module>
+
+    <module name="HiddenPostProcess" group="Total Usage" layoutPanel="panel_row3_col1_grp1" autoRun="True">
+              <param name="search">|eval TotalUsage=Instances*duration   |stats sum(TotalUsage) as TotalUsage | eval h=floor(TotalUsage/3600) | eval m=floor((TotalUsage-(h*3600))/60) | eval s=floor(TotalUsage-(h*3600)-(m*60)) | eval TotalUsage=h.":".m.":".s |   eval range="time"</param>
+              <module name="SingleValue">
+                <param name="field">TotalUsage</param>
+                <param name="beforeLabel">Total Usage:</param>
+                <param name="classField">range</param>
+                <param name="format">count</param>
+              </module>
+            </module>
+
+
+   
+   
+              <module name="LinkSwitcher" layoutPanel="panel_row7_col1" group="Usage by User">
+                <param name="mode">independent</param>
+                <param name="label"> </param>
+                <module name="NullModule" group="Chart" layoutPanel="panel_row7_col1" autoRun="True">
+   
+   
+
+            <module name="HiddenPostProcess" group="Usage by User" layoutPanel="panel_row7_col1" autoRun="True">
+                    <param name="groupLabel">Usage by User</param>
+                    <param name="search">eval  Duration=(Instances*duration) / 60   | rename owner as User |  stats sum(Duration) as Duration by User | head 15</param>
+
+                    <module name="HiddenChartFormatter">
+                      <param name="chart">bar</param>
+                      <param name="chart.stackMode">stacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <param name="secondaryAxisTitle.text">Usage in Minutes by User</param>
+                      <module name="JSChart"></module>
+                      
+                    </module>
+                  </module>  
+          </module>  
+                <module name="NullModule" group="Table" layoutPanel="panel_row7_col1" autoRun="True">
+        <module name="HiddenPostProcess" group="Usage by user"  layoutPanel="panel_row7_col1" autoRun="True">
+                    <param name="groupLabel">Usage by User</param>
+                    <param name="search">eval Duration=Instances*duration | rename owner as User | stats sum(Duration) as Duration by User | head 15 | eval h=floor(Duration/3600) | eval m=floor((Duration-(h*3600))/60) | eval s=floor(Duration-(h*3600)-(m*60)) | eval Duration=h.":".m.":".s | sort - Duration | fields + owner Duration  </param>
+                <module name="SimpleResultsTable" layoutPanel="panel_row7_col1">
+                  <param name="displayMenu">true</param>
+                  <param name="count">100</param>
+                  <param name="drilldown">all</param>
+                  <param name="entityName">results</param>
+                  <param name="displayRowNumbers">False</param>
+   
+         
+                </module>
+     
+                  </module>  
+                  </module>  
+                  </module>  
+
+
+            <module name="LinkSwitcher" layoutPanel="panel_row7_col2" group="Usage by Cloud">
+                <param name="mode">independent</param>
+                <param name="label"> </param>
+                <module name="NullModule" group="Chart" layoutPanel="panel_row7_col2" autoRun="True">
+   
+   
+
+            <module name="HiddenPostProcess" group="Usage by Cloud" layoutPanel="panel_row7_col2" autoRun="True">
+                    <param name="groupLabel">Usage by Cloud</param>
+                    <param name="search">eval Duration=(Instances*duration) / 60  | rename pool as Cloud | stats sum(Duration) as Duration by Cloud | head 15</param>
+
+                    <module name="HiddenChartFormatter">
+                      <param name="chart">bar</param>
+                      <param name="chart.stackMode">stacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <param name="secondaryAxisTitle.text">Usage in Minutes by Cloud</param>
+                      <module name="JSChart"></module>
+                      
+                    </module>
+                  </module>  
+          </module>  
+                <module name="NullModule" group="Table" layoutPanel="panel_row7_col2" autoRun="True">
+        <module name="HiddenPostProcess" group="Usage by Cloud"  layoutPanel="panel_row7_col2" autoRun="True">
+                    <param name="groupLabel">Usage by Cloud</param>
+                    <param name="search">eval Duration=(Instances*duration) / 60 | rename pool as Cloud | stats sum(Duration) as Duration by Cloud | head 15 | eval h=floor(Duration/3600) | eval m=floor((Duration-(h*3600))/60) | eval s=floor(Duration-(h*3600)-(m*60)) | eval Duration=h.":".m.":".s | sort - Duration | rename pool as Cloud | fields + Cloud Duration  </param>
+                <module name="SimpleResultsTable" layoutPanel="panel_row7_col2">
+                  <param name="displayMenu">true</param>
+                  <param name="count">100</param>
+                  <param name="drilldown">all</param>
+                  <param name="entityName">results</param>
+                  <param name="displayRowNumbers">False</param>
+   
+         
+                </module>
+     
+                  </module>  
+                  </module>  
+                  </module>  
+           <module name="LinkSwitcher" layoutPanel="panel_row7_col3" group="AppForm by ID">
+                <param name="mode">independent</param>
+                <param name="label"> </param>
+                <module name="NullModule" group="Chart" layoutPanel="panel_row7_col3" autoRun="True">
+   
+   
+
+            <module name="HiddenPostProcess" group="AppForm by ID" layoutPanel="panel_row7_col3" autoRun="True">
+                    <param name="groupLabel">"AppForm by Deployment ID</param>
+                    <param name="search">eval Duration=(Instances*duration) / 60 | stats sum(Duration) as Duration by deployment_id| rename deployment_id as "AppForm ID" | head 15</param>
+
+                    <module name="HiddenChartFormatter">
+                      <param name="chart">bar</param>
+                      <param name="chart.stackMode">stacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <param name="secondaryAxisTitle.text">Usage in Minutes by Deployment ID</param>
+                      <module name="JSChart"></module>
+                      
+                    </module>
+                  </module>  
+          </module>  
+                <module name="NullModule" group="Table" layoutPanel="panel_row7_col3" autoRun="True">
+        <module name="HiddenPostProcess" group="Usage by App Form ID"  layoutPanel="panel_row7_col2" autoRun="True">
+                    <param name="groupLabel">Usage by App Form ID</param>
+                    <param name="search">eval Duration=Instances*duration | stats sum(Duration) as Duration by deployment_id | head 15 | eval h=floor(Duration/3600) | eval m=floor((Duration-(h*3600))/60) | eval s=floor(Duration-(h*3600)-(m*60)) | eval Duration=h.":".m.":".s | sort - Duration | fields + deployment_id Duration  </param>
+                <module name="SimpleResultsTable" layoutPanel="panel_row7_col3">
+                  <param name="displayMenu">true</param>
+                  <param name="count">100</param>
+                  <param name="drilldown">all</param>
+                  <param name="entityName">results</param>
+                  <param name="displayRowNumbers">False</param>
+   
+         
+                </module>
+     
+                  </module>  
+                  </module>  
+                  </module>  
+
+
+
+
+
+
+
+
+
+<!--
+
+                       <module name="HiddenPostProcess" group="Usage by Deployment" layoutPanel="panel_row7_col3" autoRun="True">
+                    <param name="groupLabel">Usage by Deployment</param>
+                    <param name="search">eval Duration=Instances*duration | stats sum(Duration) as Duration by deployment_id | head 15</param>
+
+                    <module name="HiddenChartFormatter">
+                      <param name="chart">bar</param>
+                      <param name="chart.stackMode">stacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <param name="secondaryAxisTitle.text">Usage in Seconds by Deployment</param>
+                      <module name="JSChart"></module>
+                      
+                    </module>
+                  </module>  
+
+
+                       <module name="HiddenPostProcess" group="Usage by Pool" layoutPanel="panel_row7_col2" autoRun="True">
+                    <param name="groupLabel">Usage by Pool</param>
+                    <param name="search">eval Duration=Instances*duration | stats sum(Duration) as Duration by pool | head 15</param>
+
+                    <module name="HiddenChartFormatter">
+                      <param name="chart">bar</param>
+                      <param name="chart.stackMode">stacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <param name="secondaryAxisTitle.text">Usage in Seconds by Pool</param>
+                      <module name="JSChart"></module>
+                    </module>
+                  </module>  
+-->
+
+                    <module name="HiddenPostProcess" group="AppForm Details" layoutPanel="panel_row8_col1" autoRun="True">
+                    <param name="search">| eval TotalUsage=duration * Instances | eval h=floor(TotalUsage/3600) | eval m=floor((TotalUsage-(h*3600))/60) | eval s=floor(TotalUsage-(h*3600)-(m*60)) | eval TotalUsage=h.":".m.":".s | rename deployment_id as "AppForm ID" provider as "Cloud Resource Cluster"  owner as User TotalUsage as "Total Usage" | table "AppForm ID" "Cloud Resource Cluster" User Instances "Total Usage"  </param>
+
+                <module name="SimpleResultsTable" layoutPanel="panel_row8_col1">
+                  <param name="displayMenu">true</param>
+                  <param name="count">100</param>
+                  <param name="drilldown">all</param>
+                  <param name="entityName">results</param>
+                  <param name="displayRowNumbers">False</param>
+   
+         
+                </module>
+
+
+
+   </module>   
+
+
+
+   </module>   
+   </module>   
+
+
+
+
+   
+   
+   </module>
+   </module>
+      </module>
+-->
+
+
+  </view>

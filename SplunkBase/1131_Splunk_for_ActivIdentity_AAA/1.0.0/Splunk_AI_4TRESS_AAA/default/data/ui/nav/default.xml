@@ -1,0 +1,36 @@
+<nav>
+  <collection label="Splunk for ActivIdentity 4TRESS AAA">
+    <collection label="Search AI 4TRESS AAA">
+      <a href="flashtimeline?q=search%20%60ai_4tress_aaa_auth%60">Authentication Logs</a>
+       <a href="flashtimeline?q=search%20%60ai_4tress_aaa_audit%60">Audit Logs</a>
+    </collection>
+    <divider />
+  </collection>
+  
+  
+  <collection label="AAA Authentication Statstics">
+    <view name="authentication_overview" default="true"/>
+    <divider />
+    <view name="authentication_activity"/>
+    <divider />
+    <collection label="Searches &amp; Reports">
+      <a href="flashtimeline?q=search%20%60ai_4tress_aaa_auth%60">Search Authentication Data</a>
+      <divider />
+      <saved source="all" match="AI - Authentication" view="flashtimeline" />
+    </collection>
+  </collection>
+
+ <collection label="AAA Audit Statstics">
+    <view name="audit_overview"/>
+    <divider />
+     <view name="audit_activity"/>
+    <divider />
+    <collection label="Searches &amp; Reports">
+      <a href="flashtimeline?q=search%20%60ai_4tress_aaa_audit%60">Search Authentication Data</a>
+      <divider />
+      <saved source="all" match="AI - Audit" view="flashtimeline" />
+    </collection>
+  </collection>
+
+  
+</nav>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html" stylesheet="srs.css">
+    <label>Storage Repositories</label>
+    <module name="AccountBar" layoutPanel="appHeader"/>
+    <module name="AppBar" layoutPanel="navigationHeader"/>
+    <module name="Message" layoutPanel="messaging">
+        <param name="filter">*</param>
+        <param name="clearOnJobDispatch">False</param>
+        <param name="maxSize">1</param>
+    </module>
+    <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+    <module name="Message" layoutPanel="navigationHeader">
+        <param name="filter">splunk.search.job</param>
+        <param name="clearOnJobDispatch">True</param>
+        <param name="maxSize">1</param>
+        <param name="level">warn</param>
+    </module>
+    
+    <module name="GenericHeader" layoutPanel="panel_row1_col1">
+        <param name="label">Storage Repositories</param>
+    </module>
+    <module name="TimeRangePicker" layoutPanel="panel_row1_col1">
+        <param name="default">Last 4 Hours</param>
+        <param name="searchWhenChanged">True</param>
+        
+        <module name="SearchSelectLister">
+            <param name="search">
+              | inputlookup hv_type_lookup
+            </param>
+            <param name="label">Hypervisor type: </param>
+            <param name="settingToCreate">hvtype_setting</param>
+            <param name="staticFieldsToDisplay">
+              <list>
+                <param name="value">*</param>
+                <param name="label">All</param>
+              </list>
+            </param>
+            <param name="searchFieldsToDisplay">
+              <list>
+                <param name="value">product_value</param>
+                <param name="label">product</param>
+              </list>
+            </param>
+            <param name="selected">*</param>
+            <param name="searchWhenChanged">True</param>
+    
+            <module name="ConvertToIntention">
+                <param name="settingToConvert">hvtype_setting</param>
+                <param name="intention">
+                  <param name="name">stringreplace</param>
+                  <param name="arg">
+                    <param name="hvtype">
+                      <param name="fillOnEmpty">True</param>
+                      <param name="value">$target$</param>
+                    </param>
+                  </param>
+                </param>
+                
+                <module name="SearchSelectLister">
+                    <param name="search">
+                      eventtype=servervirt:$hvtype$:cluster | fields hyp_clust_id hyp_clust_name | dedup hyp_clust_id
+                    </param>
+                    <param name="label">Cluster: </param>
+                    <param name="applyOuterIntentionsToInternalSearch">True</param>
+                    <param name="applyOuterTimeRangeToInternalSearch">True</param>
+                    <param name="settingToCreate">clust_setting</param>
+                    <param name="staticFieldsToDisplay">
+                      <list>
+                        <param name="value">*</param>
+                        <param name="label">All</param>
+                      </list>
+                    </param>
+                    <param name="searchFieldsToDisplay">
+                      <list>
+                        <param name="value">hyp_clust_id</param>
+                        <param name="label">hyp_clust_name</param>
+                      </list>
+                    </param>
+                    <param name="selected">*</param>
+                    <param name="searchWhenChanged">True</param>
+            
+                    <module name="ConvertToIntention">
+                        <param name="settingToConvert">clust_setting</param>
+                        <param name="intention">
+                          <param name="name">stringreplace</param>
+                          <param name="arg">
+                            <param name="clust_id">
+                              <param name="fillOnEmpty">True</param>
+                              <param name="value">$target$</param>
+                            </param>
+                          </param>
+                        </param>
+        
+                        <module name="HiddenSearch" layoutPanel="panel_row1_col1">
+                            <param name="search">
+                                eventtype=servervirt:$hvtype$:sr hyp_clust_id=$clust_id$ | dedup sr_id | stats count as sr_count 
+                            </param>
+                            
+                            <module name="SingleValue" layoutPanel="panel_row1_col1">
+                                <param name="beforeLabel">SR Count: </param>
+                                <param name="field">sr_count</param>
+                            </module>
+                        </module>
+                        
+                        <module name="HiddenSearch" layoutPanel="panel_row1_col1">
+                            <param name="search">
+                                eventtype=servervirt:$hvtype$:vdisk hyp_clust_id=$clust_id$ | dedup vdisk_id | stats count as vdisk_count
+                            </param>
+                            
+                            <module name="SingleValue" layoutPanel="panel_row1_col1">
+                                <param name="beforeLabel">vDisk Count: </param>
+                                <param name="field">vdisk_count</param>
+                            </module>
+                            
+                        </module>
+                    
+                        <module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Storage Repositories">
+                        <param name="search">
+                            eventtype=servervirt:$hvtype$:sr hyp_clust_id=$clust_id$ |
+                            fields sr_id sr_name sr_desc sr_shared sr_size sr_util |
+                            dedup sr_id |
+                            eval Size=`formatBytes(sr_size)` |
+                            eval Allocated=`formatBytes(sr_util)` |
+                            eval "Percent Free"=round(`getDiskPercentFree(sr_size, sr_util)`,2)."%" | 
+                            join type=outer sr_id [search eventtype=servervirt:*:vdisk | fields vdisk_id sr_id | dedup vdisk_id | stats count(vdisk_id) as vDisks by sr_id ] |
+                            sort - "Percent Free" |
+                            table sr_id, sr_name, sr_desc, sr_shared, Size, Allocated, "Percent Free", vDisks |
+                            rename sr_name as Name sr_desc as Description sr_shared as Shared
+                        </param>
+                    <module name="StaticContentSample" layoutPanel="panel_row2_col1">
+                        <param name="text">
+                            <![CDATA[<img src="/static/app/SplunkForServerVirt/info.gif" class="info_icon" />]]> Click on a row below to view more details about the storage repository.
+                        </param>
+                    </module>
+                    <module name="JobProgressIndicator"  />
+                    
+                    <module name="Paginator" layoutPanel="panel_row2_col1">
+                        <param name="count">10</param>
+                        <param name="entityName">results</param>
+                    
+                        <module name="SimpleResultsTable">
+                            <param name="displayMenu">true</param>
+                            <param name="drilldown">row</param>
+                            <param name="drilldownPrefix">click1</param>
+                            <param name="displayRowNumbers">False</param>
+                        
+                            <module name="HiddenSearch" layoutPanel="panel_row3_col1">
+                                <param name="search">
+                                    eventtype=servervirt:*:vdisk |
+                                    dedup vdisk_id |
+                                    rename vdisk_name as vDiskName |
+                                    eval allocatedSizeName=`formatBytes(vdisk_size)` |
+                                    eval sizeUsedName=`formatBytes(vdisk_util)` |
+                                    eval diff=vdisk_size-vdisk_util |
+                                    eval sizeFreeName=if(diff>0, `formatBytes(diff)`, `formatBytes(0)`) | 
+                                    stats count by vdisk_id vDiskName allocatedSizeName sizeUsedName sizeFreeName vdisk_size vdisk_util
+                                </param>
+                            
+                                <module name="ConvertToIntention">
+                                    <param name="intention">
+                                        <param name="flags">
+                                            <item>indexed</item>
+                                        </param>
+                                        <param name="name">addterm</param>
+                                        <param name="arg">
+                                            <param name="sr_id">$click1.value$</param>
+                                        </param>
+                                    </param>
+                                    
+                                    <module name="HiddenPostProcess" group="vDisks">
+                                        <param name="search">
+                                            | table vDiskName, allocatedSizeName, sizeUsedName, sizeFreeName
+                                            | rename allocatedSizeName as "Allocated Size" sizeUsed as "Amount Used" sizeFreeName as "Free Space" vDiskName as "vDisk Name"
+                                        </param>
+                                        <module name="JobProgressIndicator"/>
+                                        <module name="Paginator" layoutPanel="panel_row3_col1">
+                                            <param name="count">10</param>
+                                            <param name="entityName">results</param>
+                    
+                                            <module name="SimpleResultsTable" layoutPanel="panel_row3_col1">
+                                                <param name="displayMenu">false</param>
+                                                <param name="drilldown">row</param>
+                                                <param name="displayRowNumbers">False</param>
+                                            </module>
+                                        
+                                            <module name="ViewRedirectorLink">
+                                                <param name="viewTarget">flashtimeline</param>
+                                            </module>
+                                        
+                                        </module> <!-- End Paginator -->
+                                    </module> <!-- End HiddenPostProcess (for table) -->
+                                
+                                    <module name="HiddenPostProcess" layoutPanel="panel_row3_col2" group="vDisk Allocation">
+                                        <param name="search">
+                                            | chart max(vdisk_size) by vDiskName
+                                        </param>
+                                        <module name="HiddenChartFormatter">
+                                            <param name="charting.chart">pie</param>
+                                            <param name="charting.chart.sliceCollapsingThreshold">0</param>
+                                            <param name="charting.chart.showPercent">true</param>
+                                            <module name="JSChart">
+                                              <param name="width">100%</param>
+                                            </module>
+                                        </module>
+                                        
+                                        <module name="ViewRedirectorLink">
+                                            <param name="viewTarget">flashtimeline</param>
+                                        </module>
+                                    </module> <!-- End HiddenPostProcess (for chart) -->
+                                
+                                    <module name="HiddenPostProcess" layoutPanel="panel_row3_col3" group="vDisk Usage">
+                                        <param name="search">
+                                            | chart max(vdisk_util) by vDiskName
+                                        </param>
+                                        <module name="HiddenChartFormatter">
+                                            <param name="charting.chart">pie</param>
+                                            <param name="charting.chart.sliceCollapsingThreshold">0</param>
+                                            <param name="charting.chart.showPercent">true</param>
+                                            <module name="JSChart">
+                                              <param name="width">100%</param>
+                                            </module>
+                                        </module>
+                                        
+                                        <module name="ViewRedirectorLink">
+                                            <param name="viewTarget">flashtimeline</param>
+                                        </module>
+                                    </module> <!-- End HiddenPostProcess (for chart) -->
+                                
+                                </module> <!-- End ConvertToIntention -->
+                            </module> <!-- End HiddenSearch for Chart and Table -->
+                        
+                        </module>
+                        <module name="ViewRedirectorLink">
+                            <param name="viewTarget">flashtimeline</param>
+                        </module>
+                
+                </module> <!-- End Paginator -->
+            </module> <!-- End Hidden Search -->
+    
+            
+                    </module> <!-- ConvertToIntention (clust_id) -->
+                </module> <!-- SearchSelectLister (clust_id) -->
+            </module> <!-- ConvertToIntention (hvtype) -->
+        </module> <!-- SearchSelectLister (hvtype) -->
+    </module> <!-- TimeRangePicker -->
+    
+
+    
+</view>

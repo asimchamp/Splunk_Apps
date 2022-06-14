@@ -1,0 +1,183 @@
+<form>
+    <label>Search Events</label>
+
+    <!-- define master search template, with replacement tokens delimited with $ -->
+    <searchTemplate>EventID="$action$"</searchTemplate>
+
+    <fieldset>
+        <!-- Define a simple dropdown form driven by a search -->
+        <input type="dropdown" token="action" searchWhenChanged="true">
+            <label>Filter by Audit Action</label>
+            <choice value="">Select Action</choice>
+            
+            <choice value="16">USER - LOGIN</choice>
+            <choice value="17">USER - LOGOUT</choice>
+            <choice value="18">USER - LOGIN FAILURE</choice>
+            <choice value="19">USER - PASSWORD CHANGE</choice>
+            <choice value="1">USER - CREATE</choice>
+            <choice value="2">USER - DISABLE</choice>
+            <choice value="3">USER - ENABLE</choice>
+            <choice value="4">USER - LOCKOUT</choice>
+            <choice value="5">USER - ADDED TO GROUP</choice>
+            <choice value="6">USER - REMOVED FROM GROUP</choice>
+            <choice value="10097">USER - OWNERS MODIFIED</choice>
+            <choice value="10100">USER - EDIT</choice>
+            <choice value="10101">USER - TWO FACTOR UPDATED</choice>
+            <choice value="10116">USER - CHALLENGE APPLIED</choice>
+            <choice value="10117">USER - CHALLENGE CLEARED</choice>
+            
+            <choice value="10053">FOLDER - SECRET POLICY CHANGE</choice>
+            <choice value="7">FOLDER - CREATE</choice>
+            <choice value="8">FOLDER - DELETE</choice>
+            <choice value="14">FOLDER - EDIT PERMISSIONS</choice>
+            
+            <choice value="9">ROLE - CREATE</choice>
+            <choice value="10">ROLE - ASSIGN USER OR GROUP</choice>
+            <choice value="11">ROLE - UNASSIGN USER OR GROUP</choice>
+            <choice value="20">ROLE - ENABLE ROLE</choice>
+            <choice value="21">ROLE - DISABLE ROLE</choice>
+            
+            <choice value="12">ROLE PERMISSION - ADDED TO ROLE</choice>
+            <choice value="13">ROLE PERMISSION - REMOVED FROM ROLE</choice>
+            
+            <choice value="15">CONFIGURATION - EDIT</choice>
+            
+            <choice value="10050">GROUP - OWNERS MODIFIED</choice>
+
+            <choice value="10109">IP ADDRESS RANGE - CREATE</choice>
+            <choice value="10110">IP ADDRESS RANGE - UPDATE</choice>
+            <choice value="10111">IP ADDRESS RANGE - DELETE</choice>
+            <choice value="10112">IP ADDRESS RANGE - USER ASSIGN</choice>
+            <choice value="10113">IP ADDRESS RANGE - USER UNASSIGN</choice>
+            <choice value="10114">IP ADDRESS RANGE - GROUP ASSIGN</choice>
+            <choice value="10115">IP ADDRESS RANGE - GROUP UNASSIGN</choice>
+
+            <choice value="10102">SECRET - FILE SAVE</choice>
+            <choice value="10103">SECRET - CACHE VIEW</choice>
+            <choice value="10099">SECRET - WEB PASSWORD FILL</choice>
+            <choice value="10054">SECRET - SECRET POLICY CHANGE</choice>
+            <choice value="10055">SECRET - SECRET PASSWORD CHANGE</choice>
+            <choice value="10093">SECRET - EXPORT SECRET</choice>
+            <choice value="10094">SECRET - EXPIRES 30 DAYS</choice>
+            <choice value="10095">SECRET - EXPIRES 45 DAYS</choice>
+            <choice value="10096">SECRET - EXPIRES 60 DAYS</choice>
+            <choice value="10044">SECRET - ACCESS APPROVED</choice>
+            <choice value="10045">SECRET - ACCESS DENIED</choice>
+            <choice value="10046">SECRET - CUSTOM PASSWORD REQUIREMENT ADDED</choice>
+            <choice value="10047">SECRET - CUSTOM PASSWORD REQUIREMENT REMOVED</choice>
+            <choice value="10048">SECRET - DEPENDENCY DELETED</choice>
+            <choice value="10049">SECRET - DEPENDENCY ADDED</choice>
+            <choice value="10032">SECRET - HEARTBEAT SUCCESS</choice>
+            <choice value="10033">SECRET - HOOK FAILURE</choice>
+            <choice value="10034">SECRET - HOOK SUCCESS</choice>
+            <choice value="10035">SECRET - HOOK CREATE</choice>
+            <choice value="10036">SECRET - HOOK EDIT</choice>
+            <choice value="10037">SECRET - HOOK DELETE</choice>
+            <choice value="10038">SECRET - CUSTOM AUDIT</choice>
+            <choice value="10039">SECRET - PASSWORD DISPLAYED</choice>
+            <choice value="10040">SECRET - PASSWORD COPIED TO CLIPBOARD</choice>
+            <choice value="10041">SECRET - VIEWED EDIT</choice>
+            <choice value="10068">SECRET - PASSWORD CHANGE MAX ATTEMPTS REACHED</choice>
+            <choice value="10019">SECRET - SESSION RECORDING VIEW</choice>
+            <choice value="10020">SECRET - COPY</choice>
+            <choice value="10025">SECRET - CHECK IN</choice>
+            <choice value="10026">SECRET - CHECK OUT</choice>
+            <choice value="10001">SECRET - CREATE</choice>
+            <choice value="10002">SECRET - DELETE</choice>
+            <choice value="10003">SECRET - UNDELETE</choice>
+            <choice value="10004">SECRET - VIEW</choice>
+            <choice value="10005">SECRET - EDIT</choice>
+            <choice value="10006">SECRET - LAUNCH</choice>
+            <choice value="10007">SECRET - HEARTBEAT FAILURE</choice>
+            <choice value="10008">SECRET - DEPENDENCY FAILURE</choice>
+            <choice value="10009">SECRET - EXPIRED TODAY</choice>
+            <choice value="10010">SECRET - EXPIRES 1 DAY</choice>
+            <choice value="10013">SECRET - EXPIRES 3 DAYS</choice>
+            <choice value="10011">SECRET - EXPIRES 7 DAYS</choice>
+            <choice value="10012">SECRET - EXPIRES 15 DAYS</choice>
+            
+            <choice value="10014">UNLIMITED ADMIN - ENABLE</choice>
+            <choice value="10015">UNLIMITED ADMIN - DISABLE</choice>
+            
+            <choice value="10016">EXPORT SECRETS - EXPORTED</choice>
+            <choice value="10017">IMPORT SECRETS - IMPORTED</choice>
+            
+            <choice value="10018">USER AUDIT - EXPIRE NOW</choice>
+
+            <choice value="10021">SECRET TEMPLATE - CREATE</choice>
+            <choice value="10022">SECRET TEMPLATE - EDIT</choice>
+            <choice value="10023">SECRET TEMPLATE - TEMPLATE COPIED FROM</choice>
+            <choice value="10042">SECRET TEMPLATE - FIELD ENCRYPTED</choice>
+            <choice value="10043">SECRET TEMPLATE - FIELD EXPOSED</choice>
+            <choice value="10107">SECRET TEMPLATE - OWNERS MODIFIED</choice>
+            <choice value="10108">SECRET TEMPLATE - CREATE SECRET ACCESS CHANGED</choice>
+
+            <choice value="10024">LICENSES - EXPIRES30DAYS</choice>
+            
+            <choice value="10051">SECRET POLICY - CREATE</choice>
+            <choice value="10052">SECRET POLICY - EDIT</choice>
+            
+            <choice value="10027">SCRIPT POWERSHELL - CREATE</choice>
+            <choice value="10028">SCRIPT POWERSHELL - DEACTIVATE</choice>
+            <choice value="10029">SCRIPT POWERSHELL - EDIT</choice>
+            <choice value="10030">SCRIPT POWERSHELL - REACTIVATE</choice>
+            <choice value="10031">SCRIPT POWERSHELL - VIEW</choice>
+            
+            <choice value="10056">SCRIPT SSH - CREATE</choice>
+            <choice value="10057">SCRIPT SSH - DEACTIVATE</choice>
+            <choice value="10058">SCRIPT SSH - EDIT</choice>
+            <choice value="10059">SCRIPT SSH - REACTIVATE</choice>
+            <choice value="10060">SCRIPT SSH - VIEW</choice>
+
+            <choice value="10061">SCRIPT SQL - CREATE</choice>
+            <choice value="10062">SCRIPT SQL - DEACTIVATE</choice>
+            <choice value="10063">SCRIPT SQL - EDIT</choice>
+            <choice value="10064">SCRIPT SQL - REACTIVATE</choice>
+            <choice value="10065">SCRIPT SQL - VIEW</choice>
+            
+            <choice value="10066">ENCRYPTION - HSM ENABLE</choice>
+            <choice value="10067">ENCRYPTION - HSM DISABLE</choice>
+            <choice value="10069">ENCRYPTION - ROTATE SECRET KEYS</choice>
+            <choice value="10070">ENCRYPTION - ROTATE SECRET KEYS CANCEL REQUESTED</choice>
+            <choice value="10071">ENCRYPTION - ROTATE SECRET KEYS SUCCESS</choice>
+            <choice value="10072">ENCRYPTION - ROTATE SECRET KEYS FAILURE</choice>
+            
+            <choice value="10073">SITE - CREATE</choice>
+            <choice value="10074">SITE - EDIT</choice>
+            <choice value="10075">SITE - ENABLE</choice>
+            <choice value="10076">SITE - DISABLE</choice>
+            <choice value="10077">SITE - ADD ENGINE</choice>
+            <choice value="10078">SITE - REMOVE ENGINE</choice>
+            <choice value="10079">SITE - ENGINE ONLINE</choice>
+            <choice value="10080">SITE - ENGINE OFFLINE</choice>
+            <choice value="10081">SITE - ENGINE DOWNLOAD</choice>
+            <choice value="10091">SITE - ASSIGNED DOMAIN</choice>
+            <choice value="10092">SITE - REMOVED DOMAIN</choice>
+            
+            <choice value="10082">ENGINE - CREATE</choice>
+            <choice value="10083">ENGINE - ACTIVATE</choice>
+            <choice value="10084">ENGINE - DEACTIVATE</choice>
+            <choice value="10085">ENGINE - DELETE</choice>
+            
+            <choice value="10086">SITE CONNECTOR - CREATE</choice>
+            <choice value="10087">SITE CONNECTOR - EDIT</choice>
+            <choice value="10088">SITE CONNECTOR - ENABLE</choice>
+            <choice value="10089">SITE CONNECTOR - DISABLE</choice>
+            <choice value="10090">SITE CONNECTOR - CREDENTIAL VIEW</choice>
+            
+            <choice value="10098">SECURITY ANALYTICS CONFIGURATION - EDIT</choice>
+
+            <choice value="10104">DUAL CONTROL - CREATE</choice>
+            <choice value="10105">DUAL CONTROL - UPDATE</choice>
+            <choice value="10106">DUAL CONTROL - DELETE</choice>
+        </input>
+    </fieldset>
+
+    <row>
+        <!-- output the results as a 50 row events view -->
+        <event>
+            <title>Results</title>
+            <option name="count">50</option>
+        </event>
+    </row>
+</form>

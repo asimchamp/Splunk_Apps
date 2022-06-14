@@ -1,0 +1,70 @@
+<dashboard>
+<label>Preparing your Windows Server</label>
+
+<row>
+<html>
+<h1>Welcome to the Splunk Modular Input for Microsoft Message Queuing</h1>
+
+<p>Thank you for downloading the Splunk Modular Input for MSMQ.  We hope you will find it
+useful to you.  Please note that this modular input requires specific configuration on 
+your Windows server prior to using this modular input.  In addition, the modular input needs
+to know about the format of the messages that are being received, through the provision of
+a .NET assembly that formats the messages for output.</p>
+
+<h1>Tested Platforms</h1>
+
+<p>You can run the Splunk Modular Input for MSMQ on the following platforms:</p>
+
+<ul>
+<li>64-bit Windows Server 2008 R2</li>
+<li>64-bit Windows Server 2012</li>
+</ul>
+
+<p>Other platforms may work, but they have not been tested.</p>
+
+<h1>Preparing your server for the Splunk Modular Input for MSMQ</h1>
+
+<p>Prior to installing the Splunk Modular Input for MSMQ, please ensure that the 
+.NET Framework 4.5 and MSMQ Services are installed.  These are covered in more
+detail below.</p>
+
+<h2>Installing the .NET Framework 4.5</h2>
+
+<p>If you are running Windows Server 2012, then it is likely that the .NET
+Framework 4.5 is already installed.  If you are running Windows Server 2008 R2, 
+you can download the .NET Framework 4.5 from the following location:</p>
+
+<p style="margin-left: 16px;"><code>
+<a href="http://go.microsoft.com/fwlink/p/?LinkId=268529" target="_blank">http://go.microsoft.com/fwlink/p/?LinkId=268529</a>
+</code></p>
+
+<p>Note that the installer will often require that the system be rebooted.  If
+this is a concern, ensure the installation is done during a maintenance window.</p>
+
+<h2>Installing MSMQ</h2>
+
+<p>Windows Server comes with the MSMQ Server as a Windows Feature.  The list of
+features you need are:</p>
+
+<ul>
+<li>Message Queuing Server</li>
+<li>MSMQ Directory Service Integration</li>
+</ul>
+
+<p>On Windows Server 2008 R2, go into Control Panel and Add/Remove Windows Features.
+Select the features to install and walk through the resulting wizard to complete the
+installation.</p>
+
+<p>On Windows Server 2012, open the PowerShell console and type the following:</p>
+
+<p><code><pre style="padding-left: 16px;">Import-Module ServerManager
+Add-WindowsFeature MSMQ
+Add-WindowsFeature MSMQ-Services
+Add-WindowsFeature MSMQ-Server
+Add-WindowsFeature MSMQ-Directory</pre></code></p>
+
+<p>The addition of the MSMQ server should not require a reboot of the server.</p>
+</html>
+</row>
+	
+</dashboard>

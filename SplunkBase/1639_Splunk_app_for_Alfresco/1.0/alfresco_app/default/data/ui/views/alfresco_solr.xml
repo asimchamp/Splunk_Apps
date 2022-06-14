@@ -1,0 +1,91 @@
+<form>
+  <label>Alfresco SOLR</label>
+  <fieldset autoRun="true">
+    <input type="dropdown" token="host">
+      <label>Choose SOLR Server</label>
+      <prefix>host="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <populatingSearch fieldForValue="host" fieldForLabel="host" earliest="-1d@d" latest="now"><![CDATA[| metadata type=hosts index=alfresco | dedup host | table host]]></populatingSearch>
+    </input>
+    <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Search Requests per Second</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoSolrAvgRequestsPerSecond) as "/alfresco Reqs/Sec", avg(aftsSolrAvgRequestsPerSecond) as "/afts Reqs/Sec", avg(cmisSolrAvgRequestsPerSecond) as "/cmis Reqs/Sec"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Search Response Time</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoSolrAvgTimePerRequest) as "/alfresco Avg Time per Request", avg(aftsSolrAvgTimePerRequest) as "/afts Avg Time per Request", avg(cmisSolrAvgTimePerRequest) as "/cmis Avg Time per Request"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Search Errors</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoSolrErrors) as "/alfresco Errors", avg(aftsSolrErrors) as "/afts Errors", avg(cmisSolrErrors) as "/cmis Errors"]]>
+      </searchString>
+    </chart>
+    <chart>
+      <title>Search Timeouts</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ solr/alfresco | timechart avg(alfrescoSolrTimeouts) as "/alfresco Timeouts", avg(aftsSolrTimeouts) as "/afts Timeouts", avg(cmisSolrTimeouts) as "/cmis Timeouts"]]>
+      </searchString>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Index Document Count</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ SolrIndexes | timechart avg(alfrescoSolrMaxDocument) as "Alfresco Core, Max Doc", avg(alfrescoSolrNumDocuments) as "Alfresco Core, Num Docs", avg(archiveSolrMaxDocument) as "Archive Core, Max Doc", avg(archiveSolrNumDocuments) as "Archive Core, Num Docs"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+</form>

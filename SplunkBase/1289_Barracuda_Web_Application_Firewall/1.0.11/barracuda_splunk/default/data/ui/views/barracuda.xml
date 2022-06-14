@@ -1,0 +1,113 @@
+<form>
+  <label>Overall Summary</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="unit_name" searchWhenChanged="true">
+      <label>Unit Name:</label>
+      <fieldForLabel>unit_name</fieldForLabel>
+      <fieldForValue>unit_name</fieldForValue>
+      <search ref="WF_search"></search>
+    </input>
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Traffic Over Time</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$"| eval bandwidth=round(bytes_sent/1024,2)| timechart sum(bandwidth) | rename sum(bandwidth) AS "Bandwidth Consumed (in KB)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Bandwidth (KB)</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Attacks Over Time</title>
+        <search>
+          <query>sourcetype="firewall" Attack_Description!="NULL" | where unit_name = "$unit_name$" | timechart count by Attack_Description</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Attacks</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Errors Over Time</title>
+        <search>
+          <query>sourcetype="access" HTTP_Status="404" OR HTTP_Status="500" OR HTTP_Status="503" | where unit_name = "$unit_name$" | timechart count</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Errors</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+  <panel>
+      <chart>
+        <title>Traffic Over Services</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$" |eval ip_port = app_ip +":"+ app_port|eval bandwidth=round(bytes_sent/1024,2)| timechart sum(bandwidth) BY ip_port|rename sum(bandwidth) AS "Bandwidth Consumed (in KB)"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Bandwidth (KB)</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Attacks Over Services</title>
+        <search>
+          <query>sourcetype="firewall" Attack_Description!="NULL" | where unit_name = "$unit_name$" | eval ip_port = app_ip +":"+ app_port|timechart count BY ip_port | rename ip_port AS "Service"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Attacks</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    
+    <panel>
+      <chart>
+        <title>Errors Over Services</title>
+        <search>
+          <query>sourcetype="access" HTTP_Status="404" OR HTTP_Status="500" OR HTTP_Status="503" | where unit_name = "$unit_name$" |eval ip_port = app_ip +":"+ app_port|timechart count by ip_port|rename ip_port AS "Service"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Errors</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

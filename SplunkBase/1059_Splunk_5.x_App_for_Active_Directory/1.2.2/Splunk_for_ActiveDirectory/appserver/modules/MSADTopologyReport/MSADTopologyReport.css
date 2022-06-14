@@ -1,0 +1,402 @@
+#MSADTopologyReport
+{
+	width:			100%;
+}
+
+#MSADTopologyReport .MSADTopology_DataTable
+{
+	width:			100%;
+}
+
+#MSADTopologyReport h2.title
+{
+	color:			#73A550;
+	font-size:		14px;
+	font-weight:	bold;
+	margin:			16px 0 10px;
+	display:		block;
+	clear:			both;
+}
+
+#MSADTopologyReport td.fsmoroles, 
+#MSADTopologyReport td.dsaoptions,
+#MSADTopologyReport td.truefalse {
+	width:			128px;
+}
+
+div.fsmoroles, div.dsaoptions {
+	display:		inline-block;
+}
+
+#MSADTopologyReport span.imageSep {
+	display:		block;
+	float:			left;
+	width:			8px;
+	height:			8px;
+}
+
+#MSADTopologyReport span.imageStatusTrue {
+	background: 	url('MSADTopologyReport/img/tick.png');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imageStatusFalse {
+	background: 	url('MSADTopologyReport/img/cross.png');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+#MSADTopologyReport span.imageRODC {
+	background: 	url('MSADTopologyReport/img/lock.png');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imageGlobalCatalog {
+	background: 	url('MSADTopologyReport/img/globe.png');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imageSchema {
+	background: 	url('MSADTopologyReport/img/schema.jpg');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imageDomainNaming {
+	background: 	url('MSADTopologyReport/img/domainnaming.jpg');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imagePDCEmulator {
+	background: 	url('MSADTopologyReport/img/pdcemulator.jpg');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imageRIDMaster {
+	background: 	url('MSADTopologyReport/img/ridmaster.jpg');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.imageInfrastructure {
+	background: 	url('MSADTopologyReport/img/infrastructure.jpg');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.hostTrue {
+	background: 	url('MSADTopologyReport/img/tick.png');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.hostFalse {
+	background: 	url('MSADTopologyReport/img/cross.png');
+	display:		block;
+	float:			left;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport span.host {
+	vertical-align:	middle;
+	height:			16px;
+	margin-left:	12px;
+}
+
+#MSADTopologyReport div.imageTrue {
+	background: 	url('MSADTopologyReport/img/tick.png');
+	display:		block;
+	margin:			0 auto;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport div.imageFalse {
+	background: 	url('MSADTopologyReport/img/cross.png');
+	display:		block;
+	margin:			0 auto;
+	width: 			16px;
+	height: 		16px;
+}
+
+#MSADTopologyReport .dataTables_wrapper {
+	position: 		relative;
+	clear: 			both;
+	zoom: 			1; /* Feeling sorry for IE */
+}
+
+#MSADTopologyReport .dataTables_processing {
+	position: 		absolute;
+	top: 			50%;
+	left: 			50%;
+	width: 			250px;
+	height: 		30px;
+	margin-left: 	-125px;
+	margin-top: 	-15px;
+	padding: 		14px 0 2px 0;
+	border: 		1px solid #ddd;
+	text-align: 	center;
+	color: 			#999;
+	font-size: 		14px;
+	background-color: white;
+}
+
+#MSADTopologyReport .dataTables_length {
+	width: 			40%;
+	float: 			left;
+}
+
+#MSADTopologyReport .dataTables_filter {
+	width: 			50%;
+	float: 			right;
+	text-align: 	right;
+}
+
+#MSADTopologyReport .dataTables_info {
+	width: 			60%;
+	float: 			left;
+}
+
+#MSADTopologyReport .dataTables_paginate {
+	float: 			right;
+	text-align: 	right;
+	width:			44px;
+}
+
+#MSADTopologyReport .paginate_disabled_previous, 
+#MSADTopologyReport .paginate_enabled_previous, 
+#MSADTopologyReport .paginate_disabled_next, 
+#MSADTopologyReport .paginate_enabled_next {
+	height: 		19px;
+	width: 			19px;
+	margin-left: 	1px;
+	margin-right:	1px;
+	padding:		0px;
+	float: 			left;
+}
+
+#MSADTopologyReport .paginate_disabled_previous {
+	background-image: url('MSADTopologyReport/img/back_disabled.jpg');
+}
+
+#MSADTopologyReport .paginate_enabled_previous {
+	background-image: url('MSADTopologyReport/img/back_enabled.jpg');
+}
+
+#MSADTopologyReport .paginate_disabled_next {
+	background-image: url('MSADTopologyReport/img/forward_disabled.jpg');
+}
+
+#MSADTopologyReport .paginate_enabled_next {
+	background-image: url('MSADTopologyReport/img/forward_enabled.jpg');
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable {
+	margin: 		0 auto;
+	clear: 			both;
+	width: 			100%;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable thead th {
+	padding: 		3px 18px 3px 10px;
+	border-bottom: 	1px solid black;
+	font-weight: 	bold;
+	cursor: 		pointer;
+	* cursor: 		hand;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable tfoot th {
+	padding: 		3px 18px 3px 10px;
+	border-top: 	1px solid black;
+	font-weight: 	bold;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable tr.heading2 td {
+	border-bottom: 	1px solid #aaa;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable td {
+	padding: 		3px 10px;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable td.center {
+	text-align: 	center;
+	margin:			0 auto;
+}
+
+#MSADTopologyReport .sorting_asc {
+	background: 	url('MSADTopologyReport/img/sort_asc.png') no-repeat center right;
+}
+
+#MSADTopologyReport .sorting_desc {
+	background: 	url('MSADTopologyReport/img/sort_desc.png') no-repeat center right;
+}
+
+#MSADTopologyReport .sorting {
+	background: 	url('MSADTopologyReport/img/sort_both.png') no-repeat center right;
+}
+
+#MSADTopologyReport .sorting_asc_disabled {
+	background: 	url('MSADTopologyReport/img/sort_asc_disabled.png') no-repeat center right;
+}
+
+#MSADTopologyReport .sorting_desc_disabled {
+	background: 	url('MSADTopologyReport/img/sort_desc_disabled.png') no-repeat center right;
+}
+
+#MSADTopologyReport tr.odd {
+	background-color: #E2E4FF;
+}
+
+#MSADTopologyReport tr.even {
+	background-color: white;
+}
+
+#MSADTopologyReport .dataTables_scroll {
+	clear: 			both;
+}
+
+#MSADTopologyReport .dataTables_scrollBody {
+	*margin-top: 	-1px;
+}
+
+#MSADTopologyReport .top, .bottom {
+	padding: 		15px;
+	background-color: #F5F5F5;
+	border: 		1px solid #CCCCCC;
+}
+
+#MSADTopologyReport .top .dataTables_info {
+	float: 			none;
+}
+
+#MSADTopologyReport .clear {
+	clear: 			both;
+}
+
+#MSADTopologyReport .dataTables_empty {
+	text-align: 	center;
+}
+
+#MSADTopologyReport tfoot input {
+	margin: 		0.5em 0;
+	width: 			100%;
+	color: 			#444;
+}
+
+#MSADTopologyReport tfoot input.search_init {
+	color: 			#999;
+}
+
+#MSADTopologyReport td.group {
+	background-color: #d1cfd0;
+	border-bottom: 	2px solid #A19B9E;
+	border-top: 	2px solid #A19B9E;
+}
+
+#MSADTopologyReport td.details {
+	background-color: #d1cfd0;
+	border: 		2px solid #A19B9E;
+}
+
+#MSADTopologyReport .paging_full_numbers {
+	width: 			400px;
+	height: 		22px;
+	line-height: 	22px;
+}
+
+#MSADTopologyReport .paging_full_numbers span.paginate_button,
+#MSADTopologyReport .paging_full_numbers span.paginate_active {
+	border: 		1px solid #aaa;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	padding: 		2px 5px;
+	margin: 		0 3px;
+	cursor: 		pointer;
+	*cursor: 		hand;
+}
+
+#MSADTopologyReport .paging_full_numbers span.paginate_button {
+	background-color: #ddd;
+}
+
+#MSADTopologyReport .paging_full_numbers span.paginate_button:hover {
+	background-color: #ccc;
+}
+
+#MSADTopologyReport .paging_full_numbers span.paginate_active {
+	background-color: #99B3FF;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable tr.even.row_selected td {
+	background-color: #B0BED9;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable tr td {
+	cursor: 		pointer;
+}
+
+#MSADTopologyReport table.MSADTopology_DataTable tr.odd.row_selected td {
+	background-color: #9FAFD1;
+}
+
+#MSADTopologyReport tr.odd td.sorting_1 {
+	background-color: #D3D6FF;
+}
+
+#MSADTopologyReport tr.odd td.sorting_2 {
+	background-color: #DADCFF;
+}
+
+#MSADTopologyReport tr.odd td.sorting_3 {
+	background-color: #E0E2FF;
+}
+
+#MSADTopologyReport tr.even td.sorting_1 {
+	background-color: #EAEBFF;
+}
+
+#MSADTopologyReport tr.even td.sorting_2 {
+	background-color: #F2F3FF;
+}
+
+#MSADTopologyReport tr.even td.sorting_3 {
+	background-color: #F9F9FF;
+}
+
+#MSADTopologyReport table.KeyTable td {
+	border: 3px solid transparent;
+}
+
+#MSADTopologyReport div.box {
+	height: 		100px;
+	padding: 		10px;
+	overflow: 		auto;
+	border: 		1px solid #8080FF;
+	background-color: #E5E5FF;
+}

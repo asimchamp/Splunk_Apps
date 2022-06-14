@@ -1,0 +1,104 @@
+<form>
+  <label>Network Firewall Reports</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="unit_name" searchWhenChanged="true">
+      <label>Unit Name:</label>
+      <fieldForLabel>unit_name</fieldForLabel>
+      <fieldForValue>unit_name</fieldForValue>
+      <search ref="NF_search"></search>
+    </input>
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <map>
+        <title>Geo-location of Network Events</title>
+        <search>
+          <query>sourcetype="nw_firewall" | where unit_name = "$unit_name$" |search source_ip!=192.168* source_ip!=0.0.* source_ip!=10.* | stats count by source_ip | geom geo_countries allFeatures=True featureIdField=Country</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="mapping.type">choropleth</option>
+      </map>
+    </panel>
+    <panel>
+      <chart>
+        <title>Destination of Network Traffic (Destination IP:Port)</title>
+        <search>
+          <query>sourcetype="nw_firewall" | where unit_name = "$unit_name$"| eval dest_ip_port = dest_ip +":"+ dest_port | timechart count BY dest_ip_port</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Traffic Count</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Matched Network ACL Rules</title>
+        <search>
+          <query>sourcetype="nw_firewall" | where unit_name = "$unit_name$" | timechart count BY ACL_name</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Traffic Count</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Action Taken Based on ACL</title>
+        <search>
+          <query>sourcetype="nw_firewall" | where unit_name = "$unit_name$"| eval action = upper(traffic_action) | timechart count BY action</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Action Count</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Network Traffic Layer-3 Protocols</title>
+        <search>
+          <query>sourcetype="nw_firewall" | where unit_name = "$unit_name$"| stats count BY protocol</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <event>
+        <title>Network Firewall Logs</title>
+        <search>
+          <query>sourcetype="nw_firewall" | where unit_name = "$unit_name$"| eval source_ip_port = source_ip +":"+ source_port | eval dest_ip_port = dest_ip +":"+ dest_port | table _time,ACL_name, source_ip_port, dest_ip_port, protocol, traffic_action| rename _time as Time | convert timeformat="%m/%d/%Y %l:%M:%S %p" ctime(Time)| rename source_ip_port as Source| rename dest_ip_port AS Destination|rename protocol AS Protocol|rename traffic_action AS Action</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="list.drilldown">none</option>
+      </event>
+    </panel>
+  </row>
+</form>

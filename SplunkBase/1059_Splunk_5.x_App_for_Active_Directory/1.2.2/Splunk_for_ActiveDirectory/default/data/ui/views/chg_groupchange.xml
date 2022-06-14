@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view onUnloadCancelJob="True" template="dashboard.html">
+	<label>Group Changes</label>
+	<module name="AccountBar" layoutPanel="appHeader" />
+	<module name="AppBar" layoutPanel="appHeader" />
+	<module name="SideviewUtils" layoutPanel="appHeader" />
+
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+
+	<module name="TitleBar" layoutPanel="viewHeader"/>
+		
+	<!-- The Time Range Picker feeds the picker for the MSADDomainSelector -->
+	<module name="TimeRangePicker" layoutPanel="panel_row3_col1_grp1" autoRun="True">
+		<param name="default">Last 60 minutes</param>
+		<param name="searchWhenChanged">True</param>
+			
+		<!-- Search for the MSAD Topology so we can render it in the Domain Selector -->
+		<module name="Search">
+			<param name="search">|`domain-selector`</param>
+			<module name="JobProgressIndicator" layoutPanel="panel_row2_col1"></module>
+
+			<module name="ColumnSelector" layoutPanel="panel_row2_col1">
+				<param name="drilldownPrefix">domainselection</param>
+				<param name="defaultState">true</param>
+				<param name="autoSelector">both</param>
+				<param name="loadFromCookie">true</param>
+				<param name="cookieName">domainselection</param>
+				<param name="columns">
+					<param name="ForestName">
+						<param name="title">Forest</param>
+						<param name="weight">0</param>
+					</param>
+					<param name="Site">
+						<param name="title">Site</param>
+						<param name="weight">1</param>
+					</param>
+					<param name="DomainDNSName">
+						<param name="title">Domain</param>
+						<param name="weight">2</param>
+					</param>
+					<param name="host">
+						<param name="title">Server</param>
+						<param name="weight">3</param>
+					</param>
+				</param>
+						
+				<module name="Search" layoutPanel="panel_row2_col1">
+					<param name="search"><![CDATA[(eventtype=msad-group-changes OR eventtype=msad-groupmembership-changes) $domainselection.host$ NOT src_nt_domain="NT AUTHORITY"|fillnull value="*" member_id|eval adminuser=src_nt_domain."\\".src_user|stats count by adminuser,user_group,member_id,MSADGroupClass,MSADGroupType|fields *]]></param>
+					<module name="Pulldown" layoutPanel="panel_row3_col1_grp2">
+						<param name="name">adminuser</param>
+						<param name="label">Administrator</param>
+						<param name="template">adminuser="$value$"</param>
+						<param name="postProcess">dedup $name$|sort $name$</param>
+						<param name="searchFieldsToDisplay">
+							<list>
+								<param name="label">adminuser</param>
+								<param name="value">adminuser</param>
+							</list>
+						</param>
+						
+						<module name="Pulldown" layoutPanel="panel_row3_col1_grp1">
+							<param name="name">user_group</param>
+							<param name="label">Group</param>
+							<param name="template">user_group="$value$"</param>
+							<param name="postProcess">dedup $name$|sort $name$</param>
+							<param name="searchFieldsToDisplay">
+								<list>
+									<param name="label">user_group</param>
+									<param name="value">user_group</param>
+								</list>
+							</param>
+							
+							<module name="Pulldown" layoutPanel="panel_row3_col1_grp3">
+								<param name="name">member_id</param>
+								<param name="label">Member</param>
+								<param name="template">member_id="$value$"</param>
+								<param name="postProcess">dedup $name$|sort $name$</param>
+								<param name="searchFieldsToDisplay">
+									<list>
+										<param name="label">member_id</param>
+										<param name="value">member_id</param>
+									</list>
+								</param>
+										
+								<module name="Pulldown" layoutPanel="panel_row3_col1_grp2">
+									<param name="name">MSADGroupClass</param>
+									<param name="label">Group Class</param>
+									<param name="template">MSADGroupClass="$value$"</param>
+									<param name="postProcess">dedup $name$|sort $name$</param>
+									<param name="searchFieldsToDisplay">
+										<list>
+											<param name="label">MSADGroupClass</param>
+											<param name="value">MSADGroupClass</param>
+										</list>
+									</param>
+									
+									<module name="Pulldown" layoutPanel="panel_row3_col1_grp3">
+										<param name="name">MSADGroupType</param>
+										<param name="label">Group Scope</param>
+										<param name="template">MSADGroupType="$value$"</param>
+										<param name="postProcess">dedup $name$|sort $name$</param>
+										<param name="searchFieldsToDisplay">
+											<list>
+												<param name="label">MSADGroupType</param>
+												<param name="value">MSADGroupType</param>
+											</list>
+										</param>
+												
+										<module name="Search" layoutPanel="panel_row4_col1">
+											<param name="search"><![CDATA[eventtype=msad-group-changes $domainselection.host$ $user_group$ $MSADGroupType$ $MSADGroupClass$|eval adminuser=src_nt_domain."\\".src_user|search $adminuser$|table _time,adminuser,msad_action,MSADGroupClass,MSADGroupType,src_nt_domain,user_group|rename adminuser as "Administrator",msad_action as "Action",user_group as "Group", MSADGroupClass as "Type", MSADGroupType as "Scope",src_nt_domian as "Domain"]]></param>
+											<module name="JobProgressIndicator"></module>
+											<module name="GenericHeader"><param name="label">Group Changes</param></module>
+											<module name="Pager">
+												<module name="SimpleResultsTable">
+													<param name="drilldown">row</param>
+													<module name="Redirector">
+														<param name="url">audit_group</param>
+														<param name="arg.groupName">$click.cell6.value$</param>
+														<param name="arg.nt_domain">$click.cell5.value$</param>
+														<param name="arg.earliest">$search.timeRange.earliest$</param>
+														<param name="arg.latest">$search.timeRange.latest$</param>
+													</module> <!-- Redirector -->
+												</module> <!-- SimpleResultsTable -->
+											</module> <!-- Pager -->
+										</module> <!-- Search -->
+
+										<module name="Search" layoutPanel="panel_row5_col1">
+											<param name="search"><![CDATA[eventtype=msad-groupmembership-changes $domainselection.host$ $user_group$ $MSADGroupType$ $MSADGroupClass$ $member_id$|eval adminuser=src_nt_domain."\\".src_user|search $adminuser$|table _time,adminuser,MSADGroupClass,MSADGroupType,src_nt_domain,user_group,msad_action,member_id|rename adminuser as "Administrator",MSADGroupClass as "Type",MSADGroupType as "Scope",src_nt_domain as "Domain",user_group as "Group",msad_action as "Action",member_id as "Member"]]></param>
+											<module name="JobProgressIndicator"></module>
+											<module name="GenericHeader"><param name="label">Membership Changes</param></module>
+											<module name="Pager">
+												<module name="SimpleResultsTable">
+													<param name="drilldown">row</param>
+													<module name="Redirector">
+														<param name="url">audit_group</param>
+														<param name="arg.groupName">$click.cell5.value$</param>
+														<param name="arg.nt_domain">$click.cell4.value$</param>
+														<param name="arg.earliest">$search.timeRange.earliest$</param>
+														<param name="arg.latest">$search.timeRange.latest$</param>
+													</module> <!-- Redirector -->													
+												</module> <!-- SimpleResultsTable -->
+											</module> <!-- Pager -->
+										</module> <!-- PostProcess -->
+									</module> <!-- Pulldown#group_scope -->
+								</module> <!-- Pulldown#sectype -->
+							</module> <!-- Pulldown#member_id -->
+						</module> <!-- Pulldown#group_id -->
+					</module> <!-- Pulldown#user_subject -->
+				</module> <!-- NewSearch -->
+			</module> <!-- ColumnSelector -->
+		</module> <!-- NewSearch#domainselector -->
+	</module> <!-- TimeRangePicker -->
+</view>

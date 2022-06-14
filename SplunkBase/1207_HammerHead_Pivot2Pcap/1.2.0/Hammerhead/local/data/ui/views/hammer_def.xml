@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>hammer_def</label>
+  <row>
+    <chart>
+      <searchName>hammer_def</searchName>
+      <title>Number of Events</title>
+      <option name="charting.chart">radialGauge</option>
+    </chart>
+    <chart>
+      <searchName>total hosts reporting</searchName>
+      <title>HammerHead Appliances</title>
+      <option name="charting.chart">radialGauge</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchName>sum sbytes</searchName>
+      <title>Total Source Bytes</title>
+      <option name="charting.chart">area</option>
+    </chart>
+    <chart>
+      <searchName>sum sbytes by daddr</searchName>
+      <title>Total Source Bytes By IP</title>
+      <option name="charting.chart">line</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchName>sum dbytes</searchName>
+      <title>Total Dest Bytes</title>
+      <option name="charting.chart">area</option>
+    </chart>
+    <chart>
+      <searchName>sum dbytes by saddr</searchName>
+      <title>Sum Dest Bytes  by IP</title>
+      <option name="charting.chart">line</option>
+    </chart>
+  </row>
+</dashboard>

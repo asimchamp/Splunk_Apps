@@ -1,0 +1,27 @@
+<form>
+  <label>Geo Location</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <map>
+        <title>Location of Attacks</title>
+        <search>
+          <query>sourcetype="firewall" client_ip!=192.168* client_ip!=0.0.* client_ip!=10.*| iplocation client_ip | geostats latfield=lat longfield=lon count by Attack_Description</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="mapping.type">marker</option>
+        <option name="refresh.display">progressbar</option>
+      </map>
+    </panel>
+  </row>
+</form>

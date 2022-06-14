@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Devices View</label>
+
+  <fieldset>
+    <input type="dropdown" token="device">
+      	<label>Select Device</label>
+		<default>*</default>
+   	<populatingSearch fieldForValue="dev" fieldForLabel="dev">
+     		<![CDATA[sourcetype="DASP4" | stats values(device) AS "dev"]]>
+  	 </populatingSearch>
+	 <choice value="*">all</choice>
+    </input>
+    <input type="time" />
+  </fieldset>
+
+  <row>
+	<single>
+		<searchString>sourcetype="DASP4" device="$device$" | where isnotnull(applicationID) | stats dc(application) as nb | rangemap field=nb default=low</searchString>
+		<earliestTime>-12h</earliestTime>
+		<option name="afterLabel">protected applications</option>
+		<option name="classField">range</option>
+	</single>
+	<single>
+		<searchString>sourcetype="DASP4" alert_id="4.*" device="$device$" | stats count  as nb | rangemap field=nb default=severe</searchString>
+		<option name="afterLabel">security alerts</option>
+		<option name="classField">range</option>
+	</single>
+	<single>
+		<searchString>sourcetype="DASP4" alert_id="2.*" device="$device$" | stats count as nb | rangemap field=nb default=elevated</searchString>
+		<earliestTime>-12h</earliestTime>
+		<option name="afterLabel">system events</option>
+		<option name="classField">range</option>
+	</single>
+
+	</row>
+  <row>
+	<chart>
+		<title>Total traffic</title>
+		<searchString>sourcetype="DASP4" device="$device$"| timechart eval(((sum(bytes_sent)+sum(bytes_received))/1000)) AS "kB" by device | rename device AS "Device"</searchString>
+		<option name="charting.chart">line</option>
+		<option name="charting.primaryAxisTitle.text">Time</option>
+		<option name="charting.secondaryAxisTitle.text">kB</option>
+
+	</chart>
+	</row>
+	<row>
+		<table>
+			<title>10 last login events</title>
+			<searchString>sourcetype="DASP4" alert_id="2.1.*"  | convert ctime(_time) as time timeformat="%H:%M:%S" | table time,device, alert_message | rename time AS "Time", device AS "Device", alert_message AS "Event" | sort 10 _time desc</searchString>
+
+		</table>
+		<table>
+			<title>10 last operations events</title>
+			<searchString>sourcetype="DASP4" (alert_id="2.2.*" OR alert_id="3.*" OR alert_id="5.*") | convert ctime(_time) as time timeformat="%H:%M:%S" | table time,device, alert_message | rename time AS "Time", device AS "Device", alert_message AS "Event" | sort 10 _time desc</searchString>
+
+		</table>
+		<table>
+			<title>10 last HA events</title>
+			<searchString>sourcetype="DASP4" alert_id="2.3.*" | convert ctime(_time) as time timeformat="%H:%M:%S" | table time,device, alert_message | rename time AS "Time", device AS "Device", alert_message AS "Event" | sort 10 _time desc</searchString>
+
+		</table>
+	</row>
+  </form>

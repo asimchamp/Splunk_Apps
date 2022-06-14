@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>What does this Knowledge Object use?</label>
+  <searchTemplate>| inputlookup lookup_ko | where match(name,"(?i)$ko$") AND match(level,"$app$") | search type="$type$"
+                  | rename id as ko_id name as ko_name type as ko_type level as ko_level
+                  | lookup lookup_ko_mapping  used_by_id as ko_id OUTPUT item_id
+                  | mvexpand item_id
+                  | lookup lookup_ko id as item_id OUTPUT name as item_name type as item_type level as item_level
+                  | sort count=0 str(ko_name) ko_level ko_type item_name item_level item_type
+                  | table ko_name ko_type ko_level item_name item_type  item_level
+                  | rename ko_name as "Knowledge Object" ko_level as "Level Where Defined" ko_type as "Type"
+                           item_name as "Uses KO" item_type as "Type of KO" item_level as "Level of KO"
+
+  </searchTemplate>
+
+  <fieldset>
+    <input type="text" token="ko">
+      <label>Search for the uses of this Knowledge Object</label>
+    </input>
+    <input type="dropdown" token="type">
+      <label>Type</label>
+         <choice value="*">Any</choice>
+         <populatingSearch fieldForValue="type" fieldForLabel="type"><![CDATA[| inputlookup lookup_ko | stats count by type]]></populatingSearch>
+    </input>
+    <input type="dropdown" token="app">
+      <label>App</label>
+         <choice value=".*">Any</choice>
+         <populatingSearch fieldForValue="appName" fieldForLabel="appName"><![CDATA[| inputlookup lookup_ko | rex field=level "app:(?<appName>\S+)" | stats count by appName ]]></populatingSearch>
+    </input>
+  </fieldset>
+
+  <row>
+    <table>
+      <label>Uses Knowledge Objects:"</label>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+
+    <row>
+    <html>
+      You may enter
+      <li>the exact name of the knowledge object,</li>
+      <li>part of the name of the object, or </li>
+      <li>a regular expression</li>
+      <br/>
+      The simple wildcard (*) does not work for this search.<br/>
+      The search is case-insensitive.
+    </html>
+  </row>
+</form>

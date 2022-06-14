@@ -1,0 +1,31 @@
+<nav search_view="search">
+
+<view name="landing_page" default="true"/>
+
+<collection label="Alfresco Metrics">
+	<!-- Alfresco repository metrics -->
+	<view name="alfresco_repository" />	
+	<!-- JVM metrics for Alfresco repository -->
+	<view name="alfresco_repository_jvm_threading_and_memory" />
+	<view name="alfresco_repository_jvm_gc" />
+</collection>
+
+<collection label="SOLR Metrics">
+	<!-- SOLR search and cache metrics -->
+	<view name="alfresco_solr" />
+	<view name="alfresco_solr_cache" />
+	<!-- JVM metrics for SOLR -->
+	<view name="alfresco_solr_jvm_threading_and_memory" />
+	<view name="alfresco_solr_jvm_gc" />
+</collection>
+
+<collection label="Documentation"> 
+  <a href="/static/app/alfresco_app/docs/README.md">App README</a> 
+  <a href="http://docs.alfresco.com/4.1/index.jsp?topic=%2Fcom.alfresco.enterprise.doc%2Ftasks%2Fjmx-access.html">Connecting with JMX (official docs)</a>
+  <a href="http://wiki.alfresco.com/wiki/JMX">Alfresco JMX Wiki page</a>
+</collection>
+
+<view name="about"/>
+
+   
+</nav>

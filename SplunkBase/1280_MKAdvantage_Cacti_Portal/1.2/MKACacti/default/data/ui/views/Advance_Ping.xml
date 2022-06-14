@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Advanced Ping</label>
+  <row>
+    <table>
+      <searchString>index=cacti_perf www NOT advanced | dedup target_host | sort - loss | rename target_host as Node, loss as loss(ms), max as max(ms), min as min(ms), avg as avg(ms) | table Node, loss(ms), max(ms), min(ms), avg(ms)</searchString>
+      <title>Advanced Ping Stats</title>
+      <earliestTime>-8d@d</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+</dashboard>

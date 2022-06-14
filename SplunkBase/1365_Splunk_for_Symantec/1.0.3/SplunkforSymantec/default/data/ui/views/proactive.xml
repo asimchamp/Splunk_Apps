@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+    <label>Proactive Threat Detection with SONAR</label>
+    <fieldset autoRun="true">
+        <input type="time" searchWhenChanged="true">
+            <default>Today</default>
+        </input>
+    </fieldset>
+    <row>
+        <single>
+            <searchString>`proactive_count`</searchString>
+            <option name="beforeLabel">Risks Proactively Mitigated: </option>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </single>
+        <chart>
+            <searchString>`proactive_detection_types`</searchString>
+            <title>Detection Types</title>
+            <option name="charting.chart">pie</option>
+        </chart>
+    </row>
+    <row>
+        <table>
+            <searchString>`proactive_table`</searchString>
+            <title>SONAR Detections</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+</form>

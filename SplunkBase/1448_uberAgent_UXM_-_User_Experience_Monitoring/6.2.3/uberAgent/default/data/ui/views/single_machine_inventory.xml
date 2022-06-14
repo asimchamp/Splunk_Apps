@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css, single_machine_inventory.css">
+
+   <label>Single Machine Inventory</label>
+   <description>This dashboard displays the number of application installations over time. It also shows detailed information about each installed application and each installed software update. Please note that inventory information is only collected once per 24 hour period by default.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-7d@d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_MachineInventory</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_System_MachineInventory` System_MachineInventory
+            latest(host) as Host
+            $SearchFilter$
+         | eval Title = "Inventory data: " . Host
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">Title</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title"></option>
+         </viz>
+         
+         <table id="Table_Panel11">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_MachineInventory` System_MachineInventory
+                     count(System_MachineInventory) as EventCount
+                     latest(AdDomainDns) as "AD domain DNS"
+                     latest(AdDomainNetBios) as "AD domain NetBIOS"
+                     latest(AdOu) as "AD OU"
+                     latest(AdSite) as "AD site"
+                     latest(BaseboardSerial) as "Baseboard serial number"
+                     latest(BatteryWearLevelPercent) as "Battery wear level (%)"
+                     latest(BIOSSerial) as "BIOS serial number"
+                     latest(ComputerNameCanonical) as "Computer name (canonical)"
+                     latest(ComputerNameDn) as "Computer name (distinguished name)"
+                     latest(CPUCoresLogical) as "CPU cores (logical)"
+                     latest(CPUCoresPhysical) as "CPU cores (physical)"
+                     latest(CPUMaxMhz) as "CPU speed (MHz)"
+                     latest(CPUName) as "CPU name"
+                     latest(CPUSockets) as "CPU sockets"
+                     latest(CtxDeliveryGroupName) as "Citrix delivery group"
+                     latest(CtxFarmName) as "Citrix site"
+                     latest(CtxMachineCatalogName) as "Citrix machine catalog"
+                     latest(HwBiosVersion) as "BIOS version"
+                     latest(HwIsVirtualMachine) as "Hardware: is VM?"
+                     latest(IsBatteryPresent) as "Hardware: has battery?"
+                     latest(IsUpsPresent) as "Hardware: has UPS?"
+                     latest(HwManufacturer) as "Hardware manufacturer"
+                     latest(HwModel) as "Hardware model"
+                     latest(OsName) as "OS name"
+                     latest(OsType) as "OS type"
+                     latest(OsVersion) as "OS version number"
+                     latest(OsBuildUbr) as "OS build"
+                     latest(OsSpName) as "OS service pack name"
+                     latest(OsSpVersion) as "OS service pack version"
+                     latest(OsInstallDate) as "OS install date"
+                     latest(OsArchitecture) as "OS architecture"
+                     latest(PowerSupportsConnectedStandby) as "Power: supports connected standby"
+                     latest(PowerSupportsS1) as "Power: supports S1"
+                     latest(PowerSupportsS2) as "Power: supports S2"
+                     latest(PowerSupportsS3) as "Power: supports S3"
+                     latest(PowerSupportsS4) as "Power: supports S4"
+                     latest(PowerSupportsS5) as "Power: supports S5"
+                     latest(RAMSizeGB) as "RAM size (GB)"
+                     values(TagsHost) as "TagsHost"
+                     $SearchFilter$
+                  | join type=left host
+                     [ 
+                        | pivot `uA_DM_System_MonitorInventory` System_MonitorInventory
+                           latest(MonitorDisplayName) AS MonitorDisplayName 
+                           latest(MonitorVRes) AS MonitorVRes
+                           latest(MonitorHRes) AS MonitorHRes
+                           latest(MonitorColorDepth) AS MonitorColorDepth 
+                           latest(MonitorIsPrimary) AS MonitorIsPrimary 
+                           $SearchFilter$
+                           splitrow
+                               MonitorDisplayName
+                           splitrow
+                               MonitorIndex
+                        | sort MonitorIndex
+                        | eval MonitorIsPrimary=if(MonitorIsPrimary = "1", " [primary]", "")
+                        | eval Monitor = MonitorHRes + "x" + MonitorVRes + "x" + MonitorColorDepth + " - " + MonitorDisplayName + MonitorIsPrimary
+                        | fields Monitor
+                        | transpose
+                        | rename "row *" AS "Monitor *"
+                     ]
+                  | join type=left host
+                     [
+                        | pivot `uA_DM_System_NetworkConfigInformation` System_NetworkConfigInformation
+                           latest(NetworkConfigDescription) AS NetworkConfigDescription
+                           latest(NetworkConfigInterfaceTypeDisplayName) AS NetworkConfigInterfaceTypeDisplayName
+                           latest(NetworkConfigDnsSuffix) AS NetworkConfigDnsSuffix
+                           latest(NetworkConfigIPv4) as NetworkConfigIPv4
+                           latest(NetworkConfigMACAddress) as NetworkConfigMACAddress
+                              $SearchFilter$
+                           splitrow
+                              NetworkConfigFriendlyName
+                        | sort NetworkConfigFriendlyName
+                        | eval NetworkConfigMACAddress = coalesce (", MAC: " + NetworkConfigMACAddress, "")
+                        | eval Network = "Type: " + NetworkConfigInterfaceTypeDisplayName + " [" + NetworkConfigDescription + "], DNS: " + NetworkConfigDnsSuffix + ", IPv4: " + NetworkConfigIPv4 + NetworkConfigMACAddress
+                        | fields Network
+                        | transpose
+                        | rename "row *" AS "Network connection *"
+                     ]
+                  | fields
+                     - EventCount _timediff column
+                  | transpose
+                  | sort column
+                  | rename
+                     column as Property
+                     "row 1" as Data
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Application count over time</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_ApplicationInventory` Application_ApplicationInventory
+                     dc(DisplayName) as Count
+                     splitrow
+                        _time
+                        period day
+                     $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>All application installations on this machine</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_ApplicationInventory` Application_ApplicationInventory
+                     latest(InstallDate) as "Install date"
+                     latest(Language) as Language
+                     latest(InstallLocation) as "Install location"
+                     latest(IsMsiPackage) as IsMsiPackage
+                     latest(IsMachineInstall) as IsMachineInstall
+                     splitrow
+                        DisplayName as Name
+                     splitrow
+                        DisplayVersion as Version
+                     splitrow
+                        Publisher
+                     $SearchFilter$
+                  | eval "MSI package?"=if(IsMsiPackage=1,"yes","no")
+                  | eval "Installation scope"=if(IsMachineInstall=1,"machine","user")
+                  | eval sortfield=lower('Name')
+                  | table
+                     Name
+                     Publisher
+                     Version
+                     "Install date"
+                     Language
+                     "MSI package?"
+                     "Installation scope"
+                     "Install location"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">25</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_application_inventory?earliest=$earliest$&latest=$latest$&form.FilterField=sDisplayName&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+
+      <html src="single_machine_inventory_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>All updates on this machine</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_SoftwareUpdateInventory` Application_SoftwareUpdateInventory
+                     latest(ProductName) as Product
+                     latest(DisplayName) as Name
+                     latest(State) as State
+                     latest(InstallDate) as "Install date"
+                     splitrow
+                        Guid
+                     $SearchFilter$
+                   | sort - "Install date"
+               </query>
+            </search>
+            <option name="count">25</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_update_inventory?earliest=$earliest$&latest=$latest$&form.FilterField=shost&form.FilterOperator=in&form.FilterExpression=*&FilterGuid=$row.Guid$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+
+      <html src="single_machine_inventory_update_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+</form>

@@ -1,0 +1,39 @@
+<nav>
+    <collection label="Search">
+      <view name="flashtimeline" default="true" />
+      <view name="flight_search"/>
+      <view name="dashboard_live" />
+    </collection>
+    <collection label="Form searches">
+        <view name="sample_formsearch"/>
+        <view name="sample_dropdown"/>
+        <view name="sample_radio"/>
+    </collection>
+    <collection label="Dashboards">
+      <view name="airlineInformation" />
+      <view name="cityinformation" />
+      <view name="hubcitiesinformation" />
+      <view name="NYFlightTrends" />
+      <divider/>
+        <collection label="Other Views and User Created Content">
+          <view source="unclassified" />
+        </collection>
+      <divider/>
+      <a href="javascript:Splunk.Globals.Viewmaster.openDashCreateForm();">Create dashboard...</a>
+    </collection>
+    <collection label="Searches">
+      <collection label="Airline">
+        <saved source="unclassified" match="airline" />
+      </collection>
+      <collection label="Cities">
+        <saved source="unclassified" match="cit" />
+      </collection>
+      <collection label="New York">
+        <saved source="unclassified" match="NY" />
+      </collection>
+      <collection label="Other">
+        <saved source="unclassified"/>
+      </collection>
+    </collection>
+    <view name="about" />
+</nav>

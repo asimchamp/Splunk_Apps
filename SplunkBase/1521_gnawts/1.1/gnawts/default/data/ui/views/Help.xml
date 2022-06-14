@@ -1,0 +1,297 @@
+<view template="dashboard.html">
+  <label>Help</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="ServerSideInclude" layoutPanel="appHeader">
+  <module name="SideviewUtils" layoutPanel="appHeader" />
+    <param name="src">error_messages.html</param>
+  </module>
+
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text"><![CDATA[
+    <table cellpadding=10><tr><td>
+    <img src="../../static/app/gnawts/bigIcon.png" height=150 width=150></td>
+    <td>
+    <h1>Welcome to the Gnawts Help page</h1>
+	Gnawts is a Splunk app for fast detangling of supercomputer
+	logs.  The name is a pun: HPC systems have many hosts emitting
+	many logs concurrently, which can be related or not - making
+	these into a coherent signal and making sense of them can 
+	be like untangling many strings in a knot.  Hard places in logs
+	are called knots, this app helps you chew (gnaw) through such
+	hard places in computer logs.  And the term "log" has a 
+    <a href="http://en.wikipedia.org/wiki/Chip_log">nautical background</a>, and speed is measured in knots (fast).
+	So the name has multiple layers, just as the app has 
+	<a href="http://static.usenix.org/event/slaml10/tech/full_papers/Stearley.pdf">
+	multiple layers 
+	</a>
+	of functionality.  This page provides some tips on getting started.
+    In the icon, the red sky in the icon speaks to gnawt's ability to help forecast storms
+    (or not) on HPC systems, similar to red skies at sea.
+	<p>
+	Gnawts is open source, so if you have better design ideas,
+	or dashboards/searches/moi/etc to contribute, please do!  The code is on
+    <a href="https://github.com/hpc/gnawts">github</a>, and/or contact
+	<a href="mailto:jrstear@sandia.gov">Jon Stearley</a>.
+    </td></tr></table>
+    ]]></param>
+  </module>
+
+  <module name="StaticContentSample" layoutPanel="panel_row2_col1">
+    <param name="text"><![CDATA[
+    <h1>Setup</h1>
+	Gnawts depends on your using certain sourcetype names, and 
+	that you tell it how to recognize different clusters.  But first,
+	you'll need Sideview...
+    <h2>Dependencies</h2>
+	Gnawts depends on the excellent Sideview Utils app.
+	Without it, many of Gnawt's dashboards will not function properly.
+	So, go install it now if you have not already.  You can install the 
+	<a href="http://sideviewapps.com/apps/sideview-utils/">
+	latest version</a> (which includes a cool dashboard editor), or an 
+	<a href="http://splunk-base.splunk.com/apps/36405/sideview-utils-lgpl">
+	older, LGPL version</a>.
+    <h2>Multiple Clusters</h2>
+	Gnawts is designed to support multiple HPC clusters.  Some dashboards
+	have pulldown menus which can be used to limit the information on
+	that page to selected clusters.  The pulldown can be populated in
+	either of two ways:
+	<p>
+    <i>One index per cluster:</i> By default, system lists will be 
+    automatically populated by finding all indexes containing at least one event.
+    We recommend putting all logs for each cluster into its own index, whose
+    name matches the cluster name.  This enables efficient searches when
+    drilling into specific clusters, and you can use per-role index filters to
+    control who can see what.
+    In order for this approach to work, another step is <u>absolutely critical</u> -
+    you <b>MUST</b> add the indexes to the default search list for your splunk user/role
+    (otherwise, the user will not search those indexes, and nothing will appear in gnawts).
+    If you do not need to limit access via roles as described above, a best practice is
+    to simply add "All non-internal indexes" to the "Indexes searched by default" for the "user"
+    role, via the Splunk GUI under "Manager » Access controls » Roles » user".  In this way,
+    any time you add additional indexes they will automatically appear in Gnawts lists and results.
+    As a minor note, if the index names start with hpc_, that prefix string is ignored in forming
+    cluster name lists (this is a backwards compatibility convenience).
+
+	<p>
+	<i>Manual list:</i> If you want to form lists of clusters via some other
+    method, you can modify the sysnames saved search to consult a lookup
+    file instead.  For example, add the line "foo, host=foo*"
+    to GNAWTS_HOME/local/sysnames.csv, and then redefine the saved search via
+    <CODE>`cd GNAWTS_HOME/local; cat sysnames.savedsearch >> savedsearch.conf`</CODE>.
+    Now, the cluster list will contain foo, and searches within it will use the 
+    search predicate host=foo*.  However, beware that wildcard searches can be
+    quite inefficient, expecially if the wildcard is at the start of the name
+    instead of the end.  Putting "foo,index=foo" in sysnames.csv would be
+    functionally equivalent to the aforementioned one index per cluster
+    method, but you would control the list manually (instead of it being
+    populated automatically - eg add an index and it will appear in the list).
+
+    <h2>Sourcetypes</h2>
+        In order to know what to do with certain log types which are not
+	defined by default with Splunk, Gnawts requires that you use 
+	certain sourcetype names.  Below is a list of key sourcetypes
+	and what information they provide.
+
+	<DL>
+	 <DT>moabstats
+	 <DD>A primary capability that Gnawts provides is 
+	 automatic association of log messages to job numbers.  This sourcetype
+	 is where the information comes from.  These logs are typically found
+	 on the 
+     <a href="http://www.adaptivecomputing.com/products/hpc-products/moab-hpc-basic-edition/">
+     MOAB</a> node of the cluster, in a file like
+	 <CODE>/var/log/moab/stats/events.Mon_Oct_1_2012</CODE>.
+	 <p>
+	 Systems without MOAB have similar information in other logs.  Using
+	 those instead of moabstats would not be difficult, we have just not
+	 needed to do it.  For help, please contact 
+	 <a href="mailto:jrstear@sandia.gov">Jon Stearley</a>, and/or also
+	 note that Gnawts is open source and we would be happy to include
+	 contributed code in future releases.
+
+	 <DT>syslog
+	 <DD>This is plain old syslog.  Gnawts doesn't provide parsing
+	 rules etc, but it does apply job lookups etc to this sourcetype,
+	 so if you have syslogs, use <CODE>sourcetype=syslog</CODE>.
+
+	 <DT>moab
+	 <DD>This is the moab control daemon log.  No gnawts functionality
+	 depends on it.
+
+	 <DT>joblog
+	 <DD>This is the SLURM job log.  No gnawts functionality
+	 depends on it.  IT provides better job exit information than 
+	 MOAB, however is only written when jobs end (if this was the 
+	 primary source of job info, only jobs that have ended would be
+	 known.  By monitoring moabstats, logs for jobs that are still
+	 running can be associated to corresponding job).
+
+	 <DT>slurmctld
+	 <DD>This is the SLURM control daemon log.  No gnawts functionality
+	 depends on it.  This is a candidate for job info.
+
+	 <DT>cray
+	 <DD>This is the eventlog on Cray machines, which is a superset
+	 of many of their other logs which they break into separate files.
+	 No general gnawts functionality depends on this, but if you 
+	 do have a Cray XT3, XE6, XK6, etc, you'll want this sourcetype.
+     If you do have a cray, you will also <b>need</b> to update <CODE>gnawts/lookups/cray.csv</CODE>
+     as described in <CODE>gnawts/bin/xtprocadmin2csv</CODE>.
+	</DL>
+
+	To see the corresponding parsing rules (defining fields for each
+	sourcetype, etc), see <CODE>gnawts/default/props.conf</CODE>.
+    It should be possible to use Splunk sourcetype aliases in order to make the
+    above work with gnawts, eg in the case that you have already indexed a bunch
+    of data using sourcetype names that do not match the above.
+
+    <h2>For example</h2>
+        At Sandia, we put a Splunk Universal forwarder on the log 
+	collector node of each cluster, all pointed at a single Splunk
+	server (where the data is indexed, stored, searched).
+
+	When adding a new cluster, we first create the corresponding
+	index on the server (the index must exist before data can
+	be saved to it!) by adding the below to indexes.conf and
+	restarting splunk:
+<PRE>
+[hpc_foo]
+homePath = &#36;SPLUNK_DB/hpc_foo/db
+coldPath = &#36;SPLUNK_DB/hpc_foo/colddb
+thawedPath = &#36;SPLUNK_DB/hpc_foo/thaweddb
+</PRE>
+
+
+	Then, on foo's log aggregator we configure the Splunk Universal
+	Forwarder with the below inputs.conf, which specifies that all 
+	the logs from this forwarder should be saved in the index named
+	hpc_foo on the server, and which monitored files should have
+	which sourcetype names.  Note that the ignoreOlderThan option is handy
+	when monitoring directories with many files, such as moat/stats/,
+	but is optional (you'l want to comment that option out when
+	importing historical data, but then uncomment it for ongoing
+	monitoring).
+
+	<PRE>
+[default]
+host = foo
+index = hpc_foo
+ignoreOlderThan = 7d
+
+[monitor:///var/log/syslog-ng/]
+sourcetype = syslog
+
+[monitor:///var/log/moab/stats/events.*]
+sourcetype = moabstats
+
+[monitor:///var/log/moab/log/moab.log]
+sourcetype = moab
+
+[monitor:///var/log/slurm/joblog]
+sourcetype = joblog
+
+[monitor:///var/log/slurm/slurmctld.log]
+sourcetype = slurmctld
+	</PRE>
+
+	<p>
+	LANL uses distributed indexing (with a Splunk indexer on
+	each cluster's log aggregator node), so the above is just
+	one example of how to configure a Gnawts setup.
+    ]]></param>
+  </module>
+
+  <module name="StaticContentSample" layoutPanel="panel_row3_col1">
+    <param name="text"><![CDATA[
+    <h1>Brief Tour</h1>
+    Ok, what is gnawts good for?  This section highlights a few things 
+	to look for - it is by no means an exhaustive description of
+	all the dashboards etc.
+	<h2>Job Lookup, Macro, Workflow Action</h2>
+	As mentioned previously, Gnawts associates logged events to jobs.
+	This is done in a number of ways.
+	<DL>
+	 <DT>Lookup
+	 <DD>For each event (syslog for instance), the job on that node
+	 is looked up using an auto-updated time-based lookup table.
+	 <DT>Macro
+	 <DD>A search like "`job(1234)`", will expand to show you all
+	 the log events associated with that job (eg, all messages on
+	 all nodes in that job from start to end times, based on moabstats).
+	 <DT>Workflow action
+	 <DD>Events having a jobid field (eg via the above lookup) will
+	 have a workflow action to the above macro.  Eg click on the 
+	 green triangle to the left of the event and select it from the
+	 resulting pull-down menu.
+	</DL>
+	<h2>Messages of Interest (MOI)</h2>
+	Gnawts includes a long list of rules matching messages of interest
+	to Sandia HPC admins, and various 
+	<a href="https://cfwebprod.sandia.gov/cfdocs/CCIM/docs/main.pdf">
+	research papers 
+	</a>
+	on HPC logs.
+	Simply search for <CODE>tag=moi</CODE> to see if you have any.
+	In fact, various dashboards are based on just that search, serving
+	up the results in various tables, charts, etc.  Here is one
+	last plug for open source - we welcome contributions of additional
+	MOI, better ways to categorize groups of related messages, etc.
+	<h2>Dashboards</h2>
+	Just a few words about a few of the dashboards...
+	<DL>
+	 <DT>Summary
+	 <DD>This comes up as the Gnawts home page, it includes a
+	 place to enter a (MOAB) job id and all the logs in that job
+	 will appear, and a table of MOI per host, which you can click on to
+	 drill down to the actual events.
+	 <DT>Messages of Interest: OOM'd jobs
+	 <DD>This dashboard shows jobs which have encountered an Out Of
+	 Memory MOI's, grouped by user.  By clicking on a user, you get
+	 additional information including a chart of OOM's per day, so 
+	 you can see if the user is having a bad day, or is habitually
+	 OOM'ing (and might benefit from a little education on how to avoid
+	 this).
+	 <DT>Moab: Processor Hours
+	 <DD>This dashboard shows how many nodehours were used in what
+	 queues by what users in what jobsizes.  The queue names are
+	 currently hard-coded but the dashboard gives you an idea of what 
+	 can be done.  We can show you how to customize it to your site,
+	 and we plan to generalize it so it will automatically work with
+	 whatever queues you might have on your system...
+	 <DT>Moab: Wait Time
+	 <DD>This dashboard is similar to the above (and the same caveats
+	 apply), but is focussed around how long users wait for what size
+	 jobs etc.
+	 <DT>Slurm: sinfo -Rl
+	 <DD>This dashboard shows you SLURM's notion of what nodes are in 
+	 what states - similar to "sinfo -Rl" in a shell, but Splunkified.  
+	 <DT>Admin: resetJobLookup
+	 <DD>You should not need to use any of the Admin searches.  This
+	 is the one that runs each night to update the jobs lookup table.
+	 It can take a long time to run, but if you run it manually, 
+	 let it finish!
+	</DL>
+    ]]></param>
+  </module>
+
+  <module name="StaticContentSample" layoutPanel="panel_row4_col1">
+    <param name="text"><![CDATA[
+    <h1>Component Operations Status</h1>
+    Gnawts can also 
+	<a href="https://www.usenix.org/system/files/mad12-final8.pdf">
+	track the state 
+	</a>
+	of each cluster node.
+	This is disabled by default.  Contact 
+	contact <a href="mailto:jrstear@sandia.gov">Jon Stearley</a>
+	for info on how to enable it.
+    ]]></param>
+  </module>
+
+</view>

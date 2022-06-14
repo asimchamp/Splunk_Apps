@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Welcome</label>
+  <row>
+    <html>
+      <h2>Welcome to the X-ray Splunk app!</h2>
+
+      <p>This app is designed to help you understand the dependencies between knowledge objects. It can answer questions such as
+      </p>
+      <list>
+        <li>Where is the tag "dmz" used in my Splunk environment? <a href="where_is_it_used">[Hint]</a></li>
+        <li>Where is the search "Top users by day" defined? <a href="ko_search_by_name_and_tupe">[Hint]</a></li>
+      </list>
+
+      <p>This app does not address all knowledge objects. It records the following for the various types:
+      </p>
+      <table border="1" cellpadding="2">
+        <tr>
+          <th>Type</th>
+          <th>Identifies where the <br/> object is <strong>defined</strong></th>
+          <th>Identifies where the <br/>object is <strong>used</strong></th>
+        </tr>
+        <tr>
+          <td>Saved Searches</td><td align="center">yes</td><td align="center">yes</td>
+        </tr>
+        <tr><td>Eventtypes</td><td align="center">yes</td><td align="center">yes</td>
+        </tr>
+        <tr><td>Tags</td><td align="center">yes</td><td align="center">yes</td>
+        </tr>
+        <tr><td>Fields</td><td align="center">-</td><td align="center">-</td>
+        </tr>
+        <tr><td>Lookups</td><td align="center">yes</td><td align="center">yes</td>
+        </tr>
+				<tr><td>Macros</td><td align="center">yes</td><td align="center">yes</td>
+        </tr>
+        <tr><td>Dashboards - simple XML</td><td align="center">yes</td><td align="center">-</td>
+        </tr>
+				<tr><td>Forms - simple XML</td><td align="center">yes</td><td align="center">-</td>
+        </tr>
+				<tr><td>Views - advanced XML</td><td align="center">yes</td><td align="center">-</td>
+        </tr>
+      </table>
+      <br/><p>Note that it does not analyze automatic lookups or their effects.</p>
+    </html>
+  </row>
+</dashboard>

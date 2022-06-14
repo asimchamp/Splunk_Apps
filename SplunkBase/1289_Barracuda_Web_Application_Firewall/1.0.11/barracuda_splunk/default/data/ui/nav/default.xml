@@ -1,0 +1,40 @@
+<nav color="transparent">
+    <collection label="Web Application Firewall Summary">
+
+        <view name="barracuda" default='true' />
+        <view name="waf_summary" />
+        <divider />
+
+        <collection label="My Dashboards">
+            <view source="unclassified"  />
+            <divider />
+            <view name="flashtimeline" default='true' />
+        </collection>
+        <divider />
+        <a href="mailto:support@barracuda.com">Send Feedback...</a>
+    </collection>
+
+    <collection label="Security Reports">
+        <view name="security_reports" default="true" />
+        <divider />
+        <view name="service_security_reports"/>
+        <divider />
+        <view name="security_reports_geo"/>
+        <view name="custom_security_reports"/>
+        <view name="custom_security_reports2"/> 
+    </collection>
+
+    <collection label="Traffic Reports">         
+        <collection label="Traffic Summary">
+            <view name="traffic_reports" />
+            <view name="traffic_reports_bw" />
+        </collection>
+        <divider />
+        <view name="service_traffic_reports"/>
+        <view name="traffic_reports_geo" />
+    </collection>
+
+    <view name="audit_reports" />
+    <view name="nw_firewall_reports" />
+    <view name="system_reports" />
+</nav>

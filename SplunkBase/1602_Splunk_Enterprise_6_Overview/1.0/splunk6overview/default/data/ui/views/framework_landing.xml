@@ -1,0 +1,61 @@
+<dashboard isVisible="false">
+	<label>Web Development</label>
+	<row>
+        <html>
+		<div>
+			<a href="/app/splunk6overview/maps_landing"><h2 align="left">Previous: Maps</h2></a>
+		</div>
+	</html>
+	<html>
+		<div>
+			<a href="/app/splunk6overview/forwarder_landing"><h2 align="right">Next: Forwarder Management</h2></a>
+		</div>
+	</html>
+    </row>
+        <row>
+        <html>
+		<p>The Splunk Application Framework expands the capabilities of dashboards. The new framework includes both Web and Application Framework. The Web Framework
+		enables users to display events using HTML and JavaScript, while the Application Framework allows users to display events with third party data visualization
+		libraries, such as D3 and JSChart. </p>
+            <h1>Using the feature</h1>
+            <div STYLE="margin-left: 20px;">
+		<p>In Splunk 6 the application framework is embracing industry standard and open development technologies to accelerate the adoption of Splunk
+		as a platform among the broad developer community and our enterprise customers. There are 2 main areas of the framework: the client side (JavaScript) and
+		server side (Python).</p>
+                <p><b>Escaping from SimpleXML to Framework JavaScript</b><br/>
+                Splunk 6 significantly eases the migration path from rapid dashboarding in SimpleXML to more complex development via the framework.
+		This is done by escaping simple xml to the javascript, client-side, aspects of the framework. There are UI capabilities that exist that
+		will enable someone to escape from simple xml to the framework and have the full capabilities of the framework available to them to build applications that
+		meet their needs.</p>
+		<p><b>Client Side Development (JavaScript)</b><br/> 
+                For the client side development, the framework makes it easier to incorporate existing custom or 3rd party visualization elements. The visualization
+		elements based on the D3 <a href="http://d3js.org/" >library</a> show the most promise and have generated a lot of interest in the developer community.
+		By working with the application framework, your imagination and the whole internet is at your disposal.</p>
+                <p><b>Server Side (Python and Django)</b><br/>
+                Additionally, there is a server-side component in the framework that allows developers to handle aspects of app development that are more appropriately handled
+		at that tier in the architecture. For example, because we are leveraging django in the framework, we are taking advantage of a number of built-in facilities
+		to ease the creation of application setup capabilities for Splunk apps. The server side aspects are also handling authentication behavior for applications. </p>
+            </div>
+	    <h1>Example</h1>
+	    <div STYLE="margin-left: 20px;">
+		<ul>
+                    <li><a href="/app/splunk6overview/framework_simple_xml_escaped" >Simple Framework Example</a></li>
+                    <li><a href="/app/splunk6overview/framework_simple_xml_escaped_and_modified">Escaped XML Example</a></li>
+                </ul>
+	    </div>
+	</html>
+	<html>
+		<div>
+			<img src="/static/app/splunk6overview/images/framework_creation.png" />
+		</div>
+        </html>
+    </row>
+	<row>
+		<html>
+			<h1>Resources</h1>
+			<a href="/help?location=whatsnew.integratedwebframework" target="_blank"><h2>Learn More</h2></a>
+			<a href="http://docs.splunk.com/Documentation/Splunk/6.0beta/ReleaseNotes/MeetSplunk" target="_blank"><h2>Intro to Splunk 6 documentation</h2></a>
+		</html>
+	</row>
+</dashboard>
+	

@@ -1,0 +1,23 @@
+<dashboard>
+	<label>Server Logons</label>
+
+	<row>
+		<html>
+			<p>Ensure you are auditing all the LOGIN (successful and failed) audit events on each SQL server if you wish to use this report.</p>
+		</html>
+	</row>
+
+	<row>
+		<table>
+			<title>Server Logons - Last 24 hours</title>
+			<searchName>Security - Server Logons - Last 24 hours</searchName>
+			<option name="count">25</option>
+			<option name="showPager">true</option>
+			<option name="displayRowNumbers">true</option>
+			<drilldown>
+				<link><![CDATA[/app/Splunk_for_SQLServer/ops_user?form.ServerInstance=$row.ServerInstance$&form.User=$row.User$]]></link>
+			</drilldown>
+		</table>
+	</row>
+	
+</dashboard>

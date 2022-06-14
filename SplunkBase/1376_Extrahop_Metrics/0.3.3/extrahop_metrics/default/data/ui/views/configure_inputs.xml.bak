@@ -1,0 +1,211 @@
+<view autoCancelInterval="90" isVisible="true" onunloadCancelJobs="true" template="dashboard.html" isSticky="False">
+    <label>Configure Inputs</label>
+    <module name="AccountBar" layoutPanel="appHeader" />
+    <module name="AppBar" layoutPanel="appHeader" />
+    <module name="SideviewUtils" layoutPanel="appHeader" />
+
+<!--
+    <module name="GenericFTR" layoutPanel="viewHeader">
+        <param name="configLink">/app/extrahop_metrics/setup</param>
+    </module>
+-->
+
+    <module name="SaveConfiguredDevices" layoutPanel="appHeader"/>
+    
+    <module name="HTML" layoutPanel="viewHeader">
+        <param name="html">
+            <![CDATA[ <h1>Configure Inputs</h1> ]]>
+</param>
+    </module>
+    <module name="HTML" layoutPanel="panel_row1_col1">
+        <param name="html">To use a predefined template select it from the Templates selection</param>
+    </module>
+    <module name="Search" layoutPanel="panel_row1_col1" autoRun="True">
+        <param name="search">| inputlookup ehm_templates.csv | sort template_name a</param>
+        <module name="Pulldown">
+            <param name="size">1</param>
+            <param name="name">Template_Name</param>
+            <param name="label">Templates</param>
+            <param name="searchFieldsToDisplay">
+                <list>
+                    <param name="label">Template Name</param>
+                    <param name="value">template_name</param>
+                </list>
+            </param>
+            <param name="staticFieldsToDisplay">
+                <list>
+                    <param name="value">blank</param>
+                    <param name="label">Select Template</param>
+                </list>
+            </param>
+            <module name="HTML">
+                <param name="html">
+                    <![CDATA[<input type="hidden" id="template_name" value=$Template_Name$ />]]>
+</param>
+            </module>
+            <module name="Search" layoutPanel="panel_row1_col1" autoRun="True">
+                <param name="search">| inputlookup ehm_all_devices.csv | sort name a</param>
+                <module name="Pulldown">
+                    <param name="size">10</param>
+                    <param name="width">25em</param>
+                    <param name="template">$value$</param>
+                    <param name="separator">,</param>
+                    <param name="outerTemplate">"$value$"</param>
+                    <param name="name">Node_Name</param>
+                    <param name="label">Nodes</param>
+                    <param name="searchFieldsToDisplay">
+                        <list>
+                            <param name="label">name</param>
+                            <param name="value">oid</param>
+                        </list>
+                    </param>
+                    <param name="staticFieldsToDisplay">
+                        <list>
+                            <param name="value">blank</param>
+                            <param name="label">Please select a node</param>
+                        </list>
+                    </param>
+                    <module name="HTML">
+                        <param name="html">
+                            <![CDATA[  
+                                                <input type="hidden" id="node_name" value=$Node_Name$ />
+                                                ]]>
+</param>
+                    </module>
+                    <module name="Search">
+                        <param name="search">| inputlookup metrics_lookup.csv | sort metric a</param>
+                        <module name="Pulldown">
+                            <param name="name">Metric_Type</param>
+                            <param name="label">Metric Type</param>
+                            <param name="searchFieldsToDisplay">
+                                <list>
+                                    <param name="label">metric</param>
+                                    <param name="value">metric</param>
+                                </list>
+                            </param>
+                            <param name="staticFieldsToDisplay">
+                                <list>
+                                    <param name="value">blank</param>
+                                    <param name="label">Please select a metric type</param>
+                                </list>
+                            </param>
+                            <module name="HTML">
+                                <param name="html">
+                                    <![CDATA[<input type="hidden" id="metric_type" value=$Metric_Type$ />]]>
+</param>
+                            </module>
+                            <module name="Search">
+                                <param name="search">| inputlookup "$Metric_Type$_lookup.csv" | dedup device | sort device</param>
+                                <module name="Pulldown">
+                                    <param name="name">Device_Type</param>
+                                    <param name="label">Device Type</param>
+                                    <param name="searchFieldsToDisplay">
+                                        <list>
+                                            <param name="label">device</param>
+                                            <param name="value">device</param>
+                                        </list>
+                                    </param>
+                                    <param name="staticFieldsToDisplay">
+                                        <list>
+                                            <param name="value">blank</param>
+                                            <param name="label">Please select a device type</param>
+                                        </list>
+                                    </param>
+                                    <module name="HTML">
+                                        <param name="html">
+                                            <![CDATA[  <input type="hidden" id="device_type" value=$Device_Type$ /> ]]>
+</param>
+                                    </module>
+                                    <module name="Search">
+                                        <param name="search">| inputlookup "$Metric_Type$_lookup.csv" | where device="$Device_Type$" | sort metric | eval mt=metric+":"+type</param>
+                                        <module name="Pulldown">
+                                            <param name="size">10</param>
+                                            <param name="template">$value$</param>
+                                            <param name="separator">,</param>
+                                            <param name="outerTemplate">"$value$"</param>
+                                            <param name="name">Metrics</param>
+                                            <param name="label">Metrics</param>
+                                            <param name="searchFieldsToDisplay">
+                                                <list>
+                                                    <param name="label">metric</param>
+                                                    <param name="value">mt</param>
+                                                </list>
+                                            </param>
+                                            <param name="staticFieldsToDisplay">
+                                                <list>
+                                                    <param name="value">blank</param>
+                                                    <param name="label">Please select metric(s)</param>
+                                                </list>
+                                            </param>
+                                            <module name="HTML">
+                                                <param name="html">
+                                                    <![CDATA[  <input type="hidden" id="metrics" value=$Metrics$ />
+                                                <input type="button" value="Submit" class="mySubmitButton splButton-primary" onclick="addHandler();">
+                                            ]]>
+</param>
+                                            </module>
+                                        </module>
+                                    </module>
+                                </module>
+                            </module>
+                        </module>
+                    </module>
+                </module>
+            </module>
+        </module>
+    </module>
+    <module name="Search" layoutPanel="panel_row2_col1" group="Configured Metrics" autoRun="True">
+        <param name="search">
+            <![CDATA[
+                | inputlookup ehm_selected_metrics.csv
+                | join oid [| inputlookup ehm_all_devices.csv ]
+                | sort name
+                | eval met=metric_type
+                | stats values(metric) AS mets values(oid) AS OID values(device) AS Device values(metric_type) as "Metric Type" by name,met,device
+                | eval splt=split(mets ,",")
+                | mvexpand splt        
+                | rex field=splt "^(?<sm>.*):.*"    
+                | fields - splt, mets, met, device
+                | mvcombine delim="," sm
+                | nomv sm
+                | table name,splt,sm,Device,"Metric Type",OID
+                | rename name as Node
+                | rename Device as "Device Type"
+                | rename sm as "Selected Metrics"
+                | sort Node, "Selected Metrics", "Device Type"  a
+            ]]>
+</param>
+        <module name="SubmitButton">
+            <param name="label">Refresh</param>
+            <module name="ViewstateAdapter">
+                <module name="HiddenFieldPicker">
+                    <param name="strictMode">True</param>
+                    <module name="JobProgressIndicator" />
+                    <module name="Paginator">
+                        <param name="count">15</param>
+                        <param name="entityName">results</param>
+                        <module name="EnablePreview">
+                            <param name="enable">True</param>
+                            <param name="display">False</param>
+                            <module name="SimpleResultsTable">
+                                <param name="count">15</param>
+                                <param name="entityName">results</param>
+                                <param name="allowTransformedFieldSelect">True</param>
+                                <param name="drilldown">row</param>
+                                <param name="displayRowNumbers">false</param>
+                                <module name="Redirector">
+                                    <param name="popup">False</param>
+                                    <param name="url">edit_input</param>
+                                    <param name="arg.oid">$click.fields.OID$</param>
+                                    <param name="arg.name">$click.fields.Node$</param>
+                                    <param name="arg.mt">$click.fields.Metric Type$</param>
+                                    <param name="arg.device">$click.fields.Device Type$</param>
+                                </module>
+                            </module>
+                        </module>
+                    </module>
+                </module>
+            </module>
+        </module>
+    </module>
+</view>

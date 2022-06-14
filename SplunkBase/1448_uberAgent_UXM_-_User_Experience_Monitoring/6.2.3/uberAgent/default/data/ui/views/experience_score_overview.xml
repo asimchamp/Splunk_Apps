@@ -1,0 +1,1498 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, experience_score_overview.js" stylesheet="main.css, experience_score_overview.css">
+    <label>Experience Score</label>
+    <description>This dashboard displays a high level overview of your environment. The lowest score is 0.0. The highest score is 10.0. The higher, the better. The data is updated every full and half hour. Click on a value of interest, to get a drilldown.</description>
+    <fieldset autoRun="true">
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_SystemPerformanceSummary</default>
+      </input>
+   </fieldset>
+
+   <init>
+      <unset token="showMore"/>
+      <unset token="DrilldownClickValue"/>
+      <set token="MachinePivotFields">
+         avg(machine_cpu) as machine_cpu
+         avg(machine_ram) as machine_ram
+         avg(machine_diskio) as machine_diskio
+         avg(machine_networkavailability) as machine_networkavailability
+         avg(machine_stoperrors) as machine_stoperrors
+         avg(machine_diskspace) as machine_diskspace
+         avg(machine_score) as machine_score
+      </set>
+      <set token="MachineTimechartFields">
+         eval(round(avg(machine_cpu),1)) as CPU
+         eval(round(avg(machine_ram),1)) as RAM
+         eval(round(avg(machine_diskio),1)) as "Disk IO"
+         eval(round(avg(machine_networkavailability),1)) as "Network availability"
+         eval(round(avg(machine_stoperrors),1)) as "Stop errors"
+         eval(round(avg(machine_diskspace),1)) as "Disk space"
+         eval(round(avg(machine_score),1)) as Score
+      </set>
+      <set token="SessionPivotFields">
+         avg(session_cpu) as session_cpu
+         avg(session_ram) as session_ram
+         avg(session_diskio) as session_diskio
+         avg(session_logonduration) as session_logonduration
+         avg(session_protocollatency) as session_protocollatency
+         avg(session_score) as session_score
+      </set>
+      <set token="SessionTimechartFields">
+         eval(round(avg(session_cpu),1)) as CPU
+         eval(round(avg(session_ram),1)) as RAM
+         eval(round(avg(session_diskio),1)) as "Disk IO"
+         eval(round(avg(session_logonduration),1)) as "Logon duration"
+         eval(round(avg(session_protocollatency),1)) as "Protocol latency"
+         eval(round(avg(session_score),1)) as Score
+      </set>
+      <set token="ApplicationPivotFields">
+         avg(app_cpu) as app_cpu
+         avg(app_ram) as app_ram
+         avg(app_diskio) as app_diskio
+         avg(app_networkavailability) as app_networkavailability
+         avg(app_errors) as app_errors
+         avg(app_uidelay) as app_uidelay
+         avg(app_networklatency) as app_networklatency
+         avg(app_score) as app_score
+      </set>
+      <set token="ApplicationTimechartFields">
+         eval(round(avg(app_cpu),1)) as CPU
+         eval(round(avg(app_ram),1)) as RAM
+         eval(round(avg(app_diskio),1)) as "Disk IO"
+         eval(round(avg(app_networkavailability),1)) as "Network availability"
+         eval(round(avg(app_errors),1)) as "App errors"
+         eval(round(avg(app_uidelay),1)) as "UI delay"
+         eval(round(avg(app_networklatency),1)) as "Network latency"
+         eval(round(avg(app_score),1)) as Score
+      </set>
+   </init>
+   
+    <search id="Search_AllowedIndexesFilter">
+        <query>
+            | tstats count WHERE index=`uberAgent_index` by index | table index | mvcombine delim="," index | nomv index
+        </query>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="AllowedIndexesFilter">filter SourceIndex in ($result.index$)</set>
+        </progress>
+    </search>
+   
+   <search id="Search_Base_Machine_Number_Different_Scores">
+      <query>
+         | pivot uberAgent_Score Score_Machine 
+            min(machine_score) as machine_score
+            splitrow host
+            $SearchFilter$
+            $AllowedIndexesFilter$
+         | eval IsBad = if(machine_score &lt; 4,1,0)
+         | eval IsMedium = if(machine_score &gt;= 4 AND machine_score &lt; 7,1,0)
+         | eval IsGood = if(machine_score &gt;= 7,1,0)
+         | stats 
+            sum(IsBad) as IsBad
+            sum(IsMedium) as IsMedium
+            sum(IsGood) as IsGood
+      </query>
+      <earliest>@d</earliest>
+        <latest>now</latest>
+   </search>
+   
+   <search id="Search_Base_Session_Number_Different_Scores">
+      <query>
+         | pivot uberAgent_Score Score_Session
+            min(session_score) as session_score
+            splitrow SessionGUID
+            $SearchFilter$
+            $AllowedIndexesFilter$
+         | eval IsBad = if(session_score &lt; 4,1,0)
+         | eval IsMedium = if(session_score &gt;= 4 AND session_score &lt; 7,1,0)
+         | eval IsGood = if(session_score &gt;= 7,1,0)
+         | stats 
+            sum(IsBad) as IsBad
+            sum(IsMedium) as IsMedium
+            sum(IsGood) as IsGood
+      </query>
+      <earliest>@d</earliest>
+        <latest>now</latest>
+   </search>
+   
+   <search id="Search_Base_Application_Number_Different_Scores">
+      <query>
+         | pivot uberAgent_Score Score_Application
+            min(app_score) as app_score
+            splitrow AppName
+            $SearchFilter$
+            $AllowedIndexesFilter$
+         | eval IsBad = if(app_score &lt; 4,1,0)
+         | eval IsMedium = if(app_score &gt;= 4 AND app_score &lt; 7,1,0)
+         | eval IsGood = if(app_score &gt;= 7,1,0)
+         | stats 
+            sum(IsBad) as IsBad
+            sum(IsMedium) as IsMedium
+            sum(IsGood) as IsGood
+      </query>
+      <earliest>@d</earliest>
+        <latest>now</latest>
+   </search>
+   
+    <search id="Search_Base_Score_Machine">
+        <query>
+            | pivot uberAgent_Score Score_Machine 
+               $MachinePivotFields$
+               splitrow 
+                  _time period day
+            $SearchFilter$
+            $AllowedIndexesFilter$
+            | timechart span=1d
+               $MachineTimechartFields$
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+    </search>
+    <search id="Search_Base_Score_Session">
+        <query>
+            | pivot uberAgent_Score Score_Session
+               $SessionPivotFields$
+               splitrow 
+                  _time period day
+            $SearchFilter$
+            $AllowedIndexesFilter$
+            | timechart span=1d
+               $SessionTimechartFields$
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+    </search>
+    <search id="Search_Base_Score_Application">
+        <query>
+            | pivot uberAgent_Score Score_Application
+               $ApplicationPivotFields$
+               splitrow 
+                  _time period day
+            $SearchFilter$
+            $AllowedIndexesFilter$
+            | timechart span=1d
+               $ApplicationTimechartFields$
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+    </search>
+    <search id="Search_Base_Score_Total">
+        <query>
+            | pivot uberAgent_Score Score_Machine 
+               avg(machine_score) as machine_score
+               splitrow 
+                  _time 
+                     period day
+            $SearchFilter$
+            $AllowedIndexesFilter$
+            | append [| pivot uberAgent_Score Score_Session
+                           avg(session_score) as session_score
+                           splitrow 
+                              _time 
+                                 period day
+                           $SearchFilter$
+                           $AllowedIndexesFilter$
+                     ]
+            | append [| pivot uberAgent_Score Score_Application
+                           avg(app_score) as app_score
+                           splitrow 
+                              _time 
+                                 period day
+                           $SearchFilter$
+                           $AllowedIndexesFilter$
+                     ]
+            | timechart span=1d
+              avg(machine_score) as machine_score
+              avg(session_score) as session_score
+              avg(app_score) as app_score
+            | eval "Experience score" = round((machine_score + session_score + app_score) /3,1)
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+    </search>
+    <search id="Search_Single_Machines_7d" depends="$showMore$">
+        <query>
+            | pivot `uA_DM_Session_SessionDetail_Session0` Session_SessionDetail_Session0
+                dc(host) as Hosts
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="Machines7d">$result.Hosts$</set>
+        </progress>
+    </search>
+    <search id="Search_Single_Users_7d" depends="$showMore$">
+        <query>
+            | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                dc(SessionUserLower) as UniqueUsers
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="Users7d">$result.UniqueUsers$</set>
+        </progress>
+    </search>
+    <search id="Search_Single_Logon_7d" depends="$showMore$">
+        <query>
+            | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                dc(SessionGUID) as Logons
+        </query>
+        <earliest>-7d</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="Logons7d">$result.Logons$</set>
+        </progress>
+    </search>
+    <search id="Search_Single_Applications_Today" depends="$showMore$">
+        <query>
+            | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                dc(AppName) as AppNameCount
+        </query>
+        <earliest>@d</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="AppNamesToday">$result.AppNameCount$</set>
+        </progress>
+    </search>
+    
+    <!-- Row 1 -->
+    <row>
+        <panel id="Panel11">
+            <single>
+                <title>Today</title>
+                <search base="Search_Base_Score_Total">
+                    <query>
+                        | fields _time "Experience score"
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="colorBy">value</option>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">0</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trendInterval">-1d</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">0</option>
+                <option name="height">200</option>
+            </single>
+        </panel>
+        <panel id="Panel12">
+            <chart>
+                <title>Over time</title>
+                <search base="Search_Base_Score_Total">
+                    <query>
+                        | fields _time "Experience score"
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="charting.axisLabelsY.majorUnit">10</option>
+                <option name="charting.axisTitleX.text">Experience score</option>
+                <option name="charting.axisTitleX.visibility">collapsed</option>
+                <option name="charting.axisTitleY.visibility">collapsed</option>
+                <option name="charting.axisY.abbreviation">none</option>
+                <option name="charting.axisY.maximumNumber">10</option>
+                <option name="charting.axisY.minimumNumber">0</option>
+                <option name="charting.axisY.scale">linear</option>
+                <option name="charting.chart">line</option>
+                <option name="charting.seriesColors">[0x77C4CF]</option>
+                <option name="charting.chart.nullValueMode">connect</option>
+                <option name="charting.chart.showDataLabels">all</option>
+                <option name="charting.drilldown">none</option>
+                <option name="charting.legend.placement">right</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="height">200</option>
+            </chart>
+        </panel>
+    </row>
+    
+    <!-- Row 2 -->
+    <row>
+        <panel id="Panel21">
+            <html>
+                <h1>
+                    <b>
+                        <center>Machines</center>
+                    </b>
+                </h1>
+            </html>
+        </panel>
+        <panel id="Panel22">
+            <html>
+                <h1>
+                    <b>
+                        <center>User sessions</center>
+                    </b>
+                </h1>
+            </html>
+        </panel>
+        <panel id="Panel23">
+            <html>
+                <h1>
+                    <b>
+                        <center>Applications</center>
+                    </b>
+                </h1>
+            </html>
+        </panel>
+    </row>
+    
+    <!-- Row 3 -->
+    <row>
+        <panel>
+            <single>
+                <title>Overall machine score</title>
+                <search base="Search_Base_Score_Machine">
+                    <query>
+                        | fields _time Score
+                    </query>
+                </search>
+                <option name="colorBy">value</option>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">1</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trendInterval">-24h</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">0</option>
+            </single>
+        </panel>
+        <panel>
+            <single>
+                <title>Overall session score</title>
+                <search base="Search_Base_Score_Session">
+                    <query>
+                        | table _time Score
+                    </query>
+                </search>
+                <option name="colorBy">value</option>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">1</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trendInterval">-24h</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">0</option>
+            </single>
+        </panel>
+        <panel>
+            <single>
+                <title>Overall application score</title>
+                <search base="Search_Base_Score_Application">
+                    <query>
+                        | table _time Score
+                    </query>
+                </search>
+                <option name="colorBy">value</option>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">1</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trendInterval">-24h</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">0</option>
+            </single>
+        </panel>
+    </row>
+    
+    <!-- Row 4 -->
+    <row>
+        <panel id="Panel41">
+            <single id="vlSingleTrellis260px_1">
+                <title>Machine component scores</title>
+                <search base="Search_Base_Score_Machine">
+                    <query>
+                        | fields _time CPU RAM "Disk IO" "Stop errors" "Disk space" "Network availability"
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">1</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trellis.enabled">1</option>
+                <option name="trellis.size">medium</option>
+                <option name="trendInterval">-24h</option>
+                <option name="useColors">1</option>
+            </single>
+        </panel>
+        <panel id="Panel42">
+            <single id="vlSingleTrellis260px_2">
+                <title>Session component scores</title>
+                <search base="Search_Base_Score_Session">
+                    <query>
+                        | table _time CPU RAM "Disk IO" "Logon duration" "Protocol latency"
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">1</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trellis.enabled">1</option>
+                <option name="trellis.size">medium</option>
+                <option name="trendInterval">-24h</option>
+                <option name="useColors">1</option>
+            </single>
+        </panel>
+        <panel id="Panel43">
+            <single id="vlSingleTrellis260px_3">
+                <title>Application component scores</title>
+                <search base="Search_Base_Score_Application">
+                    <query>
+                        | table _time CPU RAM "Disk IO" "App errors" "UI delay" "Network availability" "Network latency"
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0.0</option>
+                <option name="rangeColors">["0xdc4e41","0xf8be34","0x53a051"]</option>
+                <option name="rangeValues">[4,7]</option>
+                <option name="refresh.display">progressbar</option>
+                <option name="showSparkline">1</option>
+                <option name="showTrendIndicator">1</option>
+                <option name="trellis.enabled">1</option>
+                <option name="trellis.size">medium</option>
+                <option name="trendInterval">-24h</option>
+                <option name="useColors">1</option>
+            </single>
+        </panel>
+    </row>
+    
+    <!-- Row 5 -->
+    <row>
+      <panel>
+         <title>Machine analysis</title>
+         <single>
+            <title>Bad scores</title>
+                <search base="Search_Base_Machine_Number_Different_Scores">
+                    <query>
+                        | table IsBad
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xdc4e41","0xdc4e41"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Machines</option>
+                <option name="useColors">1</option>
+                <option name="drilldown">none</option>
+         </single>
+         <single>
+            <title>Medium scores</title>
+                <search base="Search_Base_Machine_Number_Different_Scores">
+                    <query>
+                        | table IsMedium
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xf8be34","0xf8be34"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Machines</option>
+                <option name="useColors">1</option>
+         </single>
+         <single>
+            <title>Good scores</title>
+                <search base="Search_Base_Machine_Number_Different_Scores">
+                    <query>
+                        | table IsGood
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x53a051"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Machines</option>
+                <option name="useColors">1</option>
+         </single>
+      </panel>
+      <panel>
+         <title>Session analysis</title>
+         <single>
+            <title>Bad scores</title>
+                <search base="Search_Base_Session_Number_Different_Scores">
+                    <query>
+                        | table IsBad
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xdc4e41","0xdc4e41"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Sessions</option>
+                <option name="useColors">1</option>
+                <option name="drilldown">none</option>
+         </single>
+         <single>
+            <title>Medium scores</title>
+                <search base="Search_Base_Session_Number_Different_Scores">
+                    <query>
+                        | table IsMedium
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xf8be34","0xf8be34"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Sessions</option>
+                <option name="useColors">1</option>
+         </single>
+         <single>
+            <title>Good scores</title>
+                <search base="Search_Base_Session_Number_Different_Scores">
+                    <query>
+                        | table IsGood
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x53a051"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Sessions</option>
+                <option name="useColors">1</option>
+         </single>
+      </panel>
+      <panel>
+         <title>Application analysis</title>
+         <single>
+            <title>Bad scores</title>
+                <search base="Search_Base_Application_Number_Different_Scores">
+                    <query>
+                        | table IsBad
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xdc4e41","0xdc4e41"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Applications</option>
+                <option name="useColors">1</option>
+                <option name="drilldown">none</option>
+         </single>
+         <single>
+            <title>Medium scores</title>
+                <search base="Search_Base_Application_Number_Different_Scores">
+                    <query>
+                        | table IsMedium
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xf8be34","0xf8be34"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Applications</option>
+                <option name="useColors">1</option>
+         </single>
+         <single>
+            <title>Good scores</title>
+                <search base="Search_Base_Application_Number_Different_Scores">
+                    <query>
+                        | table IsGood
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x53a051"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Applications</option>
+                <option name="useColors">1</option>
+         </single>
+      </panel>
+    </row>
+    
+    <!-- Row 6 -->
+    <row>
+        <panel>
+            <input type="link" id="vlInputLinkPanel6_1" token="Panel61Token1" searchWhenChanged="true">
+               <label>Filter:</label>
+               <choice value="IsBad">Bad</choice>
+               <choice value="IsMedium">Medium</choice>
+               <choice value="IsGood">Good</choice>
+               <default>Bad</default>
+            </input>
+            <table id="table_machines">
+                <search>
+                    <query>
+                        | pivot uberAgent_Score Score_Machine 
+                           min(machine_score) as Lowest
+                           avg(machine_score) as "Daily average"
+                           splitrow 
+                              host
+                        $SearchFilter$
+                        $AllowedIndexesFilter$
+                        | eval IsBad = if(Lowest &lt; 4,1,0)
+                        | eval IsMedium = if(Lowest &gt;= 4 AND Lowest &lt; 7,1,0)
+                        | eval IsGood = if(Lowest &gt;= 7,1,0)
+                        | where $Panel61Token1$ = 1
+                        | eval Lowest = round(Lowest,1)
+                        | eval "Daily average" = round('Daily average',1)
+                        | rename host as Machine
+                        | sort limit=0 "Daily average"
+                        | table Machine Lowest "Daily average"
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="count">15</option>
+                <option name="drilldown">row</option>
+                <option name="refresh.display">progressbar</option>
+                <format type="color" field="Lowest">
+                    <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+                    <scale type="threshold">4,7</scale>
+                </format>
+                <format type="color" field="Daily average">
+                    <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+                    <scale type="threshold">4,7</scale>
+                </format>
+                <drilldown>
+                    <unset token="DrilldownClickValue"/>
+                    <set token="DrilldownClickValue">$click.value|s$</set>
+                    <set token="DrilldownType">machine</set>
+                    <set token="DrilldownFilter">host</set>
+                    <set token="DrilldownQuery">
+                        | pivot uberAgent_Score Score_Machine
+                           $MachinePivotFields$
+                           splitrow 
+                              _time 
+                                 period minute
+                           $SearchFilter$
+                           $AllowedIndexesFilter$
+                           filter $DrilldownFilter$ is $DrilldownClickValue$
+                        | timechart span=30m
+                           $MachineTimechartFields$
+                        | fields - Score
+                    </set>
+                </drilldown>
+            </table>
+            <html src="experience_score_overview_explanation.html">
+            </html>
+        </panel>
+        <panel>
+            <input type="link" id="vlInputLinkPanel6_2" token="Panel62Token1" searchWhenChanged="true">
+               <label>Filter:</label>
+               <choice value="IsBad">Bad</choice>
+               <choice value="IsMedium">Medium</choice>
+               <choice value="IsGood">Good</choice>
+               <default>Bad</default>
+            </input>
+            <table id="table_sessions">
+                <search>
+                    <query>
+                        | pivot uberAgent_Score Score_Session 
+                           min(session_score) as Lowest
+                           avg(session_score) as "Daily average"
+                           latest(SessionGUID) as SessionGUID
+                           splitrow 
+                              Session
+                        $SearchFilter$
+                        $AllowedIndexesFilter$
+                        | eval IsBad = if(Lowest &lt; 4,1,0)
+                        | eval IsMedium = if(Lowest &gt;= 4 AND Lowest &lt; 7,1,0)
+                        | eval IsGood = if(Lowest &gt;= 7,1,0)
+                        | where $Panel62Token1$ = 1
+                        | eval Lowest = round(Lowest,1)
+                        | eval "Daily average" = round('Daily average',1)
+                        | sort limit=0 Lowest
+                        | table Session Lowest "Daily average" SessionGUID
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <fields>["Session","Lowest","Daily average"]</fields>
+                <option name="count">15</option>
+                <option name="drilldown">row</option>
+                <format type="color" field="Lowest">
+                    <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+                    <scale type="threshold">4,7</scale>
+                </format>
+                <format type="color" field="Daily average">
+                    <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+                    <scale type="threshold">4,7</scale>
+                </format>
+                <drilldown>
+                    <unset token="DrilldownClickValue"/>
+                    <set token="DrilldownClickValue">$click.value|s$</set>
+                    <set token="DrilldownType">session</set>
+                    <set token="DrilldownFilter">Session</set>
+                    <set token="DrilldownSessionGUID">$row.SessionGUID|s$</set>
+                    <set token="DrilldownQuery">
+                        | pivot uberAgent_Score Score_Session
+                           $SessionPivotFields$
+                           splitrow 
+                              _time 
+                                 period minute
+                           $SearchFilter$
+                           $AllowedIndexesFilter$
+                           filter $DrilldownFilter$ is $DrilldownClickValue$
+                        | timechart span=30m
+                           $SessionTimechartFields$
+                        | fields - Score
+                    </set>
+                </drilldown>
+            </table>
+            <html src="experience_score_overview_explanation_2.html">
+            </html>
+        </panel>
+        <panel>
+            <input type="link" id="vlInputLinkPanel6_3" token="Panel63Token1" searchWhenChanged="true">
+               <label>Filter:</label>
+               <choice value="IsBad">Bad</choice>
+               <choice value="IsMedium">Medium</choice>
+               <choice value="IsGood">Good</choice>
+               <default>Bad</default>
+            </input>
+            <table id="table_applications">
+                <search>
+                    <query>
+                        | pivot uberAgent_Score Score_Application
+                           min(app_score) as Lowest
+                           avg(app_score) as "Daily average"
+                           splitrow 
+                              AppName
+                        $SearchFilter$
+                        $AllowedIndexesFilter$
+                        | eval IsBad = if(Lowest &lt; 4,1,0)
+                        | eval IsMedium = if(Lowest &gt;= 4 AND Lowest &lt; 7,1,0)
+                        | eval IsGood = if(Lowest &gt;= 7,1,0)
+                        | where $Panel63Token1$ = 1
+                        | eval Lowest = round(Lowest,1)
+                        | eval "Daily average" = round('Daily average',1)
+                        | rename AppName as Application
+                        | sort limit=0 Lowest
+                        | table Application Lowest "Daily average"
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="count">15</option>
+                <option name="drilldown">row</option>
+                <option name="refresh.display">progressbar</option>
+                <format type="color" field="Lowest">
+                    <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+                    <scale type="threshold">4,7</scale>
+                </format>
+                <format type="color" field="Daily average">
+                    <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+                    <scale type="threshold">4,7</scale>
+                </format>
+                <drilldown>
+                    <unset token="DrilldownClickValue"/>
+                    <set token="DrilldownClickValue">$click.value|s$</set>
+                    <set token="DrilldownType">application</set>
+                    <set token="DrilldownFilter">AppName</set>
+                    <set token="DrilldownQuery">
+                        | pivot uberAgent_Score Score_Application
+                           $ApplicationPivotFields$
+                           splitrow 
+                              _time 
+                                 period minute
+                           $SearchFilter$
+                           $AllowedIndexesFilter$
+                           filter $DrilldownFilter$ is $DrilldownClickValue$
+                        | timechart span=30m
+                           $ApplicationTimechartFields$
+                        | fields - Score
+                    </set>
+                </drilldown>
+            </table>
+            <html src="experience_score_overview_explanation_3.html">
+            </html>
+        </panel>
+    </row>
+    
+    <!-- Row 7 -->
+    <row depends="$DrilldownClickValue$">
+        <panel id="Panel71">
+            <title>Component scores for $DrilldownType$: $DrilldownClickValue$</title>
+            <chart>
+                <search>
+                  <query>
+                     $DrilldownQuery$
+                  </query>
+                  <earliest>@d</earliest>
+                  <latest>now</latest>
+                </search>
+                <option name="charting.axisTitleX.visibility">collapsed</option>
+                <option name="charting.axisY.maximumNumber">10.0</option>
+                <option name="charting.axisY.minimumNumber">0.0</option>
+                <option name="charting.chart">line</option>
+                <option name="charting.chart.nullValueMode">connect</option>
+                <option name="charting.chart.showDataLabels">none</option>
+                <option name="charting.drilldown">none</option>
+                <option name="charting.layout.splitSeries">0</option>
+                <option name="charting.legend.mode">standard</option>
+            </chart>
+            <html>
+                <div id="Panel71_Div_BtnGoToSingleDashboard">
+                <!-- Button will be placed here by JavaScript-->
+                </div>
+            </html>
+        </panel>
+    </row>
+    
+    <!-- Row 8 -->
+    <row>
+        <panel id="Panel81">
+            <html>
+              <h1><b><img id="Panel81imgToggle1" class="toggle" title="Show/hide more details" src="/static/app/uberAgent/expand.svg" width="24" height="24"/> More details</b></h1>
+            </html>
+        </panel>
+    </row>
+
+    <!-- Row 9 -->
+    <row depends="$showMore$">
+        <panel>
+            <single>
+                <title># of machines seen today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Session0` Session_SessionDetail_Session0
+                            dc(host)
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[machine_inventory?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+                <option name="numberPrecision">0</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="useThousandSeparators">1</option>
+            </single>
+            <html>
+                <p># of machines seen during the last 7 days: <b>$Machines7d$</b>
+                </p>
+            </html>
+        </panel>
+        <panel>
+            <single>
+                <title># of unique users seen today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                            dc(SessionUserLower) as UniqueUsers
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[session_overview?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+                <option name="numberPrecision">0</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="useThousandSeparators">1</option>
+            </single>
+            <html>
+                <p># of unique users seen during the last 7 days: <b>$Users7d$</b>
+                </p>
+            </html>
+        </panel>
+        <panel>
+            <single>
+                <title># of unique new applications seen today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                            earliest(_time) as EventTime
+                            splitrow
+                                ProcName
+                            splitrow
+                                AppName
+                            splitrow 
+                                _time 
+                                period day
+                            `uberAgent_filter_AppNameIsNotOS`
+                            $SearchFilter$
+                        | eval EventTime = round (strptime (EventTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), 0)
+                        | eval ProcNameLower = lower(ProcName)
+                        | lookup lookup_processstartup_processlist ProcName as ProcNameLower OUTPUTNEW FirstSeen
+                        | where isNull(FirstSeen) OR (EventTime-FirstSeen &lt; 3600)
+                        | stats dc(AppName) as "unique new apps" by _time
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <drilldown target="_blank">
+                    <link><![CDATA[process_startup_duration?Tokenlink_Panel21=Application&Tokenlink_Panel22=Application&Tokenlink_Panel31=Application&mode=app&earliest=$earliest$&latest=$latest$]]></link>
+                </drilldown>
+                <option name="numberPrecision">0</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="useThousandSeparators">1</option>
+                <option name="field">"unique new apps"</option>
+            </single>
+            <html>
+                <p># of unique applications seen today: <b>$AppNamesToday$</b>
+                </p>
+            </html>
+        </panel>
+    </row>
+    <row depends="$showMore$">
+        <panel>
+            <single>
+                <title>Average uptime of all machines seen today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Session0` Session_SessionDetail_Session0
+                            latest(SessionLogonTime) as BootTime
+                            splitrow
+                                host
+                        $SearchFilter$
+                        | eval BootTime = strptime (BootTime,"%Y-%m-%d %H:%M:%S.%Q %z")
+                        | eval Uptime = round ((now() - BootTime) / 86400, 2)
+                        | stats avg(Uptime) as AvgUptime max(Uptime) as MaxUptime min(Uptime) as MinUptime
+                        | eval AvgUptime = round (AvgUptime, 0)
+                        | eval MaxUptime = round (MaxUptime, 0)
+                        | eval MinUptime = round (MinUptime, 0)
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                    <progress>
+                        <set token="MaxUptime">$result.MaxUptime$</set>
+                        <set token="MinUptime">$result.MinUptime$</set>
+                    </progress>
+                </search>
+                <option name="drilldown">all</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="unit">days</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[machine_uptime?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+            </single>
+            <html>
+                <p>Highest: <b>$MaxUptime$</b> days/Lowest: <b>$MinUptime$</b> days</p>
+            </html>
+        </panel>
+        <panel>
+            <single>
+                <title># of logons today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                            dc(SessionGUID) as SessionGUID
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="drilldown">all</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[session_overview?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+            </single>
+            <html>
+                <p># of logons during the last 7 days: <b>$Logons7d$</b>
+                </p>
+            </html>
+        </panel>
+        <panel>
+            <single>
+                <title># of application errors today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Application_Errors` Application_Errors
+                            count(ErrorType) as ErrorCount
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="colorBy">trend</option>
+                <option name="drilldown">all</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="trendColorInterpretation">inverse</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link><![CDATA[application_errors?earliest=$earliest$&latest=$latest$]]></link>
+                </drilldown>
+            </single>
+        </panel>
+    </row>
+    <row depends="$showMore$">
+        <panel>
+            <single>
+                <title>Machine performance trend</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+                            avg(CPUUsagePercent) as CPU
+                            avg(RAMUsagePercent) as RAM
+                            avg(IOPercentDiskTime) as "Disk IO"
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="colorBy">trend</option>
+                <option name="drilldown">all</option>
+                <option name="height">161</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="trellis.enabled">1</option>
+                <option name="trellis.size">medium</option>
+                <option name="trendColorInterpretation">inverse</option>
+                <option name="trendDisplayMode">absolute</option>
+                <option name="trendInterval">-1d</option>
+                <option name="unit">%</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[machine_detail?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+            </single>
+        </panel>
+        <panel>
+            <single>
+                <title>Average logon duration today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                            avg(TotalLogonTimeMs) as AvgTotalLogonTimeMs
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                        | eval AvgTotalLogonTimeSRounded = round(AvgTotalLogonTimeMs/1000)
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="colorBy">trend</option>
+                <option name="drilldown">all</option>
+                <option name="field">AvgTotalLogonTimeSRounded</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="trendColorInterpretation">inverse</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="unit">seconds</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[session_logon_time?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+            </single>
+        </panel>
+        <panel>
+            <single>
+                <title>Average application wait time today</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+                            avg(UIDelayMs) as AvgUIDelayMs
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                        | eval AvgUIDelayS = round(AvgUIDelayMs/1000)
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="colorBy">trend</option>
+                <option name="drilldown">all</option>
+                <option name="field">AvgUIDelayS</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="trendColorInterpretation">inverse</option>
+                <option name="trendInterval">-1d@d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="unit">seconds</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link><![CDATA[application_ui_delays?earliest=$earliest$&latest=$latest$]]></link>
+                </drilldown>
+            </single>
+        </panel>
+    </row>
+    <row depends="$showMore$">
+        <panel>
+            <single>
+                <title># of stop errors</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_System_Bugcheck` System_Bugcheck
+                            count(System_Bugcheck) as BugcheckCount
+                            splitrow
+                                _time
+                                period day
+                            $SearchFilter$
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="colorBy">trend</option>
+                <option name="drilldown">all</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+                <option name="trendColorInterpretation">inverse</option>
+                <option name="trendInterval">-1d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="useColors">1</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[machine_bugcheck?earliest=$earliest$&latest=$latest$]]>
+                    </link>
+                </drilldown>
+            </single>
+        </panel>
+        <panel>
+            <chart>
+                <title>Slowest logons (top 3 today)</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                            max(TotalLogonTimeMs) as MaxTotalLogonTimeMs
+                            latest(User) as User
+                            latest(host) as Host
+                            splitrow
+                            SessionGUID
+                        $SearchFilter$
+                        | eval "Logon duration (s)" = round(MaxTotalLogonTimeMs/1000)
+                        | eval Session=replace(User,"([^\\\\]+\\\\)([^\\\\]+)","\\2")+"@"+Host
+                        | sort limit=3 - "Logon duration (s)"
+                        | table
+                            Session
+                            "Logon duration (s)"
+                            SessionGUID
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <fields>["Session","Logon duration (s)"]</fields>
+                <drilldown target="_blank">
+                    <set token="FilterSessionGUID">$row.SessionGUID$</set>
+                    <link>
+                        <![CDATA[single_session_logon_time?earliest=$earliest$&latest=$latest$&FilterSessionGuid=$FilterSessionGUID$]]>
+                    </link>
+                </drilldown>
+                <option name="charting.axisTitleX.visibility">collapsed</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisTitleY.text">Logon duration (s)</option>
+                <option name="charting.chart">bar</option>
+                <option name="charting.legend.placement">none</option>
+                <option name="charting.seriesColors">[0x318796]</option>
+                <option name="height">150</option>
+            </chart>
+        </panel>
+        <panel>
+            <chart>
+                <title>Highest application wait time (top 3 today)</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+                            sum(UIDelayMs) as SumUIDelayMs
+                            splitrow
+                                AppName as Application
+                        $SearchFilter$
+                        | eval "Wait time (s)" = round(SumUIDelayMs/1000)
+                        | sort limit=3 - "Wait time (s)"
+                        | fields
+                            Application
+                            "Wait time (s)"
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <drilldown target="_blank">
+                    <link>
+                        <![CDATA[single_application_detail?earliest=$earliest$&latest=$latest$&form.FilterField=sAppName&form.FilterOperator=in&form.FilterExpression=$click.value|s$]]>
+                    </link>
+                </drilldown>
+                <option name="charting.axisTitleX.visibility">collapsed</option>
+                <option name="charting.axisTitleY.visibility">visible</option>
+                <option name="charting.axisTitleY.text">Wait time (s)</option>
+                <option name="charting.chart">bar</option>
+                <option name="charting.legend.placement">none</option>
+                <option name="charting.seriesColors">[0x77C4CF]</option>
+                <option name="height">150</option>
+            </chart>
+        </panel>
+    </row>
+    <row depends="$showMore$">
+        <panel>
+            <chart>
+                <title>OS distribution</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_System_MachineInventory` System_MachineInventory
+                            dc(host) as "OS count"
+                            splitrow
+                                OsName
+                            splitrow 
+                               OsVersion
+                            $SearchFilter$
+                        | rex field=OsVersion &quot;^(?&lt;OsVersionMajor&gt;[^.]*)&quot;
+                        | eval macOSVersion = OsName . " " . OsVersionMajor
+                        | eval "Operating system" = if(OsName == "macOS", macOSVersion, OsName)
+                        | stats
+                           sum("OS count") as "OS count" by "Operating system"
+                    </query>
+                    <earliest>-1d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="charting.chart">pie</option>
+                <option name="charting.drilldown">none</option>
+                <option name="charting.seriesColors">["0x77C4CF","0x54A6B3","0x318796","0x377F8B","0x3C777F","0x276F7D","0x11677B","0x1A6374","0x225E6C","0x366D79"]</option>
+                <option name="height">150</option>
+            </chart>
+        </panel>
+        <panel>
+            <chart>
+                <title>Session protocol distribution</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                            latest(SessionProtocol) as SessionProtocol
+                            splitrow
+                            SessionUserLower
+                            $SearchFilter$
+                        | stats
+                            count(SessionUserLower) as "# Users"
+                                by SessionProtocol
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="charting.chart">pie</option>
+                <option name="charting.drilldown">none</option>
+                <option name="charting.seriesColors">["0x77C4CF","0x54A6B3","0x318796","0x377F8B","0x3C777F","0x276F7D","0x11677B","0x1A6374","0x225E6C","0x366D79"]</option>
+                <option name="height">150</option>
+            </chart>
+        </panel>
+        <panel>
+            <single>
+                <title>Browser in foreground</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                            count(Session_SessionDetail_Users)
+                            splitrow
+                            _time
+                                period day
+                            $SearchFilter$
+                            splitcol
+                                SessionFgBrowserDisplayName
+                        | addtotals
+                        | eval BrowserForegroundPercent = round((Total - NULL) / Total * 100,0)
+                    </query>
+                    <earliest>-7d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="drilldown">all</option>
+                <option name="field">BrowserForegroundPercent</option>
+                <option name="numberPrecision">0</option>
+                <option name="trendInterval">-1d</option>
+                <option name="underLabel">compared to yesterday</option>
+                <option name="unit">%</option>
+                <option name="useThousandSeparators">1</option>
+                <drilldown target="_blank">
+                    <link><![CDATA[browser_usage?earliest=$earliest$&latest=$latest$]]></link>
+                </drilldown>
+            </single>
+        </panel>
+    </row>
+    <row depends="$showMore$">
+        <panel>
+            <chart>
+                <title>Machine type distribution</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_System_MachineInventory` System_MachineInventory
+                            latest(IsBatteryPresent) as IsBatteryPresent
+                            latest(HwIsVirtualMachine) as HwIsVirtualMachine
+                            splitrow
+                                host
+                            $SearchFilter$
+                        | fillnull IsBatteryPresent
+                        | eval PC = if(IsBatteryPresent==0 AND HwIsVirtualMachine==0,1,0)
+                        | stats
+                            sum(IsBatteryPresent) as Laptops
+                            sum(HwIsVirtualMachine) as VMs
+                            sum(PC) as PCs
+                        | transpose | rename column AS Type "row 1" AS Count
+                    </query>
+                    <earliest>-1d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="charting.chart">pie</option>
+                <option name="charting.drilldown">none</option>
+                <option name="charting.seriesColors">["0x77C4CF","0x54A6B3","0x318796","0x377F8B","0x3C777F","0x276F7D","0x11677B","0x1A6374","0x225E6C","0x366D79"]</option>
+                <option name="height">150</option>
+            </chart>
+        </panel>
+        <panel>
+            <chart>
+                <title>Session connection state distribution</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                            latest(SessionConnectionState) as SessionConnectionState
+                            splitrow
+                                SessionUserLower
+                            $SearchFilter$
+                        | stats count(SessionUserLower) as "# Users" by SessionConnectionState
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="charting.chart">pie</option>
+                <option name="charting.drilldown">none</option>
+                <option name="charting.seriesColors">["0x77C4CF","0x54A6B3","0x318796","0x377F8B","0x3C777F","0x276F7D","0x11677B","0x1A6374","0x225E6C","0x366D79"]</option>
+                <option name="height">150</option>
+            </chart>
+        </panel>
+        <panel>
+            <chart>
+                <title>Most used web apps (top 3)</title>
+                <search depends="$showMore$">
+                    <query>
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                            count(SessionFgBrowserActiveTabHost) as CountSessionFgBrowserActiveTabHost
+                            splitrow
+                                SessionFgBrowserActiveTabHost as BrowserTab
+                            $SearchFilter$
+                        | eventstats sum(CountSessionFgBrowserActiveTabHost) as EventCount
+                        | eval "Relative time in foreground (%)" = round (CountSessionFgBrowserActiveTabHost / EventCount * 100)
+                        | fields BrowserTab "Relative time in foreground (%)"
+                        | sort - "Relative time in foreground (%)"
+                        | head 3
+                    </query>
+                    <earliest>@d</earliest>
+                    <latest>now</latest>
+                </search>
+                <option name="charting.axisTitleX.visibility">collapsed</option>
+                <option name="charting.chart">bar</option>
+                <option name="charting.drilldown">all</option>
+                <option name="charting.legend.placement">none</option>
+                <option name="charting.seriesColors">[0x77C4CF]</option>
+                <option name="height">150</option>
+                <option name="refresh.display">progressbar</option>
+                <drilldown target="_blank">
+                    <link><![CDATA[browser_usage?earliest=$earliest$&latest=$latest$]]></link>
+                </drilldown>
+            </chart>
+        </panel>
+    </row>
+</form>

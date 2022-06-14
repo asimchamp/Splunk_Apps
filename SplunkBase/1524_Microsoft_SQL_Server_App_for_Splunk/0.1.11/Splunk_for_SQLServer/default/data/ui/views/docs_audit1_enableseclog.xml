@@ -1,0 +1,76 @@
+<dashboard isVisible="false">
+	<label>Enabling the Security Log for SQL Server</label>
+	<row>
+		<html>
+<p>Before the audit logs can be read by Splunk, you must allow the SQL Server to write to the Windows Security Log.  This
+procedure describes how to enable the service account that runs SQL Server to write to the Windows Security Log.  In cases
+where you are configuring clustered SQL servers, these steps must be performed on each cluster server member.</p>
+
+<p>If you are enabling audit on a Developer system running Windows 7 or Windows 8, then do not perform these steps.
+Instructions are included for enabling the Application Log instead later.</p>
+
+<h3>Step 1: Determine the Service Account for the SQL Server</h3>
+
+<ol>
+	<li>Bring up the Services control panel.</li>
+	<li>Find the SQL Server service for the instance you want to monitor.</li>
+	<li>Right-click and select Properties.</li>
+	<li>Click on the Log On tab.</li>
+	<li>Select and Copy the Username (normally starts with NT Service).</li>
+</ol>
+
+<h3>Step 2: Grant the SQL Service the ability to write to the Security Log</h3>
+
+<p>This process may also be done as a Group Policy in Active Directory scenarios.  The process described below uses
+the Local Security Policy to accomplish the same thing.  If you are already controlling the permission via Group Policy, you
+must use Group Policy as the GPO will override what you do here.</p>
+
+<ol>
+	<li>Run the secpol.msc control panel.</li>
+	<li>Browse to Security Settings &gt; Local Policies &gt; User Rights Assignment.</li>
+	<li>Find the "Generate security audits" policy.</li>
+	<li>Right-click and select Properties.</li>
+	<li>Click on Add User or Group...</li>
+	<li>Paste in your service credential (from step 1) and click on Check Names.</li>
+	<li>Click on Locations and select your server name (instead of the domain).</li>
+	<li>Click on OK to return to the "Name Not Found" window.</li>
+	<li>Click on OK to return to the "Select Users or Group" window.</li>
+	<li>Your username should now be underlined - click on OK to accept.</li>
+	<li>Your service account (from step 1) will now be listed in the policy.  Click on OK.</li>
+	<li>Close the secpol.msc control panel.</li>
+	<li>Open a Command window and run the command: <pre>auditpol /set /subcategory:"application generated" /success:enable /failure:enable</pre></li>
+	<li>Restart your SQL Server instance from the Services control panel.</li>
+</ol>
+
+<h3>Step 3: Grant the SQL Service permission to read the Security Log Registry Entries</h3>
+
+<ol>
+	<li>Start the Registry Editor (regedit)</li>
+	<li>Browse to HKEY_LOCAL_MACHINE\System\CurrentControlSet\services\eventlog\Security</li>
+	<li>Right-click on the Security node and select Permissions...</li>
+	<li>Click on Add...</li>
+	<li>Enter the service account from step 1.</li>
+	<li>If needed, click on Locations and select the local server instead of the domain.</li>
+	<li>Click on Check Names (the user will be underlined), then click on OK.</li>
+	<li>Highlight the just-added name and check Allow Full Control.</li>
+	<li>Click on OK.</li>
+	<li>Close the registry editor.</li>
+	<li>Use the Services control panel to restart the SQL Server, or reboot the server.</li>
+</ol>
+
+<h3>Step 4: Prepare your Windows Security Log for increased activity</h3>
+
+<ol>
+	<li>Open the Event Viewer.</li>
+	<li>Browse to Windows Logs &gt; Security.</li>
+	<li>Right-click on Security and select Properties.</li>
+	<li>Select Overwrite events as needed (oldest events first).</li>
+	<li>Set a suitable size on the Maximum Log Size (for example, 2Gb).</li>
+	<li>Click on OK.</li>
+	<li>Close the Event Viewer.</li>
+</ol>
+
+<p>These tasks must be completed before configuring audit settings on any SQL Server.</p>
+		</html>
+	</row>
+</dashboard>

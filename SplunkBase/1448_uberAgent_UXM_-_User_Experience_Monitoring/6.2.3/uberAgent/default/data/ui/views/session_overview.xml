@@ -1,0 +1,245 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, session_overview.js" stylesheet="main.css">
+
+   <label>User Session Overview</label>
+   <description>This dashboard displays a session status overview. Many more detailed dashboards can be accessed through the menu above.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Session_SessionDetail_Users</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            dc(host) as UniqueHosts
+            dc(SessionUserLower) as UniqueUsers
+            dc(SessionGUID) as UniqueSessions
+            $SearchFilter$
+         | appendcols
+         [
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            dc(SessionGUID) as UniqueSessions
+            splitrow
+               _time
+               period minute
+            $SearchFilter$
+         | stats
+            max(UniqueSessions) as MaxConcurrentSessions
+         ]
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Totals for all sessions</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">UniqueHosts</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Unique hosts:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">UniqueUsers</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Unique users:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">UniqueSessions</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Unique sessions:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">MaxConcurrentSessions</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Max. concurrent sessions:</option>
+         </viz>
+         
+      </panel>
+   </row>
+         
+   <!-- Row 2 -->
+   <row>
+      <panel>
+         <title>Number of user sessions over time</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     dc(SessionGUID) as UniqueSessions
+                     splitrow
+                        _time
+                        period minute
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     max(UniqueSessions) as "Unique Sessions"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Average logon duration over time</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                     count(Logon_LogonDetail) as EventCount
+                     sum(TotalLogonTimeMs) as SumTotalLogonTimeMs
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                      filter host in (*)
+                      filter TotalLogonTimeMs is *
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     eval(round(sum(SumTotalLogonTimeMs)/sum(EventCount)/1000,1)) as "Avg. logon duration (s)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>Concurrent sessions per host</title>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     dc(SessionGUID) as UniqueSessions
+                     latest(_time) as LastSeen
+                     latest(HwManufacturer) as LastHwManufacturer
+                     latest(HwModel) as LastHwModel
+                     splitrow
+                        _time
+                        period minute
+                     splitrow
+                        host as Host
+                     $SearchFilter$
+                  | stats
+                     latest(LastSeen) as LastSeen
+                     latest(LastHwManufacturer) as "Hardware manufacturer"
+                     latest(LastHwModel) as "Hardware model"
+                     latest(UniqueSessions) as "#Sessions last"
+                     min(UniqueSessions) as "#Sessions min."
+                     max(UniqueSessions) as "#Sessions max."
+                     by
+                        Host
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | table
+                     Host
+                     "Hardware manufacturer"
+                     "Hardware model"
+                     "#Sessions min."
+                     "#Sessions max."
+                     "#Sessions last"
+                     "Last seen"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+      </panel>
+
+      <panel>
+         <title>Concurrent sessions per user</title>
+         <table id="Table_Panel42">
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     dc(SessionGUID) as UniqueSessions
+                     latest(_time) as LastSeen
+                     splitrow
+                        _time
+                        period minute
+                     splitrow
+                        SessionUserLower as User
+                     $SearchFilter$
+                  | stats
+                     latest(LastSeen) as LastSeen
+                     latest(UniqueSessions) as "#Sessions last"
+                     min(UniqueSessions) as "#Sessions min."
+                     max(UniqueSessions) as "#Sessions max."
+                     by
+                        User
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | table
+                     User
+                     "#Sessions min."
+                     "#Sessions max."
+                     "#Sessions last"
+                     "Last seen"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+      </panel>
+   </row>
+</form>

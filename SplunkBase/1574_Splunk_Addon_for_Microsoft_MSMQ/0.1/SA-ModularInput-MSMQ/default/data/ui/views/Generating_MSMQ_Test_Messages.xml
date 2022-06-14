@@ -1,0 +1,77 @@
+<dashboard>
+	<label>Testing the MSMQ Modular Input</label>
+
+	<row>
+		<html>
+		
+<h1>Testing The MSMQ Modular Input</h1>
+
+<p>During this test process, we assume that your Splunk instance is running on a Windows host and that you
+have prepared this system as described in 
+<a href="Additional_Software_Requirements">Preparing your Windows Server</a>.  The process involves three
+steps:</p>
+
+<ol>
+<li>Manually creating a test queue</li>
+<li>Configuring the MSMQ modular input</li>
+<li>Injecting some test messages</li>
+</ol>
+
+<p>If the test succeeds, then you will see the injected test messages in your Splunk index.</p>
+
+<h2>Manually create a test queue</h2>
+
+<ol>
+<li>Open Computer Management (within Administrative Tools)</li>
+<li>Expand Services and Applications >> Message Queuing</li>
+<li>Right-click on Public Queues and select New >> Public Queue</li>
+<li>Enter the Name "SplunkMSMQTest" in the Queue Name box, and click on OK</li>
+</ol>
+
+
+<h2>Configure the MSMQ Modular Input</h2>
+
+<ol>
+<li>Log onto Splunk as an Administrator</li>
+<li>Click on Manager >> Data Inputs</li>
+<li>Click on "Add new" next to the "MSMQ Monitoring" data input</li>
+<li>Fill in the fields as follows:
+	<ul style="margin-top: 2em;">
+	<li>Input Name: SplunkMSMQTest</li>
+	<li>Queue path: .\SplunkMSMQTest</li>
+	<li>Consume Message: True</li>
+	<li>Source Type Override: MSMQ:SplunkTest</li>
+	<li>Message Handler: MessagePropertyHandler</li>
+	</ul></li>
+<li>Click on Save</li>
+</ol>
+
+<h2>Inject some test messages</h2>
+
+<p>For this piece, we use PowerShell to inject the messages.  Cut and paste the following into a file
+(or <a href="https://gist.github.com/nczeczulin/6179706#file-createmessagequeue-ps1" target="_blank">download 
+the file</a>) and then run the PowerShell script.</p>
+
+<pre>[void][Reflection.Assembly]::LoadWithPartialName("System.Messaging")
+$queue = New-Object System.Messaging.MessageQueue ".\SplunkMSMQTest"
+$msg = New-Object System.Messaging.Message
+$utf8 = New-Object System.Text.Utf8Encoding
+
+for ($x=1; $x -le 10; $x++)
+{
+	$msg.Label = "Test Message #{0:D3}" -f $x
+	$msgBytes = $utf8.GetBytes("Test Message #{0:D3}" -f $x)
+	$msg.BodyStream = New-Object System.IO.MemoryStream
+	$msg.BodyStream.Write($msgBytes,0,$msgBytes.Length)
+	$queue.Send($msg)
+}</pre>
+
+<h2>Check Splunk for Messages</h2>
+
+<p>Log onto Splunk and go to Search.  Set up a real-time search for sourcetype="MSMQ:Test" - you should see 10
+messages from the MSMQ.</p>
+
+		</html>
+	</row>
+	
+</dashboard>

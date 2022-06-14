@@ -1,0 +1,301 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, browser_ie.js" stylesheet="main.css, browser_ie.css">
+
+   <label>Browser Performance: Internet Explorer</label>
+   <description>This dashboard displays the resources consumed per website. Each site's performance is calculated across all user sessions and instances of Internet Explorer.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Application_BrowserPerformanceIE</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Charts">
+      <query>
+         | pivot `uA_DM_Application_BrowserPerformanceIE` Application_BrowserPerformanceIE
+            $Panel11Function1$(CPUPercent) as "$Panel11Function1$(CPUPercent)"
+            $Panel12Function1$(WorkingSetMB) as "$Panel12Function1$(WorkingSetMB)"
+            $Panel21Function1$(IOPS) as "$Panel21Function1$(IOPS)"
+            $Panel22Function1$(NetKBPS) as "$Panel22Function1$(NetKBPS)"
+            splitrow
+               URLHost as "URL host"
+            $SearchFilter$
+            filter URL isNot "none"
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Total CPU time per hostname (top 10)</title>
+         <input type="dropdown" token="Panel11Function1" id="Input_Panel11Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+         </input>
+         <chart id="Chart_Panel11">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel11Function1$(CPUPercent)"
+                  | fields
+                     "URL host"
+                     "$Panel11Function1$(CPUPercent)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Average RAM per hostname (top 10)</title>
+         <input type="dropdown" token="Panel12Function1" id="Input_Panel12Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+         </input>
+         <chart id="Chart_Panel12">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel12Function1$(WorkingSetMB)"
+                  | fields
+                     "URL host"
+                     "$Panel12Function1$(WorkingSetMB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Average IOPS per hostname (top 10)</title>
+         <input type="dropdown" token="Panel21Function1" id="Input_Panel21Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+         </input>
+         <chart id="Chart_Panel21">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel21Function1$(IOPS)"
+                  | fields
+                     "URL host"
+                     "$Panel21Function1$(IOPS)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Network bandwidth per hostname (top 10)</title>
+         <input type="dropdown" token="Panel22Function1" id="Input_Panel22Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+         </input>
+         <chart id="Chart_Panel22">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel22Function1$(NetKBPS)"
+                  | fields
+                     "URL host"
+                     "$Panel22Function1$(NetKBPS)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <input type="dropdown" token="Panel31Function1" id="Input_Panel31Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel31Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel31Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel31Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel31Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel31Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel31Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel31Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table id="Table_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_BrowserPerformanceIE` Application_BrowserPerformanceIE
+                        sum(CPUTimeS) AS SumCPUTimeS
+                        $Panel31Function1$(CPUPercent) AS FuncCPUPercent
+                        $Panel31Function1$(IOPS) AS FuncIOPS
+                        sum(IOCount) AS SumIOCount
+                        $Panel31Function1$(IOMBPS) AS FuncIOMBPS
+                        sum(IOMB) AS SumIOMB
+                        sum(IODurationMs) AS SumIODurationMs
+                        $Panel31Function1$(WorkingSetMB) as FuncWorkingSetMB
+                        $Panel31Function1$(NetKBPS) AS FuncNetKBPS
+                     splitrow
+                        URLHost as "URL host"
+                     $SearchFilter$
+                     filter URL isNot "none"
+                  | eval "Total CPU time (s)"=round(SumCPUTimeS,1)
+                  | eval "$Panel31Function1Display$ CPU (%)"=round(FuncCPUPercent,1)
+                  | eval "$Panel31Function1Display$ IOPS"=round(FuncIOPS,1)
+                  | eval "Total IO (count)"=round(SumIOCount,0)
+                  | eval "$Panel31Function1Display$ IO (MB/s)"=round(FuncIOMBPS,3)
+                  | eval "Total IO (MB)"=round(SumIOMB,1)
+                  | eval "Avg. IO latency (ms)"=round(SumIODurationMs/SumIOCount,1)
+                  | eval "$Panel31Function1Display$ RAM (MB)"=round(FuncWorkingSetMB,0)
+                  | eval "$Panel31Function1Display$ net thruput (KB/s)"=round(FuncNetKBPS,1)
+                  | eval sortfield=lower('Process type')
+                  | table
+                     "URL host"
+                     "Total CPU time (s)"
+                     "$Panel31Function1Display$ CPU (%)"
+                     "$Panel31Function1Display$ IOPS"
+                     "Total IO (count)"
+                     "$Panel31Function1Display$ IO (MB/s)"
+                     "Total IO (MB)"
+                     "Avg. IO latency (ms)"
+                     "$Panel31Function1Display$ RAM (MB)"
+                     "$Panel31Function1Display$ net thruput (KB/s)"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+
+      <html src="browser_ie_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+</form>

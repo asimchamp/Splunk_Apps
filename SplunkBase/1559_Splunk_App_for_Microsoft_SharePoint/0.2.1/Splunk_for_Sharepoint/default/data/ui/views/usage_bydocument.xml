@@ -1,0 +1,88 @@
+<form>
+ <label>Document Tracking</label>
+ 
+ <fieldset autoRun="false" submitButton="true">
+   <input type="dropdown" token="Url">
+    <label>Site</label>
+    <populatingSearch fieldForValue="Id" fieldForLabel="Url" earliest="-1m" latest="now">
+| inputlookup SPSite
+| search NOT ServerRelativeUrl="/my/*"
+| table Id,Url
+| sort Url
+    </populatingSearch>
+   </input>
+   <input type="text" token="Document">
+     <label>Filename</label>
+     <default></default>
+     <prefix>DocLocation="</prefix>
+     <suffix>"</suffix>
+   </input>
+   <input type="time">
+    <default>Last 24 hours</default>
+   </input>
+ </fieldset>
+ 
+  <row>
+   <chart>
+    <title>Document Views over Time</title>
+    <searchString>
+eventtype=mssharepoint-audit ItemType=1 Event=3 SiteId="$Url$" $Document$
+| timechart count
+    </searchString>
+    <option name="charting.chart">line</option>
+    <option name="charting.legend.placement">none</option>
+    <option name="height">240px</option>
+   </chart>
+   <table>
+    <title>Document Views by User</title>
+    <searchString>
+eventtype=mssharepoint-audit ItemType=1 Event=3 SiteId="$Url$" $Document$
+| stats latest(_time) as _time by src_user
+| table _time, src_user
+| eval modUsername=replace(src_user,"\\\\","\\\\")
+| rename src_user as Username
+| sort _time
+    </searchString>
+    <fields>_time,Username</fields>
+    <drilldown>
+	    <link><![CDATA[/app/Splunk_for_Sharepoint/usage_byuser?form.username=$row.modUsername$]]></link>
+    </drilldown>
+   </table>
+  </row>
+  <row>
+   <table>
+    <title>Document Updates by User</title>
+    <searchString>
+eventtype=mssharepoint-audit ItemType=1 (Event=2 OR Event=4 OR Event=5 OR Event=10 OR Event=14) SiteId="$Url$" $Document$
+| table _time, src_user
+| eval modUsername=replace(src_user,"\\\\","\\\\")
+| rename src_user as Username
+| sort _time
+    </searchString>
+    <fields>_time,Username</fields>
+    <drilldown>
+	    <link><![CDATA[/app/Splunk_for_Sharepoint/usage_byuser?form.username=$row.modUsername$]]></link>
+    </drilldown>
+   </table>
+   <table>
+    <title>Users who have not read Document</title>
+    <searchString>
+| inputlookup SPUser 
+| lookup SPWeb Id as WebId OUTPUT SiteId 
+| where SiteId="$Url$"
+| join type=outer src_user [search eventtype=mssharepoint-audit SiteId="$Url$" $Document$ | stats latest(_time) as tt by src_user]
+| where isnull(tt)
+| table src_user,DisplayName
+| lookup SPSystemAccounts src_user OUTPUT isSystemAccount
+| where isnull(isSystemAccount)
+| eval modUsername=replace(src_user,"\\\\","\\\\")
+| sort src_user
+| rename src_user as Username
+    </searchString>
+    <fields>Username,DisplayName</fields>
+    <drilldown>
+	    <link><![CDATA[/app/Splunk_for_Sharepoint/usage_byuser?form.username=$row.modUsername$]]></link>
+    </drilldown>
+   </table>
+  </row>
+</form>

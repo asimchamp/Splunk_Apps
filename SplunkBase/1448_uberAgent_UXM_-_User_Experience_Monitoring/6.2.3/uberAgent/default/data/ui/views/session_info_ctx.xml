@@ -1,0 +1,365 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Session Info: Citrix</label>
+   <description>This dashboard displays detailed information about Citrix ICA/HDX sessions.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Session_SessionDetail_Users</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            dc(SessionClientName) as SessionClientNameCount
+            dc(SessionClientPlatform) as SessionClientPlatformCount
+            dc(SessionClientVersion) as SessionClientVersionCount
+            dc(SessionClientIp) as SessionClientIpCount
+            filter SessionBrokerType is "Citrix"
+            $SearchFilter$
+      </query>
+   </search>
+   
+   <search id="Search_Single2">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            count(Session_SessionDetail_Users)
+            splitrow
+               SessionPublishedAppsCtxSplitLower
+            splitrow
+               SessionUser
+            filter SessionBrokerType is "Citrix"
+            $SearchFilter$
+         | stats 
+            count(SessionPublishedAppsCtxSplitLower) as PublishedAppCountAllUsers
+            dc(SessionPublishedAppsCtxSplitLower) as UniquePublishedApps
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Totals for all sessions</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">SessionClientVersionCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Client versions:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">SessionClientPlatformCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Client platforms:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">SessionClientNameCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Client names:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">SessionClientIpCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Client IPs:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">PublishedAppCountAllUsers</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Published app count (all users):</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">UniquePublishedApps</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">Unique published apps:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Client versions (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     dc(SessionClientName) as DcSessionClientName
+                     splitrow
+                        SessionClientVersion
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | fields
+                     SessionClientVersion
+                     DcSessionClientName
+                  | rename
+                     DcSessionClientName as "Clients per version"
+                     SessionClientVersion as "Client version"
+                  | sort limit=10 - "Clients per version"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Client platforms (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     dc(SessionClientName) as DcSessionClientName
+                     splitrow
+                        SessionClientPlatform
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | fields
+                     SessionClientPlatform
+                     DcSessionClientName
+                  | rename
+                     DcSessionClientName as "Clients per platform"
+                     SessionClientPlatform as "Client platform"
+                  | sort limit=10 - "Clients per platform"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   
+   <!-- Row 3 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Display specifications</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     count(SessionDisplaySpecs) as "Display spec count"
+                     splitrow
+                        SessionDisplaySpecs
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | sort limit=10 - "Display spec count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Session app states</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     count(SessionAppStateCtx) as "App state count"
+                     splitrow
+                        SessionAppStateCtx
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | sort limit=10 - "App state count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Published application usage (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     count(SessionPublishedAppsCtxSplitLower) as "Published app count"
+                     splitrow
+                        SessionPublishedAppsCtxSplitLower as "Published app"
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | sort limit=10 - "Published app count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Published names used to launch sessions (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     latest(SessionPublishedName) as "Published name"
+                     splitrow
+                        SessionGUID
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | top "Published name" showcount=false percentfield="Published name percentage"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     latest(SessionUserLower) as User
+                     latest(host) as Host
+                     latest(SessionID) as ID
+                     latest(SessionLogonTime) as SessionLogonTime
+                     latest(_time) as LastSeen
+                     latest(SessionProtocol) as "Protocol"
+                     latest(SessionConnectionState) as "Last state"
+                     values(SessionClientName) as "Client name(s)"
+                     values(SessionClientIp) as "Client IP(s)"
+                     values(SessionClientPlatform) as "Client platform(s)"
+                     values(SessionClientVersion) as "Client version(s)"
+                     values(SessionDisplaySpecs) as "Display specs"
+                     values(SessionPublishedName) as "Pub. name"
+                     values(SessionPublishedAppsCtxSplitLower) as "Pub. app(s)"
+                     latest(SessionAppStateCtx) as "Last app state"
+                     values(SessionEncryptionCtx) as "Encryption"
+                     splitrow
+                        SessionGUID
+                     filter SessionBrokerType is "Citrix"
+                     $SearchFilter$
+                  | join type=outer SessionGUID 
+                     [
+                        | pivot `uA_DM_Logoff_LogoffDetail` Logoff_LogoffDetail
+                           latest(SessionEndTime) as SessionEndTime
+                           splitrow
+                              SessionGUID
+                        | fields + SessionGUID SessionEndTime
+                     ]
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Logon time"=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Session end"=strftime(strptime(SessionEndTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval sortfield=lower('Logon time')
+                  | sort limit=0 -sortfield
+                  | table
+                     SessionGUID
+                     User
+                     Host
+                     ID
+                     "Logon time"
+                     "Last seen"
+                     "Session end"
+                     "Protocol"
+                     "Last state"
+                     "Client name(s)"
+                     "Client IP(s)"
+                     "Client platform(s)"
+                     "Client version(s)"
+                     "Display specs"
+                     "Pub. name"
+                     "Pub. app(s)"
+                     "Last app state"
+                     "Encryption"
+               </query>
+            </search>
+            <fields>User,Host,ID,"Logon time","Last seen","Session end","Protocol","Last state","Client name(s)","Client IP(s)","Client platform(s)","Client version(s)","Display specs","Pub. name","Pub. app(s)","Last app state","Encryption"</fields>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterExpression=$row.SessionGUID$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+
+      <html src="session_info_ctx_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+</form>

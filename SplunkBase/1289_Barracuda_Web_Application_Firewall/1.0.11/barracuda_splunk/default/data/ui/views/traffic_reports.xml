@@ -1,0 +1,92 @@
+<form>
+  <label>Traffic By Requests</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="unit_name" searchWhenChanged="true">
+      <label>Unit Name:</label>
+      <fieldForLabel>unit_name</fieldForLabel>
+      <fieldForValue>unit_name</fieldForValue>
+      <search ref="TR_search"></search>
+    </input>
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Clients by Requests</title>
+        <search>
+          <query>sourcetype="access" |where unit_name = "$unit_name$" |stats count BY client_ip|sort - count| head 15 | rename client_ip AS Client_IP | rename count AS "Count of Requests"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Requests</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Services by Requests</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$" | eval ip_port = app_ip +":"+ app_port | stats count BY ip_port | head 15| rename ip_port AS "Service"| rename count AS "Count of Requests"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text"># of Requests</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Domains by Requests</title>
+        <search>
+          <query>sourcetype="access" |where unit_name = "$unit_name$" | stats count BY host_name | sort - count | head 15 | rename host_name AS "Domain" | rename count AS "Count of Requests"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Domain</option>
+        <option name="charting.axisTitleY.text"># of Requests</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top URLs by Requests</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$" | chart count BY URL | head 10 | rename count AS "Count of Requests"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Access Logs</title>
+        <search>
+          <query>sourcetype="access" | where unit_name = "$unit_name$" | eval ip_port = app_ip +":"+ app_port | table _time, client_ip, ip_port, method, protocol, host_name, HTTP_Status, URL, bytes_sent, bytes_received, response_type_field, profile_matched_field, protected_field, wf_matched_field, time_taken | rename _time as Time | convert timeformat="%m/%d/%Y %l:%M:%S %p" ctime(Time) | rename client_ip as "Client IP"| rename ip_port as "Service"| rename methos as Method| rename protocol as Protocol| rename host_name as Host| rename HTTP_Status as "HTTP Status"| rename bytes_sent as "Bytes Sent"| rename bytes_received as "Bytes Received" | rename profile_matched_field as "Profile Matched Field" | rename protected_field as "Protected Field" | rename wf_matched_field as "WF Matched Field" | rename time_taken as "Time Taken"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

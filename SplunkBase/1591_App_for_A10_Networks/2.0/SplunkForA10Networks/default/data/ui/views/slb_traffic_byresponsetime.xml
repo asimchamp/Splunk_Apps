@@ -1,0 +1,159 @@
+<form>
+  <label>Traffic by Response Time</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time Picker</label>
+      <default>Last 24 hours</default>
+    </input>
+    <input type="text" token="s_ip">
+      <label>Virtual Server:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="n_ip">
+      <label>Node:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+  </fieldset>
+  <searchTemplate>index="a10networks" sourcetype="a10_slb" $s_ip$ $n_ip$ | stats count by final_time_taken c_ip n_ip s_ip cs_uri_stem _time</searchTemplate>
+  <row>
+    <html>
+      <h2>SLB Traffic by Response Time</h2>This report breaks down your SLB traffic by the time the request took to complete.</html>
+  </row>
+  <row/>
+  <row grouping="3">
+    <single>
+      <title>Response Time Stats</title>
+      <searchPostProcess>stats min(final_time_taken) as req_elapsed_time | eval range="time"</searchPostProcess>
+      <option name="afterLabel">secs</option>
+      <option name="beforeLabel">Min. Response Time:</option>
+      <option name="field">req_elapsed_time</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>stats avg(final_time_taken) as req_elapsed_time | eval range="time"</searchPostProcess>
+      <option name="afterLabel">secs</option>
+      <option name="beforeLabel">Avg. Response Time:</option>
+      <option name="field">req_elapsed_time</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>stats max(final_time_taken) as req_elapsed_time | eval range="time"</searchPostProcess>
+      <option name="afterLabel">secs</option>
+      <option name="beforeLabel">Max. Response Time:</option>
+      <option name="field">req_elapsed_time</option>
+      <option name="linkView">search</option>
+    </single>
+  </row>
+  <row>
+    <chart>
+      <title>Response Time Over Time by Source</title>
+      <searchPostProcess>timechart max(final_time_taken) as "Response Time" by s_ip</searchPostProcess>
+      <Title>Response Time Over Time</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.text">Response Time</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleX.text">Time</option>
+    </chart>
+    <chart>
+      <title>Response Time Over Time by Destination</title>
+      <searchPostProcess>timechart max(final_time_taken) as "Response Time" by n_ip</searchPostProcess>
+      <Title>Response Time Over Time</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.text">Response Time</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleX.text">Time</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Slowest Virtual Server(s)</title>
+      <searchPostProcess>stats sum(final_time_taken) by s_ip | head 10 | sort - final_time_taken</searchPostProcess>
+      <Title>Slowest Virtual Server(s)</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Slowest Node(s)</title>
+      <searchPostProcess>stats sum(final_time_taken) by n_ip | head 10 | sort - final_time_taken</searchPostProcess>
+      <Title>Slowest Node(s)</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Slowest Client(s)</title>
+      <searchPostProcess>stats sum(final_time_taken) by c_ip | head 10 | sort - final_time_taken</searchPostProcess>
+      <Title>Slowest Client(s)</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>URL Statistics</title>
+      <searchPostProcess>rename cs_uri_stem as URL | stats max(final_time_taken) as "Max Response Time" avg(final_time_taken) as  "Avg Response Time"  count as Requests dc(c_ip) as Clients dc(s_ip) as Servers dc(n_ip) as Nodes by URL | head 1000 | sort - "Max Response Time"</searchPostProcess>
+      <Title>URL Statistics</Title>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

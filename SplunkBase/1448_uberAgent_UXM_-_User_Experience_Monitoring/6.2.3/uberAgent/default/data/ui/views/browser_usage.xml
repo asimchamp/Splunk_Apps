@@ -1,0 +1,422 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Browser Web App Usage</label>
+   <description>This dashboard displays information about web app as well as browser usage. Data is collected via browser extensions, which must be installed in addition to the endpoint agent.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>CommonWithUser</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Application_BrowserWebRequests2` Application_BrowserWebRequests2
+            dc(TabHost) as TabHostCount
+            dc(ProcUser) as UserCount
+            dc(host) as HostCount
+            dc(Browser) as BrowserCount
+            dc(BrowserVersion) as BrowserVersionCount
+            $SearchFilter$
+         | appendcols
+         [
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            count(Session_SessionDetail_Users)
+            splitrow
+            _time
+                period auto
+            splitcol
+                SessionFgBrowserDisplayName
+            $SearchFilter$
+         | addtotals
+         | stats
+            sum(Total) as Total
+            sum(NULL) as NULL
+         | eval BrowserForegroundPercent = round((Total - NULL) / Total * 100, 1)
+         ]
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Overview</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">BrowserForegroundPercent</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Browser in foreground:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">TabHostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Tab URLs:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">BrowserCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Browsers:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">BrowserVersionCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Browser versions:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">UserCount</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">#Users:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">#Hosts:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <panel>
+         <title>Foreground web app over time (percent of all applications)</title>
+         <chart>
+            <title>This chart shows the percentage of time users interact with web apps and websites. A column value of 50% means that users spent half their time in the browser.</title>
+            <search>
+               <query>
+                  <![CDATA[
+                     | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                        count(Session_SessionDetail_Users)
+                        splitrow
+                           _time
+                           period $PivotPeriodAutoSolo$
+                        splitcol
+                           SessionFgBrowserActiveTabHost
+                        $SearchFilter$
+                     | addtotals fieldname=_TotalEvents
+                     | foreach * [ eval <<MATCHSTR>> = round ('<<FIELD>>' / _TotalEvents * 100, 1)]
+                     | rename NULL as _NULL
+                  ]]>
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">right</option>
+            <option name="charting.axisY.includeZero">false</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+         </chart>
+      </panel>
+
+   </row>
+   
+   <!-- Row 3 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Web apps in foreground (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     count(SessionFgBrowserActiveTabHost) as CountSessionFgBrowserActiveTabHost
+                     splitrow
+                        SessionFgBrowserActiveTabHost as BrowserTab
+                     $SearchFilter$
+                  | eventstats sum(CountSessionFgBrowserActiveTabHost) as EventCount
+                  | eval "Relative time in foreground, regarding only web apps (%)" = round (CountSessionFgBrowserActiveTabHost / EventCount * 100, 1)
+                  | fields BrowserTab "Relative time in foreground, regarding only web apps (%)"
+                  | sort - "Relative time in foreground, regarding only web apps (%)"
+                  | head 10
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Foreground browser over time (percent of all applications)</title>
+         <chart>
+            <search>
+               <query>
+                  <![CDATA[
+                     | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                        count(Session_SessionDetail_Users)
+                        splitrow
+                           _time
+                           period $PivotPeriodAutoSolo$
+                        splitcol
+                           SessionFgBrowserDisplayName
+                        $SearchFilter$
+                     | eval NULL = coalesce (NULL, 0)
+                     | rename NULL as _NULL
+                     | eval _RowTotal = 0
+                     | foreach * [ eval _RowTotal = _RowTotal + '<<FIELD>>']
+                     | eval _TotalEvents = _RowTotal + _NULL
+                     | foreach * [ eval <<MATCHSTR>> = round ('<<FIELD>>' / _TotalEvents * 100, 1)]
+                  ]]>
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">right</option>
+            <option name="charting.axisY.includeZero">false</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+         </chart>
+      </panel>
+
+   </row>
+
+   <!-- Row 4 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Number of users running a web app (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_BrowserWebRequests2` Application_BrowserWebRequests2
+                     dc(ProcUser) as "#Users"
+                     splitrow
+                        TabHost as URL
+                     $SearchFilter$
+                  | sort - "#Users"
+                  | head 10
+                  | fields
+                     URL
+                     "#Users"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_application_detail?earliest=$earliest$&latest=$latest$&form.FilterField=sAppName&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Number of hosts running a web app (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_BrowserWebRequests2` Application_BrowserWebRequests2
+                     dc(host) as "#Hosts"
+                     splitrow
+                        TabHost as URL
+                     $SearchFilter$
+                  | sort - "#Hosts"
+                  | head 10
+                  | fields
+                     URL
+                     "#Hosts"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     single_application_detail?earliest=$earliest$&latest=$latest$&form.FilterField=sAppName&form.FilterOperator=in&form.FilterExpression=$click.value$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+
+   </row>
+
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Web app usage</title>
+         <input type="dropdown" token="Panel51AppFilterTemp" searchWhenChanged="true">
+            <choice value="">All</choice>
+            <default></default>
+            <label>Web app name:</label>
+            <allowCustomValues>true</allowCustomValues>
+            <change>
+               <condition value="">
+                  <set token="Panel51AppFilter"></set>
+                  <unset token="DrilldownFilterBy51"></unset>
+               </condition>
+               <condition value="*">
+                  <set token="Panel51AppFilter">filter TabHost in ("$value$")</set>
+                  <unset token="DrilldownFilterBy51"></unset>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <title>All filtered web applications</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_BrowserWebRequests2` Application_BrowserWebRequests2
+                     dc(BrowserDisplayName) as "#Browsers"
+                     count(PageLoadTotalDurationMs) as CountPageLoadTotalDurationMs
+                     avg(PageLoadTotalDurationMs) as AvgPageLoadTotalDurationMs
+                     dc(host) as "#Hosts"
+                     dc(ProcUser) as "#Users"
+                     splitrow
+                        TabHost as "Tab URL"
+                     $Panel51AppFilter$
+                     $SearchFilter$
+                  | eval "Avg. page load duration (ms)" = round (AvgPageLoadTotalDurationMs, 0)
+                  | eval "#Page loads" = coalesce (CountPageLoadTotalDurationMs, 0)
+                  | sort limit=0 "Tab URL"
+                  | table
+                     "Tab URL"
+                     "#Browsers"
+                     "Avg. page load duration (ms)"
+                     "#Page loads"
+                     "#Hosts"
+                     "#Users"
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy51">$click.value$</set>
+            </drilldown>
+         </table>
+
+         <html src="browser_usage_explanation.html">
+         </html>
+
+      </panel>
+   </row>
+
+   <!-- Row 6 -->
+   <row depends="$DrilldownFilterBy51$">
+
+      <panel>
+         <chart>
+            <title>$DrilldownFilterBy51$: usage activity (page loads &amp; background requests) over time</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_BrowserWebRequests2` Application_BrowserWebRequests2
+                     dc(host) as "#Hosts"
+                     dc(ProcUser) as "#Users"
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     filter TabHost is $DrilldownFilterBy51|s$
+                     $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">right</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+      
+   <!-- Row 7 -->
+   <row depends="$DrilldownFilterBy51$">
+
+      <panel>
+         <table>
+            <title>$DrilldownFilterBy51$: usage detail</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Application_BrowserWebRequests2` Application_BrowserWebRequests2
+                     avg(PageLoadTotalDurationMs) as AvgPageLoadTotalDurationMs
+                     values(BrowserVersion) as "Browser version"
+                     values(host) as "Host"
+                     splitrow
+                        User
+                     splitrow
+                        BrowserDisplayName as Browser
+                     filter TabHost in ($DrilldownFilterBy51$)
+                     $Panel51AppFilter$
+                     $SearchFilter$
+                  | table
+                     Host
+                     User
+                     Browser
+                     "Browser version"
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">none</option>
+         </table>
+
+         <html src="browser_usage_explanation_2.html" depends="$DrilldownFilterBy51$">
+         </html>
+
+      </panel>
+   </row>
+   
+</form>

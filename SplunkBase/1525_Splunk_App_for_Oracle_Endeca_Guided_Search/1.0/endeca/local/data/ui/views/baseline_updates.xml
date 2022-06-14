@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Baseline Updates</label>
+  <row>
+    <chart>
+      <searchName>Average Baseline Update Duration</searchName>
+      <title>Average Baseline Update Duration</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Average Duration</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+    <chart>
+      <searchName>Average Baseline Step Duration</searchName>
+      <title>Average Baseline Step Duration</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Average Duration</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.labelStyle.overflowMode">default</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+  </row>
+  <row>
+    <event>
+      <searchName>Baseline Update Raw Events</searchName>
+      <title>Baseline Update Raw Events</title>
+    </event>
+  </row>
+</dashboard>

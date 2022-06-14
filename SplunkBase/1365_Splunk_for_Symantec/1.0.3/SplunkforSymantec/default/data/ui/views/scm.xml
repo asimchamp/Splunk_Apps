@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+    <label>SEP Manager System Logs</label>
+    <fieldset autoRun="tre">
+        <input type="time" searchWhenChanged="true">
+            <default>Today</default>
+        </input>
+    </fieldset>
+    <row>
+        <single>
+            <searchString>`scm_count`</searchString>
+            <option name="beforeLabel">SEPM Events: </option>
+        </single>
+    </row>
+    <row>
+        <chart>
+            <searchString>`scm_trends`</searchString>
+            <title>SEP Manager Event Trends</title>
+            <option name="charting.chart">line</option>
+            <option name="count">10</option>
+            <option name="charting.legend.placement">bottom</option>
+        </chart>
+    </row>
+    <row>
+        <table>
+            <searchString>`scm_table`</searchString>
+            <title>SEPM System Events</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <option name="maxLines">10</option>
+            <option name="segmentation">outer</option>
+            <option name="softWrap">true</option>
+        </table>
+    </row>
+</form>

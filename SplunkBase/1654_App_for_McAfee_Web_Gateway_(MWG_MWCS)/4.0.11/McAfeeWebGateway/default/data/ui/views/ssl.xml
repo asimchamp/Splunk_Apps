@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>SSL</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <row>
+    <chart>
+      <title>SSL Versions by Hits (Server)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields ssl_server_protocol | stats count by ssl_server_protocol</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+    <chart>
+      <title>SSL Versions by Hits (Client)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields ssl_client_protocol | stats count by ssl_client_protocol</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>SSL Ciphers by Hits (Server)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields ssl_server_cipher | stats count by ssl_server_cipher</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+    <chart>
+      <title>SSL Ciphers by Hits (Client)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields ssl_client_cipher | stats count by ssl_client_cipher</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>SSL KeyExchangeBits by Hits (Server)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields ssl_server_kex_bits | stats count by ssl_server_kex_bits</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+    <chart>
+      <title>SSL KeyExchangeBits by Hits (Client)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields ssl_client_kex_bits | stats count by ssl_client_kex_bits</query>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>SSL Ciphers (Server)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields dest src http_user_agent ssl_server_cipher | stats count, dc(dest) AS "#dest", dc(src) AS "#src", dc(http_user_agent) AS "#User-Agent" by ssl_server_cipher | sort - count</query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>SSL Versions (Server)</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | fields dest src http_user_agent ssl_server_protocol | stats count, dc(dest) AS "#dest", dc(src) AS "#src", dc(http_user_agent) AS "#User-Agent" by ssl_server_protocol | sort - count</query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Client Certificate Requested</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ ssl_server_handshake_cert_requested=true | fields category web_reputation src ssl_subject_common_name reverse_dns dest | stats count values(category) AS category values(web_reputation) AS web_reputation dc(src) AS "#src" values(ssl_subject_common_name) AS certCN values(reverse_dns) AS reverse_dns by dest | sort - count</query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>SSL-related blocks</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ block_id &gt; 90 AND block_id &lt; 100 | fields dest src ssl_subject_common_name reverse_dns block_reason block_id rule | stats count, values(dest) AS dest, dc(src) AS #src, values(ssl_subject_common_name) AS certCN, values(reverse_dns) AS reverse_dns by block_reason, block_id, rule | sort - count</query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Expired Certificate</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ | eval ssl_cert_valid_days = if(ssl_cert_days_expired &gt; 0, ssl_cert_days_expired * -1 ."d", "+" . abs(ssl_cert_days_expired) ."d") | eval ssl_cert_valid_until=relative_time(_time, ssl_cert_valid_days) | fieldformat a=strftime(a, "%F %T") | where _time &gt; ssl_cert_valid_until | fields action category web_reputation src ssl_subject_common_name reverse_dns ssl_cert_days_expired dest | stats count, values(action) AS action, values(category) AS category values(web_reputation) AS web_reputation dc(src) AS "#src" values(ssl_subject_common_name) AS ssl_subject_common_name values(reverse_dns) AS reverse_dns, values(ssl_cert_days_expired) AS ssl_cert_days_expired by dest | sort - count</query>
+      </search>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Certificate Issuers</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ ssl_server_cert_chain_issuer_cns="*" | fields ssl_server_cert_chain_issuer_cns src dest http_user_agent | makemv delim="," ssl_server_cert_chain_issuer_cns | stats count, dc(src) AS #src dc(dest) AS #dest dc(http_user_agent) AS #http_user_agent by ssl_server_cert_chain_issuer_cns | sort - count</query>
+      </search>
+    </table>
+  </row>
+
+
+</form>

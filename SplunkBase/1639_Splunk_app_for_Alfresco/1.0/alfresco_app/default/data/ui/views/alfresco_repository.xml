@@ -1,0 +1,77 @@
+<form>
+  <label>Alfresco Repository</label>
+  <fieldset autoRun="true">
+    <input type="dropdown" token="host">
+      <label>Choose Alfresco Server</label>
+      <prefix>host="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <populatingSearch fieldForValue="host" fieldForLabel="host" earliest="-1d@d" latest="now"><![CDATA[| metadata type=hosts index=alfresco | dedup host | table host]]></populatingSearch>
+    </input>
+    <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Database Connections</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ ConnectionPool | timechart avg(alfrescoDbNumActiveConns) as "Active DB Connections", avg(alfrescoDbNumIdleConns) as "Idle DB Connections"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Users</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ RepoServerMgmt | timechart avg(alfrescoUserCountAll) as "All Users", avg(alfrescoUserCountNonExpired) as "Live Users"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Auth Tickets</title>
+      <searchString>
+      	<![CDATA[index=alfresco $host$ RepoServerMgmt | timechart avg(alfrescoTicketCountAll) as "All Tickets", avg(alfrescoTicketCountNonExpired) as "Live Tickets"]]>
+      </searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+</form>

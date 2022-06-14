@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+    <label>Windows Event Viewer</label>
+    <module name="AccountBar" layoutPanel="appHeader"/>
+    <module name="AppBar" layoutPanel="navigationHeader"/>
+    <module name="Message" layoutPanel="messaging">
+        <param name="filter">*</param>
+        <param name="clearOnJobDispatch">False</param>
+        <param name="maxSize">1</param>
+    </module>
+    <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+    <module name="Message" layoutPanel="navigationHeader">
+        <param name="filter">splunk.search.job</param>
+        <param name="clearOnJobDispatch">True</param>
+        <param name="maxSize">1</param>
+        <param name="level">warn</param>
+    </module>
+    
+    <module name="TimeRangePicker" layoutPanel="panel_row1_col1">
+        <param name="default">Last 4 Hours</param>
+        <param name="searchWhenChanged">True</param>
+        
+        <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp1">
+            
+            <param name="label">Server Name:</param>
+            <param name="field">ServerName</param>
+            
+            <param name="replacementMap">
+                <param name="arg">
+                    <param name="ServerName">
+                        <param name="value"/>
+                    </param>
+                </param>
+            </param>
+            
+            <param name="intention">
+                <param name="name">stringreplace</param>
+                <param name="arg">
+                    <param name="ServerName">
+                        <param name="default"/>
+                        <param name="prefix">host="</param>
+                        <param name="suffix">"</param>
+                        <param name="fillOnEmpty">false</param>
+                    </param>
+                </param>
+            </param>
+            
+            <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp2">
+                <param name="label">Event Code:</param>
+                <param name="field">EventCode</param>
+                
+                <param name="replacementMap">
+                    <param name="arg">
+                        <param name="EventCode">
+                            <param name="value"/>
+                        </param>
+                    </param>
+                </param>
+                
+                <param name="intention">
+                    <param name="name">stringreplace</param>
+                    <param name="arg">
+                        <param name="EventCode">
+                            <param name="default"/>
+                            <param name="prefix">EventCode="</param>
+                            <param name="suffix">"</param>
+                            <param name="fillOnEmpty">false</param>
+                        </param>
+                    </param>
+                </param>
+                
+                <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp3">
+                    <param name="label">Source Name:</param>
+                    <param name="field">SourceName</param>
+                    
+                    <param name="replacementMap">
+                        <param name="arg">
+                            <param name="SourceName">
+                                <param name="value"/>
+                            </param>
+                        </param>
+                    </param>
+                    
+                    <param name="intention">
+                        <param name="name">stringreplace</param>
+                        <param name="arg">
+                            <param name="SourceName">
+                                <param name="default"/>
+                                <param name="prefix">SourceName="</param>
+                                <param name="suffix">"</param>
+                                <param name="fillOnEmpty">false</param>
+                            </param>
+                        </param>
+                    </param>
+                    
+                    <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp4">
+                        <param name="label">Type:</param>
+                        <param name="field">Type</param>
+                        
+                        <param name="replacementMap">
+                            <param name="arg">
+                                <param name="Type">
+                                    <param name="value"/>
+                                </param>
+                            </param>
+                        </param>
+                        
+                        <param name="intention">
+                            <param name="name">stringreplace</param>
+                            <param name="arg">
+                                <param name="Type">
+                                    <param name="default"/>
+                                    <param name="prefix">Type="</param>
+                                    <param name="suffix">"</param>
+                                    <param name="fillOnEmpty">false</param>
+                                </param>
+                            </param>
+                        </param>
+    
+                        <module name="HiddenSearch" autoRun="true" layoutPanel="panel_row3_col1" group="Windows Events">
+                            <param name="search">
+                                index="xenapp_winevents" sourcetype="WinEventLog:*" $ServerName$ |
+                                search $EventCode$ $SourceName$ $Type$ |
+                                fields host, Type, SourceName, EventCode, TaskCategory, Message |
+                                eval ServerName=host |
+                                eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S") |
+                                table Message, Time, ServerName, Type, SourceName, EventCode, TaskCategory
+                            </param>
+                            <module name="StaticContentSample" layoutPanel="panel_row3_col1">
+                                <param name="text"><![CDATA[<img src="/static/app/SplunkForServerVirt/info.gif" class="info_icon" />]]> Click on a row below to view more details about the event.</param>
+                            </module>
+                            <module name="JobProgressIndicator"  />
+                                
+                            <module name="Paginator" layoutPanel="panel_row3_col1">
+                                <param name="count">10</param>
+                                <param name="entityName">results</param>
+                                
+                                <module name="SimpleResultsTable">
+                                    <param name="displayMenu">true</param>
+                                    <param name="drilldown">row</param>
+                                    <param name="displayRowNumbers">False</param>
+                                    <module name="NullModule" />
+                                </module>
+                                <module name="ViewRedirectorLink">
+                                    <param name="viewTarget">flashtimeline</param>
+                                </module>
+                            
+                            </module> <!-- End Paginator -->
+                        </module> <!-- End Hidden Search -->
+                        
+                        <module name="StaticContentSample" layoutPanel="panel_row4_col1">
+                            <param name="text"><![CDATA[<div id="evtMsg" style="white-space: pre;"></div>]]></param>
+                        </module>
+                        
+                    </module> <!-- ExtendedFieldSearch (Type) -->
+                </module> <!-- ExtendedFieldSearch (SourceName) -->
+            </module> <!-- ExtendedFieldSearch (EventCode) -->
+        </module> <!-- ExtendedFieldSearch (ServerName) -->
+    </module> <!-- TimeRangePicker -->
+    
+
+    
+</view>

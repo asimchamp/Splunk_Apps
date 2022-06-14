@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<form version="1.1">
+  <label>Connections</label>
+  <fieldset>
+    <input type="text" token="user">
+      <label>User</label>
+      <default/>
+      <prefix>user=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="src">
+      <label>Src IP</label>
+      <default/>
+      <prefix>src=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="dest">
+      <label>Dest</label>
+      <default/>
+      <prefix>dest=</prefix>
+      <initialValue/>
+    </input>
+    <input type="text" token="http_user_agent">
+      <label>User-Agent</label>
+      <default/>
+      <prefix>http_user_agent=</prefix>
+      <initialValue/>
+    </input>
+    <input type="multiselect" token="action" searchWhenChanged="true">
+      <default>allowed,blocked,auth,error</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>action="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="allowed">allowed</choice>
+      <choice value="blocked">blocked</choice>
+      <choice value="auth">auth</choice>
+      <choice value="error">error</choice>
+      <label>Action</label>
+    </input>
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+
+  <row>
+    <table>
+      <title>Long running transactions</title>
+      <search>
+        <query> `index_and_sourcetype` $user$ $src$ $dest$ $http_user_agent$ $action$ connection_runtime &gt; 1800 | eval connection_tuple=dest_ip."_".dest_port."_".proxy_src_ip."_".proxy_src_port | fields connection_runtime dest category bytes_in bytes_out web_reputation url connection_tuple url_domain | eval url_domain=coalesce(url_domain, dest) | stats dc(url) AS "#url", dc(dest) AS "#dest", values(category) AS category, values(web_reputation) AS web_reputation, sum(bytes_in) AS bytes_in, sum(bytes_out) AS bytes_out , count, dc(connection_tuple) AS #connections, avg(connection_runtime) AS avg_connection_runtime by url_domain | eval avg_connection_runtime=round(avg_connection_runtime)</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

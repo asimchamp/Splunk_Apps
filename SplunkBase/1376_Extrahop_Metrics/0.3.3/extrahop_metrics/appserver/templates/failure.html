@@ -1,0 +1,24 @@
+<%page expression_filter="h"/>
+<%inherit file="//layout/base.html" />
+<%namespace name="lib" file="//lib.html" import="*"/>
+<%namespace name="helpers" file="//view/_helpers.html" import="*"/>
+<%!
+    import logging
+    logger = logging.getLogger('splunk.extrahop_metrics')
+%>
+
+
+<%def name="gen_text(name, form_content, dynamic=False)">
+  <p>${form_content['msg']}</p>
+</%def>
+
+
+
+<div id="failure">
+  <h2>Failure</h2>
+  <p>There was an error in connecting to the Extrahop device</p>
+  <h3>Here is the error message from the script</h3>
+  ${gen_text('error', form_content.get('error'), dynamic=True)}
+  <input class="splButton-primary" type="submit" value="Go to setup view" onClick=parent.location="${make_url('/app/extrahop_metrics/setup')}"></input>
+
+</div>

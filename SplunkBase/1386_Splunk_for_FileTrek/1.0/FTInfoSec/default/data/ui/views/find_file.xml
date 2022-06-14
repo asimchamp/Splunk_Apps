@@ -1,0 +1,74 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleForm" onunloadCancelJobs="true" template="dashboard.html">
+	<label>Search</label>
+	<module name="AccountBar" layoutPanel="appHeader" />
+	<module name="AppBar" layoutPanel="navigationHeader" />
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">splunk.search.job</param>
+		<param name="clearOnJobDispatch">True</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="TitleBar" layoutPanel="viewHeader">
+		<param name="actionsMenuFilter">dashboard</param>
+	</module>
+	<module name="StaticContentSample" layoutPanel="viewHeader">
+		<param name="text"><![CDATA[Simple text search of all FileTrek audit events<br>Use '*' as wildcard<br>For more search options use the Splunk 'Search' app. and enter 'index==ftauditevents' as the first search clause]]></param>
+	</module>
+	<module name="HiddenSearch" layoutPanel="viewHeader">
+		<param name="search">
+			index="ftauditevent*"
+			$SearchString$
+			| eval Id=coalesce(ftstartfileid,ftfileid)
+			| eval File=coalesce(ftstartfileidpath,ftfileidpath)
+			| eval Volume=coalesce(ftstartfileidvolumeidname, ftfileidvolumeidname, ftstartfileidvolume, ftfileidvolume)
+			| eval EndFile=coalesce(ftendfileidpath, '')
+			| eval EndVolume=coalesce(ftendfileidvolumeidname, ftendfileidvolume, '')
+			| eval Action=coalesce(ftlinktype,fteventtype, '')
+			| rename ftendfileid as EndFileId ftsourceuseridname as User ftsourceuserid as UserId ftsourcemachineidname as Machine ftsourcemachineid as MachineId fteventtime as Date | fields Id, File, Volume, Action, EndFileId, EndFile, EndVolume, UserId, User, MachineId, Machine, Date | fields - _*
+			| dedup Id
+		</param>
+		<module name="ExtendedFieldSearch">
+			<param name="replacementMap">
+				<param name="arg">
+					<param name="SearchString">
+						<param name="value"></param>
+					</param>
+				</param>
+			</param>
+			<param name="field">Search</param>
+			<param name="intention">
+				<param name="name">stringreplace</param>
+				<param name="arg">
+					<param name="SearchString">
+						<param name="default">*</param>
+						<param name="fillOnEmpty">True</param>
+					</param>
+				</param>
+			</param>
+
+			<module name="StaticContentSample" layoutPanel="viewHeader">
+				<param name="text"><![CDATA[<br>]]></param>
+			</module>
+
+			<module name="TimeRangePicker">
+				<param name="searchWhenChanged">True</param>
+				<module name="SubmitButton">
+					<param name="allowSoftSubmit">True</param>
+					<param name="label">Search</param>
+
+					<module name="JobProgressIndicator"></module>
+					<module name="FTResultTable"></module>
+
+				</module>
+			</module>
+
+
+		</module>
+	</module>
+	<module name="NullModule" layoutPanel="panel_row3_col1"> </module>
+</view>
+
