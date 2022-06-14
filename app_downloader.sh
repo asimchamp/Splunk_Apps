@@ -74,7 +74,8 @@ file_tgz=$(ls $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/ | grep 
 if [ "$file_tgz" = "1" ];
    then
       echo "File already present."
-
+      tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER
+      sleep 2
    else
       cd $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/
       curl -L -J -O -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/
