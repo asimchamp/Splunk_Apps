@@ -1,0 +1,203 @@
+<dashboard>
+  <label>Lenovo XClarity - Security Logins</label>
+  <description>Events associated with authenticating to the LXCA server</description>
+  <row>
+    <panel></panel>
+  </row>
+  <row>
+    <panel>
+      <title>Count of logins to XClarity grouped by IP address</title>
+      <chart>
+        <title>This graph shows how many successful logons to the XClarity Administrator occurred over time, grouped by the IP addresses that the logins came from.  For security audits, understanding where users are connecting from may be important.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=FQXHMSE0200I | timechart count by Lenovo_LXCA_Context_IP</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Number of failed logins to XClarity by attempted user ID</title>
+      <chart>
+        <title>This graph shows what user IDs attempted to authenticate to an XClarity Administrator, but failed.  Seeing which unauthorized user IDs were used to attempt access should be useful in system audits, finding out who is trying to access the systems.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=FQXHMSE0202I | timechart count by user</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Number of unsuccessful authentications by IPV4 address</title>
+      <chart>
+        <title>This graph shows how many unsuccessful attempts there were to log in to an XClarity Administrator, or a resource managed by an XClarity Administrator.  A spike in the number of unsuccessful attempts to access these systems may indicate that unauthorized users may be attempting to hack into the systems.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=FQXHMSE0202I OR 00200000 OR 40000012-00000000 OR 40000013-00000000 OR 40000029-00000000 OR 4000008d-00000000 OR 00016102 OR 00016106 OR 00200000 OR FQXHMTS0009G OR FQXTS421633 OR FQXTS421634 OR FQXTS421635 OR FQXTS421636 OR FQXTS421637 | timechart count by Lenovo_LXCA_Context_IP</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Pie chart of user ids that have successfully logged in</title>
+      <chart>
+        <title>This graph shows the user IDs that logged into an XClarity Administrator and when.  This may be helpful when auditing which users are accessing your environment over an extended period of time.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=FQXHMSE0200I | stats by user</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>All messages on nights and weekends</title>
+      <chart>
+        <title>This graph shows any messages that were surfaced to XClarity Adminstrators outside of normal business hours.  This may help identify uncommon user account activity, such as someone changing system configuration in the middle of the night.</title>
+        <search>
+          <query>index=lenovo_lxca and appl=LXCA date_wday=sunday OR saturday OR date_hour&lt;6 OR date_hour&gt;17 | timechart count</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Count of XClarity login attempts on nights and weekends</title>
+      <chart>
+        <title>This graph shows how many login attempts occurred outside of normal business hours.   This may help identify uncommon user account activity, like a large number of login attempts in the middle of the night or on a weekend.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=FQXHMSE0200I OR FQXHMSE0202I date_wday=sunday OR saturday OR date_hour&lt;6 OR date_hour&gt;17 | timechart count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>

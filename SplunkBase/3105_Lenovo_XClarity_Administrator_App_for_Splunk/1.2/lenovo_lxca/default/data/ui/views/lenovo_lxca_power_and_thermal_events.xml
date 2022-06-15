@@ -1,0 +1,109 @@
+<dashboard>
+  <label>Lenovo XClarity Power and Thermal events</label>
+  <row>
+    <panel>
+      <title>Number of power threshold alerts over time</title>
+      <chart>
+        <title>This graph shows the number of times when a power threshold has been exceeded for any XClarity Administrator-managed resources, over time.  This can help identify environmental issues in the datacenter.  If the exceeding of power thresholds caused power capping, this could also explain performance slow downs.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=806f0a070301ffff OR 4000007500000000 OR 4000007f00000000 OR FQXTS131330 OR FQXTS131331 OR FQXTS131332 OR FQXTS131333 OR FQXTS131336 OR FQXTS131337 OR FQXTS131338 OR FQXTS131339 OR FQXTS131841 OR FQXTS132866 OR FQXTS132869 OR FQXTS132870 OR FQXTS196866 OR FQXTS196867 OR FQXTS196868 OR FQXTS196869 OR FQXTS196872 OR FQXTS196873 OR FQXTS196874 OR FQXTS196875 OR FQXTS487169 | timechart count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Number or thermal thresholds that have been exceeded by any XClarity-managed resources</title>
+      <chart>
+        <title>This graph shows the number of XClarity Administrator-managed resources that have posted a temperature alert, or have exceeded a temperature threshold.  This can help identify cooling issues in the datacenter, or in the racks.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=80010701-3701ffff OR 80010901-3701ffff OR 80010b01-3701ffff OR 80010b01-3702ffff OR 80070601-2c01ffff OR 80070601-2c02ffff OR 80070601-2c03ffff OR 80070601-2c04ffff OR 8007060f2201ffff OR 800706142201ffff OR 806f01070301ffff OR 806f01070302ffff OR 806f01072584ffff OR 806f0a0c OR 0821C001 OR 0821C002 OR 0821C003 OR 0821C004 OR 0821C005 OR 0821C006 OR 0821C081 OR 0821C082 OR 0821C083 OR 0821C084 OR 0821C085 OR 0821C086 OR FQXTS65794 OR FQXTS65795 OR FQXTS65796 OR FQXTS65797 OR FQXTS65800 OR FQXTS65801 OR FQXTS65802 OR FQXTS65803 OR FQXTS65920 OR FQXTS67330 | timechart count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Count of low or failed battery events over time</title>
+      <chart>
+        <title>This chart shows the number of XClarity Adminstrator-managed resources that have batteries that are low or that have failed. This can cause issues for these resources in the future, so it is recommended to replace these batteries.</title>
+        <search>
+          <query>index=lenovo_lxca appl=LXCA EventID=80010202-2801ffff OR 800102022801ffff OR 0x800102022801ffff OR 00006012 OR 00006011 OR FQXTS2715393 | timechart count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
