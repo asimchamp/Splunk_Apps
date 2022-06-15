@@ -19,9 +19,9 @@ jobs:
         run: |
           ls -l
           du -sh SplunkBase/
-          mkdir .git
-          echo "Test filr in Config" > .git/config
-          cat .git/config
+          cd .git
+          ls -l
+          pwd
       - uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
