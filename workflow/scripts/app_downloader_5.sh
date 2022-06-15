@@ -186,3 +186,7 @@ done
 
 
 echo "Loop Completed for Download."
+
+echo "Permission set to Global"
+chmod -R 777 $splunk_home/
+echo "Permission has been changed"
