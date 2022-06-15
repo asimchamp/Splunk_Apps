@@ -1,0 +1,565 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% load demoview %}
+
+{% block title %}Aerospike Home{% endblock title %}
+
+{% block css %}
+     <!-- Style sheets are loaded here -->
+
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/style.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/style1.css" />
+    <style>
+        /* Define any page styles here*/
+               @font-face {
+                      font-family: "Titillium Web";
+                      font-style: normal;
+                      font-weight: 400;
+                      src: local("Titillium Web"), local("TitilliumWeb-Regular"), url("http://fonts.gstatic.com/s/titilliumweb/v4/7XUFZ5tgS-tD6QamInJTcZSnX671uNZIV63UdXh3Mg0.woff2") format("woff2");
+                    }
+
+                    label
+                   {
+
+                        font-size:16px;
+                        color : #6E6E6E;
+                        margin-left: 0px !important;
+
+                   }
+
+        td {
+            font-size: 16px;
+            /*text-shadow: 1px 1px #aaa;*/
+            height:22px;
+            text-align: center;
+            color:#6E6E6E;
+            font-family:'Titillium Web';
+        }
+        th {
+            font-size: 16px;
+            text-shadow: 1px 1px #aaa;
+             height:25px;
+             text-align: center;
+             color:#6E6E6E;
+
+        }
+        body
+        {
+            font-family:'Titillium Web';
+        }
+
+        input[type=radio] {
+            border: 0px;
+            font-size: 16px;
+            margin-right: 0px !important;
+        }
+
+
+        td.icon {
+            text-align: center;
+        }
+
+        td.icon i {
+            font-size: 22px;
+            text-shadow: 1px 1px #aaa;
+        }
+
+        td.icon .Info {
+            color: #006400;
+        }
+        td.icon .Low {
+            color: #006400;
+        }
+        td.icon .Medium {
+            color: orangered;
+        }
+        td.icon .High {
+            color: red;
+        }
+        td.icon .Critical {
+            color: red;
+        }
+
+        a
+        {
+            color:#6E6E6E;
+        }
+        a:hover
+        {
+            color:#6E6E6E;
+        }
+        a:active
+        {
+            color:#6E6E6E;
+        }
+        a:visited
+        {
+            color:#6E6E6E;
+        }
+        a:link
+        {
+            color:#6E6E6E;
+        }
+        .show_stat
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:hover
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:active
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:visited
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:link
+        {
+            color:#FAFAFA;
+        }
+        input
+        {
+          padding:5px !important;
+          width:100px !important;
+        }
+        #time_stamp
+        {
+          width:100px;
+          float: left;
+          margin-left: 10px !important;
+        }
+        #timeStamp_value
+        {
+          width:100px !important;
+          float:left;
+        }
+        .shared-timerangepicker .btn
+        {
+          float: right;
+          margin-bottom: 7px;
+        }
+        #timerange2
+        {
+          float:left;
+          padding-top: 3px;
+        }
+        #timerange1
+        {
+          padding-right: 10px;
+          padding-top: 3px;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+
+   {# Splunk views go here #}
+
+    <div class="dashboard-body container-fluid main-section-body" data-role="main" style="padding:0;margin:0;">
+
+    <!--Menu Bar for Aerospike app -->
+
+
+    <!--Page discripton-->
+
+    <div class="dashboard-header clearfix">
+        <h2 style="color : #050505;text-shadow: 1px 1px #aaa">Aerospike Dashboard</h2>
+
+    </div>
+
+    <!-- Row 1 with 2 cells -->
+
+    <div  class="dashboard-row dashboard-row1" style="height: 100px">
+
+        <!-- Row 1 cell 1-->
+
+        <div class="dashboard-cell" style="width: 100%">
+            <div id="dropdown_nodes" class="dashboard-panel" style="height: 120px">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E;width:50%;float:left;">
+                          <h3 style="color : #FAFAFA;width:auto;float:left">Select Time Range for node</h3>
+                          {% timerange id="timerange2" preset="30 second window" managerid="search_sourcetypes"  earliest_time="$et1$"|token_safe latest_time="$lt1$"|token_safe %}
+                    </div>
+                    <div class="panel-head" style="background-color : #6E6E6E;width:50%;float:left;">
+                        {% timerange id="timerange1" preset="30 minute window" managerid="search_chart_write"  earliest_time="$et$"|token_safe latest_time="$lt$"|token_safe %}
+                        <h3 style="color : #FAFAFA;float:right;padding-top:9px;">Select Time Range for chart</h3>
+
+                    </div>
+                    <div class="panel-body" style="padding-right: 75%;font-size:18px;">
+                      <h3 style="color : #6E6E6E; padding-left:10px">Select Node :
+                        {% dropdown id="drop_headcount" default="cluster" managerid="search_sourcetypes" labelField="stanza" valueField="stanza" value="$ip_addr$"|token_safe showClearButton=False %}
+                      </h3>
+                    </div>
+                </div>
+             </div>
+          </div>
+
+          <!-- Row 1 cell 2-->
+     </div>
+
+     <div class="dashboard-row dashboard-row2" style="height: 260px">
+
+        <!-- Row 2 cell 1-->
+
+        <div class="dashboard-cell" style="width: 20%;height: 260px">
+            <div id="chart_memory_usage" class="dashboard-panel" style="height: 260px">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA; text-align : center">Memory Usage(in GB)</h3>
+                    </div>
+                    <div class="panel-body" >
+                        {% chart id="piechart_memory" managerid="search_chart_memory" type="pie" drilldown="none" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 cell 2-->
+
+        <div class="dashboard-cell" style="width: 20%;">
+            <div id="chart_disk_usage" class="dashboard-panel "style="height: 260px">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA; text-align : center">Disk Usage(in GB)</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% chart id="piechart_disk" managerid="search_chart_disk" type="pie" drilldown="none" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 cell 3-->
+
+        <div class="dashboard-cell" style="width: 20%;">
+
+             <div id="single_namespaces" class="dashboard-panel "style="height: 260px">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA; text-align : center">Namespaces</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% table id="chart_sourcetype5" managerid="search_namespace"  drilldown="none" count=5 pagerPosition="bottom"%}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2 cell 4-->
+
+        <div class="dashboard-cell" style="width: 20%;">
+          <div id="table_connected_nodes" class="dashboard-panel "style="height: 260px">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA; text-align : center">Connected Nodes</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% table id="table_searchresults" managerid="search_resulttable" drilldown="none" count=5 pagerPosition="bottom"%}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cell" style="width: 20%;">
+          <div id="table_connected_nodes" class="dashboard-panel "style="height: 260px">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA; text-align : center">Alerts</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% table id="alerts" managerid="search_alertinfo"  drilldown="none" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+     </div>
+
+     <!--Row 3 with 2 cell -->
+
+     <div class="dashboard-row dashboard-row3">
+
+        <!-- Row 3 cell 1-->
+
+        <div class="dashboard-cell" style="width: 100%;height:300px">
+            <div id="chart_reads" class="dashboard-panel ">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA;">Reads per second</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% chart id="chart_read" managerid="search_chart_read" type="area" drilldown="none" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="dashboard-row dashboard-row4">
+        <!-- Row 3 cell 2-->
+
+        <div class="dashboard-cell" style="width: 100%;height:300px">
+            <div id="chart_writes" class="dashboard-panel ">
+                <div class="dashboard-element">
+                    <div class="panel-head" style="background-color : #6E6E6E">
+                        <h3 style="color : #FAFAFA;">Writes per second</h3>
+                    </div>
+                    <div class="panel-body">
+                        {% chart id="chart_write" managerid="search_chart_write" type="area" nullValueMode="connect" drilldown="none" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+
+  <div  class="dashboard-row dashboard-row1" style="height: 100px">
+
+          <!--cell 1 with 2 panels-->
+      <div class="dashboard-cell" style="width: 25%">
+
+          <!--Panel 1 for Node selection -->
+          <div id="dropdown_nodes" class="dashboard-panel" style="height: 100px">
+              <div class="dashboard-element">
+                  <div class="panel-head" style="background-color : #6E6E6E">
+                      <h3 style="color : #FAFAFA; text-align : center">Select Node</h3>
+                  </div>
+                  <div class="panel-body" style="padding-right: 1%">
+                      {% dropdown id="drop_headcount2" selectFirstChoice="true" managerid="search_sourcetypes" labelField="stanza" valueField="stanza" value="$ip_latency$"|token_safe showClearButton=False %}
+                  </div>
+              </div>
+            </div>
+
+            <!--Panel 2 for chart selection -->
+            <div id="radio_buttons" class="dashboard-panel" style="height: 240px">
+              <div class="dashboard-element">
+                  <div class="panel-head" style="background-color : #6E6E6E">
+                      <h3 style="color : #FAFAFA; text-align : center">Select Chart</h3>
+                  </div>
+                  <div class="panel-body" style="padding-right: 1%;font-size: 16px">
+                  {% radiogroup id="radio_value" default="writes" value="$chart_name$"|token_safe %}
+                   </div>
+              </div>
+          </div>
+      </div>
+
+      <!--Cell 2 for Latency chart -->
+      <div class="dashboard-cell" style="width: 75%">
+           <div id="chart_latency" class="dashboard-panel "style="height: 350px">
+              <div class="dashboard-element">
+                  <div class="panel-head" style="background-color : #6E6E6E">
+                      <h3 style="color : #FAFAFA; text-align : center">Latency Chart </h3>
+                  </div>
+                  <div class="panel-body">
+                      {% chart id="chart_latency" managerid="search_chart_latency" type="area" nullValueMode="connect" drilldown="none" %}
+                  </div>
+              </div>
+          </div>
+        </div>
+   </div>
+
+
+</div>
+    <!-- You can use HTML and <div> tags for layout -->
+
+{% endblock content%}
+
+{% block managers %}
+
+    {# Search managers go here #}
+
+    {% searchmanager
+        id="search_resulttable"
+        search="sourcetype=\"aerospike\" stanza!=\"cluster\" stanza!=\"Namespace\" | dedup stanza | rename stanza as Nodes |table Nodes"
+        earliest_time="$et1$"|token_safe
+        latest_time="$lt1$"|token_safe
+
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_alert"
+        search="index =\"_audit\" action=\"alert_fired\" ss_app=\"splunk_app_for_aerospike\" | dedup ss_name | stats count"
+        earliest_time="rt-5m"
+        latest_time="rt"
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_alertinfo"
+         search="index=\"_audit\" action=\"alert_fired\" ss_app=\"splunk_app_for_aerospike\" | dedup ss_name | rename ss_name as Alert_Name | eval severity = case(severity == \"1\", \"Info\", severity == \"2\", \"Low\", severity == \"3\", \"Medium\", severity == \"4\", \"High\", severity == \"5\", \"Critical\") | table severity Alert_Name"
+        earliest_time="rt-5m"
+        latest_time="rt"
+        cache=True
+    %}
+
+
+    {% searchmanager
+       id="search_chart_latency"
+       cancelOnUnload=True
+       status_buckets=0
+       nullValueMode="connect"
+
+       search="sourcetype=\"aerospike_latency\" stanza =$ip_latency$ chart_name =$chart_name$ |rename t0_1ms AS <=1ms |rename t1_8ms AS >1ms_to_<=8ms |rename t8_64ms AS >8ms_to_<=64ms |rename t64ms AS >64ms | timechart avg(<=1ms) avg(>1ms_to_<=8ms) avg(>8ms_to_<=64ms) avg(>64ms)"|token_safe
+       earliest_time="$et$"|token_safe
+       latest_time="$lt$"|token_safe
+       cache=True
+   %}
+
+    {% searchmanager
+        id="search_namespace"
+        search="sourcetype=\"aerospike\" stanza=\"Namespace\" |dedup Namespace_name |rename Namespace_name as Namespaces |table Namespaces"
+        earliest_time="$et$"|token_safe
+        latest_time="$lt$"|token_safe
+        cache=True
+    %}
+
+
+    {% searchmanager
+        id="search_chart_read"
+        search="sourcetype= \"aerospike\" stanza= $ip_addr$ | delta Total_read_success AS read_suc |eval read_suc = abs(read_suc * 0.1) | delta Total_read_request AS read_req |eval read_req = abs(read_req * 0.1) | timechart avg(read_suc) avg(read_req)"|token_safe
+        earliest_time="$et$"|token_safe
+        latest_time="$lt$"|token_safe
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_chart_memory"
+        search="sourcetype=\"aerospike\" stanza=$ip_addr$ |rename Total_GB_memory as Free_Memory |rename Used_GB_memory as Used_Memory|eval Free_memory = if(Free_memory = \"0.0\",1,Free_memory) |table Free_Memory Used_Memory | transpose"|token_safe
+        earliest_time="$et$"|token_safe
+        latest_time="$lt$"|token_safe
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_chart_disk"
+        search="sourcetype=\"aerospike\" stanza=$ip_addr$ |rename Total_bytes_disk as Free_Disk |rename Used_bytes_disk as Used_Disk |eval Free_Disk = if(Free_Disk = \"0.0\",1,Free_Disk) |table Free_Disk Used_Disk | transpose"|token_safe
+        earliest_time="$et$"|token_safe
+        latest_time="$lt$"|token_safe
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_chart_write"
+        search="sourcetype= \"aerospike\" stanza= $ip_addr$ | delta Total_write_success AS Write_suc |eval Write_suc = abs(Write_suc * 0.1) | delta Total_write_request AS Write_req |eval Write_req = abs(Write_req * 0.1) | timechart avg(Write_suc) avg(Write_req)"|token_safe
+        earliest_time="$et$"|token_safe
+        latest_time="$lt$"|token_safe
+        cache=True
+    %}
+
+    {%
+    searchmanager
+        id="search_sourcetypes"
+        search="sourcetype= \"aerospike\" stanza!=\"cluster\" stanza!=\"Namespace\" | stats count by stanza"
+        earliest_time="$et1$"|token_safe
+        latest_time="$lt1$"|token_safe
+        cache=True
+     %}
+
+{% endblock managers %}
+
+{% block js %}
+
+    {# JavaScript goes here #}
+
+    <script>
+        // Load the required libraries--in this case, the SplunkJS Stack and radio buttons
+        var deps = [
+            "splunkjs/ready!",
+            "splunkjs/mvc/radiogroupview"
+        ];
+        require(deps, function(mvc) {
+            // Define a dictionary of choices for the dropdown list
+            var choices_headcount = [
+                {label:"ALL", value:"cluster"}
+            ];
+            var choices_headcount2 = [
+                {label:"Cluster", value:"*"}
+            ];
+
+            var choices_value = [
+                 {label:"Writes_Master", value: "writes"},
+                 {label:"Reads", value: "reads"},
+                 {label:"Proxy", value: "proxy"},
+                 {label:"UDF", value: "udf"},
+                 {label:"Query", value: "query"}
+             ];
+             splunkjs.mvc.Components.getInstance("radio_value").settings.set("choices", choices_value);
+             splunkjs.mvc.Components.getInstance("chart_latency").settings.set("charting.chart.nullValueMode", "connect");
+             //splunkjs.mvc.Components.getInstance("chart_write").settings.set("charting.axisY.minimumNumber", "0");
+             splunkjs.mvc.Components.getInstance("chart_latency").settings.set("charting.axisTitleX.text", "Time");
+             splunkjs.mvc.Components.getInstance("chart_latency").settings.set("charting.axisTitleY.text", "Latency");
+
+            splunkjs.mvc.Components.getInstance("piechart_memory").settings.set("charting.fieldColors", "{'Used_Memory':0xff0000,'Free_Memory':0x00ff00}");
+            splunkjs.mvc.Components.getInstance("piechart_memory").settings.set("charting.seriesColors","[0x7cb5ec,0xFF0000]");
+            splunkjs.mvc.Components.getInstance("piechart_disk").settings.set("charting.seriesColors","[0x7cb5ec,0xFF0000]");
+
+            // Set the choices into the dropdown list
+            splunkjs.mvc.Components.getInstance("drop_headcount").settings.set("choices", choices_headcount);
+            splunkjs.mvc.Components.getInstance("drop_headcount2").settings.set("choices", choices_headcount2);
+
+            //set null value of line chart will be connected
+            splunkjs.mvc.Components.getInstance("chart_read").settings.set("charting.chart.nullValueMode", "connect");
+            //splunkjs.mvc.Components.getInstance("chart_read").settings.set("charting.axisY.minimumNumber", "0");
+            splunkjs.mvc.Components.getInstance("chart_read").settings.set("charting.axisTitleX.text", "Time");
+            splunkjs.mvc.Components.getInstance("chart_read").settings.set("charting.axisTitleY.text", "Reads Per Seconnd");
+
+            //set null value of line chart will be connected
+            splunkjs.mvc.Components.getInstance("chart_write").settings.set("charting.chart.nullValueMode", "connect");
+            //splunkjs.mvc.Components.getInstance("chart_write").settings.set("charting.axisY.minimumNumber", "0");
+            splunkjs.mvc.Components.getInstance("chart_write").settings.set("charting.axisTitleX.text", "Time");
+            splunkjs.mvc.Components.getInstance("chart_write").settings.set("charting.axisTitleY.text", "Writes Per Second");
+
+            splunkjs.mvc.Components.getInstance("piechart_disk").settings.set("charting.chart.sliceCollapsingThreshold", "0.01" );
+            splunkjs.mvc.Components.getInstance("piechart_disk").settings.set("charting.myBrushPalette", "solidFill");
+
+
+        });
+
+
+        require(["splunkjs/ready!", "underscore", "splunkjs/mvc/tableview"], function(mvc, _) {
+            var TableView = require("splunkjs/mvc/tableview");
+            var tableView1 = mvc.Components.getInstance("alerts");
+
+            var ICONS = {
+                Info: 'check-circle',
+                Low: 'check-circle',
+                Medium: 'alert',
+                High: 'alert-circle',
+                Critical: 'alert-circle'
+            };
+
+            var CustomIconCellRenderer = TableView.BaseCellRenderer.extend({
+                canRender: function(cell) {
+                    return cell.field === 'severity';
+                },
+
+                render: function($td, cell) {
+                    var icon = 'question';
+                    if(ICONS.hasOwnProperty(cell.value)) {
+                        icon = ICONS[cell.value];
+                    }
+                    $td.addClass('icon').html(_.template('<i class="icon-<%-icon%> <%- range %>" title="<%- range %>"></i>', {
+                        icon: icon,
+                        range: cell.value
+                    }));
+                }
+            });
+
+            tableView1.table.addCellRenderer(new CustomIconCellRenderer());
+            tableView1.table.render();
+        });
+    </script>
+
+    <script type="text/javascript">
+        function load_home(){
+            document.getElementById("header").innerHTML = '<object type="text/html" data="menubar.html" style="width:100%;height:40px;padding:0;margin:0;overflow: hidden;"></object>';
+        }
+    </script>
+
+{% endblock js %}

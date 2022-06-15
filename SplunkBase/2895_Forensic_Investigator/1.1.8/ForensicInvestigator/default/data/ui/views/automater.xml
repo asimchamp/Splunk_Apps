@@ -1,0 +1,94 @@
+<form stylesheet="custom.css">
+  <label>Automater</label>
+  <searchTemplate>| script automater_wrapper __EXECUTE__ "$input$"</searchTemplate>
+  <description>Enter the URL or IP below - Please be patient (up to 1 minute)</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>IP or URL:</label>
+      <suffix></suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Category</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="FNet URL"</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Geography</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="IV Geo"</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>ISP</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="IV ISP"</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>City</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="FGIP City"</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Region</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="FGIP RN"</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Country</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="FGIP CN"</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Raw</title>
+        <searchPostProcess>table Target, Type, Source, Result</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

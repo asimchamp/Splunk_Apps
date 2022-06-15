@@ -1,0 +1,162 @@
+<!-- Templates -->
+
+<!--Generic Templates-->
+<script type="text/template" id="panel_element_headliner">
+	<div  class="dashboard-cell ui-corner-all" style="width: {{row.cellwidth}}%;">
+        	<div class="dashboard-panel clearfix">
+		   <div class="panel-element-row">
+                    <div class="dashboard-element html" style="width: 100%;display:inline-block;">
+                        <div class="panel-body html" ><center>
+				<h2 class="panel-title">{{row.headline}}</h2>
+				<% for (key in row) {
+					if (/^item_/.test(key) &&  null != row[key] && "no_display" != row[key] ){
+						val = row[key].split("|"); %>
+						<span class="panel-head {{val[0]}}" style="display:inline-block"><h3>{{val[0]}}</h3><span class="single-value"><span class="single-result">{{val[1]}}</span></span></span>
+				<%
+					}
+
+				} %>
+                        </center></div>
+                    </div>
+		   </div> 
+		</div>
+	</div>
+</script>
+
+<!-- TAB ELEMENT -->
+<script type="text/template" id="tab_element">
+	<li><a href="#{{_key}}" class="toggle-tab" data-toggle="tab" data-elements="{{_key}}" >{{text}}</a></li>
+</script>
+
+<!-- Configure GigaMon FMS -->
+<script type="text/template" id="configured_credential">
+	<div class="dashboard-panel dashboard-cell html" id="{{idname}}_container" style="margin:5px;padding:5px;">
+             	<i class="fa fa-remove status-down" style="cursor:pointer;font-size:1.5em;" id="{{idname}}_delete"></i><br/>
+		<span><strong>Gigamon FM: </strong>{{content.realm}}</span><br/>
+		<span><strong>Username: </strong>{{content.username}}</span><br/>
+		<span><strong>Created by: </strong>{{author}}</span>
+	<!--<div class="panel-body html">{{content.__dict__}}</div>
+	-->
+	</div>
+</script>
+
+<!-- Port Health -->
+<script type="text/template" id="port_container">
+	<div id="ports_{{_key}}" class="port-container" style="width:80%">
+	<div id="ports_{{_key}}_accordion">
+	<h2><i class="fa fa-times-circle status-down" style="margin-right:10px"></i>Administrative Up, Operational Down</h3>
+	<div id="ports_{{_key}}_up_down" class="port-accordion" style="display:inline-block;"></div>
+	<h2><i class="fa fa-check-circle status-up" style="margin-right:10px;"></i>Admin Up, Oper Up</h3>
+	<div id="ports_{{_key}}_up_up" class="port-accordion" style="display:inline-block;"></div>
+	<h2><i class="fa fa-times-circle" style="margin-right:10px;color:gray"></i>Admin Down</h3>
+	<div id="ports_{{_key}}_down_down" class="port-accordion" style="display:inline-block;"></div>
+	</div>
+</script>
+
+<script type="text/template" id="port_element">
+	<span class="port-element">
+	<h1><a href="Single_Port?form.clusterId={{clusterId}}&form.portId={{portId}}" target="_blank">{{portId}}</a></h1>
+	<i class="fa fa-arrow-{{adminStatus}} status-{{adminStatus}}" title="Administrative Status"></i>
+	<i class="fa fa-arrow-{{operStatus}} status-{{operStatus}}" title="Operational Status"></i>
+	<br/>Type: {{portType}}
+	<br/>Speed: {{configSpeed}}
+        </span>
+</script>
+
+<!--GigaVUE-FM Health-->
+<!--Cluster Panels for in the Tabs-->
+<script type="text/template" id="fm_health_tab_content_cluster">
+	<span style="display:inline-block">
+        <h1>Last Seen: {{last_seen}}</h1>
+        <h1>Cluster: {{cluster}}</h1>
+	</span>
+</script>
+
+  <!--Tab Content-->
+  <script type="text/template" id="fm_health_tab_content">
+    <div id="{{ _key }}" class="dashboard-row dashboard-row2 tab-pane" data-original-id="{{ _key }}">
+        <div id="panel_{{ _key}}" class="dashboard-cell" style="width: 100%;">
+          <div class="dashboard-panel clearfix" style="border:none;">
+            <div class="panel-element-row">
+              <div class="dashboard-element html" style="width: 100%">
+                <div class="panel-body html " style="text-align:center;">
+                   <span class="panel-head" style="display:inline-block;"><h3>Mac Address</h3><span class="single-value"><span class="single-result">{{mac_address}}</span></span></span>
+                   <span class="panel-head" style="display:inline-block;"><h3>VM Licensed Nodes</h3><span class="single-value"><span class="single-result">{{licensedVms}}</span></span></span>
+		   <span class="panel-head" style="display:inline-block;"><h3>License Type</h3><span class="single-value"><span class="single-result">{{license_type}}</span></span></span>
+                   <span class="panel-head" style="display:inline-block;"><h3>VM Demo Mode</h3><span class="single-value"><span class="single-result"><i class="{{vm_demo_mode_icon}} "></i></span></span></span>
+                                </div>
+              </div>
+		<div id="{{_key}}_users" class="{{_key}}_users panel-body html" >
+			<% if (fmusers != null) { %>
+			<div class="panel-head" style="display:block;vertical-align:top"><h3>Fabric Manager Users</h3>
+			<% var fmus = fmusers.split("|"); 
+				_.each(fmus,function(user){ 
+					var attribs = user.split(":");
+				%>
+					<span class="dashboard-panel clearfix single-value" style="display:inline-block;padding:10px;">
+						<strong>Username:</strong> {{attribs[0]}}<br/>
+						<strong>Fullname:</strong> {{attribs[3]}}<br/>
+						<strong>Enabled: </strong> {{attribs[2]}}<br/>
+						<strong>Roles:</strong> {{attribs[1].replace(";",", ")}}</span>
+				<% });  %>
+			</div><% } %>
+			<% if (clusterUsers != null ){ %>
+			<div class="panel-head" style="display:block;vertical-align:top"><h3>Cluster Users</h3>
+                        <%  var fmus = clusterUsers.split("|"); 
+                                _.each(fmus,function(user){ 
+                                        var attribs = user.split(":");
+					var url = "Cluster_Health?form.clusterId="+attribs[0];
+                                %>
+                                        <span class="dashboard-panel clearfix single-value" style="display:inline-block;padding:10px">
+                                                <strong>Username:</strong> {{attribs[1]}}<br/>
+                                                <strong>ClusterId:</strong>{{attribs[0]}}</span>
+                                <% }); %>
+                        </div>
+			<% } %>
+
+		</div>
+		<div id="{{_key}}_clusters" class="{{_key}}_clusters panel-body html" ></div>
+            </div>
+          </div>
+      </div>
+    </div>
+</script>
+
+<!-- Giga Maps Display -->
+
+<script type="text/template" id="gigamaps_template">
+	<% console.log("Starting gigamaps_template"); %>
+	<div class="gigamap">
+       	    <h2><a target=_blank href="Single_Map?form.clusterId={{map.clusterId}}&form.alias={{map.alias}}&form.time_range.earliest=-24h%40h&form.time_range.latest=now">{{map.alias}}</a></h2>
+	    <div class="gigamaps_item"><h3>Properties</h3>
+		<strong>Type: </strong>{{map.type}} {{map.subType}}<br/>
+		<strong>Order: </strong>{{map.order}} <br/>
+		<% if ("ruleMatching" in map){ %> <strong>Rule Match: </strong> {{map.ruleMatching}}<br/><% } %>
+		<% if ("gsop" in map) { %>
+                        <strong>GigaStream Operation: </strong> {{map.gsop}} 
+                <% } %>
+	    </div>
+	    <div class="gigamaps_item"><h3>Source Ports</h3>
+		<% _.each(map.srcPorts,function(sPort){ %>
+			{{sPort}}<br/>
+		<% }); %>
+	    </div>
+	    <div class="gigamaps_item"><h3>Destination Ports</h3>
+		<% _.each(map.dstPorts,function(dPort){ %>
+			{{dPort}}<br/>
+		<% }); %>
+	    </div>
+	    <div class="gigamaps_item"><h3>Rules</h3>
+		<% if ("rules" in map) { if ("passRules" in map.rules) { 
+		   _.each(map.rules.passRules,function(pr){
+			%>Rule {{pr.ruleId}}: <%
+			if( pr.bidi ) { %><i class="fa fa-arrows-h fa-2x" title="Bidirectional" style="padding-right:5px"></i><% }
+			else	{%><i class="fa fa-long-arrow-right fa-2x" title="Unidirectional" style="padding-right:5px"></i><% }
+			_.each(pr.matches, function(ma){
+				%>{{ma.type}} = {{ma.value}}<br/><%
+			});
+		   });
+		} }  %>	
+	    </div>
+	</div>
+</script>

@@ -1,0 +1,30 @@
+<form>
+  <label>Check forwarder messages</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timerange">
+      <label>Systems reporting in during the last:</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>List forwardermessages (live).</title>
+      <table>
+        <search>
+          <query>| metadata type=hosts index=_internal| forwarderquerystreaming api="/services/messages/"
+| spath input=xmlresults | rename feed.entry.content.s:dict.s:key AS message | where not isnull(message)  | fields host,message</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="count">25</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

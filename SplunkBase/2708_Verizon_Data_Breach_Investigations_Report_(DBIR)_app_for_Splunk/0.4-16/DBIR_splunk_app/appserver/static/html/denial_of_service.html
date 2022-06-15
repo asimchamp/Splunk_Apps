@@ -1,0 +1,77 @@
+<div class="wrapper">
+    <div class="left_menu">
+        <div id='cssmenu'>
+            <div class="logo_top" />
+            <ul id="patternsList" />
+            <ul class="bg">
+                <li>
+                    <a href='dbir_help'><span class="fontb"><span class="help_icon">
+                    <img class="lalign help" src="/static/app/DBIR_splunk_app/images/help.png" alt="">
+                    </span>Help</span></a>
+                </li>
+                <li>
+                    <a href='http://www.verizonenterprise.com/DBIR/2015/' target="blank">
+                    <span class="fontb"><span class="download_icon">
+                    <img class="lalign download" src="/static/app/DBIR_splunk_app/images/download.png" alt="">
+                    </span>Download DBIR</span></a>
+                </li>
+            </ul>
+            <div class="logo_bot" />
+        </div>
+    </div>
+    <div class="right_side">
+        <div class="top_section">
+            <div class="top_section_box">
+                <div class="top_box">
+                    <h1 class="top_title">DENIAL-OF-SERVICE ATTACKS</h1>
+                    <div class="filter_indus">
+                        <ul>
+                            <li id="allIndustryList">
+                                <a class="noborder" href="#"><span class="filter_icon">
+                                <img class="lalign" src="/static/app/DBIR_splunk_app/images/filter.png" alt=""></span>
+                                <span id="all_industry_span" class="filter_title">All Industry</span></a>
+                                <ul class="fallback" id="industryList" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mid_box">
+                    <p>
+                        <b>DoS attacks rely on improperly secured services, such as Network Time Protocol (NTP), Domain Name System (DNS), and Simple
+                            Service Discovery Protocol (SSDP), which make it possible for attackers to spoof source IP addresses, send out a bazillion tiny
+                            request packets, and have the services inundate an unwitting target with the equivalent number of much larger payload replies.</b>
+                    </p>
+                    <br />
+                    <p>To understand how your organization would react to a DoS attack, conduct regular drills/exercises to see where you need to shore up
+                        processes and, perhaps, add technology or external mitigation services to help maintain or restore services. This year's data also has
+                        us wondering whether it means there might be room for less expensive, medium-sized mitigations that would protect against many if not
+                        all DoS attacks.</p>
+                    <br />
+                </div>
+                <h2>Relevant Dashboards</h2>
+            </div>
+        </div>
+        <div class="left_box">
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/dos_attack_detection">DoS Attack Detection</a>
+                </h3>
+                <p>All incidents tagged with the action category of misuse; any unapproved or malicious use of organizational resources fall within
+                    this pattern.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/vpn_access_profile">VPN Profile</a>
+                </h3>
+                <p>Chart and map the number of VPN logins from distinct cities in a given time window to track potentially compromised accounts.</p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                loadIndustryList();
+                loadPatternsList(false);
+                loadPercentages();
+            });
+        </script>
+    </div>
+</div>

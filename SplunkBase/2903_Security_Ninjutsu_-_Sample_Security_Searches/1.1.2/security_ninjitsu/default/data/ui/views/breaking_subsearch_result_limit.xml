@@ -1,0 +1,78 @@
+<dashboard>
+  <label>Breaking the subsearch result limit</label>
+  <row>
+    <html>
+      <h2>Background</h2>
+      <p>Subsearches can be powerful.. but they're also limited. Without global changes to limits.conf, they can only run for 60 seconds, and return 10k results. We can't really break the 60 second limitation (though all your normal acceleration techniques will help!), but we can easily bypass the 10k result set.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Key Techniques:</h2>
+<p>This example leverages the following useful techniques:</p>
+	<ul>
+      <li>Subsearch: Subsearch allows you to start with a very rare term search (maybe even an inputlookup!) that can complete very quickly, and allow you to filter a much much larger dataset. It's akin to going from "tag=proxy" to "tag=proxy src=dveuve-workstation"!</li>
+		  <li>Subsearch returning a literal string: With subsearch, you can return a "search" field that is literally interpreted.</li>
+      <li>Subsearch in Eval: "Religions have been formed on less."</li>
+
+      </ul>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>The Search</h2>
+      <pre>
+        <![CDATA[ [search index="bro" bytes>1000 | dedup dest 
+        | stats values(dest) as search 
+        | eval search="(dest=" . mvjoin(search, " OR dest="). ")"] 
+        index=bro 
+]]>      </pre>
+      <h3>Line by Line</h3>
+<pre><![CDATA[[search index="bro" bytes>1000 | dedup dest  ]]></pre>
+<ul><li>What: Start our subsearch by looking in our bro index for destinations with large connections.</li><li>Why: In my dataset, this does not actually return a large set of values, but it will give us an example.</li></ul>
+<pre><![CDATA[| stats values(dest) as search ]]></pre>
+<ul><li>What: Take the many, many individual elements and concatenate them into a single result.</li><li>Why: Stats values allows for very large mv fields. I originally was using list(), but found that even with a dedup its implementation created a much lower ceiling for the number of values possible.</li></ul>
+<pre><![CDATA[| eval search="(dest=" . mvjoin(search, " OR dest="). ")"] ]]></pre>
+<ul><li>What: Use eval's mvjoin command to take our multi-value field and create a single consumable string, then end our subsearch with just those values.</li><li>Why: Splunk will happily deal with pages long search clauses, and it is easy to create them by returning the search literal. Because a search variable coming out of a subsearch is literally interpreted, this is easy. (i.e., it's not going to do search="(dest=1.1.1.1)" in the main search, it will just add (dest=1.1.1.1) ).</li></ul>
+<pre><![CDATA[index=bro ]]></pre>
+<ul><li>What: Take those destinations, and look for them in our bro data.</li></ul>
+    </html>
+  </row>
+  <row>
+    <panel>
+    <title>Just the Subsearch</title>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+        index="bro" OR sourcetype=bro* bytes>1000 | dedup dest 
+        | stats values(dest) as search 
+        | eval search="(dest=" . mvjoin(search, " OR dest="). ")"
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>The Full Search</title>
+      <table>
+        <event>
+          <query>
+            <![CDATA[
+        [search index="bro" OR sourcetype=bro* bytes>1000 | dedup dest 
+        | stats values(dest) as search 
+        | eval search="(dest=" . mvjoin(search, " OR dest="). ")"] 
+        index=bro OR sourcetype=bro*
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </event>
+      </table>
+    </panel>
+  </row>
+</dashboard>

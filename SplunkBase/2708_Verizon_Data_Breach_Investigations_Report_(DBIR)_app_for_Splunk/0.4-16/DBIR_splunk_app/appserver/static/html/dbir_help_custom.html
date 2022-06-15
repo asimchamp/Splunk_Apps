@@ -1,0 +1,195 @@
+<div class="dbirHelp">
+    
+	<h1>Put a Feather in your App</h1>
+    <div class="dbirBuffer" />
+    <p>
+        <b>Ever get that feeling that something is good, but not quite great?  Or maybe
+        you see most of what you want to see, but just not quite enough?  Well now you 
+        have the chance to turn good enough into exactly what you want.
+        </b>
+    </p>
+    <p>
+        Enter Splunk.
+    </p>
+    <p>
+        The Splunk framework was created with customization in mind.  They want you to 
+        be creative.  Within each Splunk app, you will see a <b>default</b> directory.
+        This directory has all of the navigation, dashboards, objects, models, and 
+        any other configuration that the app creator wanted to include.  Let's call
+        this the developer's vision.  Next to the <b>default</b> directory is a 
+        <b>local</b> directory.  This is your vision.
+    </p>
+    <br />
+    <p class="standOut">
+        How do you find what you're looking for?  Put it on top.
+    </p>
+    <br />
+    <p>
+        You don't have to make any changes.  But if you want to, you won't lose
+        any of the originals.  Splunk apps are defined by a series of files.
+        If you want to update a dashboard or tweak a query, you won't overwrite
+        the original file included with the DBIR App.  Instead, Splunk will copy
+        the original from the <b>default</b> directory structure to the <b>local</b>
+        directory structure.  And when anyone uses the DBIR App, Splunk will always
+        prefer your copy to the original.  You just made this app yours.
+    </p>
+    <br />
+    
+    <h3>WAIT.  WHAT?</h3>
+    <p>
+        Ok.  Let's go through an example.  Let's say you're looking at the 
+        <a href="/app/DBIR_splunk_app/overall_mail_analysis">Overall Mail Analysis</a> dashboard.
+        And, obviously, you are a user with sufficient capabilities to update dashboards.
+        (If you aren't, stop reading now.)  If you look at your URL, it will read similar to:
+    </p>
+    <div class="dbirPad15">
+        <img src="/static/app/DBIR_splunk_app/images/dbir-help-03.png" width="366"
+            height="81" title="URL Example" alt="URL Example">
+    </div>
+    <p>
+        I highlighted the <em>overall_email_analysis</em> because this is the
+        name of the XML file used to define this report.  This particular XML file, 
+        overall_mail_analysis.xml, is located here:
+    </p>
+    <pre>
+.../splunk/etc/apps/DBIR_splunk_app/default/data/ui/views/
+    </pre>
+    <p>
+        Note that it falls under <samp>DBIR_splunk_app/default</samp>.  If we think ahead
+        (like we always should), we'd realize that if we customize this dashaboard a 
+        copy will be put in the same directory structure, but under the <b>local</b>
+        branch.  Does this look familiar?
+    </p>
+    <pre>
+.../splunk/etc/apps/DBIR_splunk_app/local/data/ui/views/    
+    </pre>
+    <p>
+        If you haven't customized anything yet, the directory won't exist.  In fact, 
+        if you look in the <b>local</b> directory, you may only see one or two files.
+        This is normal.
+    </p>
+    <br /><br />
+    
+    <div style="max-width: 650px">
+        <div style="float:right; padding-left:25px">
+            <img src="/static/app/DBIR_splunk_app/images/dbir-help-04.png" width="335"
+            height="184" title="Edit Menu" alt="Edit Menu">
+        </div>
+        <h3>HELLO CHANGES!</h3>
+        <p>
+            Now it's time to test this out.  If you have enough rights, when you click
+            on the Edit button a menu will display similar to the one you see on the 
+            right.  From here you can update things in multiple ways.  But since this
+            is a demonstration, let's keep is simple.
+        </p>
+        <p>
+            Click on <em>Edit Title or Description</em> and you'll see a page like this:
+        </p>
+        
+        <div class="dbirPad15">
+            <img src="/static/app/DBIR_splunk_app/images/dbir-help-05.png" width="450"
+                height="245" title="Edit Title1" alt="Edit Title1">
+        </div>
+        <p>
+            Since change is unavoidable (trust me, just try to avoid it), let's update the title:
+        </p>
+        <div class="dbirPad15">
+            <img src="/static/app/DBIR_splunk_app/images/dbir-help-06.png" width="450"
+                height="245" title="Edit Title2" alt="Edit Title2">
+        </div>
+        <br />
+        <div style="float:right; padding-left:25px">
+            <img src="/static/app/DBIR_splunk_app/images/dbir-help-07.png" width="285"
+            height="180" title="Updated Title" alt="Updated Title">
+        </div>
+        <p>
+            Click save and you'll see the title of your dashboard update.
+        </p>
+        <p>
+            There are a number of ways to customize these dashboards.  This was the
+            simplest way to demo the default/local relationship. For much more
+            extensive documentation, take a look at Splunk's
+            <a href="http://docs.splunk.com/Documentation/Splunk/latest/Viz/Aboutthismanual" target="_blank">
+            Dashboards and Visualizations</a> manual.
+        </p>
+    </div>
+    <br /><br /><br /><br /><br />
+    
+    <h3>REMEMBER THAT LOCAL DIRECTORY?</h3>
+    <p>
+        Now that we've updated a dashboard, let's go find the updated file.  Even
+        though the <b>local</b> directory may not have had any subdirectories
+        when we checked previously, when we look now, there is a <samp>data</samp>
+        directory.
+    </p>
+    <pre>
+[splunk@server]$ pwd
+/opt/splunk/etc/apps/DBIR_splunk_app/local
+[splunk@server]$ ll
+total 12
+-rw------- 1 splunk splunk   65 Aug 10 13:37 app.conf
+drwx------ 3 splunk splunk 4096 Aug 13 13:55 data
+-rw------- 1 splunk splunk  704 Aug 10 13:38 savedsearches.conf
+[splunk@server]$
+    </pre>
+    <p>
+        If we navigate into these new directories, we'll find that Splunk
+        copied overall_mail_analysis.xml to the same logical
+        location under the <b>local</b> area:
+    </p>
+    <pre>
+[splunk@server]$ pwd
+/opt/splunk/etc/apps/DBIR_splunk_app/local/data/ui/views
+[splunk@server]$ ll
+total 12
+-rw------- 1 splunk splunk 10006 Aug 13 13:55 overall_mail_analysis.xml
+[splunk@server]$
+    </pre>
+    <br /><br />
+    
+    <h3>WILL UPGRADING THE DBIR APP OVERWRITE MY CHANGES?</h3>
+    <p>
+        No.  Your changes are safe.
+    </p>
+    <p>
+        As long as your updates are limited to the <b>local</b> area, when you upgrade
+        to a new version of the DBIR App, nothing in that <b>local</b> area will be
+        touched.  Of course this means that you could be missing out on some new
+        and improved version of the dashboard you updated because Splunk will 
+        always prefer your <b>local</b> copy over the <b>default</b> version of 
+        the same file.  
+    </p>
+    <br />
+    <p class="standOut">
+        It's your app.  Of course your changes are important.
+    </p>
+    <br />
+    <p>
+        But that doesn't mean there aren't some fun updates, too.  Here's an easy
+        trick to temporarily hide your versions of the dashboards.  Go back to that
+        <b>local</b> area and rename your versions.  We could be creative here as
+        well, but for now let's just choose <samp>bak</samp>.
+    </p>
+    <pre>
+[splunk@server]$ pwd
+/opt/splunk/etc/apps/DBIR_splunk_app/local/data/ui/views
+[splunk@server]$ ll
+total 12
+-rw------- 1 splunk splunk 10006 Aug 13 13:55 overall_mail_analysis.xml
+[splunk@server]$ mv overall_mail_analysis.xml overall_mail_analysis.xml.bak
+[splunk@server]$ ll
+total 12
+-rw------- 1 splunk splunk 10006 Aug 13 13:55 overall_mail_analysis.xml.bak
+[splunk@server]$
+    </pre>
+    <br />
+    <p>
+        Then <b>restart Splunk</b> and it will ignore your
+        customizations and display the <b>default</b> versions:
+    </p>
+    <div class="dbirPad15">
+        <img src="/static/app/DBIR_splunk_app/images/dbir-help-08.png" width="600"
+            height="206" title="Default Dashboard" alt="Default Dashboard">
+    </div>
+    <br /><br /><br /><br /><br />
+</div>

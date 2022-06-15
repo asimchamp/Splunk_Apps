@@ -1,0 +1,98 @@
+<form>
+  <label>Assets - Abnormal PC Access</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="baseline" searchWhenChanged="true">
+      <label>Select Baseline Envelop:</label>
+      <default>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="time" token="analysis" searchWhenChanged="true">
+      <label>Select Analysis Period:</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+      <div> <div style="color:#311b92">
+            <b>Obtain Insights on User Behaviour based on his Previous Usage Patterns.</b>
+          </div>
+      Select the Baseline Time Period to generate an Envelop for the User which determines his normal PC Access. 
+        Thereby, select the Analysis Time Period to search actual data for User Behaviour Anomalies where a User unexpectedly accesses machine which are not usually used by him.  
+      </div>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Unexpected PC Access - Suspicious Users</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:file" earliest=$analysis.earliest$ latest=$analysis.latest$  | bucket _time span=1d as day  | stats count(src) As CurrentCount by user src | join type=outer user src [search index=orgsecure sourcetype="orgsecure:file" earliest=$baseline.earliest$ latest=$baseline.latest$ | bucket _time span=1d as day  | stats count(src) As NormalCount by user src] | where isnull(NormalCount) | stats  sum(CurrentCount) As CurrentCount by user | table user CurrentCount | sort -CurrentCount| rename user AS User src AS "PC Accessed" CurrentCount AS "Unexpected Access Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Unexpected PC Access - Suspicious Users</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:file" earliest=$analysis.earliest$ latest=$analysis.latest$  | bucket _time span=1d as day  | stats count(src) As CurrentCount by user src | join type=outer user src [search index=orgsecure sourcetype="orgsecure:file" earliest=$baseline.earliest$ latest=$baseline.latest$ | bucket _time span=1d as day  | stats count(src) As NormalCount by user src] | where isnull(NormalCount) | stats  sum(CurrentCount) As CurrentCount by user | table user CurrentCount | sort -CurrentCount| rename user AS User src AS "PC Accessed" CurrentCount AS "Unexpected Access Count"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Unexpected PC Access Details</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:file" earliest=$analysis.earliest$ latest=$analysis.latest$  | bucket _time span=1d as day  | stats count(src) As CurrentCount by user src | join type=outer user src [search index=orgsecure sourcetype="orgsecure:file" earliest=$baseline.earliest$ latest=$baseline.latest$ | bucket _time span=1d as day  | stats count(src) As NormalCount by user src] | where isnull(NormalCount) | table user src CurrentCount | rename user AS User src AS "PC Accessed" CurrentCount AS "Unexpected Access Count"</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

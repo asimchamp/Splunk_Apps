@@ -1,0 +1,58 @@
+<form stylesheet="custom.css">
+  <label>Eventlog - Analysis</label>
+  <!-- Add time range picker -->
+  <fieldset submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="host" searchWhenChanged="true">
+      <label>Host</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="logtype" searchWhenChanged="true">
+      <label>Log Type</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="Level" searchWhenChanged="true">
+      <label>Level</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="EventID" searchWhenChanged="true">
+      <label>Event ID</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table id="customWidth">
+        <title>Raw events</title>
+        <search>
+          <query>eventtype=mireventlog sourcetype=csv $wild$ host=$host$ logtype=$logtype$ Level=$Level$ "Event ID"=$EventID$ | table "Date and Time", host, logtype, Level, "Event ID", extracted_Source, "Task Category", EXTRA_FIELD_6 |  rename host as Host, logtype AS "Log Type", extracted_Source as "Source", EXTRA_FIELD_6 as Info</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

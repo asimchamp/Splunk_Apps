@@ -1,0 +1,364 @@
+<form script="savvius.js" stylesheet="savvius.css">
+  <label>VoIP</label>
+  <fieldset autorun="true" submitButton="false">
+    <!-- Global timer. Not token is necessary -->
+    <input type="time" searchWhenChanged="true">
+      <label>Date &amp; Time</label>
+      <default>
+        <earliest>-1h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="text" token="codec" searchWhenChanged="true">
+      <label>Codec</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>sourcetype=sv_voip host="$source$" Codec="$codec$"
+            | stats count
+            | fieldformat count=tostring(count, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Total Calls</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_voip host="$source$" Codec="$codec$" "Call Status"="Open"
+            | stats count
+            | fieldformat count=tostring(count, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Open Calls</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_voip host="$source$" Codec="$codec$" "Call Status"="Closed"
+            | stats count
+            | fieldformat count=tostring(count, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Closed Calls</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | stats count
+            | fieldformat count=tostring(count, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Media Flows</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | regex Codec!="^\S*RTP(\S|\s)*\(unsupported\)$"
+            | appendpipe [stats count as no_event | where no_event==0 | eval MOS_CQ=-1]
+            | stats avg(MOS_CQ) as avgcallquality
+            | eval avgcallquality=if(avgcallquality>=0,tostring(avgcallquality, "commas"),"N/A")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Call Quality (Average MOS-CQ)</option>
+        <option name="numberPrecision">0.00</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Call Volume</title>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | eval Codec=if(match(Codec,"^\S*RTP(\S|\s)*\(unsupported\)$"), "Unknown", 'Codec')
+            | timechart count as "Call Count" by Codec limit=10 useother=f</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Total Calls</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">200px</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Call Quality (Average MOS-CQ)</title>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | regex Codec!="^\S*RTP(\S|\s)*\(unsupported\)$"
+            | timechart avg(MOS_CQ) as "Average MOS-CQ" by Codec useother=f</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisTitleY.text">MOS-CQ</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">225px</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Codecs Over Time (Total Media Flows)</title>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | eval Codec=if(match(Codec,"^\S*RTP(\S|\s)*\(unsupported\)$"), "Unknown", 'Codec')
+            | timechart count by Codec useother=f usenull=f limit=10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Total Calls</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">225px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Call Quality Distribution (All Calls)</title>
+        <search>
+          <query>sourcetype=sv_voip host="$source$" Codec="$codec$"
+            | regex Codec!="^\S*RTP(\S|\s)*\(unsupported\)$"
+            | eval "Quality Score"=case(MOS_Low &gt;= 3.6, "Good", MOS_Low &gt;= 3.1, "Fair", MOS_Low &gt;= 2.6, "Poor", MOS_Low &lt; 2.6, "Bad")
+            | chart count as "Total Calls" by "Quality Score"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">225px</option>
+      </chart>
+      <html>
+        <p>Call Quality Classifications:<ul><li>Good: MOS-Low &gt;= 3.6</li><li>Fair: 3.1 &lt;= MOS-Low &lt; 3.6</li><li>Poor: 2.6 &lt;= MOS-Low &lt; 3.1</li><li>Bad: MOS-Low &lt; 2.6</li></ul></p>
+      </html>
+    </panel>
+    <panel>
+      <chart>
+        <title>Call Quality Distribution (Open Calls)</title>
+        <search>
+          <query>sourcetype=sv_voip host="$source$" "Call Status"="Open" Codec="$codec$"
+            | regex Codec!="^\S*RTP(\S|\s)*\(unsupported\)$"
+            | eval "Quality Score"=case(MOS_Low &gt;= 3.6, "Good", MOS_Low &gt;= 3.1, "Fair", MOS_Low &gt;= 2.6, "Poor", MOS_Low &lt; 2.6, "Bad")
+            | chart count as "Total Calls" by "Quality Score"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">225px</option>
+      </chart>
+      <html>
+        <p>Call Quality Classifications:<ul><li>Good: MOS-Low &gt;= 3.6</li><li>Fair: 3.1 &lt;= MOS-Low &lt; 3.6</li><li>Poor: 2.6 &lt;= MOS-Low &lt; 3.1</li><li>Bad: MOS-Low &lt; 2.6</li></ul></p>
+      </html>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Codecs (Total Media Flows)</title>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | eval Codec=if(match(Codec,"^\S*RTP(\S|\s)*\(unsupported\)$"), "Unknown", 'Codec')
+            | chart count by Codec
+            | sort -count
+            | rename count as "Media Flows"
+            | head 10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">225px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Call List</title>
+        <search>
+          <query>sourcetype=sv_voip host="$source$" Codec="$codec$"
+            | table "Call Number" "Call Status" "Caller Address" "Caller Port" "Callee Address" "Callee Port" Codec "Media Type" Start Finish Duration MOS_Low
+            | rename MOS_Low as "MOS-Low"
+            | sort + "Call Number"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="Caller Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+          <condition field="Callee Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Media List</title>
+        <search>
+          <query>sourcetype=sv_media host="$source$" Codec="$codec$"
+            | eval "Packet Loss"=round('Packet Loss', 2)
+            | table "Call Number" SSRC "Source Addr" "Source Port" "Dest Addr" "Dest Port" Codec "Media Type" "Protocol" Start Finish Duration Jitter "Packet Loss" "R Factor Conversational" MOS_CQ
+            | rename "Source Addr" as "Source Address"
+            | rename "Source Port" as "Source Port"
+            | rename "Dest Addr" as "Destination Address"
+            | rename "Dest Port" as "Destination Port"
+            | rename "Packet Loss" as "Packet Loss %"
+            | rename MOS_CQ as "MOS-CQ"
+            | fieldformat "Packet Loss %" = 'Packet Loss %' + "%"
+            | sort + "Call Number"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="Source Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+          <condition field="Destination Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+          <condition field="Protocol">
+            <link>
+              <![CDATA[
+                        statistics_protocols?earliest=$earliest$&latest=$latest$&form.source=$source$&form.protocol=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

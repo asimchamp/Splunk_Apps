@@ -1,0 +1,53 @@
+<form stylesheet="custom.css">
+  <label>Network Adapter - Analysis</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="hostname" searchWhenChanged="true">
+      <label>Host Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="description" searchWhenChanged="true">
+      <label>Description (use wildcard)</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="adapter" searchWhenChanged="true">
+      <label>Adapter</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="MAC" searchWhenChanged="true">
+      <label>MAC address</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Adapter Information</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ host="$hostname$" SystemInfoItem.networkArray.networkInfo.description="$description$" SystemInfoItem.networkArray.networkInfo.adapter="$adapter$" SystemInfoItem.networkArray.networkInfo.MAC="$MAC$" | table host, SystemInfoItem.networkArray.networkInfo.description, SystemInfoItem.networkArray.networkInfo.adapter, SystemInfoItem.networkArray.networkInfo.MAC, SystemInfoItem.networkArray.networkInfo.dhcpLeaseExpires, SystemInfoItem.networkArray.networkInfo.dhcpLeaseObtained, SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.ipAddress, SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.subnetMask, SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.ipv6Address, SystemInfoItem.networkArray.networkInfo.ipGatewayArray.ipGateway, SystemInfoItem.networkArray.networkInfo.dhcpServerArray.dhcpServer | rename host AS "Host Name", SystemInfoItem.networkArray.networkInfo.description AS Description, SystemInfoItem.networkArray.networkInfo.adapter AS Adapter, SystemInfoItem.networkArray.networkInfo.MAC AS "MAC Address", SystemInfoItem.networkArray.networkInfo.dhcpLeaseExpires AS "DHCP Lease Expires", SystemInfoItem.networkArray.networkInfo.dhcpLeaseObtained AS "DHCP Lease Obtained", SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.ipAddress AS "IP Address", SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.subnetMask AS "Subnet Mask", SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.ipv6Address AS "IPv6 Address", SystemInfoItem.networkArray.networkInfo.ipGatewayArray.ipGateway AS "IP Gateway", SystemInfoItem.networkArray.networkInfo.dhcpServerArray.dhcpServer AS "DHCP Servers"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">15</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,59 @@
+<form class="form-horizontal form-complex">
+    <div class="control-group">
+        <label class="control-label" for="hue_lights">Lights</label>
+
+        <div class="controls">
+            <input type="text" class="input-xlarge" name="action.hue.param.lights" id="hue_lights" required />
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Enter the name of the light you want to change. You can use a comma-separated list of names
+                and wildcards (eg. <code style="color: #333">Basement*</code>).
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="hue_lights">Color</label>
+
+        <div class="controls">
+            <input type="color" name="action.hue.param.color" id="hue_color" value="#FF0000" required />
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <span class="help-block" style="display: block; position: static; width: auto; margin-left: 0;">
+                Select the color you want to change the bulb to when the alert is triggered.
+                The value is a HEX color, such as <code style="color:#333">#FF3300</code>
+                Note that Hue lights might not support the exact color selected here.
+            </span>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="hue_brightness">Brightness</label>
+
+        <div class="controls">
+            <input type="range" min="1" max="255" step="1" value="255" class="input-xlarge" name="action.hue.param.bri" id="hue_brightness" required />
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="hue_flash">Flash</label>
+
+        <div class="controls">
+            <select name="action.hue.param.flash" id="hue_flash">
+                <option value="none">None</option>
+                <option value="once">Once</option>
+                <option value="long">Several times (for 15 seconds)</option>
+            </select>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <label class="checkbox" for="hue_light_on">
+                <input type="checkbox" name="action.hue.param.on" id="hue_light_on" value="1" checked />
+                Turn light on (or off) 
+            </label>
+        </div>
+    </div>
+</form>

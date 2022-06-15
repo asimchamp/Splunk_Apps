@@ -1,0 +1,57 @@
+<!-- Templates -->
+
+<!--Generic Templates-->
+<script type="text/template" id="panel_element_headliner">
+	<div  class="dashboard-cell ui-corner-all" style="width: {{row.cellwidth}}%;">
+        	<div class="dashboard-panel clearfix">
+		   <div class="panel-element-row">
+                    <div class="dashboard-element html" style="width: 100%;display:inline-block;">
+                        <div class="panel-body html" ><center>
+				<h2 class="panel-title">{{row.headline}}</h2>
+				<% for (key in row) {
+					if (/^item_/.test(key) &&  null != row[key] && "no_display" != row[key] ){
+						val = row[key].split("|"); %>
+						<span class="panel-head {{val[0]}}" style="display:inline-block"><h3>{{val[0]}}</h3><span class="single-value"><span class="single-result">{{val[1]}}</span></span></span>
+				<%
+					}
+
+				} %>
+                        </center></div>
+                    </div>
+		   </div> 
+		</div>
+	</div>
+</script>
+
+<!-- TAB ELEMENT -->
+<script type="text/template" id="tab_element">
+	<li><a href="#{{_key}}" class="toggle-tab" data-toggle="tab" data-elements="{{_key}}" >{{text}}</a></li>
+</script>
+
+<!-- Configure Modular Input And Credentials -->
+<script type="text/template" id="configured_credential">
+	<div class="panel-body html">
+	<div class="fieldset" id="{{idname}}_container">
+             	<i class="fa fa-remove fa-2x status-down" style="cursor:pointer" id="{{idname}}_delete"></i>
+		<div class="input"><label><strong>Host FQDN:</strong></label><div class="input input-text" id="{{idname}}_modify_hostname">{{content.realm}}</div></div>
+		<div class="input"><label><strong>Username:</strong></label><div class="input input-text" id="{{idname}}_modify_username">{{content.username}}</div></div>
+		<div class="input"><label><strong>Password:</strong></label><div class="input input-text" id="{{idname}}_modify_password">{{content.password}}</div></div>
+	</div>
+	</div>
+</script>
+
+<!--Tab Content-->
+  <script type="text/template" id="tab_content">
+    <div id="{{ _key }}" class="dashboard-row dashboard-row2 tab-pane" data-original-id="{{ _key }}">
+        <div id="panel_{{ _key}}" class="dashboard-cell" style="width: 100%;">
+          <div class="dashboard-panel clearfix" style="border:none;">
+            <div class="panel-element-row">
+              <div class="dashboard-element html" style="width: 100%">
+                <div class="panel-body html " style="text-align:center;">
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+</script>

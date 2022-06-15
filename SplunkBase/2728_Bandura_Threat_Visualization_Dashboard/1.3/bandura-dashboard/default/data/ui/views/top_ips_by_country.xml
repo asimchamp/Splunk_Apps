@@ -1,0 +1,63 @@
+<form>
+  <label>Top IPs by Country</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="direction" searchWhenChanged="true">
+      <label>Direction</label>
+      <choice value="inbound">Inbound</choice>
+      <choice value="outbound">Outbound</choice>
+      <choice value="*">Both</choice>
+      <default>inbound</default>
+    </input>
+    <input type="dropdown" token="action" searchWhenChanged="true">
+      <label>Action</label>
+      <choice value="allowed">Allowed</choice>
+      <choice value="dropped">Dropped</choice>
+      <choice value="*">Both</choice>
+      <default>dropped</default>
+    </input>
+    <input type="dropdown" token="src_dst_field" searchWhenChanged="true">
+      <label>Field (src or dst IP)</label>
+      <choice value="src">Source</choice>
+      <choice value="dst">Destination</choice>
+      <default>src</default>
+      <change>
+        <set token="field_label">$label$</set>
+      </change>
+    </input>
+    <input type="dropdown" token="country" searchWhenChanged="true">
+      <label>Country</label>
+      <search>
+        <query>index=poliwall action=$action$ direction=$direction$ | stats dc($src_dst_field$) as count by country | sort - count | strcat country " (" count ")" country_count</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>country_count</fieldForLabel>
+      <fieldForValue>country</fieldForValue>
+      <default>UNITED STATES</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Top IPs by Country</title>
+        <search>
+          <query>index=poliwall action=$action$ direction=$direction$ country="$country$"| top 10 $src_dst_field$ | rename $src_dst_field$ AS "$field_label$ IP"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

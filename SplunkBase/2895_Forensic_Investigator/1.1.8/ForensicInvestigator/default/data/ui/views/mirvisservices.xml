@@ -1,0 +1,171 @@
+<form stylesheet="custom.css">
+  <label>Services - Visualization</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="host" searchWhenChanged="true">
+      <label>Host</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="status" searchWhenChanged="true">
+      <label>Service Status</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="startedas" searchWhenChanged="true">
+      <label>User Started As</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="name" searchWhenChanged="true">
+      <label>Service Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="descriptivename" searchWhenChanged="true">
+      <label>Descriptive Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="path" searchWhenChanged="true">
+      <label>Path</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="arguments" searchWhenChanged="true">
+      <label>Arguments</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="description" searchWhenChanged="true">
+      <label>Description</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <label>miranalysisservices</label>
+  <row>
+    <panel>
+      <table>
+        <title>Least Common User StartedAs</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.startedAs</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Service Name</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.name</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Descriptive Name</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.descriptiveName</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Service Path (programdata)</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.path="*ProgramData*" NOT ServiceItem.path="*ProgramData\\SystemStatus*" ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$  ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.path</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Service Path</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.path</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Service Arguments</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.arguments</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Service Description</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | rare limit=0 ServiceItem.description</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Services Running as an .adm account</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs="*.adm*" ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | table host, ServiceItem.mode, ServiceItem.type, ServiceItem.status, ServiceItem{@created}, ServiceItem.startedAs, ServiceItem.name, ServiceItem.descriptiveName, ServiceItem.path, ServiceItem.arguments, ServiceItem.description | rename ServiceItem.description as Description</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,62 @@
+<form script="autodiscover.js">
+  <label>File Monitoring</label>
+  <fieldset submitButton="false">
+    <input type="text" token="filename">
+      <label>Enter File Name</label>
+      <default>Enter File Name</default>
+    </input>
+    <input type="time" token="timeselector" searchWhenChanged="true">
+      <label>Select Period of Observation:</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <search id="sankey_search">
+    <query>
+      <![CDATA[
+index=orgsecure sourcetype="orgsecure:device"  file_tree=*$filename$* | eval rem="Removeable Drive By User: ".user | eval filesearch="$filename$" | table filesearch rem | rename  filesearch as from rem as to | stats count by from to | append [search index=orgsecure sourcetype="orgsecure:device"  file_tree=*$filename$* | eval rem="Removeable Drive On PC: ".src |  eval filesearch="$filename$" | table filesearch rem | rename  filesearch as from rem as to | stats count by from to] | append [search index=orgsecure sourcetype="orgsecure:file"   file_name=*$filename$* | eval rem=activity." By User: ".user | eval filesearch="$filename$" | table filesearch rem | rename  filesearch as from rem as to | stats count by from to]| append [search index=orgsecure sourcetype="orgsecure:file"   file_name=*$filename$* | eval rem=activity." On PC: ".src | eval filesearch="$filename$" | table filesearch rem | rename  filesearch as from rem as to | stats count by from to] | append [search index=orgsecure sourcetype="orgsecure:email"   attachments=*$filename$* | eval rem = "Email ".activity." By User: ".user | eval filesearch="$filename$" | table filesearch rem | rename  filesearch as from rem as to | stats count by from to] | append [search index=orgsecure sourcetype="orgsecure:email"   attachments=*$filename$* | eval rem = "Email ".activity." On PC: ".src | eval filesearch="$filename$" | table filesearch rem | rename  filesearch as from rem as to | stats count by from to]                ]]>
+    </query>
+    <earliest>$timeselector.earliest$</earliest>
+    <latest>$timeselector.latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <html>
+      <div> <div style="color:#311b92">
+            <b>Holistic View of Files.</b>
+          </div>
+        The Diagram and Table provides a holistic view of the activities performed on a File. e.g. Opened/Written to, Copied to/from Removeable Media and sent as Attachment.<br/>
+        Select the Time Period and enter a part of File Name for which the activities needs to be monitored.
+      </div>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>File Monitoring</h2>
+        <div id="sankey" class="splunk-view" data-require="app/orgSecure/components/sankey/sankey" data-options="{           &quot;managerid&quot;: &quot;sankey_search&quot;,           &quot;height&quot;: &quot;400px&quot;         }">
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>File Details</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:device" file_tree=*$filename$* | eval rem="Removeable Drive ".activity | eval source="Removeable Media" | table _time source user src rem file_tree | rename  rem as activity file_tree as Details |  append [search index=orgsecure sourcetype="orgsecure:file"   file_name=*$filename$* | eval source="Files Accessed" | table _time user source src activity file_name | rename file_name as Details] | append [search index=orgsecure sourcetype="orgsecure:email"  attachments=*$filename$* | eval source="Emails" | eval act = "Email ".activity | eval data="To: ".to | eval det=" Attachment: ".attachments  | table _time source user src act data det | rename act as activity data as Details det as "Other Details"] | rename _time as Date source As "Event Type" user as User src as PC activity as Activity | sort by Date | eval Date= strftime(Date, "%Y-%m-%d %H:%M:%S")</query>
+          <earliest>$timeselector.earliest$</earliest>
+          <latest>$timeselector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

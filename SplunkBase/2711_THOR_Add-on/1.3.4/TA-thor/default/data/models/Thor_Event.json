@@ -1,0 +1,409 @@
+{
+    "modelName": "Thor_Event", 
+    "objectNameList": [
+        "THOR_Event", 
+        "THOR_DeepDive_Event", 
+        "THOR_File_Event", 
+        "THOR_Evtlog_Event"
+    ], 
+    "description": "THOR Event", 
+    "displayName": "Thor Event", 
+    "objectSummary": {
+        "Event-Based": 4, 
+        "Transaction-Based": 0, 
+        "Search-Based": 0, 
+        "Interface Implementations": 0, 
+        "Interfaces": 0
+    }, 
+    "objects": [
+        {
+            "constraints": [
+                {
+                    "search": "eventtype=thor_events NOT tag=false_positive "
+                }
+            ], 
+            "calculations": [
+                {
+                    "expression": " (?<system>[^\\s]+) THOR:", 
+                    "calculationID": "lsg7hjulzrm5cdi", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "system", 
+                            "hidden": false, 
+                            "fieldName": "system", 
+                            "required": true, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "THOR: (?<level>[A-Za-z]+)", 
+                    "calculationID": "dxpzwtxpvby5jyvi", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "level", 
+                            "hidden": false, 
+                            "fieldName": "level", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "MODULE: (?P<module>.*?) [A-Z_]+:", 
+                    "calculationID": "tmmn9vjp42xirudi", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "module", 
+                            "hidden": false, 
+                            "fieldName": "module", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "MESSAGE: (?P<message>.*?) [A-Z_]+:", 
+                    "calculationID": "csafxy09xyj8m2t9", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "message", 
+                            "hidden": false, 
+                            "fieldName": "message", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }
+            ], 
+            "fields": [], 
+            "comment": "", 
+            "displayName": "THOR Event", 
+            "objectName": "THOR_Event", 
+            "parentName": "BaseEvent"
+        }, 
+        {
+            "constraints": [
+                {
+                    "search": "MODULE: DeepDive"
+                }
+            ], 
+            "calculations": [
+                {
+                    "expression": "NAME: (?<signature>.*?) SCORE:", 
+                    "calculationID": "dmuzj3ibg8ql4n29", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "signature", 
+                            "hidden": false, 
+                            "fieldName": "signature", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "SCORE: (?<score>[0-9]+)", 
+                    "calculationID": "vewndowtpbbuik9", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "score", 
+                            "hidden": false, 
+                            "fieldName": "score", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "MATCHING_STRINGS: (?<matchingstrings>.*)", 
+                    "calculationID": "4g3wzhsf2x2edn29", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "matchingstrings", 
+                            "hidden": false, 
+                            "fieldName": "matchingstrings", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "NAME: (?<name>[^\\s]+)", 
+                    "calculationID": "ggpgd1jhubi3haor", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "name", 
+                            "hidden": false, 
+                            "fieldName": "name", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }
+            ], 
+            "fields": [], 
+            "comment": "", 
+            "displayName": "THOR DeepDive Event", 
+            "objectName": "THOR_DeepDive_Event", 
+            "parentName": "THOR_Event"
+        }, 
+        {
+            "constraints": [
+                {
+                    "search": "MODULE: FileScan"
+                }
+            ], 
+            "calculations": [
+                {
+                    "expression": "MD5: (?<md5>[\\w]{32})", 
+                    "calculationID": "r0tz20pmonwxw29", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "md5", 
+                            "hidden": false, 
+                            "fieldName": "md5", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "REASON_1: (?<mainreason>.*?) REASON", 
+                    "calculationID": "od4xxtqz7vnp14i", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "mainreason", 
+                            "hidden": false, 
+                            "fieldName": "mainreason", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "FILE: (?<file>.*?) [A-Z_]+:", 
+                    "calculationID": "bauhiyf0ep4on7b9", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "file", 
+                            "hidden": false, 
+                            "fieldName": "file", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "SCORE: (?<score>[0-9]+)", 
+                    "calculationID": "xt1bvjnvqbw6d2t9", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "score", 
+                            "hidden": false, 
+                            "fieldName": "score", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }
+            ], 
+            "fields": [], 
+            "comment": "", 
+            "displayName": "THOR File Event", 
+            "objectName": "THOR_File_Event", 
+            "parentName": "THOR_Event"
+        }, 
+        {
+            "constraints": [
+                {
+                    "search": "MODULE: Eventlog"
+                }
+            ], 
+            "calculations": [
+                {
+                    "expression": "(Event|EVENT)_ID: (?<eventid>[0-9]+) \\(\\\"(?<description>[^\\\"]+)", 
+                    "calculationID": "bbd1dkotbx09hpvi", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "eventid", 
+                            "hidden": false, 
+                            "fieldName": "eventid", 
+                            "required": false, 
+                            "comment": ""
+                        }, 
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "description", 
+                            "hidden": false, 
+                            "fieldName": "description", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "DATE: (?<date>[^\\s]+)", 
+                    "calculationID": "a85lyjysuaii19k9", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "date", 
+                            "hidden": false, 
+                            "fieldName": "date", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "USER: (?<user>[^\\s]+)", 
+                    "calculationID": "q477x5l0p1a714i", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "user", 
+                            "hidden": false, 
+                            "fieldName": "user", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "ACCOUNTS: (?<accounts>.*?) TARGET", 
+                    "calculationID": "smxcypg9uxytx1or", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "accounts", 
+                            "hidden": false, 
+                            "fieldName": "accounts", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "TARGET_ACCOUNT: (?<targetaccount>[^\\s]+)", 
+                    "calculationID": "9e4i44jr8kfq1tt9", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "targetaccount", 
+                            "hidden": false, 
+                            "fieldName": "targetaccount", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }, 
+                {
+                    "expression": "TARGET_ACCOUNTS: (?<targetaccounts>.*)", 
+                    "calculationID": "ls121cozvlrz4cxr", 
+                    "outputFields": [
+                        {
+                            "type": "string", 
+                            "multivalue": false, 
+                            "displayName": "targetaccounts", 
+                            "hidden": false, 
+                            "fieldName": "targetaccounts", 
+                            "required": false, 
+                            "comment": ""
+                        }
+                    ], 
+                    "calculationType": "Rex", 
+                    "inputField": "_raw", 
+                    "comment": ""
+                }
+            ], 
+            "fields": [], 
+            "comment": "", 
+            "displayName": "THOR Evtlog Event", 
+            "objectName": "THOR_Evtlog_Event", 
+            "parentName": "THOR_Event"
+        }
+    ]
+}

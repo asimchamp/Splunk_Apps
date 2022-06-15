@@ -1,0 +1,268 @@
+<form>
+  <label>Monitoring Data Population</label>
+  <search id="restconfig">
+    <query>| inputlookup sa_app_configuration_lookup | table name value | search name IN ("backfill-status","earliest-time","latest-time","conversion-status","conversion-earliest-time","conversion-latest-time","minutes-to-backfill-one-week","ldap-config","ldap-domain") | eval row="row" | rex mode=sed field=name "s/\-//g"|  xyseries row name value | eval showconversion=if(conversionstatus IN ("none",""), 0, 1) | appendcols [| rest splunk_server=local "/servicesNS/admin/-/search/jobs"| regex title="\|\s*sa(backfill|conversion)"| eval type=if(searchmatch("title=*sabackfill*"), "backfill", "conversion") | convert mktime(published) timeformat="%Y-%m-%dT%H:%M:%S.%3Q%:z" | sort - published | stats first(eval(if(type="backfill","(" . sid . ")",null))) as backfillSID first(eval(case(type="backfill" AND ( dispatchState="RUNNING" OR dispatchState="FINALIZING" OR dispatchState="QUEUED" OR dispatchState="PARSING"), "Running Now", type="backfill" AND ( dispatchState="DONE"), "Recently Run", 1=1, ""))) as backfillRunning first(eval(if(type="conversion","(" . sid . ")",null))) as conversionSID first(eval(case(type="conversion" AND ( dispatchState="RUNNING" OR dispatchState="FINALIZING" OR dispatchState="QUEUED" OR dispatchState="PARSING"), "Running Now", type="conversion" AND ( dispatchState="DONE"), "Recently Run", 1=1, ""))) as conversionRunning ] | eval backfillSID=coalesce(backfillSID, ""), conversionSID=coalesce(conversionSID, ""), backfillRunning=coalesce(backfillRunning, ""), conversionRunning=coalesce(conversionRunning, "") | eval backfillHoursRemaining=coalesce(round(((if(latesttime=="", now(), latesttime)-earliesttime)/3600/24/7)*minutestobackfilloneweek / 60, 2) , "N/A") | convert ctime(earliesttime) ctime(latesttime) ctime(conversionearliesttime) ctime(conversionlatesttime) | appendcols [ | rest /servicesNS/nobody/search_activity/saved/searches splunk_server=local | table disabled cron_schedule title | eval isEnabled = if(disabled IN (0, "0", "true", "t", "T", "True") AND isnotnull(cron_schedule) AND cron_schedule!="", "Search Scheduled", "Search Not Scheduled") | eval row = "row" | rex mode=sed field=title "s/[^a-zA-Z]//g" | xyseries row title isEnabled | fields - row ]| fillnull value="" | eval backfillstatus=case(backfillstatus="normal", "Normal Run Mode (No Backfill)",backfillstatus="selective", "Backfilling Selective Time Window", backfillstatus="general", "Standard Backfill", 1=1, backfillstatus)</query>
+    <done>
+      <condition match="'job.resultCount' == 1">
+        <set token="conversionstatus">$result.conversionstatus$</set>
+        <set token="conversionearliesttime">$result.conversionearliesttime$</set>
+        <set token="conversionlatesttime">$result.conversionlatesttime$</set>
+        <set token="backfillstatus">$result.backfillstatus$</set>
+        <set token="earliesttime">$result.earliesttime$</set>
+        <set token="backfillHoursRemaining">$result.backfillHoursRemaining$</set>
+        <set token="latesttime">$result.latesttime$</set>
+        <set token="minutestobackfilloneweek">$result.minutestobackfilloneweek$</set>
+        <set token="ldapconfig">$result.ldapconfig$</set>
+        <set token="ldapdomain">$result.ldapdomain$</set>
+        <set token="conversionRunning">$result.conversionRunning$</set>
+        <set token="backfillRunning">$result.backfillRunning$</set>
+        <set token="backfillSID">$result.backfillSID$</set>
+        <set token="conversionSID">$result.conversionSID$</set>
+        <set token="conversionSchedule">$result.ConvertSearchActivityxSummaries$</set>
+        <set token="backfillSchedule">$result.GenerateSearchActivitySummaries$</set>
+      </condition>
+      <condition match="'$result.showconversion$'==1">
+        <set token="showconversion">1</set>
+        <unset token="shownoconversion"></unset>
+      </condition>
+      <condition match="$result.showconversion$==0">
+        <unset token="showconversion"></unset>
+        <set token="shownoconversion">1</set>
+      </condition>
+    </done>
+  </search>
+  <search id="workingaroundtokenmadness">
+    <query>| inputlookup sa_app_configuration_lookup | table name value | search name="conversion-status" value IN ("none","")</query>
+    <done>
+      <condition match="'job.resultCount' == 0">
+        <set token="showconversion">1</set>
+        <unset token="shownoconversion"></unset>
+      </condition>
+      <condition match="'job.resultCount' == 1">
+        <unset token="showconversion"></unset>
+        <set token="shownoconversion">1</set>
+      </condition>
+    </done>
+  </search>
+  <!--
+  <row>
+      <event depends="$id$">
+        <title>Summary Drilldown - shows the runtime logs from the event you most recently expanded ($id$)</title>
+        <searchString>source="SA-*-ParseData" id=$id$ sourcetype="sa" $backfilltypes$</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+  </row>
+  <row>
+      <event depends="$searchid$">
+        <title>Drilldown Status - shows the audit logs from the run you most recently expanded ($searchid$)</title>
+        <searchString>index=_audit OR index=_internal  $searchid$</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+  </row>
+  <row>
+      <event>
+        <title>Logs Created by Script</title>
+        <searchString>source="SA-*-ParseData" sourcetype="sa" $backfilltypes$</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+  </row>
+  <row>
+      <event>
+        <title>Internal Logs From Population Script</title>
+        <searchString>index=_internal sourcetype=splunkd CheckDataStats $backfilltypes$</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+  </row>
+  <row>
+      <table>
+        <searchString>index=_internal sourcetype=splunkd_access $backfilltypes$ (backfill_search_window OR backfill_search_internal OR clearoldbackfilljobs OR updatemacro) | table _time clientip user uri status</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+  </row>-->
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliestTime>-30m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h3>Backfill Status</h3>
+        <table class="table table-striped" style="width: 500px">
+          <tbody>
+            <tr>
+              <td>Backfill Status</td>
+              <td>$backfillstatus$</td>
+            </tr>
+            <tr>
+              <td>Backfill Earliest Time</td>
+              <td>$earliesttime$</td>
+            </tr>
+            <tr>
+              <td>Backfill Latest Time</td>
+              <td>$latesttime$</td>
+            </tr>
+            <tr>
+              <td>Search Scheduled?</td>
+              <td>$backfillSchedule$</td>
+            </tr>
+            <tr>
+              <td>Recent Backfill Jobs</td>
+              <td>$backfillRunning$ $backfillSID$</td>
+            </tr>
+            <tr>
+              <td>Backfill Hours Remaining</td>
+              <td>$backfillHoursRemaining$</td>
+            </tr>
+          </tbody>
+        </table>
+      
+    </html>
+    </panel>
+    <panel depends="$showconversion$">
+      <html>
+        <h3>Conversion Status</h3>
+        <table class="table table-striped" style="width: 500px">
+          <tbody>
+            <tr>
+              <td>Conversion Status</td>
+              <td>$conversionstatus$</td>
+            </tr>
+            <tr>
+              <td>Conversion Earliest Time</td>
+              <td>$conversionearliesttime$</td>
+            </tr>
+            <tr>
+              <td>Conversion Latest Time</td>
+              <td>$conversionlatesttime$</td>
+            </tr>
+            <tr>
+              <td>Search Scheduled? (Only expected during active conversion)</td>
+              <td>$conversionSchedule$</td>
+            </tr>
+            <tr>
+              <td>Recent Conversion Jobs</td>
+              <td>$conversionRunning$ $conversionSID$</td>
+            </tr>
+          </tbody>
+        </table>
+      
+    </html>
+    </panel>
+    <panel depends="$shownoconversion$">
+      <html>
+        <h3>Conversion Stats</h3>
+        <p>Converting old Search Activity 2.x data not enabled. If you have old data that you want to enable, turn on the conversion in <a href="setup">setup</a>, in the Migrate 2.x Data section.</p>
+      </html>
+    </panel>
+    <panel>
+      <chart>
+        <title>Events in TSIDX (all time)</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count as Searches from `SA_SearchHistory` groupby _time span=1d  | append [| tstats `SearchActivitySummaries` count as Events from `SA_Events` groupby _time span=1d] | timechart span=1d values(*) as *</query>
+          <earliest>0</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Recent Backfill Runs</title>
+      <table>
+        <search>
+          <query>index=_internal sourcetype="searchactivity:log" | eval field="Time: " . _time . " - Level: " . level . " - Component: (" . step . ") " . item . " - Message: " . message| sort _time  | transaction maxpause=3m| table _time MinutesAgo field | rename field as Status | eval MinutesAgo = round((now() - _time) / 60, 2)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel depends="$showconversion$">
+      <title>Recent Conversion Runs</title>
+      <table>
+        <search>
+          <query>index=_internal source=*conversion sourcetype="searchactivity:log" | eval field="Time: " . _time . " - Level: " . level . " - Component: (" . step . ") " . item . " - Message: " . message| sort _time  | transaction maxpause=3m| table _time MinutesAgo field | rename field as Status | eval MinutesAgo = round((now() - _time) / 60, 2)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

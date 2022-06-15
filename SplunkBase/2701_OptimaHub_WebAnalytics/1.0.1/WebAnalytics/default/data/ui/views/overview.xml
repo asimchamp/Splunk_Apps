@@ -1,0 +1,525 @@
+<form script="link_switcher.js, table_data_bar.js, table_drilldown_url_field.js" stylesheet="table_data_bar.css, common.css">
+  <label>Audience Overview</label>
+  <!-- use the autoRun attribute so the form runs when loaded -->
+  <fieldset autoRun="true">
+    <!-- Specify search when changed for the inputs -->
+    <!-- Add time range picker -->
+    <input type="dropdown" token="website" searchWhenChanged="true">
+      <label>Domain:</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <!-- `webanalytics_page_data` | stats count by event.meta.host -->
+      <search>
+        <query>| inputlookup event_meta_host.csv</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>event.meta.host</fieldForLabel>
+      <fieldForValue>event.meta.host</fieldForValue>
+    </input>
+    <input type="dropdown" token="visitor" searchWhenChanged="true">
+      <label>Visitor Source:</label>
+      <default>person.id.cookie.optimahub3rd</default>
+      <populatingSearch earliest="-24h@h" latest="now" fieldForLabel="label" fieldForValue="visitor">| inputlookup visitor_source.csv</populatingSearch>
+    </input>
+    <input type="time" searchWhenChanged="true">
+      <label>Time Range:</label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="span_period" searchWhenChanged="true">
+      <label>Time Interval:</label>
+      <default></default>
+      <choice value="">Automatic</choice>
+      <prefix>span=</prefix>
+      <suffix></suffix>
+      <populatingSearch earliest="-24h@h" latest="now" fieldForLabel="label" fieldForValue="span_period">| inputlookup time_periods.csv</populatingSearch>
+    </input>
+  </fieldset>
+  <searchTemplate>source=webanalytics* (event.meta.scheme="http" OR event.meta.scheme="https") event.meta.host=$website$
+    | spath path=person.segments{}.name output=name
+    | spath path=person.segments{}.value output=value
+    | spath path=person.segments{}.source output=source     
+    | spath path=person.segments{}.type output=type  
+    | spath path=person.id.email.default.hashed output=personidemaildefault
+    | eval x=mvzip(mvzip(mvzip(name,value), source), type)
+    | eval y=mvfilter(match(x, "^new vs repeat,"))     
+    | eval z = split(y,",")     
+    | eval newvsrepeat=mvindex(z,1)
+    | bin _time span=30m 
+    | eval newvsrepeat=if(isnotnull(newvsrepeat),newvsrepeat,"new")
+    | eval personidemaildefault=if(isnotnull(personidemaildefault),personidemaildefault,"")
+    | stats count by _time, event.meta.host, session.id, person.id.browser.fingerprintjs, person.id.cookie.datacollector3rd, person.id.cookie.optimahub3rd, person.id.cookie.supertag1st, person.id.ip, event.type, newvsrepeat, personidemaildefault</searchTemplate>
+  <earliestTime>$earliest$</earliestTime>
+  <latestTime>$latest$</latestTime>
+  <row>
+    <panel>
+      <chart>
+        <title>Page Views</title>
+        <searchPostProcess>timechart $span_period$ sum(count) as "Content Views" by event.meta.host</searchPostProcess>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Views</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Page Events</title>
+        <searchString>source=webanalytics* $website$ event.type="page|event*"
+                           | timechart $span_period$ count as "Content Views" by event.id</searchString>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Events</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <drilldown>
+          <set token="event_id">$click.name2$</set>
+        </drilldown>
+      </chart>
+      <chart depends="$event_id$">
+        <title>Pages for Event "$event_id$"</title>
+        <searchString>source=webanalytics* $website$ event.type="page|event*" event.id="$event_id$"
+                           | timechart $span_period$ count as "$event_id$" by event.origin.id</searchString>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Events</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisNone</option>
+      </chart>
+      <table depends="$event_id$" id="Origin">
+        <title>Users by Event "$event_id$"</title>
+        <searchString>source=webanalytics* $website$
+| spath path=person.id.cookie.optimahub3rd output=Cookie
+| fillnull value="N/A" person.id.email.default.hashed            
+| fillnull value="N/A" event.supertag.object{}.id        
+| stats last(event.origin.id) as Origin, list(event.origin.id) as origins, list(event.id) as urls, list(person.id.email.default.hashed) as emails, list(event.supertag.object{}.id) as SuperTag by Cookie
+| search urls="$event_id$"
+| eval Events=mvzip(mvzip(mvzip(urls, emails), SuperTag), origins)
+| mvexpand Events
+| rex field=Events "(?&lt;Event&gt;[^,]+),(?&lt;Email&gt;[^,]+),(?&lt;SuperTag_ID&gt;[^,]+),(?&lt;Page&gt;.+)"
+| search Event="$event_id$"
+| dedup Cookie,Email
+| eval referer=Origin
+| table Cookie Origin Page Event Email SuperTag_ID
+| rename SuperTag_ID as "SuperTag ID"</searchString>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="count">10</option>
+        <drilldown target="_blank">
+          <link field="Email">
+            <![CDATA[
+                   /app/SingleView/single_customer_view_lookup?form.input=$click.value2$&form.hashorclear=0&form.fieldname=person.id.email.default.hashed&earliest=$earliest$&latest=$latest$
+          ]]>
+          </link>
+          <link field="SuperTag ID">
+            <![CDATA[
+                   http://app.supert.ag/tags/$click.value2$
+          ]]>
+          </link>
+          <link field="Cookie">
+            <![CDATA[
+                   /app/SingleView/single_customer_view_lookup?form.input=$click.value2$&form.hashorclear=1&form.fieldname=person.id.cookie.optimahub3rd&earliest=$earliest$&latest=$latest$
+          ]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Visits</title>
+        <searchPostProcess>timechart $span_period$ dc(session.id) as Sessions by event.meta.host</searchPostProcess>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Visits</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Page Views per Visit</title>
+        <searchPostProcess>timechart $span_period$ sum(count) AS Pages, dc(session.id) AS Visits
+          | eval PagesPerVisit=Pages/Visits
+          | fields - Pages, Visits
+          | rename PagesPerVisit as "Pages"</searchPostProcess>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Page Views</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h2>Visit Duration</h2>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <div class="link-switcher" data-items="link3,link4">Select a view:<!--Links go here-->
+      </div>
+    </html>
+      <chart id="link3">
+        <title>Chart</title>
+        <searchString>`webanalytics_page_data` event.meta.host=$website$
+          | spath path=session.id output=sessionid
+          | transaction sessionid
+          | search duration&gt;0
+          | eval duration=duration/60
+          | eval duration=case(duration&lt;1,"1 minute and less", duration&gt;1 AND duration&lt;5,"1-5 minutes", duration&gt;5 AND duration&lt;10,"5-10 minutes",duration&gt;10 AND duration&lt;20,"10-20 minutes",duration&gt;20 AND duration&lt;40,"20-40 minutes", duration&gt;40,"40 minutes and greater")
+          | top duration
+          | sort duration
+          | rename count AS Visits</searchString>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Visits</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+      <table id="link4">
+        <title>Table</title>
+        <searchString>`webanalytics_page_data` event.meta.host=$website$          
+        | spath path=session.id output=sessionid 
+        | transaction sessionid 
+        | search duration&gt;0 
+        | eval duration=duration/60
+        | eval duration=case(duration&lt;1,"1 minute and less", duration&gt;1 AND duration&lt;5,"1-5 minutes", duration&gt;5 AND duration&lt;10,"5-10 minutes",duration&gt;10 AND duration&lt;20,"10-20 minutes",duration&gt;20 AND duration&lt;40,"20-40 minutes", duration&gt;40,"40 minutes and greater")
+        | top duration
+        | sort duration
+        | eval percent=(round(percent,2))
+        | rename duration AS "Visit Duration"
+        | rename count AS Visits
+        | rename percent AS Percent</searchString>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <h2>Visits By Weekday</h2>
+       <!-- Placeholder/container for the link switcher to appear -->
+       <div class="link-switcher" data-items="link6,link7">Select a view:<!--Links go here-->
+       </div>
+       </html>
+      <chart id="link6">
+        <title>Chart</title>
+        <searchPostProcess>eval DOW=strftime(_time, "%A")
+          | stats dc(session.id) AS DailySession by DOW
+          | rename DOW AS "Day Of Week"</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Visits</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+      <table id="link7">
+        <title>Table</title>
+        <searchPostProcess>eval DOW=strftime(_time, "%A")
+          | stats dc(session.id) AS DailySession by DOW
+          | rename DOW AS "Day Of Week"
+          | eventstats sum(DailySession) AS Total
+          | eval Percent=round(((DailySession/Total)*100),2)
+          | fields - Total</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Visitor Frequency</title>
+        <searchString>`webanalytics_page_data` event.meta.host=$website$
+        session.id=*  
+        | rename session.id AS sessionid  
+        | transaction maxspan=60m sessionid  
+        | search duration&gt;0  
+        | top limit=0 $visitor$ 
+        | rename count as aaaa 
+        | eval range=case(aaaa=1, "1 Visit", aaaa=2, "2 Visits", aaaa=3, "3 Visits", aaaa=4, "4 Visits", aaaa&gt;5 AND aaaa&lt;=10, "5-10 Visits", aaaa&gt;10, "&gt; 10 Visits" ) 
+        | chart count by range 
+        | eventstats sum(count) AS Total 
+        | eval perc=round((count/Total)*100,1) 
+        | fields range,perc 
+        | Rename perc AS Percent</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table1">
+        <title>Visitor Recency</title>
+        <searchString>`webanalytics_page_data` event.meta.host=$website$ earliest=[ stats count | addinfo | eval search=info_min_time-(90*60*60*24)]
+          | dedup session.id
+          | streamstats current=f count by $visitor$
+          | sort $visitor$
+          | where count=0 OR count=1
+          | stats earliest(_time) AS earliesttime latest(_time) AS latesttime by $visitor$
+          | addinfo
+          | eval currentstarttime=info_min_time+(90*60*60*24)
+          | eval currentendtime=info_max_time
+          | where latesttime&gt;currentstarttime
+          | eval timedelta=currentstarttime-earliesttime
+          | eval daysdiff=if(timedelta&lt;0,0,timedelta/86400)
+          | eval range=case(daysdiff&lt;1, "0", daysdiff&gt;=1 AND daysdiff&lt;=2, "1", daysdiff&gt;2 AND daysdiff&lt;=3, "2", daysdiff&gt;3 AND daysdiff&lt;=4, "3", daysdiff&gt;4 AND daysdiff&lt;=5, "4",  daysdiff&gt;5 AND daysdiff&lt;=10, "5-10", daysdiff&gt;10 AND daysdiff&lt;=30, "10-30", daysdiff&gt;30 AND daysdiff&lt;=60, "30-60", daysdiff&gt;60 AND daysdiff&lt;=90, "60-90" )
+          | stats count by range
+          | rename range AS "Days Since Last Session", count AS "Visitors"
+          | eventstats sum(Visitors) as totalCount
+          | eval percent=round(Visitors*100/totalCount,1)
+          | fields - totalCount
+          | sort "Days Since Last Session"</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Visitors</title>
+        <searchPostProcess>timechart $span_period$ dc($visitor$) AS $visitor$</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Visitors</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Repeat Visitors</title>
+        <searchPostProcess>stats first(newvsrepeat) AS newvsrepeat by $visitor$
+          | top newvsrepeat
+          | chart max(percent) as Percentage by newvsrepeat</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">Percentage</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Identified Customers</title>
+        <search>
+        <query>
+          source=webanalytics* (event.meta.host=$website$ OR event.origin.meta.host=$website$) (event.type="page|view" OR event.type="page|event") 
+          | spath path=person.id.email.default.hashed output=piedh 
+          | fillnull piedh value=NULL 
+          | stats count by piedh,person.id.cookie.optimahub3rd 
+          | eval status=if(piedh="NULL","unidentified","identified") 
+          | top status showcount=false
+          | chart max(percent) AS percent by status
+          </query>
+        </search>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Percentage</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">1</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+    </panel>
+  </row>
+</form>

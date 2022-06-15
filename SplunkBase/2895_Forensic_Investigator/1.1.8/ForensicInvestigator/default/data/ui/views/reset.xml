@@ -1,0 +1,27 @@
+<form stylesheet="custom.css">
+  <label>Reset Host-based Evidence Indexes</label>
+  <searchTemplate>| script reset __EXECUTE__ "$pass$"</searchTemplate>
+  <description>Only deletes indexes: evetlog, redlinemir, shimchache.  Warning:  Not reversable.  Enter the Password 1234 to show intent:</description>
+  <!-- Add time range picker -->
+  <fieldset submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="pass">
+      <label>Password to reset</label>
+      <suffix></suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search base="global">
+          <query>table Answer</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

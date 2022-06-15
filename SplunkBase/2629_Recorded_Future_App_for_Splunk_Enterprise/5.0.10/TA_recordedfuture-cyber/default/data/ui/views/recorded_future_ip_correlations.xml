@@ -1,0 +1,126 @@
+<dashboard stylesheet="css/recorded_future_correlation.css"
+	   script="js/evidence.js">
+  <label>Recorded Future IP Log Correlation</label>
+  <!-- Original search using real data
+  <search id="core">
+    <query>
+      index=main sourcetype="netscreen:firewall" earliest=-24h 
+      | eval Name=dst
+      | join Name [|inputlookup rf_ip_risklist.csv | table * ]
+      | search Risk != "" 
+      | sort -Risk
+      </query>
+  </search>
+  -->
+  <search id='core'>
+    <query>
+      | rest splunk_server=local /services/TA_recordedfuture-cyber/sample_data type=ip
+      | sort -Risk
+    </query>
+  </search>
+  <row>
+    <html>
+      <div class="help-link" style="float: right; text-align: right;">
+        <img src="/static/app/TA_recordedfuture-cyber/img/logo.svg" alt="Recorded Future, Inc logotype" style="height: 30px;"/><br/>
+        <a href="/app/TA_recordedfuture-cyber/recorded_future_help_correlation_dashboards" target="_blank">Help</a>
+      </div>
+      <div>
+        <h1>
+          This dashboard displays correlated IPs with Recorded Future's IP Risk List.
+        </h1>
+      </div>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Summary</title>
+        <search base="core">
+          <query>
+            | stats dc(Name) as count
+            | fields count
+            | rangemap field=count low=0-0 evelated=1-1 default=severe
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="underLabel">High Risk IPs</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Rule Hits</title>
+        <search base="core">
+          <query>
+            | dedup Name
+            | eval Rule=spath(EvidenceDetails,"EvidenceDetails{}.Rule")
+            | top Rule limit=50 showperc=false
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel id="topcount">
+      <table>
+        <title>Top Client IP Connections</title>
+        <search base="core">
+          <query>
+	          | rename Name TO "IP Address"
+	          | top "IP Address" limit=100 showperc=false
+	        </query>
+        </search>
+        <option name="drilldown">row</option>
+        <option name="totalsRow">true</option>
+        <drilldown>
+          <condition field="IP Address">
+            <link target="_blank">/app/TA_recordedfuture-cyber/search?q=search%20index%3D*%20$row.IP Address$</link>
+          </condition>
+          <condition>
+            <link target="_blank">/app/TA_recordedfuture-cyber/recorded_future_ip_enrichment?form.name=$row.IP Address$</link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="etable">
+        <title>High Risk IPs</title>
+        <search base="core">
+          <query>
+            | eventstats Count BY Name
+            | dedup Name
+            | `format_evidence`
+            | sort -Risk
+            | eval Risk = round(Risk,0)
+            | rename RiskString AS Rules
+            | rename Name as "IP Address"
+            | table Risk, "IP Address", Count, Rules, Evidence
+          </query>
+        </search>
+        <drilldown>
+          <condition field="IP Address">
+            <link target="_blank">/app/TA_recordedfuture-cyber/search?q=search%20index%3D*%20$row.IP Address$</link>
+          </condition>
+          <condition>
+            <link target="_blank">/app/TA_recordedfuture-cyber/recorded_future_ip_enrichment?form.name=$row.IP Address$</link>
+          </condition>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <format type="color" field="Risk">
+          <colorPalette type="list">
+            ["0x777777","0xffce00","0xcf0a2c"]
+          </colorPalette>
+          <scale type="threshold">
+            30,71,100
+          </scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</dashboard>

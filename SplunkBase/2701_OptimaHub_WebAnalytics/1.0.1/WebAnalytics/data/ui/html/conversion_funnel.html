@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Conversion Funnel | Splunk</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/build/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/build/pages/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/WebAnalytics/conversion_funnel.css?v=3" />
+    <!--[if IE 7]><link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/sprites-ie7.css" /><![endif]-->
+</head>
+<body class="simplexml preload">
+  
+<!-- #1: BEGIN SUPERTAG TOP CODE v2.8.5 -->
+<script type="text/javascript" src="//c.supert.ag/datalicious.pty.ltd/splunk/supertag.js"></script>
+<!-- Do NOT remove the following tag: SuperTag requires the following as a separate <script> block -->
+<script type="text/javascript">
+if(typeof superT!="undefined" && typeof superT.t=="function"){superT.t();}
+</script>
+<!-- #1: END SUPERTAG TOP CODE -->  
+
+<!-- 
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system. 
+-->
+<a class="navSkip" href="#navSkip" tabindex="1">Screen reader users, click here to skip the navigation bar</a>
+<div class="header">
+    <div id="placeholder-splunk-bar">
+        <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+    </div>
+    <div id="placeholder-app-bar"></div>
+</div>
+<a id="navSkip"></a>
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+    <div class="dashboard-header clearfix">
+        <h2>Conversion Funnel[BETA]</h2>
+        <p class="description"></p>
+    </div>
+    <div class="fieldset">
+        <div class="input input-multiselect" id="field1">
+            <label>Domain:</label>
+        </div>
+        <div class="input input-dropdown" id="field2">
+            <label>Goal:</label>
+        </div>
+        <div class="input input-dropdown" id="field4">
+            <label>Visitor Source:</label>
+        </div>      
+        <div class="input input-timerangepicker" id="field3">
+            <label>Time Range:</label>
+        </div>
+        <div class="form-submit" id="search_btn">
+            <button class="btn btn-primary submit">Submit</button>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row1">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="bar_chart1" style="min-width: 15%">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="awareness_header" style="font-family: Impact, sans-serif; 
+                                                                                       font-size: 36px; color: white">
+                    AWARENESS
+                    </div>                 
+                    <div class="dashboard-element single" id="awareness" style="width: 12%; font-family: Arial; 
+color: white">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="awareness_dropoffs" style="width: 12%; font-family: Arial; 
+color: black">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="awareness_dropoffs_perc" style="width: 12%; font-family: Arial; 
+color: black">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element chart" id="bar_chart2" style="min-width: 15%">
+                        <div class="panel-body"></div>
+                    </div>                  
+                    <div class="dashboard-element single" id="engagement_header" style="font-family: Impact, sans-serif; 
+                                                                                       font-size: 24px; color: white">
+                    ENGAGEMENT
+                    </div>                    
+                    <div class="dashboard-element single" id="engagement" style="width: 12%; font-family: Arial; 
+color: white">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="engagement_dropoffs" style="width: 12%; font-family: Arial; 
+color: black">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="engagement_dropoffs_perc" style="width: 12%; font-family: Arial; 
+color: black">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="conversion_header" style="font-family: Impact, sans-serif; 
+                                                                                       font-size: 20px; color: white">
+                    CONVERSION
+                    </div>                   
+                    <div class="dashboard-element single" id="conversion" style="width: 12%; font-family: Arial; 
+color: white">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element single" id="conversion_perc" style="width: 12%; font-family: Arial; 
+color: black">
+                        <div class="panel-body"></div>
+                    </div>
+
+                    <div class="dashboard-element table" id="entrance_pages" style="min-width: 35%">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element table" id="exit_pages" style="min-width: 35%">
+                        <div class="panel-body"></div>
+                    </div>
+                    <div class="dashboard-element table" id="engagement_exit_pages" style="min-width: 35%">
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer"></div>
+
+<!-- 
+END LAYOUT
+-->
+
+<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/i18ncatalog?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/build/simplexml.min/config.js"></script>
+<script type="text/javascript">
+require.config({
+    baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+    waitSeconds: 0 // Disable require.js load timeout
+});
+
+//
+// LIBRARY REQUIREMENTS
+//
+// In the require function, we include the necessary libraries and modules for
+// the HTML dashboard. Then, we pass variable names for these libraries and
+// modules as function parameters, in order.
+// 
+// When you add libraries or modules, remember to retain this mapping order
+// between the library or module and its function parameter. You can do this by
+// adding to the end of these lists, as shown in the commented examples below.
+
+require([
+    "splunkjs/mvc",
+    "splunkjs/mvc/utils",
+    "splunkjs/mvc/tokenutils",
+    "underscore",
+    "jquery",
+    "splunkjs/mvc/simplexml",
+    "splunkjs/mvc/headerview",
+    "splunkjs/mvc/footerview",
+    "splunkjs/mvc/simplexml/dashboardview",
+    "splunkjs/mvc/simplexml/element/chart",
+    "splunkjs/mvc/simplexml/element/event",
+    "splunkjs/mvc/simplexml/element/html",
+    "splunkjs/mvc/simplexml/element/list",
+    "splunkjs/mvc/simplexml/element/map",
+    "splunkjs/mvc/simplexml/element/single",
+    "splunkjs/mvc/simplexml/element/table",
+    "splunkjs/mvc/simpleform/formutils",
+    "splunkjs/mvc/simpleform/input/dropdown",
+    "splunkjs/mvc/simpleform/input/radiogroup",
+    "splunkjs/mvc/simpleform/input/multiselect",
+    "splunkjs/mvc/simpleform/input/checkboxgroup",
+    "splunkjs/mvc/simpleform/input/text",
+    "splunkjs/mvc/simpleform/input/timerange",
+    "splunkjs/mvc/simpleform/input/submit",
+    "splunkjs/mvc/searchmanager",
+    "splunkjs/mvc/savedsearchmanager",
+    "splunkjs/mvc/postprocessmanager",
+    "splunkjs/mvc/simplexml/urltokenmodel"
+    // Add comma-separated libraries and modules manually here, for example:
+    // ..."splunkjs/mvc/simplexml/urltokenmodel",
+    // "splunkjs/mvc/checkboxview"
+    ],
+    function(
+        mvc,
+        utils,
+        TokenUtils,
+        _,
+        $,
+        DashboardController,
+        HeaderView,
+        FooterView,
+        Dashboard,
+        ChartElement,
+        EventElement,
+        HtmlElement,
+        ListElement,
+        MapElement,
+        SingleElement,
+        TableElement,
+        FormUtils,
+        DropdownInput,
+        RadioGroupInput,
+        MultiSelectInput,
+        CheckboxGroupInput,
+        TextInput,
+        TimeRangeInput,
+        SubmitButton,
+        SearchManager,
+        SavedSearchManager,
+        PostProcessManager,
+        UrlTokenModel
+
+        // Add comma-separated parameter names here, for example: 
+        // ...UrlTokenModel, 
+        // CheckboxView
+        ) {
+
+
+
+        var pageLoading = true;
+
+
+        // 
+        // TOKENS
+        //
+        
+        // Create token namespaces
+        var urlTokenModel = new UrlTokenModel();
+        mvc.Components.registerInstance('url', urlTokenModel);
+        var defaultTokenModel = mvc.Components.getInstance('default', {create: true});
+        var submittedTokenModel = mvc.Components.getInstance('submitted', {create: true});
+
+        urlTokenModel.on('url:navigate', function() {
+            defaultTokenModel.set(urlTokenModel.toJSON());
+            if (!_.isEmpty(urlTokenModel.toJSON()) && !_.all(urlTokenModel.toJSON(), _.isUndefined)) {
+                submitTokens();
+            } else {
+                submittedTokenModel.clear();
+            }
+        });
+
+        // Initialize tokens
+        defaultTokenModel.set(urlTokenModel.toJSON());
+
+        function submitTokens() {
+            // Copy the contents of the defaultTokenModel to the submittedTokenModel and urlTokenModel
+            FormUtils.submitForm({ replaceState: pageLoading });
+        }
+
+        function setToken(name, value) {
+            defaultTokenModel.set(name, value);
+            submittedTokenModel.set(name, value);
+        }
+
+        function unsetToken(name) {
+            defaultTokenModel.unset(name);
+            submittedTokenModel.unset(name);
+        }
+
+        //
+        // SEARCH MANAGERS
+        //
+
+        var search1 = new SearchManager({
+            "id": "search1",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=$visitor$ output=visitor | stats dc(visitor) as Awareness",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search2 = new SearchManager({
+            "id": "search2",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3)  | stats dc(visitor) as Awareness, sum(e4) as Engagement | eval Engagement2=Awareness-Engagement  | rename Engagement2 as Engagement | table Engagement",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search3 = new SearchManager({
+            "id": "search3",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3)  | stats dc(visitor) as Awareness, sum(e4) as Engagement | eval Engagement_perc=round((Engagement/Awareness)*100, 0) | eval Engagement=Engagement.\" (\".Engagement_perc.\"%)\" | table Engagement",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search4 = new SearchManager({
+            "id": "search4",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3)  | stats sum(e4) as Engagement",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search5 = new SearchManager({
+            "id": "search5",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3) | eval c=mvzip(steps,goal_names) | rex field=c \"(?<c2>Final.*$goal$)\" | rex field=c2 \"(?<c3>Final)\" | eval c4=mvcount(c3) | stats dc(visitor) as Awareness, sum(e4) as Engagement, sum(c4) as Conversion | eval Conversion2=Engagement-Conversion | rename Conversion2 as Conversion | table Conversion",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search6 = new SearchManager({
+            "id": "search6",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3) | eval c=mvzip(steps,goal_names) | rex field=c \"(?<c2>Final.*$goal$)\" | rex field=c2 \"(?<c3>Final)\" | eval c4=mvcount(c3) | stats dc(visitor) as Awareness, sum(e4) as Engagement, sum(c4) as Conversion | eval Conversion_perc=round((Conversion/Engagement)*100, 0) | eval Conversion=Conversion.\" (\".Conversion_perc.\"%)\" | table Conversion",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search7 = new SearchManager({
+            "id": "search7",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | eval c=mvzip(steps,goal_names) | rex field=c \"(?<c2>Final.*$goal$)\" | rex field=c2 \"(?<c3>Final)\" | eval c4=mvcount(c3) | stats sum(c4) as Conversion",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search8 = new SearchManager({
+            "id": "search8",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | eval c=mvzip(steps,goal_names) | rex field=c \"(?<c2>Final.*$goal$)\" | rex field=c2 \"(?<c3>Final)\" | eval c4=mvcount(c3) | stats dc(visitor) as Awareness, sum(c4) as Conversion | eval Conversion_perc=round((Conversion/Awareness)*100, 0) | eval Conversion=Conversion_perc + \"% funnel conversion rate\" | table Conversion",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search9 = new SearchManager({
+            "id": "search9",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$  | spath path=event.id output=url | spath path=$visitor$ output=visitor | stats list(url) AS url by visitor  | stats count by url    | eval url=substr(url, 1, 55)      | sort - count limit=5",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search10 = new SearchManager({
+            "id": "search10",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url | spath path=event.goal.name output=goal_name | spath path=$visitor$ output=visitor  | search goal_name=\"$goal$\" | stats list(url) AS url by visitor | eval count_of_steps=mvcount(url) | where count_of_steps >= 2 | eval url=mvindex(url,-1) | eval url=substr(url, 1, 55) | chart count by url | sort - count limit=5",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search11 = new SearchManager({
+            "id": "search11",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url          | spath path=event.goal.step output=step        | spath path=event.type output=type        | spath path=event.goal.name output=goal_name          | spath path=$visitor$ output=visitor  | search step!=\"Final*\"   | search goal_name=\"$goal$\" | stats list(url) AS url by visitor | eval count_of_steps=mvcount(url) | where count_of_steps >= 2 | eval url=mvindex(url,-1) | eval url=substr(url, 1, 55) | chart count by url | sort - count limit=5",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search21 = new SearchManager({
+            "id": "search21",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3) | eval foo=\" \" | stats dc(visitor) as Awareness, sum(e4) as Engagement by foo | eval Drop_Off=Awareness-Engagement  | table foo Drop_Off Engagement  | rename foo AS \" \"",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});  
+  
+        var search22 = new SearchManager({
+            "id": "search22",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "`webanalytics_web_data` $website$ | spath path=event.id output=url         | spath path=event.goal.step output=step       | spath path=event.type output=type       | spath path=event.goal.name output=goal_name         | spath path=$visitor$ output=visitor | stats list(step) as steps, list(goal_name) as goal_names by visitor | rex field=steps \"(?<steps_only>\\d+)\" | eval count_of_steps=mvcount(steps_only) | eval e=mvzip(steps_only,goal_names) | rex field=e \"(?<e2>\\d+,$goal$)\"  | rex field=e2 \"(?<e3>\\d+)\"  | eval e4=mvcount(e3) | eval c=mvzip(steps,goal_names) | rex field=c \"(?<c2>Final.*$goal$)\" | rex field=c2 \"(?<c3>Final)\" | eval c4=mvcount(c3) | eval foo=\" \" | stats sum(e4) as Engagement, sum(c4) as Conversion by foo | eval Drop_Off=Engagement-Conversion  | table foo Drop_Off Conversion  | rename foo AS \" \"",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});    
+
+
+        //
+        // SPLUNK HEADER AND FOOTER
+        //
+
+        new HeaderView({
+            id: 'header',
+            section: 'dashboards',
+            el: $('.header'),
+            acceleratedAppNav: true,
+            useSessionStorageCache: true
+        }, {tokens: true}).render();
+
+        new FooterView({
+            id: 'footer',
+            el: $('.footer')
+        }, {tokens: true}).render();
+
+
+        //
+        // DASHBOARD EDITOR
+        //
+
+        new Dashboard({
+            id: 'dashboard',
+            el: $('.dashboard-body')
+        }, {tokens: true}).render();
+
+
+        //
+        // VIEWS: VISUALIZATION ELEMENTS
+        //
+
+        var bar_chart1 = new ChartElement({
+            "id": "bar_chart1",
+            "charting.axisTitleX.visibility": "collapsed",
+            "charting.axisY.scale": "linear",
+            "charting.chart": "bar",
+            "charting.axisLabelsX.majorLabelStyle.rotation": "0",
+            "charting.axisY2.enabled": "0",
+            "charting.chart.sliceCollapsingThreshold": "0.01",
+            "charting.axisY2.scale": "inherit",
+            "charting.layout.splitSeries": "0",
+            "charting.chart.stackMode": "stacked100",
+            "charting.axisLabelsX.majorLabelStyle.overflowMode": "ellipsisNone",
+            "resizable": false,
+            "charting.axisX.scale": "linear",
+            "charting.drilldown": "none",
+            "charting.legend.labelStyle.overflowMode": "ellipsisMiddle",
+            "charting.axisTitleY.visibility": "collapsed",
+            "charting.axisTitleY2.visibility": "collapsed",
+            "charting.legend.placement": "none",
+            "charting.chart.style": "shiny",
+            "charting.chart.nullValueMode": "gaps",
+            "charting.axisLabelsX.axisVisibility": "hide",
+            "charting.axisLabelsY.axisVisibility": "hide",
+            "charting.axisLabelsX.majorLabelVisibility": "hide",
+            "charting.axisLabelsY.majorLabelVisibility": "hide",
+            "charting.axisLabelsX.majorTickVisibility": "hide",
+            "charting.axisLabelsY.majorTickVisibility": "hide",
+            "charting.axisLabelsX.minorTickVisibility": "hide",
+            "charting.axisLabelsY.minorTickVisibility": "hide",  
+            "link.visible": "false",
+            "refresh.time.visible": "false",
+            "charting.fieldColors": "{\"Engagement\": 0x66FF66, \"Drop_Off\": 0xFF3333}",
+            "height": "38px",
+            "managerid": "search21",
+            "el": $('#bar_chart1')
+        }, {tokens: true}).render();  
+  
+        var bar_chart2 = new ChartElement({
+            "id": "bar_chart2",
+            "charting.axisTitleX.visibility": "collapsed",
+            "charting.axisY.scale": "linear",
+            "charting.chart": "bar",
+            "charting.axisLabelsX.majorLabelStyle.rotation": "0",
+            "charting.axisY2.enabled": "0",
+            "charting.chart.sliceCollapsingThreshold": "0.01",
+            "charting.axisY2.scale": "inherit",
+            "charting.layout.splitSeries": "0",
+            "charting.chart.stackMode": "stacked100",
+            "charting.axisLabelsX.majorLabelStyle.overflowMode": "ellipsisNone",
+            "resizable": false,
+            "charting.axisX.scale": "linear",
+            "charting.drilldown": "none",
+            "charting.legend.labelStyle.overflowMode": "ellipsisMiddle",
+            "charting.axisTitleY.visibility": "collapsed",
+            "charting.axisTitleY2.visibility": "collapsed",
+            "charting.legend.placement": "none",
+            "charting.chart.style": "shiny",
+            "charting.chart.nullValueMode": "gaps",
+            "charting.axisLabelsX.axisVisibility": "hide",
+            "charting.axisLabelsY.axisVisibility": "hide",
+            "charting.axisLabelsX.majorLabelVisibility": "hide",
+            "charting.axisLabelsY.majorLabelVisibility": "hide",
+            "charting.axisLabelsX.majorTickVisibility": "hide",
+            "charting.axisLabelsY.majorTickVisibility": "hide",
+            "charting.axisLabelsX.minorTickVisibility": "hide",
+            "charting.axisLabelsY.minorTickVisibility": "hide",  
+            "link.visible": "false",
+            "refresh.time.visible": "false",
+            "charting.fieldColors": "{\"Conversion\": 0x66FF66, \"Drop_Off\": 0xFF3333}",
+            "height": "38px",
+            "managerid": "search22",
+            "el": $('#bar_chart2')
+        }, {tokens: true}).render();   
+  
+        var awareness = new SingleElement({
+            "id": "awareness",
+            "managerid": "search1",
+            "el": $('#awareness')
+        }, {tokens: true}).render();
+        
+        var awareness_dropoffs = new SingleElement({
+            "id": "awareness_dropoffs",
+            "managerid": "search2",
+            "el": $('#awareness_dropoffs')
+        }, {tokens: true}).render();
+        
+        var awareness_dropoffs_perc = new SingleElement({
+            "id": "awareness_dropoffs_perc",
+            "managerid": "search3",
+            "el": $('#awareness_dropoffs_perc')
+        }, {tokens: true}).render();
+        
+        var engagement = new SingleElement({
+            "id": "engagement",
+            "managerid": "search4",
+            "el": $('#engagement')
+        }, {tokens: true}).render();
+        
+        var engagement_dropoffs = new SingleElement({
+            "id": "engagement_dropoffs",
+            "managerid": "search5",
+            "el": $('#engagement_dropoffs')
+        }, {tokens: true}).render();
+        
+        var engagement_dropoffs_perc = new SingleElement({
+            "id": "engagement_dropoffs_perc",
+            "managerid": "search6",
+            "el": $('#engagement_dropoffs_perc')
+        }, {tokens: true}).render();
+        
+        var conversion = new SingleElement({
+            "id": "conversion",
+            "managerid": "search7",
+            "el": $('#conversion')
+        }, {tokens: true}).render();
+        
+        var conversion_perc = new SingleElement({
+            "id": "conversion_perc",
+            "managerid": "search8",
+            "el": $('#conversion_perc')
+        }, {tokens: true}).render();
+        
+        var entrance_pages = new TableElement({
+            "id": "entrance_pages",
+            "link.visible": "false",
+            "refresh.time.visible": "false",  
+            "managerid": "search9",
+            "el": $('#entrance_pages')
+        }, {tokens: true}).render();
+        
+        var exit_pages = new TableElement({
+            "id": "exit_pages",
+            "link.visible": "false",
+            "refresh.time.visible": "false",  
+            "managerid": "search10",
+            "el": $('#exit_pages')
+        }, {tokens: true}).render();
+        
+        var engagement_exit_pages = new TableElement({
+            "id": "engagement_exit_pages",
+            "link.visible": "false",
+            "refresh.time.visible": "false",  
+            "managerid": "search11",
+            "el": $('#engagement_exit_pages')
+        }, {tokens: true}).render();
+        
+
+
+        //
+        // VIEWS: FORM INPUTS
+        //
+        // "default": ["www.carhistory.com.au", "vedaauto.carhistory.com.au"],
+        var field1 = new MultiSelectInput({
+            "id": "field1",
+            "choices": [
+                {"value": "*", "label": "All"}
+            ],
+            "suffix": ")",
+            "searchWhenChanged": true,
+            "default": ["*"],
+            "labelField": "event.meta.host",
+            "valueField": "event.meta.host",
+            "delimiter": " OR ",
+            "prefix": "(",
+            "value": "$form.website$",
+            "managerid": "search12",
+            "el": $('#field1')
+        }, {tokens: true}).render();
+
+        field1.on("change", function(newValue) {
+            FormUtils.handleValueChange(field1);
+        });
+
+        // Populating search for field 'field1'
+        var search12 = new SearchManager({
+            "id": "search12",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "earliest_time": "-4h@h",
+            "latest_time": "now",
+            "search": "`webanalytics_page_data` | stats count by event.meta.host",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true});
+
+
+        // "default": "Carhistory Report purchase",
+        var field2 = new DropdownInput({
+            "id": "field2",
+            "choices": [],
+            "labelField": "event.goal.name",
+            "valueField": "event.goal.name",
+            "searchWhenChanged": true,
+            "selectFirstChoice": false,
+            "value": "$form.goal$",
+            "managerid": "search13",
+            "showClearButton": true,
+            "el": $('#field2')
+        }, {tokens: true}).render();
+
+        field2.on("change", function(newValue) {
+            FormUtils.handleValueChange(field2);
+        });
+
+        // Populating search for field 'field2'
+        var search13 = new SearchManager({
+            "id": "search13",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "earliest_time": "-4h@h",
+            "latest_time": "now",
+            "search": "`webanalytics_page_data` $website$ event.type=\"page|view|goal\" | stats count by event.goal.name",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true});
+
+  
+        var field4 = new DropdownInput({
+            "id": "field4",
+            "choices": [],
+            "labelField": "label",
+            "valueField": "visitor",
+            "searchWhenChanged": true,
+            "selectFirstChoice": false,
+            "default": "person.id.cookie.optimahub3rd",
+            "value": "$form.visitor$",
+            "managerid": "search44",
+            "showClearButton": true,
+            "el": $('#field4')
+        }, {tokens: true}).render();
+
+        field4.on("change", function(newValue) {
+            FormUtils.handleValueChange(field4);
+        });
+
+        // Populating search for field 'field4'
+        var search44 = new SearchManager({
+            "id": "search44",
+            "status_buckets": 0,
+            "cancelOnUnload": true,
+            "earliest_time": "-5m@m",
+            "latest_time": "now",
+            "search": "| inputlookup visitor_source.csv",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true});
+  
+
+        var field3 = new TimeRangeInput({
+            "id": "field3",
+            "searchWhenChanged": true,
+            "default": {"latest_time": "now", "earliest_time": "-60m@m"},
+            "earliest_time": "$earliest$",
+            "latest_time": "$latest$",
+            "el": $('#field3')
+        }, {tokens: true}).render();
+
+        field3.on("change", function(newValue) {
+            FormUtils.handleValueChange(field3);
+        });
+
+
+
+        // 
+        // SUBMIT FORM DATA
+        //
+
+        var submit = new SubmitButton({
+            id: 'submit',
+            el: $('#search_btn')
+        }, {tokens: true}).render();
+
+        submit.on("submit", function() {
+            submitTokens();
+        });
+
+        // Initialize time tokens to default
+        if (!defaultTokenModel.has('earliest') && !defaultTokenModel.has('latest')) {
+            defaultTokenModel.set({ earliest: '0', latest: '' });
+        }
+
+        submitTokens();
+
+
+        //
+        // DASHBOARD READY
+        //
+
+        DashboardController.ready();
+        pageLoading = false;
+
+    }
+);
+</script>
+
+<!-- #2: BEGIN SUPERTAG BOTTOM CODE v2.9.6.2 -->
+<script type="text/javascript">
+if(typeof superT!="undefined" && typeof superT.b=="function"){superT.b();}
+</script>
+<!-- Do NOT remove the following block: SuperTag requires the following as a separate <script> block -->
+<script type="text/javascript">
+if(typeof superT!="undefined" && typeof superT.b2=="function"){superT.b2();}
+</script>
+<!-- #2: END SUPERTAG BOTTOM CODE -->  
+  
+</body>
+</html>

@@ -1,0 +1,130 @@
+<form stylesheet="custom.css">
+  <label>VirusTotal Lookup</label>
+  <searchTemplate>| script vtlookup __EXECUTE__ "$search_hash_url$" | spath input=vt</searchTemplate>
+      <description>Enter the hash or URL below.  Ex:  57f222d8fbe0e290b4bf8eaa994ac641</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="search_hash_url" searchWhenChanged="true">
+      <label>Hash or URL/IP</label>
+      <default>$url:UrlHash$</default>
+      <suffix/>
+    </input>
+  </fieldset>
+<row>
+    <panel>
+      <single>
+        <title>VT Hits</title>
+        <searchPostProcess>rex field=vt "\"total\":\s+(?&lt;vt_total&gt;\d+)" | rex field=vt "\"positives\":\s+(?&lt;vt_positives&gt;\d+)" | eval vt_positives = coalesce(vt_positives, 0) | table vt_positives</searchPostProcess>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>VT Misses</title>
+        <searchPostProcess>rex field=vt "\"total\":\s+(?&lt;vt_total&gt;\d+)" | rex field=vt "\"positives\":\s+(?&lt;vt_positives&gt;\d+)" | eval vt_negatives=(vt_total-vt_positives) | eval vt_negatives = coalesce(vt_negatives, "ALL") | table vt_negatives</searchPostProcess>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Engines</title>
+        <searchPostProcess>rex field=vt "\"total\":\s+(?&lt;vt_total&gt;\d+)" | eval vt_total = coalesce(vt_total, "ALL") | table vt_total</searchPostProcess>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>VT Percentage</title>
+        <searchPostProcess>rex field=vt "\"total\":\s+(?&lt;vt_total&gt;\d+)" | rex field=vt "\"positives\":\s+(?&lt;vt_positives&gt;\d+)" | eval HitPercentage=(vt_positives/vt_total)*100 | eval HitPercentage=round(HitPercentage,0) | eval HitPercentage=HitPercentage | eval MissPercentage=100-HitPercentage |  eval MissPercentage = coalesce(MissPercentage, 100) | eval HitPercentage = coalesce(HitPercentage, 0) | table HitPercentage, MissPercentage | transpose</searchPostProcess>
+        <option name="height">80</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.showLabels">true</option>
+        <option name="charting.chart.showpercent">true</option>
+        <option name="charting.fieldColors">{HitPercentage:0xFA0000,MissPercentage:0xB7B7B7}</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+      </chart>
+    </panel>
+  </row>
+    <row>
+      <table id="detail">
+        <title>Messages</title>
+        <searchPostProcess>rex field=vt "\"verbose_msg\"\:\s\"(?&lt;verbose_msg&gt;.*?)\"" | rex field=vt "\"scan_date\"\:\s\"(?&lt;scan_date&gt;.*?)\"" | rex field=vt "\"permalink\"\:\s\"(?&lt;permalink&gt;.*?)\"" | table verbose_msg, scan_date, permalink | rename verbose_msg AS "Verbose Message", scan_date AS "Scan Date", permalink AS "Event Link"</searchPostProcess>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <drilldown target="_blank">
+          <condition field="Verbose Message"></condition>
+          <condition field="Scan Date"></condition>
+          <condition field="Event Link">$row.permalink$</condition>
+        </drilldown>
+        <option name="wrap">undefined</option>
+        <option name="maxLines">1</option>
+        <option name="rowNumbers">undefined</option>
+      </table>
+  </row>
+
+  <row>
+    <panel>
+      <table>
+        <title>VT Hit Details</title>
+        <searchPostProcess>rex field=vt "\"scans\":.*?{(?&lt;vt2&gt;.*})" | rex max_match=70 field=vt2 "(?&lt;json_field&gt;\".*?\".*?{\"detected\"\:.*?})," | mvexpand json_field | spath input=json_field | rex max_match=70 field=json_field "\"detected\":\s(?&lt;Detected&gt;.*?)," | sort -Detected | rex max_match=70 field=json_field "\"(?&lt;Scanner&gt;.*?)\".*?{"  | rex max_match=70 field=json_field "\"version\":.*?\"(?&lt;Version&gt;.*?)\"," | rex max_match=70 field=json_field "\"update\":.*?\"(?&lt;Update&gt;.*?)\"}" | rex max_match=70 field=json_field "\"result\":\s\"(?&lt;Result&gt;.*?)\"" | table Scanner Detected Version Update Result | rename Result AS "Signature"</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>VT Raw Response</title>
+        <searchPostProcess>table vt | rename vt AS "Response"</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

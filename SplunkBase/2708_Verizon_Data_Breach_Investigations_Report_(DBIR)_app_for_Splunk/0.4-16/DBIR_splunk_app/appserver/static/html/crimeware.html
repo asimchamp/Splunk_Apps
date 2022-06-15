@@ -1,0 +1,103 @@
+<div class="wrapper">
+    <div class="left_menu menu_two_row">
+        <div id='cssmenu'>
+            <div class="logo_top" />
+            <ul id="patternsList" />
+            <ul class="bg">
+                <li>
+                    <a href='dbir_help'><span class="fontb"><span class="help_icon">
+                    <img class="lalign help" src="/static/app/DBIR_splunk_app/images/help.png" alt="">
+                    </span>Help</span></a>
+                </li>
+                <li>
+                    <a href='http://www.verizonenterprise.com/DBIR/2015/' target="blank">
+                    <span class="fontb"><span class="download_icon">
+                    <img class="lalign download" src="/static/app/DBIR_splunk_app/images/download.png" alt="">
+                    </span>Download DBIR</span></a>
+                </li>
+            </ul>
+            <div class="logo_bot" />
+        </div>
+    </div>
+    <div class="right_side">
+        <div class="top_section">
+            <div class="top_section_box">
+                <div class="top_box">
+                    <h1 class="top_title">CRIMEWARE</h1>
+                    <div class="filter_indus">
+                        <ul>
+                            <li id="allIndustryList">
+                                <a class="noborder" href="#"><span class="filter_icon">
+                                <img class="lalign" src="/static/app/DBIR_splunk_app/images/filter.png" alt=""></span>
+                                <span id="all_industry_span" class="filter_title">All Industry</span></a>
+                                <ul class="fallback" id="industryList" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mid_box">
+                    <p>
+                        <b>Crimeware represents malware infections within organizations that are not associated with more specialized classification
+                            patterns such as Cyber-Espionage or Point-of-Sale Intrusions.</b>
+                    </p>
+                    <br />
+                    <p>Like speeches by a politician, Crimeware incidents in our corpus are large in number and short on details, as these everyday
+                        incidents are less likely to receive a full forensic investigation or rise to the level of law enforcement involvement. They are also
+                        predominantly opportunistic and financially motivated in nature.</p>
+                    <br />
+                    <p>We suggest not only capturing and tracking your own malware incidents (i.e. COUNT ALL THE THINGS!) but also spending the time
+                        necessary to get into the weeds to uncover what actions malicious programs were intent on carrying out in your environment.</p>
+                    <br />
+                </div>
+                <h2>Relevant Dashboards</h2>
+            </div>
+        </div>
+        <div class="left_box">
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/overall_mail_analysis">Overall Mail Analysis</a>
+                </h3>
+                <p>A variety of charts to visualize your mail posture, including:</p>
+                <ul>
+                    <li>Mail categories over time</li>
+                    <li>Average size</li>
+                    <li>Recipient and attachment histograms</li>
+                    <li>Blocked domains</li>
+                    <li>Biggest attachments</li>
+                </ul>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/vulnerabilities_overview">Vulnerability Overview</a>
+                </h3>
+                <p>An overview of vulnerability counts by severity and host, including a table of vulnerabilities displayed by signature, severity,
+                    and count.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/vulnerability_explorer">Vulnerability Explorer</a>
+                </h3>
+                <p>Investigate vulnerabilities by specifying customized search parameters for time range, host, signature, and/or severity.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/malware_analysis">Malware Analysis</a>
+                </h3>
+                <p>View all or a subset of malware visualizations, including:</p>
+                <ul>
+                    <li>Affected systems</li>
+                    <li>Affected users</li>
+                    <li>Malware activity over time by tag or signature</li>
+                    <li>Malware events</li>
+                </ul>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                loadIndustryList();
+                loadPatternsList(false);
+                loadPercentages();
+            });
+        </script>
+    </div>
+</div>

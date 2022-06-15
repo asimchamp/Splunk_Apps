@@ -1,0 +1,45 @@
+<dashboard stylesheet="xsv.css">
+  <label>Auto Update Context Macro</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Macro: </span>
+        <span class="cmd">auto_update_context(5)</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Uses the value of the "search" field in a context to automatically update the context using field, context, classList, container and scope parameters.
+</span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">auto_update_context(field,context,classList,container,scope)</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">auto_update_context(count,count_by_dest_port_1d,dest_port,network_traffic,app)</span>
+      </p>
+      <p>
+        <span class="explanation">Updates the context 'count_by_dest_port_1d' by class, in the container 'network_traffic', based upon the data in the field 'count". Uses the contents of the field 'dest_port' to define the context classes. This allows individual contexts for each network port.</span>
+      </p><br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150816.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

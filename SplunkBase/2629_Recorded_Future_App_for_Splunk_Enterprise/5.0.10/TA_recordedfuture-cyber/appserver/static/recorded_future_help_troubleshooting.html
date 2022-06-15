@@ -1,0 +1,125 @@
+<html><body><div><h1>Troubleshooting</h1>
+
+<p>The types of issues involving the Recorded Future App for Splunk can be divided
+into three categories. The Recorded Future App contains three reports, one 
+for each category, to assist troubleshooting:</p>
+
+<table>
+<thead>
+<tr>
+  <th>Category</th>
+  <th>Report name</th>
+  <th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Credential/Network</td>
+  <td>Validate app deployment</td>
+  <td>This report displays the result of a number of tests and lookups that is performed when the report is run.</td>
+</tr>
+<tr>
+  <td>Risk List Download/Frequency</td>
+  <td>Latest updates of all Risk Lists</td>
+  <td>This report show the last 5 Risk List updates.</td>
+</tr>
+<tr>
+  <td>Other</td>
+  <td>All logs from the App</td>
+  <td>This report displays all the logs produced by the app in one view.</td>
+</tr>
+</tbody>
+</table>
+
+<h1>How to Use the Reports</h1>
+
+<h2>Check configuration/network connectivity</h2>
+
+<p>Run the report <span class="rf-field">Validate App Deployment</span> when the 
+Recorded Future App for Splunk has been deployed and configured or as an 
+initial step during troubleshooting. The built-in validator performs a number 
+of tests and collects useful troubleshooting information. "Ok" and "NA" 
+indicates that the App's connectivity/setup is working so anything else, ie 
+"Warning" or "Error", should be investigated.</p>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/recorded_future_help_validate_app.png" alt="Validate app deployment report"></p>
+
+<h2>Verify that Risk Lists are downloaded correctly</h2>
+
+<p>The Recorded Future Risk Lists are available from the Recorded Future API.
+The report <span class="rf-field">Latest Update of all Risk Lists</span>" shows 
+all Risk Lists that have been downloaded successfully. We save the timestamps 
+from the last 5 successful downloads. Any Risk Lists not shown in the report 
+have never been downloaded successfully. </p>
+
+<p>The recommended update frequency of the Recorded Future Risk Lists depends on 
+how often they are updated. The current schedule can be found on the <a href="https://support.recordedfuture.com/hc/en-us/articles/115010401968-Risk-List-Download-Recommendations">Recorded 
+Future Support site</a>.</p>
+
+<p>There are several issues that can impact the download of a Risk List. Follow
+the following guide to troubleshoot Risk Lists which that are not updated as 
+expected:</p>
+
+<ol>
+<li>If all Risk Lists fail to be updated, it is likely that there is an issue 
+with network connectivity or the API Token used. Run the report 
+<span class="rf-field"> Validate app deployment</span> described 
+above.</li>
+<li>Check that the configuration specifies the correct interval for updates on 
+the configuration page. </li>
+<li>The Fusion path may not exist or it was spelled wrong. This can be
+verified by performing the following search: <span class="rf-field">index=_*
+sourcetype="tarecordedfuture:cyber:log" ERROR 404 "File or
+directory" path=*</span>
+<ol>
+<li>Check that the path field corresponds to a Fusion file. Note that it is 
+URL encoded which means that the Fusion file path 
+<span class="rf-field">/home/custom.csv</span> will read 
+<span class="rf-field">%2Fhome%2Fcustom.csv</span>.</li>
+<li>Ensure that the Recorded Future API Token used by the app belongs to the 
+correct enterprise in Recorded Future's system. With the exception of
+public Fusion files (paths starting with /public/), no Fusion
+files are available outside of the Enterprise that owns them.</li>
+<li>Ensure that the Fusion Flow responsible for generating the
+Fusion file was successfully executed.  </li>
+</ol></li>
+<li>The Recorded Future App does not update a Risk List that has not been 
+changed since the last download. To check when the fusion file was last
+modified, use the HEAD method to check its timestamp. <strong>* needs help!*</strong></li>
+</ol>
+
+<h2>Other issues</h2>
+
+<p>The report "All logs from the App"lists all the events created by the app. The 
+log level can be adjusted in the <span class="rf-field">Configuration</span> 
+page. Default is INFO but when troubleshooting it may be appropriate to
+increase the level to DEBUG.</p>
+
+<p>A good starting place is to look for errors (loglevel ERROR). The report can be
+opened in the search view: select <span class="rf-field">Open in Search</span> 
+via the <span class="rf-field">Edit</span> button.</p>
+
+<h1>Raising an issue with Recorded Future</h1>
+
+<p>When reporting an issue to Recorded Future, the following procedure will 
+generate a good set of information for further analysis:</p>
+
+<ol>
+<li>Short summary of the issue: what is or is not happening? Is it happening 
+all the time or is it intermittent or limited to a subset of entities?</li>
+<li>Take screenshots showing the results of reports "Validate App Deployment" 
+and "Latest Update of all Risk Lists".</li>
+<li>Increase the log level to DEBUG</li>
+<li>Trigger the issue.</li>
+<li>Note the date and time the issue was triggered.</li>
+<li>Run the report "All logs from the App" and export the results as a CSV
+file. </li>
+</ol>
+
+<h1>Further Help</h1>
+
+<p>"Recorded Future App for Splunk" has been developed by Recorded Future.</p>
+
+<p>Further information and support can be found on our Support web site:
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360003588753">support.recordedfuture.com</a> </p>
+</div></body></html>

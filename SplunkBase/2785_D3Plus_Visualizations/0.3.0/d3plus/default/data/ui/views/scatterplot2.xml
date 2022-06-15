@@ -1,0 +1,36 @@
+<form script="autodiscover.js">
+  <label>Timeline Scatterplot</label>
+  <row>
+    <panel>
+      <html>
+        <h2> A search over the <code>_internal</code> index:
+          avg bytes and sum of bytes grouped by source, file, and _time</h2>
+          <p id="info">Click on a point. Color shows maximum number of bytes. Try moving the time range selector around,
+          click and drag the black bar then press the play button.</p>
+          <div id="scatterplot_search" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options='{            
+			"search": "
+			index=_internal bytes=* file!=info earliest=-1w 
+			| bucket _time span=1d 
+			| stats sum(bytes) as sum avg(bytes) as avg max(bytes) as max by source file _time
+			| where sum>0",           
+			"preview": true           
+			}'>
+          </div>
+          <div id="scatterplot" class="splunk-view" data-require="app/d3plus/components/scatterplot/scatterplot" data-options='{
+			"managerid": "scatterplot_search",   
+			"height": "800",   
+			"width": "1000",    
+			"is_numeric": ["sum", "avg", "max"],
+			"levels": ["source", "file"],
+			"color_field": "max",
+			"aggs": {"max":"max"},
+			"x_data": {"value": "sum", "scale" : "log"},   
+			"y_data": {"value": "avg", "scale" : "log"},   
+			"point_size": 10,   "tooltip_data": {"children": false},   
+			"time_field": "_time"           
+			}'>
+          </div>
+        </html>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,371 @@
+<form version="1.1" stylesheet="css/common.css">
+  <label>Data Loss Detection - High Volume Endpoint Monitoring</label>
+  <init>
+    <set token="dh_tok"></set>
+    <set token="user_tok"></set>
+    <set token="ph_tok"></set>
+    <set token="pn_tok"></set>
+  </init>
+  <search id="baseSearch">
+    <query>
+        `nvm_flowdata_index`  $pn_tok$ $user_tok$ $ph_tok$ $dh_tok$ NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=softwareupdate AND pap!=nobody AND pap!=_mdnsreponder AND pap!=_lp AND pap!=_locationd AND pap!=root pap!=UpdateUser) | eval dh = if(dh="Unknown", da, dh) | fields _time, udid, da,dp, pn, ppn, dh, transport, user, sa,sp, iid | join udid [ | inputlookup unique_endpoints | search $vsn_tok$ ]  | fields - _raw | table _time, vsn, osn, ose, osv, sm, user, da, dp, dh, sa, sp transport, ist, it ssid, pn, udid
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search id="byteComputationSearch">
+    <query>
+        `nvm_flowdata_index` $pn_tok$ $user_tok$ $ph_tok$ $dh_tok$ NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=softwareupdate AND pap!=nobody AND pap!=_mdnsreponder AND pap!=_lp AND pap!=_locationd AND pap!=root pap!=UpdateUser)  | eval dh = if(dh="Unknown", da, dh) | fields udid, dh, _time, bytes_in, bytes_out, iid,user, pn  | join udid [ | inputlookup unique_endpoints | search $vsn_tok$ ] | eval ip_version=(if(isnull(sa), "ipv6", "ipv4"))  | eval protocol=(case(pr==17, "udp", pr==6, "tcp", pr==1, "icmp", pr==47, "gre", pr==58, "icmp6", true(), pr))  | eval src_address=(if(isnull(sa6), sa, sa6))  | eval dst_address=(if(isnull(da6), da, da6))  | eval mb_out = ((bytes_out/1024)/1024)  | eval mb_in = ((bytes_in/1024)/1024)
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset submitButton="true">
+    <input type="time" token="time">
+      <label>Time</label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="vsn_tok" searchWhenChanged="false">
+      <label>Device(s)</label>
+      <default>*</default>
+      <!-- Each value will be surrounded by the valuePrefix and valueSuffix -->
+      <valuePrefix>vsn="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>vsn</fieldForLabel>
+      <fieldForValue>vsn</fieldForValue>
+      <search>
+        <query>| inputlookup unique_endpoints | stats count by vsn</query>
+        <earliest>0</earliest>
+      </search>
+    </input>
+    <input type="multiselect" token="pn_tok" searchWhenChanged="false">
+      <label>Process(es)</label>
+      <!-- Each value will be surrounded by the valuePrefix and valueSuffix -->
+      <valuePrefix>pn="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>pn</fieldForLabel>
+      <fieldForValue>pn</fieldForValue>
+      <search>
+        <query>| inputlookup unique_processes | stats count by pn</query>
+        <earliest>0</earliest>
+      </search>
+    </input>
+    <input type="multiselect" token="user_tok" searchWhenChanged="false">
+      <label>Users</label>
+      <!-- Each value will be surrounded by the valuePrefix and valueSuffix -->
+      <valuePrefix>user="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>user</fieldForLabel>
+      <fieldForValue>user</fieldForValue>
+      <search>
+        <query>| inputlookup unique_users | stats count by user</query>
+        <earliest>0</earliest>
+      </search>
+    </input>
+    <input type="text" token="ph_tok" searchWhenChanged="false">
+      <label>Process Hash</label>
+    </input>
+    <input type="text" token="dh_tok" searchWhenChanged="false">
+      <label>Destination</label>
+      <prefix>dh="</prefix>
+      <suffix>"</suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Device(s)</title>
+      <single>
+        <search base="baseSearch" id="vsn_count">
+          <query>| dedup vsn | stats count(vsn)</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>User(s)</title>
+      <single>
+        <search base="baseSearch" id="sa_count">
+          <query>| dedup user | stats count(user)</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Process(es)</title>
+      <single>
+        <search base="baseSearch" id="app_count">
+          <query>| dedup pn | stats count(pn)</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Flow(s)</title>
+      <single>
+        <search base="baseSearch" id="sa_trend">
+          <query>| stats count</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Flow Count Trend</title>
+      <single>
+        <search base="baseSearch" id="device_trend_count">
+          <query>| timechart count by vsn</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="underLabel">7 Day Trend</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Inbound Volume</title>
+      <single>
+        <search base="byteComputationSearch" id="mb_in_volume_total">
+          <query> | stats sum(mb_in)</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="unit">MB</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Outbound Volume</title>
+      <single>
+        <search base="byteComputationSearch" id="mb_out_volume_total">
+          <query> | stats sum(mb_out)</query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="unit">MB</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Inbound Trend</title>
+      <single>
+        <search base="byteComputationSearch" id="mb_in_trend">
+          <query> | timechart sum(mb_in) </query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="underLabel">7 Day Trend</option>
+        <option name="unit">MB</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Outbound Trend</title>
+      <single>
+        <search base="byteComputationSearch" id="mb_out_trend">
+          <query> | timechart sum(mb_out)  </query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-7d</option>
+        <option name="underLabel">7 Day Trend</option>
+        <option name="unit">MB</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Client Up/Down Activity</title>
+      <chart>
+        <title>Device Volume In/Out (MB)</title>
+        <search base="byteComputationSearch" id="vsn_in_out">
+          <query> | timechart sum(bytes_in) as in sum(bytes_out) as out by vsn</query>
+        </search>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Destinations Activity</title>
+      <chart id="nvmAppDetinations">
+        <title>Destination Volume In/Out (MB)</title>
+        <search base="byteComputationSearch" id="dh_in_out">
+          <query> | timechart sum(bytes_in) as in sum(bytes_out) as out by dh limit=15</query>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked100</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown target="_blank">
+          <condition field="Destination Domain">\<link>/app/CiscoNVM/address_info?targetDomain=$row.Destination Domain$</link>
+          </condition>
+          <condition field="Destination Address">
+            <link>/app/CiscoNVM/address_info?targetAddr=$row.Destination Address$</link>
+          </condition>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Non-WL Process Traffic - Volume Out (MB)</title>
+      <chart>
+        <search base="byteComputationSearch" id="nonWLTraffic">
+          <query>| stats sum(obc) by udid | rename sum(obc) as out_bytes | sort out_bytes desc | dedup vsn | top out_bytes by vsn | head 20</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>All Process Traffic - Volume Inbound (MB)</title>
+      <chart>
+        <search base="byteComputationSearch" id="pn_in">
+          <query>| stats sum(bytes_in) as in_mb by pn | head 15</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>All Process Traffic - Volume Outbound (MB)</title>
+      <chart>
+        <search base="byteComputationSearch" id="pn_out">
+          <query>| stats sum(bytes_out) as out_mb by pn | head 15</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Total Traffic Consumed by User (MB)</title>
+      <chart>
+        <title>Inbound/Outbound</title>
+        <search base="byteComputationSearch" id="user_out">
+          <query>| eval total_mb = mb_in + mb_out | stats sum(total_mb) by user | head 15</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Flow Records</title>
+      <table id="nvmFilterApp">
+        <search base="baseSearch" id="flow_summary">
+          <query>| table _time, vsn, sa, sp,da,dp, transport, ds, dh, pn,ph | rename pn AS Application, user AS "User", pn AS "Process Name", pa AS "Process Account", ppn AS "Parent Process Name", ppa AS "Parent Process Account", mnl AS "Module Name List", mhl AS "Module Hash List", ph AS "Process Hash", vsn As "Device", sa AS "Src", da AS "Dest", sp As "Src Port", dp AS "Dest Port", ds as "Domain", dh as "Host", transport As "Transport", pph As "Parent Process Hash"</query>
+        </search>
+        <option name="count">25</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <condition field="Hash">
+            <eval token="sourcetype">replace('row.Src', "\\\\", "\\\\")</eval>
+            <set token="tokHideShow">show fade</set>
+            <unset token="showChart"></unset>
+            <link>/app/CiscoNVM/process_info?processName=$row.Hash$</link>
+          </condition>
+          <condition field="Src">
+            <eval token="sourcetype">replace('row.Src', "\\\\", "\\\\")</eval>
+            <set token="tokHideShow">show fade</set>
+            <unset token="showChart"></unset>
+            <link>/app/CiscoNVM/process_info?processName=$row.Src$</link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

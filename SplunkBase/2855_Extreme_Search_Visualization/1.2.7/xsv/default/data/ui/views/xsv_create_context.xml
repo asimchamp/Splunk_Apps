@@ -1,0 +1,205 @@
+<form script="xsv_create_context.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Create Context</label>
+  <!--<description>Enter parameters and click the "Create" button to create a new context.</description>-->
+  <row>
+    <html>
+      <div class="row-fluid">
+        <div id="single-step-create-view-container">
+          <div>
+            <label><span id="create-context-error-msg" class="xsv-error-message"></span></label>
+            <div class="wizard-box" style="height:320px;margin-top:0px;">
+              <div class="inner-wizard-box" style="width:80%;">
+                <label>What field do you want this context to be applied?</label>
+                <input id="contextNameTI" type="text" class="name-only" placeholder="Enter Field Name"/>
+                <label style="margin-top:5px;">What kind of Context would you like to create?</label>
+                <input type="radio" name="methodRadio" value="dataDefined" style="margin: 5px;" checked="checked"/> I want a normal Context.<br/>
+                <input type="radio" name="methodRadio" value="crossoverDriven" style="margin: 5px;" /> I want a context based on statistics.<br/>
+                <input type="radio" name="methodRadio" value="anomalyDriven" style="margin: 5px;" /> I want a context based on outliers.<br/>
+                <label style="margin-top:10px;margin-bottom:10px;">If you want to customize the concepts, then click on the chart.</label>
+                <div id="concepts-view-container">
+                  <div id="thumbnailChart" style="height:100px;width:90%;"><svg></svg></div>
+                </div>
+                <!--
+                <div id="concepts-view-container" style="display:block;">
+                  <label>If you want to change the default set of concepts, then select from the choices below.</label>
+                  <div id="concept-list-panel">
+                    <div class="explorer-row concepts small">
+                      <div class="explorer-nav left concepts small">
+                        <a class="" href="#">
+                          <i class="icon-chevron-left"></i>
+                        </a>
+                      </div>
+                      <div class="explorer-content small">
+                        <div class="owl-carousel concepts" style="display:none;">
+                        </div>
+                      </div>
+                      <div class="explorer-nav right concepts small">
+                        <a class="" href="#">
+                          <i class="icon-chevron-right"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                -->
+              </div>
+            </div>
+            <div class="wizard-box" style="height:320px;margin-top:0px;">
+              <div class="inner-wizard-box" style="width:80%;">
+                <label>Please enter a search Command that will extract data to help generate this context. Select a date range and click the validate button to verify data is returned.</label>
+                <div>
+                  <div id="timeRange" style="display:inline-block;margin-right:10px;vertical-align:top;">
+                  </div>
+                  <div class="buttons-wrapper clearfix" style="display:inline-block !important;padding:0px 80px 20px 0px;vertical-align:top;">
+                    <a id="validateSearchButton" class="create-button btn btn-primary pull-left" href="#" style="display:inline-block;">Validate Search</a>
+                  </div>
+                </div>
+                <textarea rows="10" id="searchTA" style="width:100%;display:block;margin-top:10px;" placeholder="Enter Search"></textarea>
+              </div>
+            </div>
+
+            <div class="wizard-box last" style="height:320px;margin-top:0px;">
+              <div class="inner-wizard-box" style="width:80%">
+                <label>Would you like to create different contexts based on the values of any field(s)? If so, then enter the field(s) here.</label>
+                <div class="input-append">
+                  <input id="newClassTI" type="text" class="form-control name-only" placeholder="Enter Field Name"/>
+                  <button id="addNewClassButton" class="btn btn-default" type="button">Add</button>
+                </div>
+                <div style="min-height:50px;border: 1px solid #CCC; padding: 2px 5px;width:255px;">
+                    <ul id="classListUL" class="concept-list"></ul>
+                </div>
+                <label style="margin-top:15px;">Would you like to create different contexts based on time periods?</label>
+                <input id="hourOfDayCB" type="checkbox" name="hourOfDayCB" value="true" aria-label="..." style="margin-bottom:8px;" >
+                  <span style="margin-left:10px;">I want it based on the Hour of Day.</span>
+                </input>
+                <br/>
+                <input id="dayOfWeekCB" type="checkbox" name="dayOfWeekCB" value="true" aria-label="..." style="margin-bottom:8px;" >
+                  <span style="margin-left:10px;">I want it based on the Day of Week.</span>
+                </input>
+              </div>
+            </div>
+          </div>
+          <div style="display:block;">
+            <div class="buttons-wrapper pull-right clearfix" style="padding:0px 80px 20px 0px;margin-right:-50px;margin-top:-20px;">
+              <a id="createContextButton" class="create-button btn btn-primary pull-left" href="#" style="display: inline;">Create Context</a>
+            </div>
+          </div>
+          <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+            <h1>FAQ</h1>
+            <div class="xsv-faq-group">
+              <div class="xsv-faq-header">
+                <i class="icon-accordion-toggle icon-chevron-right"></i>
+                <span class="xsv-faq-question">
+                  What is a normal context?
+                </span>
+              </div>
+              <div class="xsv-faq-body" style="display:none;">
+                A normal context is one where all concepts are distributed evenly across the range of the context.  The context shall consist of the following concepts: minimal, small, medium, large, and extreme.
+              </div>
+            </div>
+            <div class="xsv-faq-group">
+              <div class="xsv-faq-header">
+                <i class="icon-accordion-toggle icon-chevron-right"></i>
+                <span class="xsv-faq-question">
+                  What is a context based on statistics?
+                </span>
+              </div>
+              <div class="xsv-faq-body" style="display:none;">
+                A context based on statistics is also referred to as a "Crossover Driven" context.  The context shall consist of the following concepts: minimal, small, medium, large, and extreme. The generated context will have boundaries (crossover points between concepts) where membership in the intersecting concepts is equal (0.5).
+              </div>
+            </div>
+            <div class="xsv-faq-group">
+              <div class="xsv-faq-header">
+                <i class="icon-accordion-toggle icon-chevron-right"></i>
+                <span class="xsv-faq-question">
+                  What is a context based on outliers?
+                </span>
+              </div>
+              <div class="xsv-faq-body" style="display:none;">
+                A context based on outliers is also refered to as an "Anomaly Driven" context.  The context shall consist of two concepts: anomalous and normal. The generated context will have boundaries (crossover points between concepts) where data becomes more anomalous than normal, or more normal than anomalous.
+              </div>
+            </div>
+            <div class="xsv-faq-group">
+              <div class="xsv-faq-header">
+                <i class="icon-accordion-toggle icon-chevron-right"></i>
+                <span class="xsv-faq-question">
+                  Why do I need a search command?
+                </span>
+              </div>
+              <div class="xsv-faq-body" style="display:none;">
+                The search command shall return data that this context shall be based upon. Statistics will be generated from this search (e.g., a stats command will be appended to the search) to determine the range and how the individual concept sizes will be scaled across that range.
+              </div>
+            </div>
+            <div class="xsv-faq-group">
+              <div class="xsv-faq-header">
+                <i class="icon-accordion-toggle icon-chevron-right"></i>
+                <span class="xsv-faq-question">
+                  What additional contexts are generated when I specify field name(s)?
+                </span>
+              </div>
+              <div class="xsv-faq-body" style="display:none;">
+                The unique values from the specified field(s) will be used to generate additional contexts to apply to those different groups of events.
+              </div>
+            </div>
+            <div class="xsv-faq-group">
+              <div class="xsv-faq-header">
+                <i class="icon-accordion-toggle icon-chevron-right"></i>
+                <span class="xsv-faq-question">
+                  What additional contexts are generated when I specify time periods??
+                </span>
+              </div>
+              <div class="xsv-faq-body" style="display:none;">
+                Events have the following fields: date_wday and date_hour.  The unique values from these fields can be used to generate additional contexts to apply to those different groups of events.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="single-step-customize-view-container" style="display:none;">
+          <div id="concept-detail-view">
+            <table style="display:inline-block;vertical-align:top;">
+              <thead>
+                <tr>
+                  <th>Concept Name</th>
+                  <th>Concept Shape</th>
+                </tr>
+              </thead>
+              <tbody id="conceptRows">
+              </tbody>
+            </table>
+            <div id="conceptChart" style="height:205px;width:calc(100% - 445px);display:inline-block;"><svg></svg></div>
+            <div style="margin-right:50px;float:right;">
+              <button id="cancelCustomizeConceptsButton" type="button" class="btn btn-default">Cancel</button>
+              <button id="updateCustomizeConceptsButton" type="button" class="btn btn-primary" style="margin-left:10px;">Update</button>
+            </div>
+          </div>
+        </div>
+        <div id="single-step-done-view-container" style="display:none;">
+          <div id="single-step-review-inprogress-panel" style="margin-left:auto;margin-right:auto;width:800px;">
+            <h1 id="single-step-inprogress-message" style="height:400px;">Creating Context . . .</h1>
+          </div>
+          <div id="single-step-review-success-panel" style="margin-left:auto;margin-right:auto;width:700px;display:none">
+            <h1>Context has been created successfully!</h1>
+            <div id="singleStepChart" style="margin-left:-100px;height:500px;width:650px;"><svg style="width:100%;height:100%;"></svg></div>
+            <h3>The context was created with the following search command:</h3>
+            <textarea rows="4" id="theCreateSearchTA" style="margin-top:10px;height:130px;width:450px;"></textarea>
+          </div>
+          <div id="single-step-review-failure-panel" style="display:none;margin-left:auto;margin-right:auto;width:700px;">
+            <h1>Failure Creating Context!</h1>
+            <div id="single-step-review-failure-messages">
+              <p>The context was not created successfully. Please check the following and try again.</p>
+              <ul>
+                <li> Verify the search you entered returns events. </li>
+                <li> Verify the returned events contain the field you specified for the context name. </li>
+                <li> If you specified a field to create different context based on its values, then verify the returned events contain the field you specified. </li>
+                <li> If you specified a time period, then verify the returned events have the respective time field (hour_of_day, day_of_week). </li>
+              </ul>
+            </div>
+            <div class="buttons-wrapper pull-left clearfix" style="padding:20px 80px 20px 0px;">
+              <a id="goBackContextButton" class="create-button btn btn-primary pull-left" href="#" style="display: inline;">Go Back</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </html>
+  </row>
+</form>

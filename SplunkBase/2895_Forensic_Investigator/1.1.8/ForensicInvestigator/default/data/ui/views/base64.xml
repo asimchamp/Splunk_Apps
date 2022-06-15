@@ -1,0 +1,46 @@
+<form stylesheet="custom.css">
+  <label>Base64 Converter</label>
+  <searchTemplate>| script base64 __EXECUTE__ "$input$" "$operation$" | transpose</searchTemplate>
+      <description>Base64 encode and decode data below:</description>
+  <!-- Add time range picker -->
+  <fieldset submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input">
+      <label>Input</label>
+      <suffix/>
+    </input>
+    <input type="dropdown" token="operation">
+      <label>Operation</label>
+      <default>Decode</default>
+      <choice value="decode">Decode</choice>
+      <choice value="encode">Encode</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Result</title>
+        <searchPostProcess>table "row 1" | rename "row 1" as ASCII</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Result (Hex)</title>
+        <searchPostProcess>table "row 3" | rename "row 3" as "Hex Answer"</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+
+</form>

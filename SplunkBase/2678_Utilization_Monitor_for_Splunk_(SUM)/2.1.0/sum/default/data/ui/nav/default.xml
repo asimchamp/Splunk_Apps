@@ -1,0 +1,46 @@
+<nav search_view="search" color="#9a1b1b">
+ <!-- defaults, we won't be needing these right now:
+       <view name="search" default='true' />
+  <view name="data_models" />
+  <view name="reports" />
+  <view name="alerts" />
+  <view name="dashboards" /> -->
+<!-- Start of License Utilization Drop-down Menu -->
+  
+   <view name="Home" default='true' />
+  
+ <collection label="License Usage Analysis">
+   <view name="License_Usage"/>
+  </collection>
+  
+  <collection label="Capacity Planning">
+    <view name="Storage_Requirements"/>
+    <view name="capacity_indexer_cluster_calc"/>
+ </collection>
+  
+  <collection label="Search Head Utilization">
+    <view name="sh_scheduled_utilization"/>
+    <view name="User_Login_Logout"/>  
+    <view name="sh_utilization_by_app_and_view"/>
+    <view name="user_sh_utilization"/>
+  </collection>
+  
+  <collection label="Forwarder Reports">
+    <view name="fwdr_versions"/>
+    <saved name="Current Forwarders"/>
+  </collection>
+  
+  <collection label="Troubleshooting">
+    <view name="sh_scheduled_pdf_errors"/>
+    <view name="events_of_interest"/>
+    <view name="deployment_server"/>
+   </collection>
+  
+  <!-- Future use
+         <collection label="System Performance">
+      
+   </collection>
+  -->
+  <view name="search"/>
+    
+</nav>

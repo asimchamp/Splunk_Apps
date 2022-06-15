@@ -1,0 +1,397 @@
+<form stylesheet="single_trend.css,font_style.css">
+  <label>IPS</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time_display" searchWhenChanged="true">
+      <label>Time to display:</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="index_tok" searchWhenChanged="true">
+      <label>Select an index:</label>
+      <prefix>index="</prefix>
+      <suffix>"</suffix>
+      <!-- Define the default value -->
+      <default>main</default>
+      <!-- Hard-code the choice for "All" -->
+      <!-- Define the other choices with a populating search -->
+      <search>
+        <query>| eventcount summarize=false index=* | dedup index | fields index</query>
+      </search>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+    </input>
+    <input type="dropdown" token="sourcetype_tok" searchWhenChanged="true">
+      <label>Select a sourcetype:</label>
+      <prefix>sourcetype="</prefix>
+      <suffix>"</suffix>
+      <!-- Define the default value -->
+      <default>opsec:smartdefense</default>
+      <!-- Hard-code the choice for "All" -->
+      <!-- Define the other choices with a populating search -->
+      <search>
+        <query>|metadata type=sourcetypes index=*  | table sourcetype</query>
+      </search>
+      <fieldForLabel>sourcetype</fieldForLabel>
+      <fieldForValue>sourcetype</fieldForValue>
+    </input>
+    <input type="dropdown" token="orig" searchWhenChanged="true">
+      <label>Firewall Address</label>
+      <prefix>orig="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">All</choice>
+      <search>
+        <query>$index_tok$ $sourcetype_tok$ | dedup orig | table orig</query>
+      </search>
+      <fieldForLabel>orig</fieldForLabel>
+      <fieldForValue>orig</fieldForValue>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Attacks prevented by IPS</title>
+      <single>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense action=blocked OR action=dropped | timechart count</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="showSparkline">1</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="drilldown">none</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Attacks Detected but not blocked.</title>
+      <single>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense action=monitor | timechart count</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="showSparkline">1</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="drilldown">none</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Blocked Vs Detect Trend</title>
+      <chart>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense (action=blocked OR action=dropped OR action=monitor) | timechart count by action usenull=f useother=f</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top protections used to Block traffic</title>
+      <table>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense action=blocked OR action=dropped | top 15 Protection_Name</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="link.inspectSearch.visible">0</option>
+        <option name="link.openPivot.visible">0</option>
+        <option name="link.openSearch.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Top protection which are in Detect Mode</title>
+      <table>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense action=monitor | top 15 Protection_Name</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>IPS Severity Distribution</title>
+      <chart>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense | eval Severity = case(Severity = "0","NA",Severity = "1","Low",Severity = "2","Medium",Severity = "3","High",Severity = "4","Critical") | stats count by Severity | sort - count</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>IPS Events Performance Impact</title>
+      <chart>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$  product=SmartDefense | eval Performance_Impact = case(Performance_Impact = "0","NA",Performance_Impact = "1","Very-Low",Performance_Impact = "2","Low",Performance_Impact = "3","Medium",Performance_Impact = "4","High",Performance_Impact = "5","Critical") | stats count by Performance_Impact | sort - count</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top IPS Attacks</title>
+      <table>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense | top Attack_Info</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Hourly Block Rate - IPS</title>
+      <chart>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense action=blocked OR action=dropped | stats count by date_hour</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time(hour)</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Confidence Level - IPS</title>
+      <chart>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense | top Confidence_Level</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Monthly Trend - IPS (Blocked and Detect)</title>
+      <chart>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ product=SmartDefense (action=blocked OR action=dropped OR action=monitor)| chart count by date_month, action</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Month</option>
+        <option name="charting.axisTitleY.text">Time</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Geomap based on attack generating country</title>
+      <map>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$  $orig$ product=SmartDefense  | iplocation dest_ip | geostats count by City</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </map>
+    </panel>
+  </row>
+</form>

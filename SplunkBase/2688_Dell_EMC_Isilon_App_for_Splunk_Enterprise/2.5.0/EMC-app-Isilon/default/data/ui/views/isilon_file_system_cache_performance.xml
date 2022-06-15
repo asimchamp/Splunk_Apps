@@ -1,0 +1,116 @@
+<form>
+  <label>File System Cache Performance</label>
+  <search id="baseSearch">
+    <query>|`cache_details($cluster$)`</query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset submitButton="false">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-2h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="cluster" searchWhenChanged="true">
+      <label>Cluster</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <search>
+        <query>|`cluster_list`</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>Cluster_Name</fieldForLabel>
+      <fieldForValue>Cluster_Name</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>File System Cached Data Age</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.cache.oldest_page_age" | eval Hours = round('stats.value'/(60*60),2) | timechart max(Hours) by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Cache Age (Hours)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>L2 Cache Hit Rate (read)</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.cache.l2.data.read.hit" | eval Rate = round('stats.value'*8/(1024*1024),2) | timechart max(Rate) AS Rate  by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">L2 Hit Rate (Mbps)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>L2 Cache Miss Rate (read)</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.cache.l2.data.read.miss" | eval Rate = round('stats.value'*8/(1024*1024),2) | timechart max(Rate) AS Rate by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">L2 Miss Rate (Mbps)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>L2 Cache Read Wait Time</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.cache.l2.data.read.wait" | eval Rate = round('stats.value'*8/(1024*1024),2) | timechart max(Rate) AS Rate by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">L2 Wait Rate (Mbps)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>L2 Cache Prefetch Hit Rate</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.cache.l2.data.prefetch.hit" | eval Rate = round('stats.value'*8/(1024*1024),2) | timechart max(Rate) As Rate by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">L2 Prefetch Hit Rate (Mbps)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+</form>

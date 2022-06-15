@@ -1,0 +1,33 @@
+<form>
+  <label>Check deploy-poll settings</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timerange">
+      <label></label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="expected">
+      <label>expected value</label>
+      <initialValue>targetUri</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Specify hostname of the deployment host in expected value or use the default "targetUri" to look for a set configuration. List will show those not matching the expected value.</title>
+        <search>
+          <query>| metadata type=hosts index=_internal| fields host | forwarderquerystreaming api="/services/deployment/client" | search returnvalue!="*$expected$*" | spath input=returnvalue | fields host,feed.entry.content.s:dict.s:key,returnvalue</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">25</option>
+      </table>
+    </panel>
+  </row>
+</form>

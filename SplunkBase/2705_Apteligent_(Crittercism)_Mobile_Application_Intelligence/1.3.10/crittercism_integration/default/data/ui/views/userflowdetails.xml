@@ -1,0 +1,34 @@
+<form script="link_switcher.js, autodiscover.js">
+  <label>Userflow Details</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" token="app_name">
+      <label>Select an Application:</label>
+      <populatingSearch fieldForValue="appName" fieldForLabel="appName" earliest="-24h" latest="now">
+        <![CDATA[index=crittercism sourcetype=crittercism | stats dc by appName, appId]]>
+      </populatingSearch>
+    </input>
+    <input type="dropdown" token="userflow" searchWhenChanged="true">
+      <label>Userflow</label>
+      <populatingSearch fieldForValue="UserflowName" fieldForLabel="UserflowName">
+        <![CDATA[index=crittercism sourcetype=crittercism "MessageType=UserflowsChangeDetails" appName="$app_name$" earliest=-7d | rex ""\(Name=\"(?<UserflowName>.+?)\" max_match=30 | dedup UserflowName | top UserflowName]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Userflow Metrics</title>
+        <search>
+          <query><![CDATA[index=crittercism sourcetype="crittercism" "MessageType=UserflowGroup" appName="$app_name$" Userflow="$userflow$" |  rex "\(Metric=\"(?<METRIC>.+?)\",count=(?<COUNT>\d+),rate=(?<RATE>\d+.?\d*\%),moneyValue=(?<MONEY_VALUE>\$\d+.?\d*),meanDuration=(?<MEAN_DURATION>(\d+.?\d*)|None)\)" max_match=30 | dedup METRIC sortby -_time | sort -COUNT | table METRIC,COUNT,RATE,MONEY_VALUE,MEAN_DURATION]]></query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

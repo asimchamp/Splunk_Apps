@@ -1,0 +1,187 @@
+<form stylesheet="custom.css">
+  <label>Eventlog - Visualization</label>
+  <!-- Add time range picker -->
+  <fieldset submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="host" searchWhenChanged="true">
+      <label>Host</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="log" searchWhenChanged="true">
+      <label>Log</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="user" searchWhenChanged="true">
+      <label>User</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="EID" searchWhenChanged="true">
+      <label>Event ID</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Hosts</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | top limit=0 EventLogItem.machine</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Log</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | top limit=0 EventLogItem.log</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Source</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | rare limit=0 EventLogItem.source</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare User</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | rare limit=0 EventLogItem.user,</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Event ID</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | rare limit=0 EventLogItem.EID,</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Type</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ |rare limit=0  EventLogItem.type</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Process ID</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | rare limit=0 EventLogItem.ExecutionProcessId, | rename EventLogItem.ExecutionProcessId AS "Process ID"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Category</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | rare limit=0 EventLogItem.category</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>ServiceFileName</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32eventlogs $wild$ EventLogItem.machine=$host$ EventLogItem.log=$log$ EventLogItem.source=$source$ EventLogItem.user=$user$ EventLogItem.EID=$EID$ | rare limit=0 ServiceFileName</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,135 @@
+<form>
+  <label>Twitter Disease Tracker</label>
+  <center>
+    <description>
+      <br>List of Diseases</br>
+    </description>
+  </center>
+  <earliestTime>-120h@h</earliestTime>
+  <latestTime>now</latestTime>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" token="diseasesourcetype" searchWhenChanged="true">
+      <label>Select a disease for heatmap and graph visualization</label>
+      <default value="TwitterFlu">Flu</default>
+      <choice value="TwitterFlu">Flu</choice>
+      <choice value="TwitterCold">Cold</choice>
+      <choice value="TwitterAllergy">Allergies</choice>
+      <choice value="TwitterSalmonella">Salmonella</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <map>
+        <search>
+          <query>sourcetype=$diseasesourcetype$ coordinates.type=Point | rename coordinates.coordinates{} as lnglat | 
+            eval lat=mvindex(lnglat,1) | eval lng=mvindex(lnglat,0) | geostats latfield=lat longfield=lng count</query>
+          <earliest>rt-5d</earliest>
+          <latest>rtnow</latest>
+        </search>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+      </map>
+    </panel>
+    <panel>
+      <title>About this application</title>
+      <html>
+      
+        
+          
+          <left> 
+            <p> <b>Note: Only a small percentage of Twitter users supply latitude/longitude coordinates.  Because of this, there
+              are significantly fewer results for the heatmap than there are for self-reported users' locations.</b>  
+              </p>
+            
+            <p> <b>Synopsis:</b> This application tracks tweets worldwide, searching for symptoms of common diseases.  Based on these
+              symptoms, the application creates dashboard visualizations by extracting Twitter users' location coordinates and
+              self-reported locations.  All searches are conducted within a five-day realtime window.
+              </p>
+            <p> Much of our work was based on a college paper called "You Are What You Tweet", which is formally cited 
+            at the bottom of this dashboard.</p>
+            <p> For information on how to run this application on your computer, see the README in $SPLUNKHOME/etc/apps/twitterdiseasetracker</p>
+            <p> <b>Search terms for flu:</b> fever, vomiting</p>
+            <p> <b>Search terms for cold:</b> congestion, cough, sore throat, runny nose, stuffy nose, headache, sneezing, watery eyes,fatigue</p>
+            <p> <b>Search terms for allergies:</b> sneezes, sneezy, watery eyes, claritin, zyrtec, hayfever, antihistamine, itchy eyes, itchy nose, nose is itchy</p>
+            <p> <b>Search terms for salmonella:</b> nausea, vomiting, diarrhea, fever, chills, headache </p>
+          </left> 
+      
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Self-reported Time Zone Visualization</title>
+        <search>
+          <query>sourcetype=$diseasesourcetype$ user.time_zone != "null"| top limit=20 user.time_zone</query>
+          <earliest>rt-5d</earliest>
+          <latest>rtnow</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Users' time zone</option>
+        <option name="charting.axisTitleY.text">Count</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>List of Top, Self-Reported Locations</title>
+        <search>
+          <query>sourcetype=$diseasesourcetype$ user.location != ""| replace "United States" with "USA" in user.location|
+            replace "philippines" with "Philippines" in user.location|top limit=20 user.location</query>
+          <earliest>rt-5d</earliest>
+          <latest>rtnow</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title> References</title>
+      <html>
+        <left> 
+          <p>"Common Cold." <i>Mayo Clinic.</i> N.p., n.d. Web.</p> 
+          <p> Dallimore, Damien. <i>"Rest API Modular Input."</i> Splunk.com. Splunk Inc, 18 Feb. 2014. Web.</p>
+          <p>"How to Stream Twitter into Splunk in 10 Simple Steps." <i>Discovered Intelligence.</i> N.p., 8 Jan. 2014. Web.</p>
+          <p> Paul, Michael J., and Mark Dredze. "You Are What You Tweet: Analyzing Twitter for Public Health." (2011): n. pag. <i>John Hopkins Department of Computer Science.</i> John Hopkins University. Web. </p>
+          <p> "Salmonella Infection." <i>Mayo Clinic.</i> Mayo Clinic Staff, n.d. Web.</p>
+          <p> "Twitter Developers." <i>Twitter.</i> N.p., n.d. Web.</p>
+        </left>
+      </html>
+    </panel>
+  </row>
+</form>

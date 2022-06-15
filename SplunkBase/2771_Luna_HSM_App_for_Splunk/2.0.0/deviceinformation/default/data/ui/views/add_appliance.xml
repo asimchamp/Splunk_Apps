@@ -1,0 +1,123 @@
+<dashboard script="javascript/add_appliance.js" stylesheet="styles/remove_appliance.css,styles/vendor/bootstrap.min.css" version="1.1">
+  <label>Add Luna HSM Appliance</label>
+  <row>
+    <panel>
+      <html>
+        <hr />
+        <form class="luna-form-group-form-element">
+          <div class="form-group row">
+            <label for="destination" class="col-4 col-form-label">Configuration Name</label>
+            <div class="col-8">
+              <input autocomplete="off" id="configName" name="configName" type="text" aria-describedby="configNameHelpBlock" required="required" class="form-control" />
+              <span id="configNameHelpBlock" class="form-text text-muted">Unique name for configuration</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="activation_key" class="col-4 col-form-label">SNMP Modular Input Activation Key</label>
+            <div class="col-8">
+              <input autocomplete="off" id="activation_key" name="activation_key" type="text" aria-describedby="activation_keyHelpBlock" required="required" class="form-control" />
+              <span id="activation_keyHelpBlock" class="form-text text-muted">
+                Visit <a href="http://www.baboonbones.com/#activation" target="_blank">http://www.baboonbones.com#activation</a>
+              </span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="destination" class="col-4 col-form-label">Destination</label>
+            <div class="col-8">
+              <input autocomplete="off" id="destination" name="destination" type="text" aria-describedby="destinationHelpBlock" required="required" class="form-control" />
+              <span id="destinationHelpBlock" class="form-text text-muted">IP or hostname of the device you would like to query</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-4">IP version 6</label>
+            <div class="col-8">
+              <div class="custom-control custom-checkbox custom-control-inline">
+                <input autocomplete="off" name="ipv6" id="ipv6_0" type="checkbox" aria-describedby="ipv6HelpBlock" class="custom-control-input" value="" />
+                <label for="ipv6_0" class="custom-control-label">Yes</label>
+              </div>
+              <span id="ipv6HelpBlock" class="form-text text-muted">Whether or not this is an IP version 6 address. Defaults to false</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="v3_securityName" class="col-4 col-form-label">SNMPv3 USM username</label>
+            <div class="col-8">
+              <input autocomplete="off" id="v3_securityName" name="v3_securityName" type="text" required="required" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="v3_authKey" class="col-4 col-form-label">SNMPv3 Authorization Key</label>
+            <div class="col-8">
+              <input autocomplete="off" id="v3_authKey" name="v3_authKey" type="password" aria-describedby="v3_authKeyHelpBlock" required="required" class="form-control" />
+              <span id="v3_authKeyHelpBlock" class="form-text text-muted">SNMPv3 secret authorization key used within USM for SNMP PDU authorization</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="v3_authProtocol" class="col-4 col-form-label">SNMPv3 Authorization Protocol</label>
+            <div class="col-8">
+              <select id="v3_authProtocol" name="v3_authProtocol" aria-describedby="v3_authProtocolHelpBlock" required="required" class="custom-select">
+                <option value="usmHMACSHAAuthProtocol">usmHMACSHAAuthProtocol</option>
+                <option value="usmHMACMD5AuthProtocol">usmHMACMD5AuthProtocol</option>
+                <option value="fishusmNoAuthProtocol">usmNoAuthProtocol</option>
+              </select>
+              <span id="v3_authProtocolHelpBlock" class="form-text text-muted">Hashing for Authorisation Protocol parameter</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="v3_privKey" class="col-4 col-form-label">SNMPv3 Encryption Key</label>
+            <div class="col-8">
+              <input autocomplete="off" id="v3_privKey" name="v3_privKey" type="password" aria-describedby="v3_privKeyHelpBlock" required="required" class="form-control" />
+              <span id="v3_privKeyHelpBlock" class="form-text text-muted">SNMPv3 secret encryption key used within USM for SNMP PDU encryption</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="v3_privProtocol" class="col-4 col-form-label">SNMPv3 Encryption Key Protocol</label>
+            <div class="col-8">
+              <select id="v3_privProtocol" name="v3_privProtocol" aria-describedby="v3_privProtocolHelpBlock" class="custom-select">
+                <option value="usmAesCfb128Protocol">usmAesCfb128Protocol</option>
+                <option value="usmDESPrivProtocol">usmDESPrivProtocol</option>
+                <option value="usmAesCfb192Protocol">usmAesCfb192Protocol</option>
+                <option value="usmAesCfb256Protocol">usmAesCfb256Protocol</option>
+                <option value="usmNoPrivProtocol">usmNoPrivProtocol</option>
+              </select>
+              <span id="v3_privProtocolHelpBlock" class="form-text text-muted">Encryption methods for Encryption Protocol parameters</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="port" class="col-4 col-form-label">Port</label>
+            <div class="col-8">
+              <input id="port" name="port" placeholder="161" type="text" aria-describedby="portHelpBlock" class="form-control" />
+              <span id="portHelpBlock" class="form-text text-muted">The SNMP port. Defaults to 161</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="system_python_path" class="col-4 col-form-label">System Python Path</label>
+            <div class="col-8">
+              <input autocomplete="off" id="system_python_path" name="system_python_path" type="text" aria-describedby="system_python_pathHelpBlock" required="required" class="form-control" />
+              <span id="system_python_pathHelpBlock" class="form-text text-muted">Defaults to /usr/bin/python</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="snmpinterval" class="col-4 col-form-label">SNMP Interval</label>
+            <div class="col-8">
+              <input id="snmpinterval" name="snmpinterval" placeholder="60" type="text" aria-describedby="snmpintervalHelpBlock" class="form-control" />
+              <span id="snmpintervalHelpBlock" class="form-text text-muted">SNMP attribute polling timeout (in seconds). Defaults to 60 second.</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="timeout" class="col-4 col-form-label">SNMP Timeout</label>
+            <div class="col-8">
+              <input id="timeout" name="timeout" placeholder="5" type="text" aria-describedby="timeoutHelpBlock" class="form-control" />
+              <span id="timeoutHelpBlock" class="form-text text-muted">How often to run the SNMP query (in seconds). Defaults to 5 seconds</span>
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="offset-4 col-8">
+              <button name="cancel" id="lunaapp_cancel_button" type="button" class="btn btn-primary">Cancel</button>
+              <button name="submit" id="lunaapp_submit_button" type="button" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+        </form>
+      </html>
+    </panel>
+  </row>
+</dashboard>

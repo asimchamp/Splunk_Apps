@@ -1,0 +1,301 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}} Setup{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <style>       
+        .main-area {
+            margin: 0px auto;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding: 10px;
+            width: 70%;
+        }
+
+        .box-setting {
+            margin: 10px !important;
+            padding: 10px;
+            font-size: 10pt;
+            text-align: left;
+            background-color: #f5f5f5;
+            border: 1px solid rgb(204, 204, 204);
+        }
+
+        .center
+        {
+            float: none !important;
+            margin-left:auto;
+            margin-right:auto;
+            width:400px;
+        }
+
+        .setting-input{
+            width: 90%;
+        }
+
+        .success {
+            color: green !important;
+            border-color: green !important;
+        }
+
+        .error {
+            color: red !important;
+            border-color: red !important;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+    <div>
+        <div class="dashboard-body container-fluid main-section-body">
+           <div class="dashboard-row">
+                <div class="dashboard-cell center">
+                    <div class="dashboard-panel">
+                        <div class="panel-head">
+                            <div class="box-setting">
+                                <h3>Blueliv API feed settings</h3>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="box-setting">
+                                <label class="apikey">API-Key</label>
+                                <input type="text" id="apikey" class="setting-input apikey">
+                                <!--<label class="apiurl">API-url</label>
+                                <input type="text" id="apiurl" class="setting-input apikey">-->
+                                <label class="apirefresh">Access type</label>
+                                <select data-type="{{message}}" id="apirefresh" class="setting-input apikey">
+                                    <option value="PAID">COMMERCIAL</option>
+                                    <option value="FREE">FREE</option>
+                                </select>
+                                </br><button class="btn btn-primary submit" id="save-apikey">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-panel">
+                        <div class="panel-head">
+                            <div class="box-setting">
+                                <h3>Threat Overview feed settings</h3>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="box-setting">
+                                <div>
+                                    This will force the download of all current ONLINE CrimeServers in the next update.
+                                </div>
+                                <button style="margin-top:0.70em;" id="restart-feed" type="button" class="btn btn-danger">Restart feed</button><span id="restart-msg"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-cell center">
+                    <div class="dashboard-panel">
+                        <div class="panel-head">
+                            <div class="box-setting">
+                                <h3>Configure Proxy settings if needed</h3>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="box-setting">
+                                <label class="proxy">Proxy host (blank if not needed):</label>
+                                <input type="text" id="proxy-host" class="setting-input proxy">
+                                <label class="proxy">Proxy port (blank if not needed):</label>
+                                <input type="text" id="proxy-port" class="setting-input proxy">
+                                <label class="proxy">Proxy user (blank if not needed):</label>
+                                <input type="text" id="proxy-user" class="setting-input proxy">
+                                <label class="proxy">Proxy password (blank if not needed):</label>
+                                <input type="password" id="proxy-pass" class="setting-input proxy">
+                                </br><button class="btn btn-primary submit" id="save-proxy">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script>
+        var deps = [
+            'splunkjs/mvc',
+            'splunkjs/mvc/utils',
+            "splunkjs/mvc/searchmanager",
+            "splunkjs/mvc/savedsearchmanager",
+            "splunkjs/ready!",
+            "jquery"
+        ];
+
+        require(deps, function(mvc) {
+            var SearchManager = require("splunkjs/mvc/searchmanager");
+            var SavedSearchManager = require("splunkjs/mvc/savedsearchmanager");
+
+            var search_id = 0;
+            
+            $("#save-apikey").click(function(event) {
+                search_id++;
+                var apikey = $("#apikey").val().replace(" ", "");
+                if(apikey == ''){
+                    apikey = 'paste-your-apikey-here';
+                }
+                var access = $("#apirefresh").val();
+                if(access == "PAID"){
+                    var apiurl = "https://api.blueliv.com";
+                    var refresh = "15";
+                }else{
+                    var apiurl = "https://freeapi.blueliv.com";
+                    var refresh = "360";
+                }
+                var mysearch = new SearchManager({
+                    id : "blueliv_setup_"+search_id,
+                    search : "| script python blueliv_setup key " + apikey + " " + apiurl + " " + refresh,
+                    autostart: "false"
+                });
+
+
+                mysearch.startSearch();
+
+                mysearch.on('search:done', function (properties) {
+            
+                    var results = mysearch.data("results");
+                    
+                    if(typeof results['attributes']['manager']['attributes']['data']['messages'][0] !== "undefined") {
+                        var msg = results['attributes']['manager']['attributes']['data']['messages'][0]['text'];
+                        
+                        if(msg === 'ok'){
+                            $(".apikey").addClass('success');
+                        }
+                        else{
+                            $(".apikey").addClass('error');
+                        }
+                        
+                    }else{
+                        $(".apikey").addClass('error');
+                    }
+                    
+                });
+            });
+            search_id = 0;
+            $("#restart-feed").click(function(event) {
+                search_id++;
+                var restartSearch = new SearchManager({
+                    id : "reset_db_"+search_id,
+                    search : "| script python resetcsdb",
+                    autostart: "false"
+                });
+
+
+                restartSearch.startSearch();
+
+                restartSearch.on('search:done', function (properties) {
+
+                    var results = restartSearch.data("results");
+
+                    if(typeof results['attributes']['manager']['attributes']['data']['messages'][0] !== "undefined") {
+                        var msg = results['attributes']['manager']['attributes']['data']['messages'][0]['text'];
+
+                        if(msg === 'ok'){
+                            $("#restart-msg").text('Feed will be restarted.');
+                        }else{
+                           $("#restart-msg").text('Error restarting feed.');
+                        }
+
+                    }else{
+                        $("#restart-msg").text('Error restarting feed.');
+                    }
+
+                });
+            });
+
+            $("#save-proxy").click(function(event) {
+                var host = $("#proxy-host").val().replace(" ", "");;
+                var port = $("#proxy-port").val().replace(" ", "");;
+                var user = $("#proxy-user").val();
+                var pass = $("#proxy-pass").val();
+                if((host == '' || port == '') && (pass != '' && user == '')){
+                    $(".proxy").addClass('error');
+                }else{
+                    search_id++;
+                    var mysearchProxy = new SearchManager({
+                        id : "blueliv_setup_"+search_id,
+                        search : "| script python blueliv_setup proxy " + host + " " + port + " " + user + " " + pass,
+                        autostart: "false"
+                    });
+
+
+                    mysearchProxy.startSearch();
+
+                    mysearchProxy.on('search:done', function (properties) {
+                
+                        var results = mysearchProxy.data("results");
+                        
+                        if(typeof results['attributes']['manager']['attributes']['data']['messages'][0] !== "undefined") {
+                            var msg = results['attributes']['manager']['attributes']['data']['messages'][0]['text'];
+                            
+                            if(msg === 'ok'){
+                                $(".proxy").addClass('success');
+                            }else{
+                                $(".proxy").addClass('error');
+                            }
+
+                        }else{
+                            $(".proxy").addClass('error');
+                        }
+                        
+                    });
+                }
+                
+            });
+
+
+            var mysearchGetConfig = new SearchManager({
+                id : "blueliv_get_configuration",
+                search : "| script python blueliv_get_config",
+                autostart: "true"
+            });
+            
+            mysearchGetConfig.on('search:done', function (properties) {
+            
+                var results = mysearchGetConfig.data("results");
+                
+                if(typeof results['attributes']['manager']['attributes']['data']['messages'][0] !== "undefined") {
+                    var result = results['attributes']['manager']['attributes']['data']['messages'][0]['text'];
+                    var msg = result.split("|");
+                    var apikey = msg[0];
+                    var apiurl = msg[1];
+                    var refresh = msg[2];
+                    var host = msg[3];
+                    var port = msg[4];
+                    var user = msg[5];
+                    var passwd = msg[6];
+
+                    $("#apikey").val(apikey);
+                    //$("#apiurl").val(apiurl);
+                    if(refresh == 15){
+                        refresh = "PAID";
+                    }else{
+                        refresh = "FREE";
+                    }
+                    if($("#apirefresh").data('type') == "PAID"){
+                        $("#apirefresh").val("PAID");
+                    }else{
+                        $("#apirefresh").val("FREE");
+                    }
+                    //$("#apirefresh").val(refresh);
+                    $("#proxy-host").val(host);
+                    $("#proxy-port").val(port);
+                    $("#proxy-user").val(user);
+                    $("#proxy-pass").val(passwd);
+                }
+                
+            });
+            
+        });
+
+        
+    </script>
+    
+{% endblock js %}

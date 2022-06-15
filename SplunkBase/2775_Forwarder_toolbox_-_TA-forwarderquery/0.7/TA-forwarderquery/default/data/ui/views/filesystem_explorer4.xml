@@ -1,0 +1,155 @@
+<form>
+  <!--  script="table_icons_rangemap2.js" stylesheet="table_decorations2.css" -->
+  <label>Filesystem explorer4</label>
+  <init>
+    <set token="path">/services/admin/file-explorer/</set>
+    <set token="root">/services/admin/file-explorer/</set>
+    <set token="prittypath">/services/admin/file-explorer/</set>
+    <set token="parentpath">/services/admin/file-explorer/</set>
+  </init>
+  <fieldset autoRun="false" submitButton="true">
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>host</label>
+      <search>
+        <query>| metadata type=hosts index=_internal</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+    <input type="dropdown" token="stanza">
+      <label>Password set</label>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>| rest splunk_server=local /servicesNS/nobody/TA-forwarderquery/properties/forwarderquery/  | search title!=mystanza</query>
+      </search>
+      <initialValue>default</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>|forwarderquery server="$host$" api="/services/server/info" stanza="default" contenttype=json2 | eval startup_time=strftime(startup_time,"%c") | table cpu_arch,os_name,os_version,startup_time</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Browse folder - click to navigate to path</title>
+      <html>
+        you are here: <b>$prittypath$</b> <!-- parent: $parentpath$ path: $path$ -->
+      </html>
+      <table>
+        <search>
+          <query>| gentimes start=-1 | eval alternate="$root$" | eval name=" (list filesystems) " | eval nav="/" | eval fullpath="/" | eval path="/" | eval breadcrumb="True" 
+| append [
+|forwarderquery server="$host$" api="$path$" stanza="$stanza$" contenttype=json2   
+| search breadcrumb="True"  | search alternate!="$form.path$"
+]
+| table nav,name,lastModifiedTime,alternate,fullpath,path | sort nav desc</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">50</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">false</option>
+        <fields>["nav","name","lastModifiedTime"]</fields>
+        <drilldown>
+          <set token="parentpath">$path$</set>
+          <set token="path">$row.alternate$</set>
+          <set token="form.path">$path$</set>
+          <set token="prittypath">$row.fullpath$</set>
+        </drilldown>
+      </table>
+      <table>
+        <search>
+          <query>|forwarderquery server="$host$" api="$path$" stanza="$stanza$" contenttype=json2   
+| search hasSubNodes="True" | where isnull(breadcrumb)
+| table nav,name,lastModifiedTime,alternate,fullpath,path | sort name DESC</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">50</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">false</option>
+        <fields>["nav","name","lastModifiedTime"]</fields>
+        <drilldown>
+          <set token="parentpath">$path$</set>
+          <set token="path">$row.alternate$</set>
+          <set token="form.path">$path$</set>
+          <set token="prittypath">$row.fullpath$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <title>Files - click to open oneshot index dialog</title>
+      <table>
+        <search>
+          <query>|forwarderquery server="$host$" api="$path$" stanza="$stanza$" contenttype=json2 | eval fileSize=if(hasSubNodes="True", "(folder)", fileSize+" kb")   
+| eval alternate=if(hasSubNodes="True", alternate, "$path$")
+| search hasSubNodes="False"
+| eval extension=mvindex(split(name,"."),-1)
+| table name,extension,fileSize,lastModifiedTime,alternate,fullpath | sort name DESC</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["name","extension","fileSize","lastModifiedTime"]</fields>
+        <drilldown>
+          <link target="_blank">/app/TA-forwarderquery/forwarder_add_oneshot?form.host=$host$&amp;form.path=$row.fullpath$&amp;form.sourcetype=breakable_text&amp;form.index=devnull</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <title>Biggest files</title>
+      <viz type="treemap_app.treemap">
+        <search>
+          <query>|forwarderquery server="$host$" api="$path$" stanza="$stanza$" contenttype=json2
+| eval alternate=if(hasSubNodes="True", alternate, "$path$")
+| search hasSubNodes="False"
+| eval extension=mvindex(split(name,"."),-1)
+| stats sum(fileSize) as Size by extension,name | where not isnull(Size)</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="treemap_app.treemap.colorMode">categorical</option>
+        <option name="treemap_app.treemap.maxCategories">10</option>
+        <option name="treemap_app.treemap.maxColor">#3fc77a</option>
+        <option name="treemap_app.treemap.minColor">#d93f3c</option>
+        <option name="treemap_app.treemap.numOfBins">9</option>
+        <option name="treemap_app.treemap.showLabels">false</option>
+        <option name="treemap_app.treemap.showLegend">false</option>
+        <option name="treemap_app.treemap.showTooltip">true</option>
+        <option name="treemap_app.treemap.useColors">true</option>
+        <option name="treemap_app.treemap.useZoom">true</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+</form>

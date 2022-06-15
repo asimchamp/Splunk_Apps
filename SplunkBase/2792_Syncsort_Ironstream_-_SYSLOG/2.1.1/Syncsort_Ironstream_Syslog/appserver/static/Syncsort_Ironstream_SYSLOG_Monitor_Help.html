@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Roboto, Droid, Helvetica Neue, Helvetica, Arial, sans-serif;
+        }
+
+        .ironstream-help-main-table {
+            margin: 20px;
+            border-spacing: 0;
+        }
+
+        .ironstream-help-main-table th {
+            padding: 10px 5px;
+            text-align: left;
+            background-color: #1e83bb;
+            color: #fff;
+        }
+
+        .ironstream-help-main-table td {
+            padding: 10px 5px;
+        }
+
+        .ironstream-help-main-table tr:nth-child(even) {
+            background: #d8d8d8;
+        }
+
+        .ironstream-help-main-table tr:nth-child(odd) {
+            background: #FFF
+        }
+    </style>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <h2>Syncsort Ironstream® SYSLOG Monitor </h2>
+    The z/OS System Log (SYSLOG) monitor application allows users to see all messages,
+	or select messages from RACF, CICS, DB2, IMS, USS, WebSphere
+	Application Server and WebSphere MQ. The SYSLOG monitor can also examine some 
+	IEF system messages.
+	
+	The z/OS SYSLOG is the main system log that runs on the mainframe. Users can 
+	distinguish different message types by examining the different message numbers.
+
+
+    <p>The following are message numbers used in within the application:
+        </p>
+        
+    <table class="ironstream-help-main-table">
+        <thead>
+            <tr>
+                <th>Message Number</th>
+                <th>Explanation</th>
+                </th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ICH408I</td>
+                <td>RACF authority violations</td>
+            </tr>
+			<tr>
+                    <td>ICH70001I</td>
+                    <td>User granted access to system by RACF
+                    </td>
+            </tr> 
+            <tr>
+                <td>IEF450I </td>
+                <td>Job abend
+                    </td>
+            </tr>
+            <tr>
+            <td>IEF099I</td>
+            <td>Dataset in waiting
+            </td>
+            </tr>
+
+                <td>IWF403I</td>
+                <td>Job start
+                </td>
+            </tr>    
+            <tr>
+                    <td>IEF404I</td>
+                    <td>Job end
+                    </td>
+            </tr>
+            <tr>
+                    <td>IEF453I</td>
+                    <td>JCL error
+                    </td>
+            </tr>             
+             <tr>
+                    <td>$HASP250</td>
+                    <td>Job was removed from the queue normally
+                    </td>
+            </tr>     
+			  <tr>
+                    <td>$HASP395</td>
+                    <td>Job completed processing
+                    </td>
+            </tr>  
+			  <tr>
+                    <td>DSNT375I</td>
+                    <td>DB2 deadlock                    </td>
+            </tr>    
+			  <tr>
+                    <td>DSNI031I</td>
+                    <td>DB2 lock escalation
+                    </td>
+            </tr>         
+			  <tr>
+                    <td>DSNB260I</td>
+                    <td>Long-running DB2 reader
+                    </td>
+            </tr>     
+			  <tr>
+                    <td>DSNT376I</td>
+                    <td>DB2 time out
+                    </td>
+            </tr>     
+        </tbody>
+    </table>
+
+   

@@ -1,0 +1,872 @@
+{
+    "modelName": "ftnt_fos",
+    "displayName": "Fortinet FOS Log",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 18,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "log",
+            "displayName": "Firewall Logs",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "devname",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "device_name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "vd",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "vdom",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "dstip",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "destination_ip",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "dstport",
+                    "owner": "log",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "destination_port",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "vendor_action",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "vendor_action",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "subtype",
+                    "owner": "log",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "subtype",
+                    "comment": "",
+                    "fieldSearch": "subtype=*"
+                },
+                {
+                    "fieldName": "msg",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "msg",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "srcip",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source_ip",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "user",
+                    "owner": "log",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "user",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sentbyte",
+                    "owner": "log",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "bytes_sent",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "rcvdbyte",
+                    "owner": "log",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "bytes_received",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "bytes",
+                            "owner": "log",
+                            "type": "number",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "bytes",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "33ye7jatrnc23xr",
+                    "owner": "log",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "rcvdbyte + sentbyte"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "suser",
+                            "owner": "log",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "user",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "b5nvzeqblzjs8aor",
+                    "owner": "log",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "coalesce(user, \"unknown\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "`fortigate_logs`",
+                    "owner": "log"
+                }
+            ],
+            "lineage": "log"
+        },
+        {
+            "objectName": "traffic",
+            "displayName": "traffic",
+            "parentName": "log",
+            "fields": [
+                {
+                    "fieldName": "app",
+                    "owner": "log.traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "application",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "action",
+                    "owner": "log.traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "action",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sessionid",
+                    "owner": "log.traffic",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sessionid",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "srcintf",
+                    "owner": "log.traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source_interface",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "dstintf",
+                    "owner": "log.traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "destination_interface",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "sappcat",
+                            "owner": "log.traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "appcat",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "mzjg69trwbmg3nmi",
+                    "owner": "log.traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "coalesce(appcat, \"unknown\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "gapp",
+                            "owner": "log.traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Application",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "6xc7edtj41zcl3di",
+                    "owner": "log.traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(isnotnull(app), app, 1=1, service)"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "type=traffic",
+                    "owner": "log.traffic"
+                }
+            ],
+            "lineage": "log.traffic"
+        },
+        {
+            "objectName": "utm",
+            "displayName": "utm",
+            "parentName": "log",
+            "fields": [
+                {
+                    "fieldName": "service",
+                    "owner": "log.utm",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "service",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "gseverity",
+                            "owner": "log.utm",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "generic severity",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "xkmgmwi8eka9k9",
+                    "owner": "log.utm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(  ( subtype==\"app-ctrl\" AND appcat==\"Botnet\"), \"critical\", (subtype==\"app-ctrl\" AND appcat==\"P2P\"), \"medium\", (subtype==\"app-ctrl\" AND appcat==\"Game\"), \"low\", (subtype==\"app-ctrl\" AND appcat==\"Proxy\"),\"high\", (subtype==\"webfilter\" AND  (cat==26 OR cat==61 OR cat==86 OR action==\"blocked\")), \"high\",(subtype==\"webfilter\" AND (cat==1 OR cat==2 OR cat==3 OR cat==4 OR cat==5 OR cat==6 OR cat==12 OR cat==59 OR cat==62 OR cat==83)), \"medium\",(subtype==\"webfilter\" AND (cat==14 OR cat==72)), \"low\",severity==\"critical\", \"critical\", severity==\"high\", \"high\", severity==\"medium\", \"medium\",severity==\"low\", \"low\", (subtype==\"virus\" AND eventype==\"infected\"), \"critical\", (1=1), \"\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "(type=utm OR type=anomaly) AND (subtype=app-ctrl OR subtype=webfilter OR subtype=ips OR subtype=virus OR subtype=emailfitler OR subtype=dlp OR subtype=anomaly)",
+                    "owner": "log.utm"
+                }
+            ],
+            "lineage": "log.utm"
+        },
+        {
+            "objectName": "system_event",
+            "displayName": "system_event",
+            "parentName": "log",
+            "fields": [],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "type=event AND subtype!=wireless",
+                    "owner": "log.system_event"
+                }
+            ],
+            "lineage": "log.system_event"
+        },
+        {
+            "objectName": "virus",
+            "displayName": "virus",
+            "parentName": "utm",
+            "fields": [],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=virus",
+                    "owner": "log.utm.virus"
+                }
+            ],
+            "lineage": "log.utm.virus"
+        },
+        {
+            "objectName": "webfilter",
+            "displayName": "webfilter",
+            "parentName": "utm",
+            "fields": [
+                {
+                    "fieldName": "hostname",
+                    "owner": "log.utm.webfilter",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "hostname",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=webfilter",
+                    "owner": "log.utm.webfilter"
+                }
+            ],
+            "lineage": "log.utm.webfilter"
+        },
+        {
+            "objectName": "ips",
+            "displayName": "ips",
+            "parentName": "utm",
+            "fields": [
+                {
+                    "fieldName": "attack",
+                    "owner": "log.utm.ips",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "attack_name",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=ips OR subtype=anomaly",
+                    "owner": "log.utm.ips"
+                }
+            ],
+            "lineage": "log.utm.ips"
+        },
+        {
+            "objectName": "spam",
+            "displayName": "spam",
+            "parentName": "utm",
+            "fields": [],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=spam",
+                    "owner": "log.utm.spam"
+                }
+            ],
+            "lineage": "log.utm.spam"
+        },
+        {
+            "objectName": "appctrl",
+            "displayName": "appctrl",
+            "parentName": "utm",
+            "fields": [],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "app_severity",
+                            "owner": "log.utm.appctrl",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "severity",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "nxbd9b3tj88jv2t9",
+                    "owner": "log.utm.appctrl",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(appcat==\"Botnet\", \"critical\", appcat==\"p2p\", \"medium\", appcat==\"game\", \"low\", appcat==\"proxy\",\"high\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "subtype=app-ctrl",
+                    "owner": "log.utm.appctrl"
+                }
+            ],
+            "lineage": "log.utm.appctrl"
+        },
+        {
+            "objectName": "system",
+            "displayName": "system",
+            "parentName": "system_event",
+            "fields": [
+                {
+                    "fieldName": "level",
+                    "owner": "log.system_event.system",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "level",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "cpu",
+                    "owner": "log.system_event.system",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "cpu",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "mem",
+                    "owner": "log.system_event.system",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "mem",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "setuprate",
+                    "owner": "log.system_event.system",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "setuprate",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "totalsession",
+                    "owner": "log.system_event.system",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "totalsession",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=system OR subtype=router OR subtype=wad OR subtype=ha",
+                    "owner": "log.system_event.system"
+                }
+            ],
+            "lineage": "log.system_event.system"
+        },
+        {
+            "objectName": "vpn",
+            "displayName": "vpn",
+            "parentName": "system_event",
+            "fields": [
+                {
+                    "fieldName": "group",
+                    "owner": "log.system_event.vpn",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "user_group",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "tunneltype",
+                    "owner": "log.system_event.vpn",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "tunneltype",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "duration",
+                    "owner": "log.system_event.vpn",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "duration",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "tunnelname",
+                            "owner": "log.system_event.vpn",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "tunnel_name",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "0mzxjr0ttlzq6w29",
+                    "owner": "log.system_event.vpn",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "coalesce(vpntunnel,tunnelid)"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "subtype=vpn",
+                    "owner": "log.system_event.vpn"
+                }
+            ],
+            "lineage": "log.system_event.vpn"
+        },
+        {
+            "objectName": "user",
+            "displayName": "user",
+            "parentName": "system_event",
+            "fields": [
+                {
+                    "fieldName": "vendor_status",
+                    "owner": "log.system_event.user",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "vendor_status",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "time",
+                    "owner": "log.system_event.user",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "time",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=user",
+                    "owner": "log.system_event.user"
+                }
+            ],
+            "lineage": "log.system_event.user"
+        },
+        {
+            "objectName": "dlp",
+            "displayName": "dlp",
+            "parentName": "utm",
+            "fields": [],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "subtype=dlp",
+                    "owner": "log.utm.dlp"
+                }
+            ],
+            "lineage": "log.utm.dlp"
+        },
+        {
+            "objectName": "wireless",
+            "displayName": "wireless",
+            "parentName": "log",
+            "fields": [
+                {
+                    "fieldName": "stamac",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "station-mac-address",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "ap",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "ap",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "apstatus",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "apstatus",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "manuf",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "vendor",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "bssid",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "bssid",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "security",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "security",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "radioband",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "radioband",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "channel",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "channel",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sndetected",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "detected-by",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "signal",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "signal",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "onwire",
+                    "owner": "log.wireless",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "onwire",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "type=event AND subtype=wireless",
+                    "owner": "log.wireless"
+                }
+            ],
+            "lineage": "log.wireless"
+        }
+    ],
+    "objectNameList": [
+        "log",
+        "traffic",
+        "utm",
+        "system_event",
+        "virus",
+        "webfilter",
+        "ips",
+        "spam",
+        "appctrl",
+        "system",
+        "vpn",
+        "user",
+        "dlp",
+        "wireless"
+    ]
+}

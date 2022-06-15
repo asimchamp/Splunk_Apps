@@ -1,0 +1,19 @@
+<dashboard>
+  <label>Single Sign-On Using SAML</label>
+  <description>SAML 2.0 Support via PingFederate</description>
+  <row>
+    <panel>
+      <html>
+      	
+        <p>Splunk 6.3 lets you use SAML authentication to setup Single Sign-On. To configure SSO with SAML you must have the following:</p>
+
+        <ul>
+          <li>An identity provider. Currently, Ping Identity is the only supported identity provider.</li>
+          <li>A configuration that uses an on-premise search head. Currently SSO with SAML is not supported for off-site configurations.</li>
+          <li>An admin role with the change_authentication Splunk capability. This permissions level lets you enable SAML and edit authentication settings on a Splunk Search Head.</li>
+        </ul>
+
+      </html>
+    </panel>
+  </row>
+</dashboard>

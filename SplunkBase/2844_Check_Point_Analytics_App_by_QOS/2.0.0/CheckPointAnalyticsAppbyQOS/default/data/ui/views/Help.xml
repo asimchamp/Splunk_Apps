@@ -1,0 +1,101 @@
+<dashboard  stylesheet="help.css">
+  <label>Help</label>
+ 
+  <row>
+    <panel>
+      <title>FAQ for Check Point Analytics App for Checkpoint</title>
+      <html>
+      <div id="QA">
+	  
+      <ul>
+        
+      <li>
+      <span>Why i am not getting data in "Syslog Message" tab?</span><br/>
+        
+      <p>This may be because sourcetype of your syslog is different from "qos_syslog". You can follow any of the below steps to make this work</p>
+      <p>Option 1. Create an inputs.conf file in "$SPLUNK_HOME/etc/apps/CheckPointAnalyticsAppbyQOS/default/" and add below line to same file<br/>
+         [udp:514]<br/>
+         sourcetype=qos_syslog<br/>
+      </p>
+      <p>Option 2. You can monitor you UDP port 514 for syslog and give sourcetype name as "qos_syslog". Document for same is available here <a href="http://docs.splunk.com/Documentation/Splunk/latest/Data/Monitornetworkports">http://docs.splunk.com/Documentation/Splunk/latest/Data/Monitornetworkports</a></p>
+      <p>Option 3. Install our Add-on <a href="https://splunkbase.splunk.com/app/2996/">https://splunkbase.splunk.com/app/2996/</a><br/>
+		This will open UDP port 514 automatically and give its sourcetype as "qos_syslog".</p>
+      
+      </li>
+      <br/> <br/>
+      
+      
+      <li>
+      <span>Which Checkpoint Blades(Features) are supported by this app?</span><br/>
+        
+      <p>This App currently supports Firewall, IPS and Application/URL Control Blades.
+        If you want us to add more blades Please mail us at splunk@qos.co.in</p>
+      
+      </li>
+      <br/> <br/>
+	  
+      <li>
+      <span>Is Checkpoint LEA app mandatory for this app to work?</span><br/>
+         
+	  <p>No Check Point LEA Add-on is not mandatory for this App.
+         There are two methods by which one can capture Check Point Firewall logs on Splunk.</p>
+      <p>Option 1. [Recommended]  => <a href="https://splunkbase.splunk.com/app/1454/">https://splunkbase.splunk.com/app/1454/</a> <br/>
+ 		 This Add-on uses the index file created using Checkpoint LEA app. </p>
+      <p>Option 2. <a href="https://splunkbase.splunk.com/app/2996/">https://splunkbase.splunk.com/app/2996/</a><br/>
+		This Add-on should be used when Splunk indexer is running on Windows. We developed this App because Check Point LEA is not available on Windows.
+	  </p>
+      </li>
+          
+      <br/><br/>
+              
+	  <li>
+      <span>I need step by step document to install Checkpoint LEA app or Check Point syslog Add-on on my Splunk.</span><br/>
+             
+      <p> Please check following link and follow the steps mentioned in the blog.<br/></p>
+      <p><a href="http://qostechnology.in/blog/integrate-splunk-with-checkpoint-managementlog-server//">
+			   http://qostechnology.in/blog/integrate-splunk-with-checkpoint-managementlog-server//</a><br/></p>
+      <p>If you want to send Check Point logs via syslog please check the following link.<br/></p>
+      <p><a href="http://qostechnology.in/blog/check-point-tracker-logs-to-external-syslog-server/">
+			   http://qostechnology.in/blog/check-point-tracker-logs-to-external-syslog-server/</a><br/></p>
+      <p>Alternately for more information you can read splunk's official documentation.<br/></p>
+      <p><a href="http://docs.splunk.com/Documentation/OPSEC-LEA/3.1.0/Install/InstalltheSplunkTechnologyAdd-onforCheckPointOPSECLEA">
+                    http://docs.splunk.com/Documentation/OPSEC-LEA/3.1.0/Install/InstalltheSplunkTechnologyAdd-onforCheckPointOPSECLEA</a></p>
+      </li>
+         
+      <br/> <br/>
+      
+      <li>
+	  <span>Is this Free app or paid app?</span><br/>
+    
+      <p>This app is absolutely free to use and will never be charged in future. QOS will launch a new paid version of this app very soon which will have many more stuffs and powerful analytics on Checkpoint Logs. Stay tuned.</p>
+         
+	  </li>
+         
+      <br/><br/>
+       <li>
+       <span>I need help as I am facing some issues with this app? Whom shall I contact?</span><br/>
+	   <p>Please email  the issue in detail with appropriate screenshots at splunk@qos.co.in and we promise to get back to you in less than 48 hrs.</p>
+       </li>
+       <br/><br/>
+      <li>
+	  <span>How can I give some suggestions to improve this app.</span><br/>
+      <p>We will be more than happy to listen from our customers. Feel free to drop your emails at splunk@qos.co.in</p>
+      </li>
+      <br/> <br/>
+        
+	  <li>
+      <span>Dashboard appears to be too slow. Is there any problem?</span><br/>
+         
+      <p>Here is the formula which determines the number of concurrent searches one can run at any point of time.</p>
+      <p>the total number of concurrent searches =  base_max_searches + (# of cpus) * (max_searches_per_cpu)</p>
+      <p>base_max_searches and max_searches_per_cpu is defined in limits.conf file on your splunk server.</p>
+      </li>
+         
+      </ul>
+      </div>
+     <br/>
+        
+  </html>
+    </panel>
+  </row>
+</dashboard>

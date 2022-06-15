@@ -1,0 +1,124 @@
+<form>
+  <label>Authentication &amp; Privilege Activities</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" searchWhenChanged="true" token="time">
+      <label>Time</label>
+      <default>
+        <earliest>-2h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="cluster_name" searchWhenChanged="true">
+      <label>Cluster</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <search>
+        <query>`isilon_index` sourcetype="emc:isilon:syslog" | dedup Cluster_Name | table Cluster_Name</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>Cluster_Name</fieldForLabel>
+      <fieldForValue>Cluster_Name</fieldForValue>
+    </input>
+    <input type="dropdown" token="user" searchWhenChanged="true">
+      <label>User</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <choice value="*">All</choice>
+      <choice value="N/A">None</choice>
+      <default>*</default>
+      <search>
+        <query>`isilon_index` sourcetype="emc:isilon:syslog" Cluster_Name="$cluster_name$" ((audit_config) OR (authentication error)) | dedup user | table user</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>user</fieldForLabel>
+      <fieldForValue>user</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Authentication Failure Activities by User over Time</title>
+        <search>
+          <query>`isilon_index` sourcetype="emc:isilon:syslog"  Cluster_Name="$cluster_name$"  NOT(audit*) authentication error | fillnull value="N/A" user | search user=$user|s$ | timechart count by src_user</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">User</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Authentication Failure Activities by Source Machines</title>
+        <search>
+          <query>`isilon_index` sourcetype="emc:isilon:syslog"  Cluster_Name="$cluster_name$"  NOT(audit*) authentication error | fillnull value="N/A" user | search user=$user|s$ | stats count by src</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Privilege Activities</title>
+        <search>
+          <query>`isilon_index` sourcetype="emc:isilon:syslog"  Cluster_Name="$cluster_name$" audit_config | fillnull value="N/A" user | search user=$user|s$ | table user remote_address uri method message | head 1000 | rename user as User remote_address as "Remote Address" uri as "URI" method as "Method" message as "Message"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <option name="count">5</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

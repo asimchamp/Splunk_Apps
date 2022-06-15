@@ -1,0 +1,106 @@
+<form>
+  <label>Overview</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time_range" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Beacon events</title>
+      <chart>
+        <search>
+          <query>`greatbay_index` sourcetype="greatbay:beacon" beacon_type!=NULL  | timechart count by beacon_type</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.legend.labels">["New Endpoint Event","Alarm Profile Event","Duplicate MAC alert, wireless/wired violation","Duplicate MAC alert, port move violation", BeaconAudit, "Non-Consistent Profile Event", "Profile Entering Event" , "Profile Exiting Event" ]</option>
+      <option name="charting.seriesColors">[0x00CC00,0xE40000,0x990099,0x990099,0x909090,0x00EBEB,0xFDEE00,0xFDEE00]</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top MAC address entering profile</title>
+      <table>
+        <search>
+          <query>sourcetype=greatbay:beacon beacon_type="Profile Entering Event" | stats count by mac_address | sort - count</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Top MAC address exiting profile</title>
+      <table>
+        <search>
+          <query>sourcetype=greatbay:beacon beacon_type="Profile Exiting Event" | stats count by mac_address | sort - count</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#D6563C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>New MAC addresses</title>
+      <input type="text" token="n_days" searchWhenChanged="true">
+        <label>for last x days</label>
+        <default>7</default>
+      </input>
+      <table>
+        <search>
+          <query>| inputlookup mac_address | eval date=now()-$n_days$*86400| where first_seen &gt; date | fieldformat first_seen = strftime(first_seen, "%F %T.%3N") | table first_seen mac_address</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

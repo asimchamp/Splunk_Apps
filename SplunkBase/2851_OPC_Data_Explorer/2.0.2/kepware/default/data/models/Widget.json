@@ -1,0 +1,1192 @@
+{
+    "modelName": "Widget",
+    "displayName": "Widget",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 0,
+        "Transaction-Based": 0,
+        "Search-Based": 16
+    },
+    "objects": [
+        {
+            "objectName": "Widget1",
+            "displayName": "Widget",
+            "parentName": "BaseSearch",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_hour",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_hour",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_minute",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_minute",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_second",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_second",
+                    "comment": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Widget_Num",
+                            "owner": "Widget1",
+                            "type": "number",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Number",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "5lxcj4bkxx",
+                    "owner": "Widget1",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(match(Tag,\"Widget1\"), 1,match(Tag,\"Widget2\"),  2)"
+                }
+            ],
+            "constraints": [],
+            "lineage": "Widget1",
+            "baseSearch": "Tag = \"*Widget*\""
+        },
+        {
+            "objectName": "Color",
+            "displayName": "Color",
+            "parentName": "Widget1",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_hour",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_hour",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_minute",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_minute",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_second",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_second",
+                    "comment": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Wid_Color",
+                            "owner": "Widget1.Color",
+                            "type": "string",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Color",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "jp39ua80rpf",
+                    "owner": "Widget1.Color",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(Value = 0, \"Blue\", Value = 1, \"Red\", Value = 2, \"Green\", Value = 3, \"Pink\", Value = 4, \"Black\", Value = 5, \"White\", Value = 6, \"Orange\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "Tag = \"*color_val*\"",
+                    "owner": "Widget1.Color"
+                }
+            ],
+            "lineage": "Widget1.Color",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Shape",
+            "displayName": "Shape",
+            "parentName": "Widget1",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_hour",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_hour",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_minute",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_minute",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_second",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_second",
+                    "comment": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Wid_Shape",
+                            "owner": "Widget1.Shape",
+                            "type": "string",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Shape",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "bk6u2rovo7d",
+                    "owner": "Widget1.Shape",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(Value = 0, \"Triangle\", Value = 1, \"Square\", Value = 2, \"Circle\", Value = 3, \"Hexagon\", Value = 4, \"Pentagon\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "Tag = \"*shape_val*\"",
+                    "owner": "Widget1.Shape"
+                }
+            ],
+            "lineage": "Widget1.Shape",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Size",
+            "displayName": "Size",
+            "parentName": "Widget1",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_hour",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_hour",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_minute",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_minute",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_second",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_second",
+                    "comment": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Wid_Size",
+                            "owner": "Widget1.Size",
+                            "type": "string",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Size",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "nzz1625on0a",
+                    "owner": "Widget1.Size",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(Value=0, \"Small\", Value=1, \"Medium\", Value=2, \"Large\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "Tag = \"*size_val*\"",
+                    "owner": "Widget1.Size"
+                }
+            ],
+            "lineage": "Widget1.Size",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Temp",
+            "displayName": "QA_Results",
+            "parentName": "Widget1",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Widget1",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_hour",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_hour",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_minute",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_minute",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "date_second",
+                    "owner": "Widget1",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "date_second",
+                    "comment": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Wid_QA_Results",
+                            "owner": "Widget1.Temp",
+                            "type": "string",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "QA Results",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "ys38cz2cb9n",
+                    "owner": "Widget1.Temp",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Value < 97, \"PASS\", \"FAIL\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "Tag=\"*quality_number*\"",
+                    "owner": "Widget1.Temp"
+                }
+            ],
+            "lineage": "Widget1.Temp",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_Set",
+            "displayName": "Torque_Set",
+            "parentName": "BaseSearch",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Wid_Line",
+                            "owner": "Torque_Set",
+                            "type": "string",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Widget Line",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "mzeiabao3lh",
+                    "owner": "Torque_Set",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(match(Tag,\"Widget1\"), 1,match(Tag,\"Widget2\"),  2)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "mach_num",
+                            "owner": "Torque_Set",
+                            "type": "string",
+                            "fieldSearch": "",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Machine Number",
+                            "comment": ""
+                        }
+                    ],
+                    "calculationID": "4ffd6jwjmit",
+                    "owner": "Torque_Set",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(match(Tag,\"Torq1\"), 1,match(Tag,\"Torq2\"),  2, match(Tag,\"Torq3\"),  3, match(Tag,\"Torq4\"),  4, match(Tag,\"Torq5\"),  5)"
+                }
+            ],
+            "constraints": [],
+            "lineage": "Torque_Set",
+            "baseSearch": "Tag = \"*Torq*\""
+        },
+        {
+            "objectName": "Torque_1",
+            "displayName": "Torque #1",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "\"Out_Torq_val1\"",
+                    "owner": "Torque_Set.Torque_1"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_1",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_2",
+            "displayName": "Torque #2",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "\"Out_Torq_val2\"",
+                    "owner": "Torque_Set.Torque_2"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_2",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_3",
+            "displayName": "Torque #3",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val3",
+                    "owner": "Torque_Set.Torque_3"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_3",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_4",
+            "displayName": "Torque #4",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val4",
+                    "owner": "Torque_Set.Torque_4"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_4",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_5",
+            "displayName": "Torque #5",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val5",
+                    "owner": "Torque_Set.Torque_5"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_5",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_6",
+            "displayName": "Torque #6",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val6",
+                    "owner": "Torque_Set.Torque_6"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_6",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_7",
+            "displayName": "Torque #7",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val7",
+                    "owner": "Torque_Set.Torque_7"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_7",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_8",
+            "displayName": "Torque #8",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val8",
+                    "owner": "Torque_Set.Torque_8"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_8",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_9",
+            "displayName": "Torque #9",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val9",
+                    "owner": "Torque_Set.Torque_9"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_9",
+            "baseSearch": ""
+        },
+        {
+            "objectName": "Torque_10",
+            "displayName": "Torque #10",
+            "parentName": "Torque_Set",
+            "fields": [
+                {
+                    "fieldName": "Quality",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Quality",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Tag",
+                    "owner": "Torque_Set",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "Value",
+                    "owner": "Torque_Set",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Value",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "Out_Torq_val10",
+                    "owner": "Torque_Set.Torque_10"
+                }
+            ],
+            "lineage": "Torque_Set.Torque_10",
+            "baseSearch": ""
+        }
+    ],
+    "objectNameList": [
+        "Widget1",
+        "Color",
+        "Shape",
+        "Size",
+        "Temp",
+        "Torque_Set",
+        "Torque_1",
+        "Torque_2",
+        "Torque_3",
+        "Torque_4",
+        "Torque_5",
+        "Torque_6",
+        "Torque_7",
+        "Torque_8",
+        "Torque_9",
+        "Torque_10"
+    ]
+}

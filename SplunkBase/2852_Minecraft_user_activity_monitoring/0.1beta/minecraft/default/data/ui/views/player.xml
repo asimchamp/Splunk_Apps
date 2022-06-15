@@ -1,0 +1,444 @@
+<form>
+  <label>Player Detail</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="player" searchWhenChanged="true">
+      <label>name</label>
+      <search>
+        <query>| pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | mvexpand name | sort - name</query>
+      </search>
+      <fieldForLabel>name</fieldForLabel>
+      <fieldForValue>name</fieldForValue>
+    </input>
+  </fieldset>
+  <search id="spellcheck_all_words">
+    <earliest>0</earliest>
+    <latest></latest>
+    <query>
+      <![CDATA[
+
+| pivot Minecraft_log_messages Chat_messages 
+     values(message) AS "message" 
+     SPLITROW _time AS _time PERIOD second 
+     SPLITROW name AS name 
+     FILTER name is "$player$"
+        SORT 100000 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1
+| eval message=replace(lower(message),"[#,!.*?()$\- ):0-9<>]|'s"," ")  
+| makemv delim=" " message 
+| mvexpand message 
+| rename message as token 
+| where token!="" AND length(token)>2 
+| lookup dictionary_check word as token OUTPUT classification 
+| sort token 
+| join type=left token 
+[
+    | pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+       | mvexpand name 
+       | eval name=replace(lower(name),"[0-9]","") 
+    | append 
+    [
+       | pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+       | mvexpand name 
+       | eval name=lower(name) 
+    ] 
+    | dedup name 
+    | rename name as token 
+    | eval classification="username" 
+]
+| eval classification=if(isNull(classification),"incorrect spelling",classification)
+| stats
+     count by classification
+]]>
+    </query>
+  </search>
+  <search id="time_spent_in_game">
+    <earliest>0</earliest>
+    <latest></latest>
+    <query>| pivot Minecraft_log_messages Login_location      
+         count(Login_location) AS "logged_in"      
+         SPLITROW _time AS _time PERIOD second      
+         SPLITROW name AS name        
+         FILTER name is $player$ 
+         SORT 10000000 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1  
+      | eval logged_out=0  
+      | append  [    
+          | pivot Minecraft_log_messages Log_out count(Log_out) AS "logged_out" 
+                SPLITROW _time AS _time PERIOD second 
+                SPLITROW name AS name 
+                  SORT 100000 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1   
+          | eval logged_in=0 ]
+      
+       | eval time=strptime(_time, "%Y-%m-%dT%H:%M:%S") 
+       | sort - time 
+       | streamstats current=f last(time) as last_time by name 
+       | eval period=if(logged_in=0,"Logged out", "Logged in") 
+       | addinfo 
+       | eval duration=if(isNull(last_time),info_max_time-time,last_time-time) 
+       | where logged_in=1 
+       | sort - time 
+       | eval duration_hours=duration/(60*60) 
+       | eval _time=time 
+       | timechart span=1d sum(duration_hours) as hours 
+       | eval hours=round(hours,2)</query>
+  </search>
+  <row depends="$player$">
+    <panel>
+      <single>
+        <search>
+          <query>tag=minecraft $player$ (left OR joined) the game  | sort + _time | eval time=_time | rex field=_raw "\]: (?&lt;name&gt;[^ ]+) (?&lt;message&gt;.*)" | streamstats current=f last(_time) as last_time by name | eval period=if(message="joined the game", "logged_out_for", "logged_in_for") | sort - _time | eval duration=time-last_time  | table _time time last_time name message period duration | stats sum(duration) as total_time_secs by name period | where period="logged_in_for" | eval total_time_hours=round(total_time_secs/3600,2) | fields + total_time_hours</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+        <option name="underLabel">Hours played</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Minecraft_log_messages Gamemode_events latest(_time) AS "latest_time" SPLITROW target AS target SPLITROW operator AS operator SPLITROW mode AS mode SORT 100000 target ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | eval target=if(target="own",operator,target) | eventstats max(latest_time) as max_time by target | where max_time=latest_time | fields + target mode | where target="$player$" | fields - target</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="linkView">search</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <option name="underLabel">Game mode</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Minecraft_log_messages Login_location count(Login_location) AS "Count of Login location" FILTER name is $player$ ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+        <option name="underLabel">Number logins</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Minecraft_log_messages levels count(levels) AS "count" SPLITROW ammount AS ammount FILTER name is $player$ SORT 100 ammount ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | eval ammount=ammount*count | fields - ammount</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+        <option name="underLabel">Levels Gifted</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Minecraft_log_messages expirence count(expirence) AS "count" SPLITROW item AS item SPLITROW ammount AS ammount FILTER name is $player$ SORT 100 item ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | eval ammount=count*ammount | stats sum(ammount) as ammount</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+        <option name="underLabel">Experience Gifted</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Minecraft_log_messages Achievements count(Achievements) AS "Count of Achievements" FILTER name is $player$ ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Achievements</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel>
+      <single>
+        <title>UUID</title>
+        <search>
+          <query>| pivot Minecraft_log_messages UUID values(uuid) AS "Distinct Values of uuid" FILTER player is $player$ ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel>
+      <chart>
+        <title>Time spend on server</title>
+        <search base="time_spent_in_game"></search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel>
+      <table>
+        <title>Geographic locations and IP addresses</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Login_location count(Login_location) AS count SPLITROW ip AS ip SPLITROW ip_Country AS ip_Country SPLITROW ip_Region AS ip_Region SPLITROW ip_City AS ip_City FILTER name is $player$ SORT 100 name ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel depends="$player$">
+      <chart>
+        <title>Suicide methods</title>
+        <search>
+          <query>| pivot Minecraft_log_messages sucide count(sucide) AS "Count of Suicide" SPLITROW suicide_method AS suicide_method FILTER name is $player$ SORT 100 suicide_method ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Chat vocabulary analysis</title>
+        <search base="spellcheck_all_words">
+          <query></query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel>
+      <table>
+        <title>Physical Items Given</title>
+        <search>
+          <query>| pivot Minecraft_log_messages given_items 
+   count(given_items) AS "count" 
+   SPLITROW item_b AS item_b 
+   SPLITROW ammount_b AS ammount_b 
+   FILTER name is $player$ 
+   SORT 10000000 item_b ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1
+| eval total=ammount_b*count
+| rename item_b as item
+| table item total</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel depends="$player$">
+      <chart>
+        <title>Login locations</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Login_location count(Login_location) AS "count" SPLITROW x AS x SPLITROW y AS y SPLITROW z AS z FILTER name is $player$ SORT 100 x ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | fields - count</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.chart">scatter</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$player$">
+      <chart>
+        <title>Murders committed</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Murder count(Murder) AS "Count of Murder" SPLITROW victim AS victim FILTER murderer is $player$ TOP 500 count(Murder) ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel depends="$player$">
+      <chart>
+        <title>Murdered by</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Murder count(Murder) AS "Count of Murder" SPLITROW murderer AS murderer FILTER victim is $player$ SORT 100 murderer ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel>
+      <table>
+        <title>Achievements earned</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Achievements count(Achievements) AS "Count of Achievements" SPLITROW name AS name SPLITROW achievement AS achievement SPLITROW game_description AS game_description SPLITROW actual_requirements AS actual_requirements SPLITROW prerequisites AS prerequisites FILTER name is $player$ SORT 100 name ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row depends="$player$">
+    <panel>
+      <input type="time" token="time_messages">
+        <label></label>
+        <default>
+          <earliest>0</earliest>
+          <latest></latest>
+        </default>
+      </input>
+      <table>
+        <title>Recent messages</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Chat_messages values(message) AS "messages" SPLITROW _time AS _time PERIOD second FILTER name is $player$ SORT 100000000 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | fields - _time</query>
+          <earliest>$time_messages.earliest$</earliest>
+          <latest>$time_messages.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

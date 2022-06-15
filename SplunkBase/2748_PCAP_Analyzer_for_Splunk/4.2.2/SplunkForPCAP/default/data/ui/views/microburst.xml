@@ -1,0 +1,37 @@
+<form>
+  <label>Microburst</label>
+  <fieldset autoRun="false" submitButton="true">
+    <input type="multiselect" token="Source" searchWhenChanged="false">
+      <label>Select tcpdump files:</label>
+     <populatingSearch fieldForValue="source" fieldForLabel="source" earliest="0" latest="now">
+        <![CDATA[index=* sourcetype=pcap:csv NOT source=*pcap2csv.sh NOT source=*pcap2csv.bat| rex field=source "SplunkForPCAP(\\\\|\/)PCAPcsv(\\\\|\/)(?<source>.*)"  |stats count by source]]>
+      </populatingSearch>
+      <valuePrefix>source="*</valuePrefix>
+      <valueSuffix>*"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <default>SELECT TCPDUMP</default>
+    </input>
+    <input type="text" token="Span" searchWhenChanged="false">
+      <label>Enter the Timechart Span:</label>
+      <default>1s</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Microburst over Time</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ tcp_length=* | eval bits=tcp_length*8| timechart span=$Span$ sum(bits) as "Bits"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

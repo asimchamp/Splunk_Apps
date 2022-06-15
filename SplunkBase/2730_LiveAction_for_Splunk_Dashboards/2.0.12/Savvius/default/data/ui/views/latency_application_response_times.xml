@@ -1,0 +1,246 @@
+<form script="savvius.js" stylesheet="latency_application_response_times.css">
+  <label>Application Response Times</label>
+  <fieldset autorun="true" submitButton="false">
+    <!-- Global timer. Not token is necessary -->
+    <input type="time" searchWhenChanged="true">
+      <label>Date &amp; Time</label>
+      <default>
+        <earliest>-1h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+        <earliest>-1h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="text" token="application" searchWhenChanged="true">
+      <label>Application</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>sourcetype=sv_apps host="$source$" Name="$application$"
+            | stats dc(Name) as appcount
+            | fieldformat appcount=tostring(appcount, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="underLabel">Applications</option>
+        <option name="field">count</option>
+        <option name="linkFields">result, underlabel</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                    statistics_applications?earliest=$earliest$&latest=$latest$&form.source=$source$&form.application=$application$
+                ]]>
+          </link>
+        </drilldown>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_appresponse host="$source$" Name="$application$"
+            | regex "Avg Response Time"="[0-9\.:]+"
+            | appendpipe [stats count as no_event | where no_event==0 | eval "Avg Response Time"=-1]
+            | rex field="Avg Response Time" "((?&lt;hour&gt;[0-9]{2}){1}:(?&lt;minute&gt;[0-9]{2}){1}:){0,1}(?&lt;second&gt;[0-9]{1,2}){1}\.(?&lt;microsecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 hour minute second microsecond
+            | eval art=if('Avg Response Time'==-1,-1,(hour*3600)+(minute*60)+second+(microsecond/1000000))
+            | stats avg(art) as avgart
+            | eval avgart=if(avgart>=0,tostring(round(avgart,2), "commas"),"N/A")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="underLabel">Average Response Time (Seconds)</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_appresponse host="$source$" Name="$application$"
+            | regex "Worst Response Time"="[0-9\.:]+"
+            | appendpipe [stats count as no_event | where no_event==0 | eval "Worst Response Time"=-1]
+            | rex field="Worst Response Time" "((?&lt;hour&gt;[0-9]{2}){1}:(?&lt;minute&gt;[0-9]{2}){1}:){0,1}(?&lt;second&gt;[0-9]{1,2}){1}\.(?&lt;microsecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 hour minute second microsecond
+            | eval wrt=if('Worst Response Time'==-1,-1,(hour*3600)+(minute*60)+second+(microsecond/1000000))
+            | stats max(wrt) as maxwrt
+            | eval maxwrt=if(maxwrt>=0,tostring(round(maxwrt,2), "commas"),"N/A")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="underLabel">Worst Response Time (Seconds)</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Application Volume</title>
+        <search>
+          <query>sourcetype=sv_apps host="$source$" Name="$application$" | timechart dc(Name) as "Application Count"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250px</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                statistics_applications?earliest=$earliest$&latest=$latest$&form.source=$source$
+                    ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Average Response Time</title>
+        <search>
+          <query>sourcetype=sv_appresponse host="$source$" Name="$application$"
+            | regex "Avg Response Time"="[0-9\.:]+"
+            | rex field="Avg Response Time" "((?&lt;hour&gt;[0-9]{2}){1}:(?&lt;minute&gt;[0-9]{2}){1}:){0,1}(?&lt;second&gt;[0-9]{1,2}){1}\.(?&lt;microsecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 hour minute second microsecond
+            | eval art=if(isnull('Avg Response Time'),null,(hour*3600)+(minute*60)+second+(microsecond/1000000))
+            | timechart eval(round(avg(art),2)) as "Average Response Time"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">Seconds</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Worst Response Time</title>
+        <search>
+          <query>sourcetype=sv_appresponse host="$source$" Name="$application$"
+            | regex "Worst Response Time"="[0-9\.:]+"
+            | rex field="Worst Response Time" "((?&lt;hour&gt;[0-9]{2}){1}:(?&lt;minute&gt;[0-9]{2}){1}:){0,1}(?&lt;second&gt;[0-9]{1,2}){1}\.(?&lt;microsecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 hour minute second microsecond
+            | eval wrt=if(isnull('Worst Response Time'),null,(hour*3600)+(minute*60)+second+(microsecond/1000000))
+            | timechart eval(round(max(wrt),2)) as "Worst Response Time"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">Seconds</option>
+        <option name="charting.chart.overlayFields">average</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Application Response Times</title>
+        <search>
+          <query>sourcetype=sv_appresponse host="$source$" Name="$application$" "Avg Response Time"="*" "Worst Response Time"="*"
+            | rex field=Duration "((?&lt;dhour&gt;[0-9]{2}){1}:(?&lt;dminute&gt;[0-9]{2}){1}:){0,1}(?&lt;dsecond&gt;[0-9]{1,2}){1}\.(?&lt;dmicrosecond&gt;[0-9]{6}){1}"
+            | rex field="Avg Response Time" "((?&lt;arthour&gt;[0-9]{2}){1}:(?&lt;artminute&gt;[0-9]{2}){1}:){0,1}(?&lt;artsecond&gt;[0-9]{1,2}){1}\.(?&lt;artmicrosecond&gt;[0-9]{6}){1}"
+            | rex field="Worst Response Time" "((?&lt;wrthour&gt;[0-9]{2}){1}:(?&lt;wrtminute&gt;[0-9]{2}){1}:){0,1}(?&lt;wrtsecond&gt;[0-9]{1,2}){1}\.(?&lt;wrtmicrosecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 dhour dminute dsecond dmicrosecond arthour artminute artsecond artmicrosecond wrthour wrtminute wrtsecond wrtmicrosecond
+            | eval dur=if(isnull(Duration) AND (dhour==0) AND (dminute==0) AND (dsecond==0) AND (dmicrosecond==0),null,(dhour*3600)+(dminute*60)+dsecond+(dmicrosecond/1000000))
+            | eval art=if(isnull('Avg Response Time') AND (arthour==0) AND (artminute==0) AND (artsecond==0) AND (artmicrosecond==0),null,(arthour*3600)+(artminute*60)+artsecond+(artmicrosecond/1000000))
+            | eval wrt=if(isnull('Worst Response Time') AND (wrthour==0) AND (wrtminute==0) AND (wrtsecond==0) AND (wrtmicrosecond==0),null,(wrthour*3600)+(wrtminute*60)+wrtsecond+(wrtmicrosecond/1000000))
+            | stats sum(Events) as Events sum(Flows) as Flows avg(dur) as "Average Duration (Seconds)" avg(art) as "Average Response Time (Seconds)" max(wrt) as "Worst Response Time (Seconds)" by Name
+            | fieldformat Events=tostring(Events, "commas")
+            | fieldformat Flows=tostring(Flows, "commas")
+            | fieldformat "Average Duration (Seconds)"=tostring('Average Duration (Seconds)', "commas")
+            | fieldformat "Average Response Time (Seconds)"=round('Average Response Time (Seconds)', 2)
+            | fieldformat "Worst Response Time (Seconds)"=round('Worst Response Time (Seconds)', 2)
+            | rename Name as Application
+            | sort - "Worst Response Time (Seconds)"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="Application">
+            <link>
+              <![CDATA[
+                        statistics_applications?earliest=$earliest$&latest=$latest$&form.source=$source$&form.application=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,83 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsGetContextFields</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsGetContextFields</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Displays all of the specified fields of a Context as a table. This command is a "generating" command, which means it must be run as the first command.</span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsGetContextFields context [IN container] [BY class] [SCOPED scope] FIELDS (field)+</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">| xsGetContextFields AirTime IN MyAirTime BY Tuesday SCOPED private FIELDS read write</span>
+      </p>
+      <p>
+        <span class="explanation">Displays the values of the read and write fields of a Context called 'AirTime' in the container 'MyAirTime' by class 'Tuesday' with scope 'private'.</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext">class, context, container, fields, scope</span>
+      </p>
+      <p>
+        <span class="para">class</span>
+      </p>
+      <p>
+        <span class="explanation">The class of the context.</span>
+      </p>
+      <p>
+        <span class="para">context</span>
+      </p>
+      <p>
+        <span class="explanation">The name of a context.</span>
+      </p>
+      <p>
+        <span class="para">container</span>
+      </p>
+      <p>
+        <span class="explanation">The container the context is stored.</span>
+      </p>
+      <p>
+        <span class="para">fields</span>
+      </p>
+      <p>
+        <span class="explanation">The fields of the context to display.</span>
+      </p>
+      <p>
+        <span class="para">scope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the container is stored.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The context is displayed in table format. See <a href="xsCreateDDContext">xsCreateDDContext</a> or <a href="xsCreateUDContext">xsCreateUDContext</a> for details about creating a Context. </span>
+      </p>
+<br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150816.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

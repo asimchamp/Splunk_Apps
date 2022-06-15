@@ -1,0 +1,27 @@
+<form class="form-horizontal form-complex">
+    <style>
+        .alert-save-as .trigger-actions .alert-actions-control-group .more-info .control-label, .alert-edit .trigger-actions .alert-actions-control-group .more-info .control-label{
+            width: 80px;
+            padding-right: 10px;
+        }
+    </style>
+    <div class="control-group">
+            <label class="control-label" ><b>User Info</b><span class="required">*</span></label>
+        <div class="control-group">
+            <label class="control-label" for="okta_user_id">User ID</label>
+
+            <div class="controls">
+                <input type="text" name="action.okta_deactivate_user_alert.param.user_id" id="okta_user_id"
+                        placeholder="uid or token: e.g., $result.uid$" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="okta_user_name">User Name</label>
+
+            <div class="controls">
+                <input type="text" name="action.okta_deactivate_user_alert.param.user_name" id="okta_user_name"
+                        placeholder="uname or token: e.g., $result.uname$" />
+            </div>
+        </div>
+    </div>
+</form>

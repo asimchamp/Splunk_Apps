@@ -1,0 +1,175 @@
+<form>
+  <label>nCircle - Host Detail</label>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="tkHost" searchWhenChanged="false">
+      <label>Choose host:</label>
+      <search>
+        <query>`vuln_search_detail` | fields hostDetail.ipAddress | dedup hostDetail.ipAddress | table hostDetail.ipAddress | sort hostDetail.ipAddress</query>
+        <earliest>-365d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>hostDetail.ipAddress</fieldForLabel>
+      <fieldForValue>hostDetail.ipAddress</fieldForValue>
+    </input>
+    <input type="time" token="tkTime">
+      <label>Timeframe</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>`vuln_search_detail` hostDetail.ipAddress=$tkHost$ | table hostDetail.ipAddress, hostDetail.name, hostDetail.ifaceMacAddress, hostDetail.netbiosName, osDetail.name, audit | dedup hostDetail.ipAddress, hostDetail.name, hostDetail.ifaceMacAddress, hostDetail.netbiosName, osDetail.name, audit | sort audit</query>
+          <earliest>$tkTime.earliest$</earliest>
+          <latest>$tkTime.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Score by Audit</title>
+        <search>
+          <query>`vuln_search_detail` hostDetail.ipAddress=$tkHost$ | stats sum(score) by audit</query>
+          <earliest>$tkTime.earliest$</earliest>
+          <latest>$tkTime.latest$</latest>
+        </search>
+        <drilldown>
+          <link>/app/SplunkForNCircle/ncircle__scan_detail?form.tkAudit=$click.value$</link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Port Distribution over Audits</title>
+        <search>
+          <query>`vuln_search_detail` hostDetail.ipAddress=$tkHost$ | eval protocol=lower(protocol) | eval service=protocol+"/"+port | chart count over audit by service</query>
+          <earliest>$tkTime.earliest$</earliest>
+          <latest>$tkTime.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Vuln Per Host</title>
+        <search>
+          <query>`vuln_search_detail` hostDetail.ipAddress=$tkHost$ | stats sum(score),count(VulnDetail.name) by VulnDetail.name</query>
+          <earliest>$tkTime.earliest$</earliest>
+          <latest>$tkTime.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Vuln over Audits with Score &gt; 0</title>
+        <search>
+          <query>`vuln_search_detail` hostDetail.ipAddress=$tkHost$ score&gt;0 | fields audit, hostDetail.ipAddress,score, VulnDetail.name | chart sum(score) over audit by VulnDetail.name</query>
+          <earliest>$tkTime.earliest$</earliest>
+          <latest>$tkTime.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisY.maximumNumber">100000</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Vulnerabilities per Audit</title>
+        <search>
+          <query>`vuln_search_detail` hostDetail.ipAddress=$tkHost$    | rex field=VulnDetail.description "DESCRIPTION:(?&lt;Issue&gt;.*):SOLUTION" | rex field=VulnDetail.description "SOLUTION:(?&lt;Solution&gt;.*)" | stats count by audit,score,VulnDetail.name,Issue,Solution | sort - score</query>
+          <earliest>$tkTime.earliest$</earliest>
+          <latest>$tkTime.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Setup | Search Activity | Splunk</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/pages/dashboard-simple-bootstrap.min.css" />
+    <!--[if IE 7]><link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/sprites-ie7.css" /><![endif]-->
+    <link rel="stylesheet" type="text/css" href="/static/app/search_activity/pages/setup_page.css" />
+</head>
+
+<body class="simplexml preload locale-en">
+
+    <!-- 
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system. 
+-->
+    <a class="navSkip" href="#navSkip" tabindex="1">Screen reader users, click here to skip the navigation bar</a>
+    <div class="header">
+        <div id="placeholder-splunk-bar">
+            <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+        </div>
+        <div id="placeholder-app-bar"></div>
+    </div>
+    <a id="navSkip"></a>
+    <div class="dashboard-body container-fluid main-section-body dv" data-role="main">
+        <div class="dashboard-header clearfix">
+            <h2>Setup</h2>
+            <p class="description"></p>
+        </div>
+        <div class="dashboard-row dashboard-row1">
+            <div class="dashboard-cell" style="width: 100%;">
+                <div class="dashboard-panel clearfix">
+                    <div class="panel-element-row">
+                        <div class="dashboard-element " id="element1" style="width: 100%">
+                            <div class="dv-stage-container" id="dv-stage-container" style="padding-left: 8px;">
+                                <div class="stage-nav" style="padding-top: 8px;">
+                                    <ul>
+                                        <li><a href="javascript:;" id="link_Intro" onclick="SwitchSection('IntroContainer')">Setup Overview</a></li>
+                                        <li><a href="javascript:;" id="link_Collect" onclick="SwitchSection('CollectContainer')">Data Collection</a></li>
+                                        <li><a href="javascript:;" id="link_2x_data" >Migrate 2.x Data</a></li>
+                                        <li><a href="javascript:;" id="link_BasicLDAP" >LDAP</a></li>
+                                        <li><a href="javascript:;" id="link_Data">Data </a></li>
+                                        <li><a href="javascript:;" id="link_DataModels">Data Models</a></li>
+                                        <li><a href="javascript:;" id="link_Advanced" style="cursor: default; color: gray; position: absolute; left: 1100px;" onclick="advancedConfig(); return false;">Advanced Options</a></li>
+                                        
+                                    </ul>
+                                </div>
+                                <div class="statuscontainer status-container-default" id="IntroContainer">
+                                    <div class="panel-head">
+                                        <h2 style="font-weight: bold">Setup Overview</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div style="padding-bottom: 30px;">
+                                            <p>Welcome to the Search Activity Setup page. This app requires a modest amount of configuration in order to set up enrichment, and also to configure the data store. While this is slightly more work than is common
+                                                for most Splunk apps, it enables the app to synthesize millions or billions of events into a summarized form, and also enrich them with context from your organization (if you so desire) to make powerful
+                                                analytics easy and lightning-fast. You can even backfill this accelerated store, to give you the historical context that you'd no doubt enjoy!</p>
+
+                                            <p>Please click "Next" below to begin the configuration process.</p>
+                                        </div>
+                                        <button class="btn btn-primary" onclick="SwitchSection('CollectContainer')" style="float: right;">Next</button>
+                                    </div>
+                                </div>
+                                <div class="statuscontainer" id="CollectContainer">
+                                    <div class="panel-head">
+                                        <h2 style="font-weight: bold">Collecting Data</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div style="padding-bottom: 30px;">
+                                            <p>In order to ease the process of configuration, we will collect as much data as possible in advance. This is a one-time effort, please wait a moment while we run these searches.</p>
+                                        </div>
+                                        <table id="data_collect_table" class="table" style="width: 700px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Check</th>
+                                                    <th>Status</th>
+                                                    <th>Link</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                        <button class="btn btn-primary" style="float: right;" disabled>Next</button>
+                                    </div>
+                                </div>
+                                <div class="statuscontainer" id="ConversionContainer">
+                                    <div class="panel-head">
+                                        <h2 style="font-weight: bold">Migrate 2.x Data</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div style="padding-bottom: 30px;" id="ConversionContent">
+                                            
+                                        </div>
+                                        <button class="btn btn-primary" onclick="SwitchSection('BasicLDAPContainer')" style="float: right;" disabled>Next</button>
+                                    </div>
+                                </div>
+                                <div class="statuscontainer" id="BasicLDAPContainer">
+                                    <div class="panel-head">
+                                        <h2 style="font-weight: bold">Basic LDAP Data</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="BasicLDAPErrors" class="ErrorPanel"></div>
+                                        <p>LDAP data is probably more accurately thought of as general identity data.. or really: a list of usernames, names, phone numbers, departments, and for each account their manager's username.
+                                        </p>
+                                        <p>If you don't have this information handy, don't fret, it's not essential data to the Search Activity app at all. You'll be able to get 90% of the value of the app without that information. The differences that you
+                                            will see are:
+                                            <ul>
+                                                <li>The Organizational Hierarchy dashboard isn't available without LDAP data. This is the pretty tree-view visualization that allows you to understand what departments in your organization use Splunk, and if
+                                                    particular organizations have lots of trouble with failed searches, or questionable search practices.</li>
+                                                <li>On dashboard panels, you will only have the option for usernames, not real names.</li>
+                                            </ul>
+                                            <b>If you don't have LDAP Data now</b>, don't fret. All of this enrichment is done when we build the accelerated data models, so you can click "No LDAP" now and go through the rest
+                                            of the setup, and re-run the setup later to refresh the data model.
+                                        </p>
+                                        <div id="LDAPOptions">
+                                            <p>Please select one of the below options:</p>
+                                            <form name="ldap" id="ldapform">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align: center;">Select</th>
+                                                            <th>Name</th>
+                                                            <th>Description</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td style="text-align: center;"><input type="radio" style="margin: 0;" name="ldapoptions" onchange="ldapToggle()" value="noldap" id="ldapoptions-noldap" /></td>
+                                                            <td>No LDAP</td>
+                                                            <td>The simplest choice -- you can always add LDAP data later, with minimal headaches.</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: center;"><input type="radio" style="margin: 0;" name="ldapoptions" onchange='ldapToggle();' value="sa-ldap" id="ldapoptions-saldap" /></td>
+                                                            <td>SA-ldapsearch</td>
+                                                            <td>If you have SA-ldapsearch installed (see the Data Collection tab) then you can select this option, and proceed to configure which domain you would like to use. The app will then schedule a daily
+                                                                search to pull the requisite data from your LDAP, and store it into a lookup file LDAPSearch.csv.</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="text-align: center;"><input type="radio" style="margin: 0;" name="ldapoptions" value="staticlookup" onchange='ldapToggle();' id="ldapoptions-existing" /></td>
+                                                            <td>Existing LDAP Lookup</td>
+                                                            <td>This option is the catch-all, intended to allow you to provide a working LDAPSearch.csv that the app doesn't need to manage. This could be because SA-ldapsearch isn't available or installed (maybe
+                                                                you pull from Powershell or ADMon via <a href="https://splunkbase.splunk.com/app/3059/">SecKit</a>, maybe you ran into some configuration issue). If you have a large and complex environment
+                                                                with multiple LDAP stores, you could also select this option and work to concatenate those LDAP stores together on your own.</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="ldap-further-config ldap-further-config-ldapsearch" style="display: none;">
+                                                    <h3>Select Domain</h3>
+                                                    <div style="display:none;" id="saldap-domain-p">
+
+                                                        <div class="fieldset">
+                                                            <div class="input input-dropdown" id="ldapdomains">
+                                                                
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="ldap-further-config ldap-further-config-existing" style="display: none;">
+                                                    <h3>Existing LDAP Further Configuration</h3>
+
+                                                    <div style="display:none;padding-left:35px;" id="ldapquery-example-p">Here is an example query that will pull back the right information using ldapsearch:
+                                                        <pre>| ldapsearch search="(&(objectclass=user)(!(objectclass=computer)))" attrs="description,title,cn,sn,name,displayName,givenName,whenChanged,sAMAccountName,mail,manager,c,l,o,st,telephoneNumber,department,company,directReports,physicalDeliveryOfficeName" 
+| makemv directReports tokenizer="(?i)(CN=.*?dc=\S*)"
+| eval NumDirectReports = coalesce(mvcount(directReports),0)
+| table dn,description,title,cn,sn,name,displayName,givenName,whenChanged,sAMAccountName,mail,manager,c,l,o,st,telephoneNumber,department,company,NumDirectReports,physicalDeliveryOfficeName
+| outputlookup LDAPSearch.csv</pre>
+                                                        <p>Ultimately, all we care about are getting columns that match the above syntax. Most are straightforward, but there are a few that have subtleties:
+                                                            <ul>
+                                                                <li>dn - the distinguishedName in LDAP terminology. The goal here is just to have a field that uniquely identifies users, even if you have multiple Jane Smiths in your company (or in multiple
+                                                                    LDAP forests).</li>
+                                                                <li>manager - this field will also be in distinguishedName format (aka, it can be whatever you want -- even an employee ID number -- but it must match the dn field. We use this to build out the
+                                                                    management hierarchy.</li>
+                                                                <li>NumDirectReports - as you can see from the SPL, we calculate how many direct reports each manager has, which is useful mostly for differentiating managers from individual contributors.</li>
+                                                            </ul>
+                                                            If you're unfamiliar with any of the other field names, consult an <a href="http://www.selfadsi.org/user-attributes.htm">Active Directory field reference</a>.
+                                                        </p>
+                                                        <p>Ultimately make sure that the information lands in LDAPSearch.csv.</p>
+                                                    </div>
+                                                </div>
+                                                <br /> &nbsp;
+
+                                            </form>
+
+                                            <button class="btn btn-primary" style="float: right;" onclick="UpdateLDAPConfig(); SwitchSection('DataContainer');" disabled>Save Config Choice</button>
+                                        </div>
+                                        <div style="display: none;">
+                                            <h3>LDAP Data</h3>
+
+                                            <div id="LDAPData">
+                                                <p> <img src="/static/app/search_activity/loader.gif" title="Loading" /></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="statuscontainer" id="DataContainer">
+                                    <div class="panel-head">
+
+                                        <h2 style="font-weight: bold">Data</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="DataErrors" class="ErrorPanel"></div>
+                                        <div>
+                                            <p>This section is the trickiest part of the Search Activity setup. There are two data feeds that the Search Activity app uses -- the first is normal event data from index=_internal (and a few events from index=_audit). The second (and more important) data source is the _audit logs. In order to scale to huge levels, enabling a response time of seconds for analytics spanning millions of searches and months of time, the Search Activity app summarizes large volumes of events for each search down into a single event per search, then builds an Accelerated Data Model on top (the next step in the setup).</p>
+                                            <p>To accomplish this summarization, the Search Activity app has a custom search command that will look at the recently completed searches, and generate the summarized data, outputing it to the _audit index using Summary Indexing (which has no license implication). This scheduled search should generally be run every 10 minutes, producing a small amount of lag, but not too much, and not too much data load either.</p>
+                                            <p>The backfill process will take hours for most environments, but could conceivably take days in very large environments. Only one search will run concurrently, so the overall health and wellness of your Splunk environment will not be impacted.</p>
+
+                                            <h3>Configuration Options</h3>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="text-align: center;">Select</th>
+                                                        <th>Estimated Duration</th>
+                                                        <th>Name</th>
+                                                        <th>Description</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="convert">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="setBackfill(this, 0,0,'normal')" id="backfill-convert-normal">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>Continue After Conversion</td>
+                                                        <td>Configures the backfill command to wait until your 2.x data conversion job completes, and then to continue from that point.</td>
+                                                    </tr>
+                                                    <tr class="convert">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="setBackfill(this, 0)" id="backfill-none">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>No Backfill</td>
+                                                        <td>Configures the backfill command to wait until your 2.x data conversion job completes, and then to forget about the backfill and start right away.</td>
+                                                    </tr>
+                                                    <tr class="normal">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="requestBackfill(this, 0)" id="backfill-none">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>No Backfill</td>
+                                                        <td>Configures the backfill search command to forget about the past, and just start from right now. Interesting dashboards will take hours or days to be ready (waiting for new searches to be run), but there will be no increased load from the backfill. Extreme high scale environments (one thousand or more daily users) may wish to opt for this method, but most users will desire some backfill. </td>
+                                                    </tr>
+                                                    <tr class="normal">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="requestBackfill(this, 604800)" id="backfill-1week">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>One Week</td>
+                                                        <td>Configure a minimal backfill of one week.</td>
+                                                    </tr>
+                                                    <tr class="normal">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="requestBackfill(this, 2678400)"  id="backfill-1month">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>One Month</td>
+                                                        <td>Configure an acceptable backfill of one month.</td>
+                                                    </tr>
+                                                    <tr class="normal">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="requestBackfill(this, 15552000)"  id="backfill-6months">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>Six Months</td>
+                                                        <td>Configure a solid backfill of six months.</td>
+                                                    </tr>
+                                                    <tr class="normal">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="requestBackfill(this, 31536000)"  id="backfill-12months">Select</button></td>
+                                                        <td class="expected-backfill-duration"></td>
+                                                        <td>Twelve Months</td>
+                                                        <td>Configure a great backfill of twelve months.</td>
+                                                    </tr>
+                                                    <tr class="normal">
+                                                        <td style="text-align: center;"><button class="backfillOptions" onclick="customBackfill(this)" id="backfill-custom">Select</button></td>
+                                                        <td class="expected-backfill-duration">Varies</td>
+                                                        <td>Custom</td>
+                                                        <td>Backfill as much or as little as you want! (Including start and end times!)</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <br />
+                                        <div style="clear: both; margin-top: 45px;">
+                                            <button class="btn btn-primary" style="clear: both; float: right;" onclick="SwitchSection('DataModelContainer');" disabled>Next</button>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="statuscontainer" id="DataModelContainer">
+                                    <div class="panel-head">
+
+                                        <h2 style="font-weight: bold">Data Models</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="DataModelErrors" class="ErrorPanel"></div>
+                                        <div>
+                                            <p>The Search Activity has one data model, with two root datasets. In order to run the high speed queries that every Splunk admin wants, we require an accelerated data model, allowing us to pull the data at what is often 100x or 1000x the speed.</p>
+                                            <h3>Acceleration Status:</h3>
+                                            <div id="acceleration-status"><div id="acceleration-answer"></div></div>
+                                            <div id="accelerate-datamodels"></div>
+                                            <h3>Rebuild Data Model</h3>
+                                            <p>In rare cases, you may need to rebuild your data model (usually: you did not have LDAP data when you set up the app, but later wished to get the great visualizations, so you added it). Good news, you can rebuild the data model to take advantage of all of that! Note that the app will be offline until the data model rebuilds (which generally shouldn't take more than a few hours).</p>
+                                            <div id="rebuild-datamodels"></div>
+                                            <button class="btn btn-primary" style="clear: both; float: right;" onclick="SwitchSection('DoneWithSetupContainer');" disabled>Finish Setup</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="statuscontainer" id="DoneWithSetupContainer">
+                                    <div class="panel-head">
+
+                                        <h2 style="font-weight: bold">Setup Complete</h2>
+                                    </div>
+                                    <div class="panel-body">
+                                        
+                                        <div>
+                                            <p>The Search Activity App Setup is now complete. If this is your first time running through the setup, you will need to wait for data to be generated (either via converting old data from the 'Migrate 2.x Data" tab, backfilling your existing data as defined on the "Data" tab, or just generating new data also as defined on the "Data" tab). Additionally, once that data is present, you will have to wait for the data model acceleration to complete, before the app dashboards begin displaying data. Generally this should take 10-30 minutes to get some data (look at all time) depending on your configuration options.</p>
+                                            
+                                            <p>To monitor your environment, browse to the <a href="monitoring_data_population">Monitoring Data Population</a> dashboard panel.</p>
+
+                                            <p>Thank you for using the Search Activity App. If you have any questions, please <a href="https://answers.splunk.com/app/questions/2632.html" target="_blank" class="ext">search on Splunk Answers</a> with the using the Search Activity app tag to see if they've already been answered, or ask a new question (again, with the Search Activity app tag) by clicking <a href="https://answers.splunk.com/answers/ask.html?appid=2632" target="_blank" class="ext">here</a>.</p>
+
+                                            <a href="home" class="btn btn-primary" style="clear: both; float: right;">Home</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer"></div>
+
+    <!-- 
+END LAYOUT
+-->
+
+    <!--<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/contrib/require.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/i18ncatalog?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/profiles/shared.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/contrib/require_dev_config.js"></script>-->
+    <script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+    <script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+    <script src="{{SPLUNKWEB_URL_PREFIX}}/i18ncatalog?autoload=1"></script>
+    <script src="{{SPLUNKWEB_URL_PREFIX}}/static/build/simplexml/index.js"></script>
+    <script src="/static/app/search_activity/pages/setup_page.js">
+    </script>
+</body>
+
+</html>

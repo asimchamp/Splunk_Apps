@@ -1,0 +1,93 @@
+<form>
+  <label>Generate Lookups</label>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="time" token="Time Range" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Generate Clusters Lookup</title>
+        <search>
+          <query>`giga_cluster_kvstore_gen`</query>
+          <earliest>$Time Range.earliest$</earliest>
+          <latest>$Time Range.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Generate Ports Lookup</title>
+        <search>
+          <query>`giga_ports_kvstore_gen`</query>
+          <earliest>$Time Range.earliest$</earliest>
+          <latest>$Time Range.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Generate FMS Lookup</title>
+        <search>
+          <query>`giga_fms_kvstore_gen`</query>
+          <earliest>$Time Range.earliest$</earliest>
+          <latest>$Time Range.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Generate Maps Lookup</title>
+        <search>
+          <query>`giga_maps_kvstore_gen`</query>
+          <earliest>$Time Range.earliest$</earliest>
+          <latest>$Time Range.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Generate Cards Lookup</title>
+        <search>
+          <query>`giga_cards_kvstore_gen`</query>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>GigaSMART Lookup</title>
+        <search>
+          <query>`giga_smart_kvstore_gen`</query>
+          <earliest>$Time Range.earliest$</earliest>
+          <latest>$Time Range.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

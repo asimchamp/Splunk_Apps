@@ -1,0 +1,172 @@
+<!--SplunkforCheckpoint - submitted by Simon O'Brien - sobrien@splunk.com--><form script="AppUrl_RiskJS.js" stylesheet="single_trend.css,font_style.css,AppUrl_Risk.css">
+  <label>Application Control and URL Filtering</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time_display" searchWhenChanged="true">
+      <label>Time to display:</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="index_tok" searchWhenChanged="true">
+      <label>Select an index:</label>
+      <prefix>index="</prefix>
+      <suffix>"</suffix>
+      <!-- Define the default value -->
+      <default>main</default>
+      <!-- Hard-code the choice for "All" -->
+      <!-- Define the other choices with a populating search -->
+      <search>
+        <query>| eventcount summarize=false index=* | dedup index | fields index</query>
+      </search>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+    </input>
+    <input type="dropdown" token="sourcetype_tok" searchWhenChanged="true">
+      <label>Select a sourcetype:</label>
+      <prefix>sourcetype="</prefix>
+      <suffix>"</suffix>
+      <!-- Define the default value -->
+      <default>opsec</default>
+      <!-- Hard-code the choice for "All" -->
+      <!-- Define the other choices with a populating search -->
+      <search>
+        <query>|metadata type=sourcetypes index=*  | table sourcetype</query>
+      </search>
+      <fieldForLabel>sourcetype</fieldForLabel>
+      <fieldForValue>sourcetype</fieldForValue>
+    </input>
+    <input type="dropdown" token="orig" searchWhenChanged="true">
+      <label>Firewall Address</label>
+      <prefix>orig="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">All</choice>
+      <search>
+        <query>$index_tok$ $sourcetype_tok$ | dedup orig | table orig</query>
+      </search>
+      <fieldForLabel>orig</fieldForLabel>
+      <fieldForValue>orig</fieldForValue>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Application/Site By Risk</title>
+      <table id="top_applicaions_by_risk">
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ (product="Application Control" OR product="URL Filtering")    (app_category != "Network Protocols")  | stats count by appi_name,app_risk,src_ip |   table   src_ip,appi_name,app_risk, count | rename appi_name As "Application/Site", app_risk As Risk, src_ip As "Source IP" |  eval Risk=`calc_risk(app_risk=Risk)`</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="link.inspectSearch.visible">0</option>
+        <option name="link.openPivot.visible">0</option>
+        <option name="link.openSearch.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Application control and URL Filtering blade blocked source IP addresses</title>
+      <table id="blockedhost">
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ (product="Application Control" OR product="URL Filtering" ) vendor_action="block" OR vendor_action="drop" OR action="blocked" OR action="dropped" | stats count by src_ip | rename src_ip AS "Source IP" count AS "Block Count"</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="link.inspectSearch.visible">0</option>
+        <option name="link.openPivot.visible">0</option>
+        <option name="link.openSearch.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Application control and URL Filtering blade allowed source IP addresses</title>
+      <table>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ (product="Application Control" OR product="URL Filtering" ) vendor_action="allow" OR vendor_action="accept" OR action="dropped" OR action="blocked" | stats count by src_ip | rename src_ip AS "Source IP" count AS "Allow Count"</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="link.inspectSearch.visible">0</option>
+        <option name="link.openPivot.visible">0</option>
+        <option name="link.openSearch.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 used Source IP addresses</title>
+      <table>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ (product="Application Control" OR product="URL Filtering" ) orig="*" |search bytes=* | dedup src_ip,bytes|stats sum(bytes) AS band by src_ip | eval Bandwidth=(band/(1024*1024))."  MB" | sort 10 - Bandwidth | rename src_ip AS "Source IP" |table "Source IP", Bandwidth</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Top 10 used Applications</title>
+      <table>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ (product="Application Control" OR product="URL Filtering" ) orig="*" |search bytes=* | dedup appi_name,bytes| stats sum(bytes) AS band by appi_name| eval Bandwidth=(band/(1024*1024))."  MB" |rename appi_name AS Applications | sort 10 - Bandwidth | table Applications, Bandwidth</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>AppRisk destinations by geoip</title>
+      <map>
+        <search>
+          <query>$index_tok$ $sourcetype_tok$ $orig$ app_risk=4 OR app_risk=3 OR app_risk=5 | iplocation dest_ip | geostats count by City</query>
+          <earliest>$time_display.earliest$</earliest>
+          <latest>$time_display.latest$</latest>
+        </search>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="drilldown">all</option>
+        <option name="link.openSearch.visible">false</option>
+        <option name="link.openPivot.visible">false</option>
+        <option name="link.inspectSearch.visible">false</option>
+      </map>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,76 @@
+<dashboard>
+
+  <label>About</label>
+
+  <description>This Splunk App for Akamai Cloud Monitor</description>
+
+<row>
+
+<html>
+
+<p>This Splunk App for Akamai Cloud Monitor leverages Akamai Cloud Monitor logs to build a rich set of dashboards that provide real time operational intelligence about your Akamai hosted properties. The simple dashboards in the app provide visualizations that provide deep insight into the availability, performance, security and user experience of web applications for you global customers. It will also provide you visibility into the performance of the Akamai Edge servers and enables monitoring of Akamai configurations changes with a less than 60 sec delay. This App is a good starting point for additional visualizations of Akamai Cloud Monitor data which maybe more specific to your implementation.
+</p>
+
+<h2>Dependencies:</h2>
+
+<ul>
+<li>Akamai cloud Monitor Data</li>
+<li>Cloud Monitor Data Sets</li>
+<ul>
+<li>Base Log Line Data</li>
+<li>Akadebug</li>
+<li>GEO</li>
+<li>HTTP</li>
+<li>Network Performance</li>
+<li>Network Data</li>
+<li>WAF Application Security</li>
+
+</ul>
+
+
+</ul>
+  
+<h2>Setup:</h2>  
+  
+  <ul>
+  <li>Add Cloud Monitor to the Akamai contract</li>
+<li>Go into the Akamai portal and enable the property for Cloud Monitor logging</li>
+<li>Select the Cloud Monitor data sets (Make sure the above sets are included)</li>
+<li>Set up the Splunk HTTP Event Collector (Splunk 6.3) or your custom receiver solution.</li>
+<li>Set up receiver VIP, DNS, and SSL Certs</li>
+<li>Configure Cloud Monitor in the Akamai portal to send the logs to the receiver VIP</li>
+<li>Set up Splunk to index the data (Create Index and Access Rules)</li>
+<li>Install the Akamai Cloud Monitor App and TA</li>
+<li>Edit the akmai_cm Macro to reflect the correct index (by default app creates akama_cm index)</li>
+</ul>
+  
+  
+  <h2>Data Models:</h2>
+
+  <p>Following Data models are created to simplify the use of the data with PIVOT and also to improve the performance of the Splunk Reports and Dashboards.</p>
+<ul>
+  <li>akamai_cm_availability</li>
+  <li>akamai_cm_performance</li>
+  <li>akamai_cm_operations</li>
+  <li>akamai_cm_origin</li>
+  <li>akamai_cm_security</li>
+  </ul>
+
+  <h2>Dashboards</h2>
+
+Following Dashboards are developed to visualize the rich information provided by Cloud Monitor
+<ul>
+  <li>Availability</li> 
+  <li>Performance</li> 
+  <li>Security</li>
+  <li>Operations</li>
+  <li>Edge</li>
+  </ul>
+
+  
+  
+</html>
+
+</row>
+
+</dashboard>

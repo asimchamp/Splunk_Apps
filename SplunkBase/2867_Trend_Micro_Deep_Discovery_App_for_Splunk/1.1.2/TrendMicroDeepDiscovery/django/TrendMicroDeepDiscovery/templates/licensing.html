@@ -1,0 +1,208 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}License Configuration{% endblock title %}
+
+{% block css %}
+<style type="text/css" media="screen">
+.btn-red {
+  color: #ffffff;
+  background-color: #e34044;
+  background-image: linear-gradient(to bottom, #ed4b4e, #d43034);
+  background-repeat: repeat-x;
+  border-color: #c92f33;
+  border-bottom-color: #c92f33;
+  box-shadow: inherit;
+}
+
+* {
+  border-color: #ccc;
+}
+.ManagerBar {
+  clear: both;
+  color: rgb(51, 51, 51);
+  display: block;
+  font-family: Roboto, Droid, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  height: 24px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding-bottom: 15px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 15px;
+  zoom: 1;
+}
+h1.ManagerPageTitle {
+  color: rgb(51, 51, 51);
+  display: block;
+  font-family: Roboto, Droid, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 200;
+  height: 24px;
+  line-height: 24px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  margin-top: 0px;
+  width: 1534px;
+  zoom: 1;  
+}
+.adminContent {
+  clear: both;
+  color: rgb(51, 51, 51);
+  display: block;
+  font-family: Roboto, Droid, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  min-height: 400px;
+}
+div.dataInputsWrapper {
+  -webkit-background-clip: border-box;
+  -webkit-background-origin: padding-box;
+  -webkit-background-size: auto;
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-color: rgb(255, 255, 255);
+  background-image: none;
+  background-origin: padding-box;
+  background-size: auto;
+  border-bottom-color: rgb(204, 204, 204);
+  border-left-color: rgb(204, 204, 204);
+  border-right-color: rgb(204, 204, 204);
+  border-top-color: rgb(204, 204, 204);
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: rgb(51, 51, 51);
+  display: block;
+  font-family: Roboto, Droid, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  min-height: 420px;
+  padding: 20px;
+}
+div.dataInputsDesc {
+  color: rgb(51, 51, 51);
+  display: block;
+  font-family: Roboto, Droid, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  height: 80px;
+  margin-bottom: 15px;
+  margin-top: 5px;
+}
+
+table.splTable {
+  background-color: #fff;
+  border-color: #999;
+  margin-bottom: 15px;
+  border-bottom: 0;
+  border: 0px;
+  border-spacing: 0px;
+}
+table.splTable th {
+  font-size: 1.1em;
+  border-color: #999;
+  padding: 3px 5px;
+  text-align: left;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  vertical-align: top;
+}
+table.splTable td {
+  padding: 10px 5px;
+  border-bottom: 1px solid #EEE;
+  vertical-align: middle;
+}
+table.splTable td select, table.splTable td input {
+  margin: 0;
+}
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="ManagerBar">
+  <h1 class="ManagerPageTitle">License Details</h1>
+</div>
+<div class="adminContent">
+  <div class="dataInputsWrapper">
+    <div class="dataInputsDesc">
+Specify the Activation Code from one of the following products:<br>
+<ul>
+  <li>Trend Micro Deep Discovery Inspector</li>
+  <li>Trend Micro Deep Discovery Email Inspector</li>
+  <li>Trend Micro Deep Discovery Analyzer</li>
+</ul>
+The Activation Code is required only if you need to use "Investigation > Web Access Log Correlation". All other features do not require the Activation Code.
+    </div>
+    <form method="post" action=".">
+      {% csrf_token %}
+      <table class="splTable" id="dataInputs">
+        <tbody>
+          <tr>
+            <td><strong>Activation Code:</strong></td>
+            <td>
+              <input type="text" maxlength="37" size="37" name="ac_key" value="{{messages.ackey}}" style="width:300px"></input>
+            </td>
+            <td>
+              <button class="btn btn-primary btn-red" id="submit-button">Activate</button>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Expiration date:</strong></td>
+            <td colspan="2">{{messages.expired_date}}</td>
+          </tr>
+          <tr>
+            <td><strong>Last C&C Information Pattern update:</strong></td>
+            <td colspan="2">{{messages.cnc_db}}</td>
+          </tr>
+          <tr>
+            <td><strong>Status:</strong></td>
+            <td colspan="2"><span id="status" style="color:#DB3D44;">{{messages.status}}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+
+  </div>
+</div>
+
+{% endblock content%}
+
+{% block managers %}
+{% endblock managers %}
+
+{% block js %}
+<script>
+var deps = [
+        "splunkjs/ready!",
+];
+require.config({
+    waitSeconds: 60
+})
+require(deps, function(mvc) {
+
+  $(document).ready(function(){
+    $("#submit-button").click(function () {
+      var $element = $('#status');
+      $element.text("Validating code ..");
+      setInterval(function () {
+          $element.fadeIn(0, function () {
+              $element.fadeOut(500, function () {
+                  $element.fadeIn(500)
+              });
+          });
+      }, 1000);
+    });
+    var action = "{{messages.action}}"
+    if(action != "" && action != 'None'){
+       alert(action);
+    }
+
+    if($('#status').text().indexOf("Expired") > -1){
+       $("#submit-button").text("Update");
+    }
+  });
+
+});
+
+</script>
+{% endblock js %}

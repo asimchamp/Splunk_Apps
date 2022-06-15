@@ -1,0 +1,139 @@
+<form script="savvius.js" stylesheet="statistics_summary_statistics.css">
+  <label>Summary Statistics</label>
+  <fieldset autorun="true" submitButton="false">
+    <!-- Global timer. Not token is necessary -->
+    <input type="time" searchWhenChanged="true">
+      <label>Date &amp; Time</label>
+      <default>
+        <earliest>-1h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="dropdown" token="group" searchWhenChanged="true">
+      <label>Group</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by Group | sort Group</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>Group</fieldForValue>
+      <fieldForLabel>Group</fieldForLabel>
+    </input>
+    <input type="text" token="statistic" searchWhenChanged="true">
+      <label>Statistic</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Average Network Utilization</title>
+        <search>
+          <query>sourcetype=sv_summaries host="$source$" Group="Network" Statistic="Average Utilization (bits/s)"
+            | eval mbps=(Bytes/1000000)
+            | timechart avg(mbps) as Mbps
+            | fieldformat Mbps=round(Mbps, 2)</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="height">200px</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+					overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+				]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Summary Statistics</title>
+        <search>
+          <query>sourcetype=sv_summaries host="$source$" Group="$group$" Statistic="$statistic$"
+            | eval packets=if(isnull(Bytes) OR (Bytes!=Packets), Packets, NULL)
+            | eval bytes=if(isnull(Packets) OR (Bytes!=Packets), Bytes, NULL)
+            | eval value=if(Bytes==Packets, Bytes, NULL)
+            | stats sparkline(sum(packets)) as "Packet Trend" sum(packets) as Packets sparkline(sum(bytes)) as "Byte Trend" sum(bytes) as Bytes sparkline(sum(value)) as "Value Trend" sum(value) as Value by Group Statistic
+            | fieldformat Packets=tostring(Packets, "commas")
+            | fieldformat Bytes=tostring(Bytes, "commas")
+            | fieldformat Value=tostring(Value, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="Packet Trend">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Byte Trend">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

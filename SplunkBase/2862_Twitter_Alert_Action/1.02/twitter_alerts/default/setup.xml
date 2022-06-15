@@ -1,0 +1,28 @@
+<setup>
+    <block title="Twitter Alerts">
+        <text>Twitter Access Tokens</text>
+    </block>
+
+    <block title="Server" endpoint="admin/alert_actions" entity="twitter">
+        <input field="param.consumer_key">
+            <label>Consumer Key</label>
+            <type>text</type>
+        </input>
+
+        <input field="param.consumer_secret">
+            <label>Consumer Secret</label>
+            <type>text</type>
+        </input>
+
+        <input field="param.access_token">
+            <label>Access Token</label>
+            <type>text</type>
+        </input>
+
+        <input field="param.access_token_secret">
+            <label>Access Token Secret</label>
+            <type>text</type>
+        </input>
+    </block>
+
+</setup>

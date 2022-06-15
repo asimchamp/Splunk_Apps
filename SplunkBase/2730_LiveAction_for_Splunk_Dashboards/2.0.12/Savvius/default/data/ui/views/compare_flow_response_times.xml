@@ -1,0 +1,126 @@
+<form>
+  <label>Compare Flow Response Times</label>
+  <fieldset autorun="true" submitButton="false">
+    <!-- Global timer. Not token is necessary -->
+    <input type="dropdown" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="dropdown" token="time_span" searchWhenChanged="true">
+      <label>Time Span</label>
+      <default>Days</default>
+      <choice value="h">Hours</choice>
+      <choice value="d">Days</choice>
+      <choice value="w">Weeks</choice>
+      <choice value="m">Months</choice>
+    </input>
+    <input type="dropdown" token="how_many" searchWhenChanged="true">
+      <label>How Many</label>
+      <default>2</default>
+      <choice value="2">2</choice>
+      <choice value="3">3</choice>
+      <choice value="4">4</choice>
+      <choice value="5">5</choice>
+      <choice value="6">6</choice>
+      <choice value="7">7</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Average Flow Response Time</title>
+        <search>
+          <query>sourcetype=sv_flows host="$source$" earliest=-$how_many$$time_span$@$time_span$ latest=@$time_span$ 
+            | regex "Avg Response Time"="[0-9\.:]+"
+            | rex field="Avg Response Time" "((?&lt;hour&gt;[0-9]{2}){1}:(?&lt;minute&gt;[0-9]{2}){1}:){0,1}(?&lt;second&gt;[0-9]{1,2}){1}\.(?&lt;microsecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 hour minute second microsecond
+            | eval art=if(isnull('Avg Response Time'),null,(hour*3600)+(minute*60)+second+(microsecond/1000000))
+            | timechart eval(round(avg(art),2)) as "Average Response Time"
+            | timewrap $time_span$</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Seconds</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="height">200px</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                latency_flow_response_times?form.source=$source$
+                    ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Worst Flow Response Time</title>
+        <search>
+          <query>sourcetype=sv_flows host="$source$" earliest=-$how_many$$time_span$@$time_span$ latest=@$time_span$ 
+            | regex "Worst Response Time"="[0-9\.:]+"
+            | rex field="Worst Response Time" "((?&lt;hour&gt;[0-9]{2}){1}:(?&lt;minute&gt;[0-9]{2}){1}:){0,1}(?&lt;second&gt;[0-9]{1,2}){1}\.(?&lt;microsecond&gt;[0-9]{6}){1}"
+            | fillnull value=0 hour minute second microsecond
+            | eval wrt=if(isnull('Worst Response Time'),null,(hour*3600)+(minute*60)+second+(microsecond/1000000))
+            | timechart eval(round(max(wrt),2)) as "Worst Response Time"
+            | timewrap $time_span$</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Seconds</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="height">200px</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                latency_flow_response_times?form.source=$source$
+                    ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+</form>

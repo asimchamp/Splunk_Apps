@@ -1,0 +1,285 @@
+<form version="1.1" script="cluster_summary_highlighting.js,cluster_summary.js" stylesheet="table_decorations.css">
+  <label>Cluster Summary</label>
+  <search id="baseSearch">
+    <query>| `get_xtremio_index` sourcetype=emc:xtremio:rest component=clusters  content.name="$cluster$" | stats values(content.bw) AS bw values(content.iops) AS iops values(content.avg-latency) AS latency by content.name,_time </query>
+    <earliest>-15m</earliest>
+    <latest>now</latest>
+  </search>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="cluster" searchWhenChanged="true">
+      <label>Cluster</label>
+      <search>
+        <query>| inputlookup XtremIOClusterNameLookup |table "Cluster Name"</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>Cluster Name</fieldForLabel>
+      <fieldForValue>Cluster Name</fieldForValue>
+	  <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <div class="detail_view_title">Summary</div>
+        <div id="summary"/> 
+      </html>
+    </panel>
+        <panel>
+      <title>Volume Summary</title>
+      <table>
+        <search>
+          <query>| inputlookup XtremIOVolumesLookup | search "Cluster Name" = "$cluster$" | table  "Index"  "Volume Name" "Creation Timestamp" "Volume Size" "Total Snapshots" "Total Lun Mappings"</query>
+          <earliest>-1h</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown target="Volumes Summary">
+          <link>
+            <![CDATA[
+          volumes_summary?form.cluster=$cluster$&form.volume=$row.Volume Name$
+			]]>
+          </link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">12</option>
+      </table>
+    </panel>
+  </row>
+   <row>
+    <panel>
+      <title>Bandwidth(MB/s)</title>
+      <chart>
+        <search base="baseSearch">
+           <query>|  timechart span=1m latest(bw) AS Bandwidth</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+		
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+      <html>
+       <div class="performance_drilldown">
+            <a href=" /app/EMC-app-XtremIO/cluster_performance?form.cluster=$form.cluster$" target="Cluster Performance">
+                    View Performance Details
+             </a>
+        </div>
+      </html>
+    </panel>
+    <panel>
+      <title>IOPS</title>
+      <chart>
+        <search  base="baseSearch">
+           <query>|  timechart span=1m   latest(iops) AS "IOPS"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+		 <option name="charting.axisTitleY.text">IOPS</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+      <html>
+       <div class="performance_drilldown">
+            <a href=" /app/EMC-app-XtremIO/cluster_performance?form.cluster=$form.cluster$" target="Cluster Performance">
+                    View Performance Details
+             </a>
+        </div>
+      </html>
+    </panel>
+    <panel>
+      <title>Latency(µs)</title>
+      <chart>
+        <search  base="baseSearch">
+          <query>|  timechart span=1m latest(latency) AS "latency"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+      <html>
+       <div class="performance_drilldown">
+            <a href=" /app/EMC-app-XtremIO/cluster_performance?form.cluster=$form.cluster$" target="Cluster Performance">
+                    View Performance Details
+             </a>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>xBrick Summary</title>
+      <table>
+        <search>
+          <query>| inputlookup XtremIOxBricksLookup | search "Cluster Name" = "$cluster$" | table  "Index" "Brick Name" "State" "Storage Controller Count" "SSD Count"</query>
+          <earliest>-1h</earliest>
+          <latest>now</latest>
+          <categoryField>$cluster$</categoryField>
+          <nameField>Index,"Brick Name"</nameField>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Storage Controller Summary</title>
+      <table>
+        <search>
+          <query>|inputlookup XtremIOStorageControllersLookup | search "Cluster Name"="$cluster$"   | table Index,"Brick Name" ,"Controller Name",Health,"Firmware Version","OS Version"</query>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Initiator Summary</title>
+      <table id="highlight_connection_state">
+        <search>
+          <query>| inputlookup XtremIOInitiatorsLookup | search "Cluster Name" = "$cluster$"  | table "Index" "Initiator Name"  "Group Name" "Port Type" "Connection State"</query>
+          <earliest>-1h</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown target="Initiator Summary">
+          <link>
+            <![CDATA[
+          initiators_summary?form.cluster=$cluster$&form.initiator=$row.Initiator Name$
+			]]>
+          </link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Target Summary</title>
+      <table id="highlight_port_state">
+        <search>
+          <query>| inputlookup XtremIOTargetsLookup | search "Cluster Name" = "$cluster$" | table "Index" "Target Name" "Storage Controller" "Port State" "Port Type"</query>
+          <earliest>-1h</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown target="Target Summary">
+          <link>
+            <![CDATA[
+          targets_summary?form.cluster=$cluster$&form.target=$row.Target Name$
+			]]>
+          </link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+ 
+  <row>
+    <panel>
+      <title>Critical Events - Last 4 hours</title>
+      <event>
+        <search>
+          <query>| `get_xtremio_index`  sourcetype="emc:xtremio:rest" component=events "Cluster Name"="$cluster$" events.entity=Cluster events.severity=critical| head 10000</query>
+          <earliest>-4h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+    </panel>
+    <panel>
+      <title>Critical Events Trend - Last 4 hours</title>
+      <chart>
+        <search>
+          <query>| `get_xtremio_index`  sourcetype="emc:xtremio:rest" component=events "Cluster Name"="$cluster$" events.entity=Cluster events.severity=critical| head 10000 | timechart span=10m count</query>
+          <earliest>-4h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

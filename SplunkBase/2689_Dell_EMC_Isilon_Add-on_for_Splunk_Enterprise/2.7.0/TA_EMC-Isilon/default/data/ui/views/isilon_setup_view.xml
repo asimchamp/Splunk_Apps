@@ -1,0 +1,86 @@
+<dashboard isDashboard="false" script="isilon_setup_page.js" stylesheet="isilon_setup_page.css">
+  <label>TA_Dell-Isilon</label>
+  <row>
+    <panel>
+      <html>
+        <table>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_input_style"/>
+            <td class="td_input_style">
+              <h4>Add any of the Cluster node credentials</h4>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_label_style">
+              <span>IP Address</span>
+              <font color="red">*</font>
+            </td>
+            <td class="td_input_style">
+              <input type="text" name="ip_address"/>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_label_style">
+              <span>Username</span>
+              <font color="red">*</font>
+            </td>
+            <td class="td_input_style">
+              <input type="text" name="username"/>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_label_style">
+              <span>Password</span>
+              <font color="red">*</font>
+            </td>
+            <td class="td_input_style">
+              <input type="password" name="password"/>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_label_style">
+              <span>Confirm password</span>
+              <font color="red">*</font>
+            </td>
+            <td class="td_input_style"> <input type="password" name="confirm_password"/>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_label_style">
+              <span>Index (Defaults to 'isilon'. Index must be created before specifying here.)</span>
+            </td>
+            <td class="td_input_style">
+              <input type="text" name="index"/>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_input_style"/>
+            <td class="td_input_style">
+              <button name="setup_button" class="setup_button">Save</button>
+            </td>
+            <td class="td_side_style"/>
+          </tr>
+          <tr>
+            <td class="td_side_style"/>
+            <td class="td_input_style"/>
+            <td class="isilon_error_msg"/>
+            <td class="td_side_style"/>
+          </tr>
+        </table>
+      </html>
+    </panel>
+  </row>
+</dashboard>

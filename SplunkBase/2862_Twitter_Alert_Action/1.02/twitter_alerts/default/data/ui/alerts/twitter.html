@@ -1,0 +1,19 @@
+<form class="form-horizontal form-complex">
+  
+    <div class="control-group">
+        <label class="control-label" for="twitter_message">Message</label>
+        <div class="controls">
+            <textarea type="text" rows="5" name="action.twitter.param.message" id="twitter_message" /></textarea>
+            <span class="help-block">Enter a tweet to send. Messages will be truncated to 140 characters. Be mindful of the fact that the Twitter API prohibits making duplicate tweets.</span>
+        </div>
+    </div>
+    
+    <div class="control-group">
+        <label class="control-label" for="twitter_recipient">Recipient (optional)</label>
+        <div class="controls">
+            <input type="text" name="action.twitter.param.recipient" id="twitter_recipient" />
+            <span class="help-block">If filled out, a direct message will be sent to the account specified. See <a href="https://dev.twitter.com/rest/reference/post/direct_messages/new">here</a> for prerequisites.</span>
+        </div>
+    </div>
+    
+</form>

@@ -1,0 +1,84 @@
+<form>
+  <label>Acquisition Overview[BETA]</label>
+  <description></description>
+  <fieldset autoRun="True">
+    <!-- Specify search when changed for the inputs -->
+    <input type="multiselect" token="website" searchWhenChanged="true">
+      <label>Domain:</label>
+      <!-- <default>vedaauto.carhistory.com.au, www.carhistory.com.au</default> -->
+      <default>www.datalicious*</default>
+      <!-- The final value will be surrounded by prefix and suffix -->
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="www.datalicious*">www.datalicious.com</choice>
+      <choice value="*">All</choice>
+      <search>
+        <query>`webanalytics_page_data` | stats count by event.meta.host</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>event.meta.host</fieldForLabel>
+      <fieldForValue>event.meta.host</fieldForValue>
+    </input>
+    <input type="dropdown" token="goal" searchWhenChanged="true">
+      <label>Goal:</label>
+      <!-- <default>Carhistory Report purchase</default> -->
+      <search>
+        <query>`webanalytics_page_data` $website$ event.type="page|view|goal" | stats count by event.goal.name</query>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>event.goal.name</fieldForLabel>
+      <fieldForValue>event.goal.name</fieldForValue>
+    </input>
+    <input type="dropdown" token="visitor" searchWhenChanged="true">
+      <label>Visitor Source:</label>
+      <default>person.id.cookie.optimahub3rd</default>
+      <populatingSearch earliest="-24h@h" latest="now" fieldForLabel="label" fieldForValue="visitor">| inputlookup visitor_source.csv</populatingSearch>
+    </input>
+    <!-- Add time range picker -->
+    <input type="time" searchWhenChanged="true">
+      <label>Time Range:</label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Top Campaigns</title>
+      <searchString>`webanalytics_web_data` $website$ event.goal.name="$goal$" 
+| spath path=event.id output=url    
+| spath path=$visitor$ output=visitor   
+| spath path=event.goal.step output=step 
+| eval conversion=case(step == "Final Step",step)
+| transaction visitor
+| stats values(url) as Pages, values(conversion) as Conversion, count AS Visits, sum(eventcount) AS "PageViews" by visitor
+| eval PagesPerVisit=round((PageViews/Visits),2)    
+| rename PagesPerVisit AS "Page Views / Visit", Email AS "Customer ID", PageViews AS "Page Views" 
+| sort - Visits</searchString>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Customer Campaign Responses</title>
+      <searchString>`webanalytics_web_data` $website$ event.goal.name="$goal$" 
+| spath path=event.id output=url    
+| spath path=$visitor$ output=visitor   
+| spath path=event.goal.step output=step 
+| eval conversion=case(step == "Final Step",step)
+| rename person.id.email.default.hashed AS personidemaildefault              
+| where isnotnull(personidemaildefault)              
+| transaction visitor
+| stats values(url) as Pages, values(conversion) as Conversion, count AS Visits, sum(eventcount) AS "PageViews" by visitor
+| eval PagesPerVisit=round((PageViews/Visits),2)    
+| rename PagesPerVisit AS "Page Views / Visit", Email AS "Customer ID", PageViews AS "Page Views" 
+| sort - Conversion</searchString>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+</form>

@@ -1,0 +1,96 @@
+<form>
+  <label>Syslog Explorer</label>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="syslog_host" searchWhenChanged="false">
+      <label>Syslog Host</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>eventtype=giga_syslogs log_level=$log_level$ process=$process$ | stats count by host</query>
+        <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="log_level" searchWhenChanged="false">
+      <label>Log Level</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>eventtype=giga_syslogs host=$syslog_host$ process=$process$ |stats count by log_level</query>
+        <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+      </search>
+      <fieldForLabel>log_level</fieldForLabel>
+      <fieldForValue>log_level</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="process">
+      <label>Process</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>eventtype=giga_syslogs log_level=$log_level$ host=$syslog_host$  | stats count by process</query>
+        <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+      </search>
+      <fieldForLabel>process</fieldForLabel>
+      <fieldForValue>process</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="time" token="field1" searchWhenChanged="false">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+          <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Hosts</title>
+        <search base="base_syslogs">
+          <query>top host</query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Log Levels</title>
+        <search base="base_syslogs">
+          <query>top log_level</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Processes</title>
+        <search base="base_syslogs">
+          <query>top process</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>Raw Syslogs</title>
+        <search id="base_syslogs">
+          <query>eventtype=giga_syslogs host=$syslog_host$ log_level=$log_level$ process=$process$</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </event>
+    </panel>
+  </row>
+</form>

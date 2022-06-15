@@ -1,0 +1,72 @@
+<dashboard>
+  <label>Conquering Alert Fatigue with Statistical Analysis</label>
+  <row>
+    <html>
+      <h2>Background</h2>
+      <p>There are more events than you can possibly handle. Fact of life. There are many great techniques for managing this, though:
+<ul><li>Risk analysis to identify machines/users/etc of the greatest concern</li>
+<li>Statistical analysis to identify unusual hits</li>
+<li>Track alerts on multiple vectors to bubble up significant threats</li>
+<li>Trigger increased logging after mundane alerts (Action!)</li>
+<li>Machine Learning to identify outliers </li></ul></p>
+      <p>Beneath, we have an example of statistical analysis to defeat alert fatigue. This technique requires some experimentation, and threat modeling. <b>You need to know your environment</b>, to know what you want to see, or know what you don't want to see. Don't treat this as a casual friday afternoon jaunt into the search language, because you will inevitably apply poor logic and miss out on events you wished you had seen.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Key Techniques:</h2>
+<p>This example leverages the following useful techniques:</p>
+  <ul>
+      <li>Bucketing Stats on Time: Timechart's bucketing is really convenient, but columnizing your data can make further analytics difficult. Bucketing _time provides the same time perspective, without the column downside.</li>
+      <li>eventstats: Non-destructive stats</li>
+      <li>stats eval if statements: Embedding if statements allow you to have incredible control over what you are counting, averaging, distinct counting, or etc. Return null to exclude values!</li>
+      <li>where: Leverage the same logic you can apply in eval, but in a where statement to filter events.</li>
+    </ul>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>The Search</h2>
+      <pre>
+        <![CDATA[tag=malware tag=attack | eval severity=coalesce(severity, "") 
+| bucket _time span=1d | stats count by severity signature dest _time 
+| stats sum(count) as count avg(count) as avg stdev(count) as stdev sum(eval(if(_time > relative_time(now(),  "-1d"), count, 0))) as recent_count min(_time) as earliest by severity signature dest
+| eventstats avg(avg) as avg_num_per_dest avg(earliest) as avg_earliest sum(count) as sig_wide_count sum(recent_count) as sig_wide_recent_count by signature
+| lookup AssetPriority as host OUTPUTNEW priority 
+| fields severity signature dest avg stdev earliest recent_count avg_earliest avg_num_per_dest sig_wide_count sig_wide_recent_count priority
+| where (avg_earliest > relative_time(now(), "-1d")) OR (earliest > relative_time(now(), "-1d") AND (recent_count / sig_wide_recent_count > 0.1 OR priority>3 )) 
+]]>      </pre>
+     
+      <h3>Line by Line</h3>
+  <pre><![CDATA[tag=malware tag=attack | eval severity=coalesce(severity, "") 
+| bucket _time span=1d | stats count by severity signature dest _time ]]></pre>
+<ul><li>What: Give a count per signature, per destiation, per day (adding severity in as well).</li><li>Why: This is a large dataset, but provides the minimum necessary granularity.</li></ul>
+<pre><![CDATA[| stats sum(count) as count avg(count) as avg stdev(count) as stdev sum(eval(if(_time > relative_time(now(),  "-1d"), count, 0))) as recent_count min(_time) as earliest by severity signature dest]]></pre>
+<ul><li>What: Build our core dataset for analysis.</li><li>Why: My goal when performing statistical analysis, particularly with stats (eventstats does have more limitations around memory usage) is to track come up with as many data points as I might use, so that when writing the business logic I can see all the parameters I might need at that stage without returning back. Splunk's search parser might clean up any extras.. but at the very least it is worthwhile.</li></ul>
+<pre><![CDATA[| eventstats avg(avg) as avg_num_per_dest avg(earliest) as avg_earliest sum(count) as sig_wide_count sum(recent_count) as sig_wide_recent_count by signature]]></pre>
+<ul><li>What: Tracking for just one host limits the amount of context you can get, and leads to false positives. Let's augment this with context about the signature's overall activity.</li><li>Why: Eventstats is non-destructive, in that it only augments existing results. You will maintain your existing event set, and just add this additional context about the signature.</li></ul>
+<pre><![CDATA[| lookup AssetPriority dest as host OUTPUTNEW priority ]]></pre>
+<ul><li>What: Lookup to include asset priority if available.</li><li>Why: If we have it available, asset priority can clearly be useful for augmenting our business logic.</li></ul>
+<pre><![CDATA[| fields severity signature dest avg stdev earliest recent_count avg_earliest avg_num_per_dest sig_wide_count sig_wide_recent_count priority ]]></pre>
+<ul><li>What: Our available fields.</li><li>Why: I find it convenient when I'm about to write the business logic to include a list of the fields I have available.</li></ul>
+<pre><![CDATA[| where (avg_earliest > relative_time(now(), "-1d")) OR (earliest > relative_time(now(), "-1d") AND (recent_count / sig_wide_recent_count > 0.1 OR priority>3 ))]]></pre>
+<ul><li>What: Apply our business logic for finding suspicious infections.</li><li>Why: This can be any logic you want to. </li></ul>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+ tag=malware tag=attack | eval severity=coalesce(severity, "")  | bucket _time span=1d | stats count by severity signature dest _time  | stats sum(count) as count avg(count) as avg stdev(count) as stdev sum(eval(if(_time > relative_time(now(),  "-1d"), count, 0))) as recent_count min(_time) as earliest by severity signature dest | eventstats avg(avg) as avg_num_per_dest avg(earliest) as avg_earliest sum(count) as sig_wide_count sum(recent_count) as sig_wide_recent_count by signature | lookup AssetPriority dest OUTPUT  priority  | fields severity signature dest avg stdev earliest recent_count avg_earliest avg_num_per_dest sig_wide_count sig_wide_recent_count priority | where (avg_earliest > relative_time(now(), "-1d")) OR (earliest > relative_time(now(), "-1d") AND (recent_count / sig_wide_recent_count > 0.1 OR priority>3 ))
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  
+</dashboard>

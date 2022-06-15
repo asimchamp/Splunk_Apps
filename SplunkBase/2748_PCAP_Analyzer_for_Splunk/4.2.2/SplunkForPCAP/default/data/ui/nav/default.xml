@@ -1,0 +1,22 @@
+<nav search_view="search" color="#1E90FF">
+  <view name="overview" default='true' />
+  <view name="top_talker"/>
+  <view name="problem_detection" />
+  <view name="wireshark_detailed_search" />
+  <view name="conversations" />
+  <view name="distancehop_calculator" />
+  <collection label="Protocol Analysis">
+        <view source="unclassified" match="overview" />
+  </collection>
+   <collection label="Others" >
+    	<view source="unclassified" />
+  	</collection>
+  <collection label="Help">
+        <a href="https://schwartzdaniel.com/pcap-analyzer-for-splunk-getting-started/">Get Started</a>
+        <a href="https://github.com/DanielSchwartz1/SplunkForPCAP/issues/new">Open Issues</a>
+    </collection>
+  <view name="dashboards" />
+  <view name="search"  />
+  <view name="reports" />
+  <view name="alerts" />
+</nav>

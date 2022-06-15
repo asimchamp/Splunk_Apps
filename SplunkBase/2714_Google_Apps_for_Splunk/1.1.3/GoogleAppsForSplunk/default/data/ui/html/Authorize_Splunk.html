@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Authorization | Splunk</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/en-US/static/@237341.1/css/build/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="/en-US/static/@237341.1/css/build/pages/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/GoogleAppsForSplunk/dashboard.css" />
+    <!--[if IE 7]><link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/sprites-ie7.css" /><![endif]-->
+  <style>
+    td.icon {
+        text-align: center;
+    }
+
+    td.icon i {
+        font-size: 15px;
+        text-shadow: 1px 1px #aaa;
+    }
+
+    td.icon .icon-delete {
+        color: red;    	
+    }
+     
+</style>
+</head>
+<body class="simplexml preload locale-en">
+<!-- 
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system. 
+-->
+<a class="navSkip" href="#navSkip" tabindex="1">Screen reader users, click here to skip the navigation bar</a>
+<div class="header splunk-header">
+        <div id="placeholder-splunk-bar">
+            <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+        </div>
+            <div id="placeholder-app-bar"></div>
+</div>
+<a id="navSkip"></a>
+  
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+    <div class="dashboard-header clearfix">
+        <h2>Authorize Splunk</h2>
+
+    <form id="form_authorize_splunk">
+        <div class="fieldset">
+          <div id="base_tokens">
+          <div class="input">
+            	<label>Google Apps Domain</label>
+            	<div class="input input-text" id="domain"></div>
+          </div>
+          <div class="input">
+            <label>Client ID</label>
+          	<div class="input input-text" id="clientid"></div>
+            </div>
+          <div class="input">
+            	<label>Client Secret</label>
+            	<div class="input input-text" id="clientsecret"></div>
+          </div>
+          </div>
+          <div class="input" id="auth_token_div" style="display:none;">
+                <label>Authorization Token</label>
+                <div class="input input-text" id="authtoken"></div>
+          </div>
+            <div class="form-submit" id="search_btn">
+                <button class="btn btn-primary submit">Authorize</button>
+            </div>
+          <div class="form-submit" id="reset_btn">
+                <button class="btn btn-primary submit">Reset</button>
+            </div>
+        </div>
+    </form>
+	<h3 id="authMsg" style='color:red'></h3>
+	 <div id="row1" class="dashboard-row dashboard-row1">
+        <div id="panel1" class="dashboard-cell" style="width: 20%;">
+            <div class="dashboard-panel clearfix">
+	<div class="panel-element-row inline-panel">
+              <div id="element2" class="dashboard-element single" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>Instructions</h3>
+                        </div>
+                        <div class="panel-body">
+<blockquote>This setup page authorizes the Google Apps For Splunk App to communicate with your instance of Google Apps. This app is designed with multiple Google Apps domains in mind.
+Before setting up any Data Inputs, you must authorize the app access to your Domain via OAuth.</blockquote>
+<blockquote><strong>It is HIGHLY recommended to setup a separate Splunk specific Super Admin user within Google Apps.</strong></blockquote>
+<blockquote>
+<ul>
+<li>Enter your Google Apps Domain into the first box above</li>
+<li>You will need the Client ID and Client Secret from a project you create at <a target="_blank" href="https://console.developers.google.com/">https://console.developers.google.com/</a>. Once there go through API Project -> APIs & Auth -> Credentials. Create Client ID -> Installed Application - Other. Copy the Client ID and Client Secret into the boxes above. </li>
+  <li>While you are at the Developer Console, make sure you enable the <strong>Admin SDK</strong> API. If you do not, this will not work.</li>
+  <li>Once you have entered those items, click Submit. A Pop-up will open, so make sure you unblock it. </li>
+<li>Click the Accept button (after any login actions into your domain). </li>
+<li>The form will return a key, copy that key, and paste it into Authorization Token box above. Click Submit again.</li>
+</ul>
+This writes a file to the $APP_HOME/local folder with the oauth information. This completes the steps for OAuth2 for the Google Apps APIs.
+
+You can now go an edit the Google Apps Data Inputs to start consuming data. 
+</blockquote>
+</div>
+</div></div></div>
+                    </div>
+                </div>
+</div>
+<div class="footer"></div>
+
+<!-- 
+END LAYOUT
+-->
+
+<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/i18ncatalog?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/build/simplexml.min/config.js"></script>
+  <script src="{{SPLUNKWEB_URL_PREFIX}}/static/app/GoogleAppsForSplunk/dashboard.js"></script>
+<script type="text/javascript">
+require.config({
+    baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+    waitSeconds: 0
+});
+
+//
+// LIBRARY REQUIREMENTS
+//
+// In the require function, we include the necessary libraries and modules for
+// the HTML dashboard. Then, we pass variable names for these libraries and
+// modules as function parameters, in order.
+// 
+// When you add libraries or modules, remember to retain this mapping order
+// between the library or module and its function parameter. You can do this by
+// adding to the end of these lists, as shown in the commented examples below.
+
+require([
+    "splunkjs/mvc",
+    "splunkjs/mvc/utils",
+    "splunkjs/mvc/tokenutils",
+    "underscore",
+    "jquery",
+    "splunkjs/mvc/simplexml",
+    "splunkjs/mvc/headerview",
+    "splunkjs/mvc/footerview",
+    "splunkjs/mvc/simplexml/dashboardview",
+    "splunkjs/mvc/simplexml/dashboard/panelref",
+    "splunkjs/mvc/simplexml/element/chart",
+    "splunkjs/mvc/simplexml/element/event",
+    "splunkjs/mvc/simplexml/element/html",
+    "splunkjs/mvc/simplexml/element/list",
+    "splunkjs/mvc/simplexml/element/map",
+    "splunkjs/mvc/simplexml/element/single",
+    "splunkjs/mvc/tableview",
+    "splunkjs/mvc/simpleform/formutils",
+    "splunkjs/mvc/simplexml/eventhandler",
+    "splunkjs/mvc/simpleform/input/dropdown",
+    "splunkjs/mvc/simpleform/input/radiogroup",
+    "splunkjs/mvc/simpleform/input/multiselect",
+    "splunkjs/mvc/simpleform/input/checkboxgroup",
+    "splunkjs/mvc/simpleform/input/text",
+    "splunkjs/mvc/simpleform/input/timerange",
+    "splunkjs/mvc/simpleform/input/submit",
+    "splunkjs/mvc/searchmanager",
+    "splunkjs/mvc/savedsearchmanager",
+    "splunkjs/mvc/postprocessmanager",
+    "splunkjs/mvc/simplexml/urltokenmodel",
+  	"splunkjs/mvc/dropdownview"
+    // Add comma-separated libraries and modules manually here, for example:
+    // ..."splunkjs/mvc/simplexml/urltokenmodel",
+    // "splunkjs/mvc/checkboxview"
+    ],
+    function(
+        mvc,
+        utils,
+        TokenUtils,
+        _,
+        $,
+        DashboardController,
+        HeaderView,
+        FooterView,
+        Dashboard,
+        PanelRef,
+        ChartElement,
+        EventElement,
+        HtmlElement,
+        ListElement,
+        MapElement,
+        SingleElement,
+        TableElement,
+        FormUtils,
+        EventHandler,
+        DropdownInput,
+        RadioGroupInput,
+        MultiSelectInput,
+        CheckboxGroupInput,
+        TextInput,
+        TimeRangeInput,
+        SubmitButton,
+        SearchManager,
+        SavedSearchManager,
+        PostProcessManager,
+        UrlTokenModel,
+  		DropdownView
+
+        // Add comma-separated parameter names here, for example: 
+        // ...UrlTokenModel, 
+        // CheckboxView
+        ) {
+
+
+
+        var pageLoading = true;
+
+
+        // 
+        // TOKENS
+        //
+        
+        // Create token namespaces
+        var urlTokenModel = new UrlTokenModel();
+        mvc.Components.registerInstance('url', urlTokenModel);
+        var defaultTokenModel = mvc.Components.getInstance('default', {create: true});
+        var submittedTokenModel = mvc.Components.getInstance('submitted', {create: true});
+
+        urlTokenModel.on('url:navigate', function() {
+            defaultTokenModel.set(urlTokenModel.toJSON());
+            if (!_.isEmpty(urlTokenModel.toJSON()) && !_.all(urlTokenModel.toJSON(), _.isUndefined)) {
+                submitTokens();
+            } else {
+                submittedTokenModel.clear();
+            }
+        });
+
+        // Initialize tokens
+        defaultTokenModel.set(urlTokenModel.toJSON());
+
+        function submitTokens() {
+            // Copy the contents of the defaultTokenModel to the submittedTokenModel and urlTokenModel
+            FormUtils.submitForm({ replaceState: pageLoading });
+        }
+
+        function setToken(name, value) {
+            defaultTokenModel.set(name, value);
+            submittedTokenModel.set(name, value);
+        }
+
+        function unsetToken(name) {
+            defaultTokenModel.unset(name);
+            submittedTokenModel.unset(name);
+        }
+
+        
+        
+        //
+        // SEARCH MANAGERS
+        //
+
+        //
+        // SPLUNK HEADER AND FOOTER
+        //
+
+        new HeaderView({
+            id: 'header',
+            section: 'dashboards',
+            el: $('.header'),
+            acceleratedAppNav: true,
+            useSessionStorageCache: true,
+            splunkbar: true,
+            appbar: true,
+            litebar: false,
+        }, {tokens: true}).render();
+
+        new FooterView({
+            id: 'footer',
+            el: $('.footer')
+        }, {tokens: true}).render();
+
+
+        //
+        // DASHBOARD EDITOR
+        //
+
+        new Dashboard({
+            id: 'dashboard',
+            el: $('.dashboard-body'),
+            showTitle: true,
+            editable: true
+        }, {tokens: true}).render();
+
+
+        //
+        // VIEWS: VISUALIZATION ELEMENTS
+        //
+
+        //
+        // VIEWS: FORM INPUTS
+        //
+  
+  	var gapps_domain = new TextInput({
+            "id": "domain",
+            "value": "$form.domain$",
+            "el": $('#domain')
+        }, {tokens: true}).render();
+	gapps_domain.on("change",function(newValue) { FormUtils.handleValueChange(gapps_domain); });
+
+  	var gapps_clientid = new TextInput({
+            "id": "clientid",
+            "value": "$form.clientid$",
+            "el": $('#clientid')
+        }, {tokens: true}).render();
+	gapps_clientid.on("change",function(newValue) { FormUtils.handleValueChange(gapps_clientid); });
+
+  	var gapps_clientsecret = new TextInput({
+            "id": "clientsecret",
+            "value": "$form.clientsecret$",
+            "el": $('#clientsecret')
+        }, {tokens: true}).render();
+	gapps_clientsecret.on("change",function(newValue) { FormUtils.handleValueChange(gapps_clientsecret); });
+
+  	var gapps_authtoken = new TextInput({
+            "id": "authtoken",
+            "value": "$form.authtoken$",
+            "el": $('#authtoken')
+        }, {tokens: true}).render();
+	gapps_authtoken.on("change",function(newValue) { FormUtils.handleValueChange(gapps_authtoken); });
+
+ 
+        // 
+        // SERVICE OBJECT
+        //
+
+        // Create a service object using the Splunk SDK for JavaScript
+        // to send REST requests
+        var service = mvc.createService({ owner: "nobody" });
+
+        // 
+        // SUBMIT FORM DATA
+        //
+
+        var submit = new SubmitButton({
+            id: "submit",
+            el: $("#search_btn"),
+	    text: "Authorize Step 1"
+        }, {tokens: true}).render();
+
+  		var reset = new SubmitButton({
+  			id: "reset",
+  			el: $("#reset_btn"),
+  			text: "Reset"
+  		}, {tokens: true}).render();
+  
+  		reset.on("submit", function(){
+  			gapps_domain.val("");
+  			gapps_clientid.val("");
+  			gapps_authtoken.val("");
+  			gapps_clientsecret.val("");
+  			$("#auth_token_div").hide();
+  			$("#base_tokens").show();
+  		});
+  
+        submit.on("submit", function() {
+            submitTokens();
+
+            // When the Submit button is clicked, get all the form fields by accessing token values
+            var tokens = mvc.Components.getInstance("default");
+	    var myDomain = tokens.get("domain"), myClientID = tokens.get("clientid"), myClientSecret = tokens.get("clientsecret");
+	    var myWonderfulBody = { "domain": myDomain, "clientid": myClientID, "clientsecret": myClientSecret, "authtoken": "", "step":"one" };
+           	var authtoken = tokens.get("authtoken");
+  		if ("undefined" == typeof(myDomain) ) { $('#authMsg').html("Please enter a Domain"); return;}
+  		if ("undefined" == typeof(myClientID) ) { $('#authMsg').html("Please enter a Client ID"); return;}
+  		if ("undefined" == typeof(myClientSecret) ) { $('#authMsg').html("Please enter a Client Secret"); return;}
+		if ("undefined" == typeof(authtoken) ) {
+			console.log("No Auth Token");
+		} else {
+			myWonderfulBody.step = "two"; 
+			console.log("Step Two: length: "+authtoken.length);
+  			if ( authtoken.length < 1) { $('#authMsg').html('Must provide Auth Token');return; }
+			myWonderfulBody.authtoken = authtoken;
+		} 
+            // to the storage/collections/data/{collection}/ endpoint
+		$.get("/custom/GoogleAppsForSplunk/ga_authorize/build", myWonderfulBody)
+			.done(function(data) {
+				console.log("starting done function");
+				console.log(data);
+				myData = JSON.parse(data);
+				if ( "launch_url" == myData.step) {
+					console.log("launching windows");
+					window.open(myData.url, "_blank");
+					mvc.Components.getInstance("submit").settings.set({ "text": "Authorize Step 2"});
+  					$("#base_tokens").hide();
+  					$("#auth_token_div").show();
+				} else if ("end_of_discussion" == myData.step) {
+  					
+  				} else {
+					console.log("done step two");
+  					$("#auth_token_div").hide();
+					mvc.Components.getInstance("submit").settings.set({ "text": "Done"});
+  					
+				}
+				$('#authMsg').html(myData.msg);
+			});	
+        });
+
+
+        // Initialize time tokens to default
+        if (!defaultTokenModel.has('earliest') && !defaultTokenModel.has('latest')) {
+            defaultTokenModel.set({ earliest: '0', latest: '' });
+        }
+
+        if (!_.isEmpty(urlTokenModel.toJSON())){
+            submitTokens();
+        }
+
+
+
+        //
+        // DASHBOARD READY
+        //
+
+        DashboardController.ready();
+        pageLoading = false;
+
+    }
+); 
+</script>
+</body>
+</html>

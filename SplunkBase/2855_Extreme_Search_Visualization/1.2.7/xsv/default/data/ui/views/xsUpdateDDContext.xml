@@ -1,0 +1,165 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsUpdateDDContext</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsUpdateDDContext</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Updates a Context with specified parameters. The context is a 'Data Driven' context.  If the type is 'average_centered', the fields avg, count, and stdev must be passed in via the search stream.  If the type is 'domain', the fields count, max and min must be passed in via the search stream.  If the type is 'median_centered', the fields median, count and stdev must be passed in via the search stream.<br /> If a context/class does not exist, and the concepts parameter (terms) is set, then a new context/class will automatically be created.  Default values will be used for endShape (curve), shape (pi), read (*), write (*), if they are not set.  Other parameters will be set to "" if they are not set.  See <a href="xsCreateUDContext">xsCreateUDContext</a> for details about creating a User Defined Context instead of data from a search. </span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsUpdateDDContext name=string terms=&quot;string(,string)*&quot; count=int [class=&quot;string(,string)*&quot;] [container=string] [endshape=(curve|linear)] [notes=string] [read=string] [scope=(private|app|global)] [search=string] [shape=(pi|trapezoid|triangle|curveincrease|curvedecrease|linearincrease|lineardecrease)] (type=average_centered avg=double stdev=double | type=domain min=double max=double) [uom=string] [write=string] </span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">index=demographics | stats count(Height) as count avg(Height) as avg stdev(Height) as stdev  by Gender | xsUpdateDDContext name=Height container=Height class=Gender scope=global terms=&quot;short,medium,tall&quot; shape=pi endshape=curve type=average_centered uom=inches</span>
+      </p>
+      <p>
+        <span class="explanation">Updates average_centered contexts (Height, Height/Male, Height/Female), centered at 0, with 3 terms (short, medium, tall) with count, avg and stdev passed in the search stream, using inches as the unit of measure (UOM).</span>
+      </p>
+      <p>
+        <span class="head4">Example: </span>
+        <span class="code">| index=demographics | stats count(Height) as count min(Height) as min max(Height) as max by Gender | xsUpdateDDContext name=Height container=Height class=Gender scope=global terms=&quot;short,medium,tall&quot; shape=pi endshape=curve type=domain uom=inches</span>
+      </p>
+      <p>
+        <span class="explanation">Updates domain contexts (Height, Height/Male, Height/Female) with terms (short, medium, tall) with count, min, and max passed in the search stream, the unit of measure is inches.</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext"> avg, class, container, count, endshape, max, min, name, notes, read, scope, search, shape, stdev, terms, type, uom, write</span>
+      </p>
+      <p>
+        <span class="para">avg</span>
+      </p>
+      <p>
+        <span class="explanation">The average value of the field. This parameter can be passed as part of the command or via search input using stats avg(field).</span>
+      </p>
+      <p>
+        <span class="para">class</span>
+      </p>
+      <p>
+        <span class="explanation">A comma separated list of classes</span>. 
+      </p>
+      <p>
+        <span class="para">container</span>
+      </p>
+      <p>
+        <span class="explanation">The container to store the context.</span>
+      </p>
+      <p>
+        <span class="para">count</span>
+      </p>
+      <p>
+        <span class="explanation">The number of fields. This parameter can be passed as part of the command or via search input using stats count(field).</span>
+      </p>
+      <p>
+        <span class="para">endshape</span>
+      </p>
+      <p>
+        <span class="explanation">The shape of the end concepts.  This defaults to curve.</span>
+      </p> 
+      <p>
+        <span class="para">max</span>
+      </p>
+      <p>
+        <span class="explanation">The maximum value of the field. This parameter can be passed as part of the command or via search input using stats max(field).</span>
+      </p>
+      <p>
+        <span class="para">min</span>
+      </p>
+      <p>
+        <span class="explanation">The minimum value of the field. This parameter can be passed as part of the command or via search input using stats min(field).</span>
+      </p>
+      <p>
+        <span class="para">name (Context name)</span>
+      </p>
+      <p>
+        <span class="explanation">A legal string which specifies the name of the Context to update.</span>
+      </p>
+      <p>
+        <span class="para">notes</span>
+      </p>
+      <p>
+        <span class="explanation">A description of the context.  This defaults to 'none'.</span>
+      </p> 
+      <p>
+        <span class="para">read</span>
+      </p>
+      <p>
+        <span class="explanation">Read permissions (i.e., roles) .  This defaults to * (for all roles).</span>
+      </p> 
+      <p>
+        <span class="para">scope</span>
+      </p>
+      <p>
+        <span class="explanation">Where to find the context (private, app, global) to update.  This defaults to global.</span>
+      </p> 
+      <p>
+        <span class="para">search</span>
+      </p>
+      <p>
+        <span class="explanation">The search string used to generate data</span>
+      </p>
+      <p>
+        <span class="para">shape</span>
+      </p>
+      <p>
+        <span class="explanation">The shape of the middle concepts.  This defaults to pi.</span>
+      </p> 
+      <p>
+        <span class="para">terms (array of term names)</span>
+      </p>
+      <p>
+        <span class="explanation">A comma delimited set of legal strings which define the names of the terms within the Context.</span>
+      </p>
+      <p>
+        <span class="para">stdev</span>
+      </p>
+      <p>
+        <span class="explanation">The standard deviation of the field values. This parameter can be passed as part of the command or via search input using stats stdev(field).</span>
+      </p>
+      <p>
+        <span class="para">type (context type)</span>
+      </p>
+      <p>
+        <span class="explanation">average_centered' - centers the context on the average and uses std dev. to scale term sizes </span>
+      </p>
+      <p>
+        <span class="explanation">domain - the default, centers the set on (max-min)/2 and scales the context to cover the whole domain </span>
+      </p>
+      <p>
+        <span class="para">write</span>
+      </p>
+      <p>
+        <span class="explanation">Write permissions (i.e., roles).  This defaults to * (for all roles).</span>
+      </p> 
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The context updated by xsUpdateDDContext is displayed in table or chart format.  See <a href="xsDisplayContext">xsDisplayContext</a> for details about display of the created Context. <br /> See <a href="xsUpdateUDContext">xsUpdateUDContext</a> for details about updating a Context using a 'generating' command instead of a 'streaming' command. </span>
+      </p>
+      <br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150817.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

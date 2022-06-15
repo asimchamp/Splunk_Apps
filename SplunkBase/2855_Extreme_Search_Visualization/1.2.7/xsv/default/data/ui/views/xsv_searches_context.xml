@@ -1,0 +1,86 @@
+<form script="xsv_searches_context.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Update Scheduler Manager</label>
+  <description>Enter the criteria to select a context to display searches that use that context.</description>
+  <row id="xsv_select_row">
+    <html>
+      <div class="row-fluid">
+      <div style="float:left;padding-right:20px;">
+          <label>* Scope:
+          </label>
+          <select id="scopeSelect">
+            <option value="public" selected="selected">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div style="float:left;padding-right:20px;">
+          <label>* App:
+            <span class="xsv_populating xsv_app"> Populating...</span>
+          </label>
+          <select id="appSelect">
+          </select>
+        </div>
+        <div style="float:left;padding-right:20px;margin-bottom:0px;">
+          <label>* Container Name:
+            <span class="xsv_populating xsv_container"> Populating...</span>
+          </label>
+          <select id="containerSelect" style="z-index: 999999999;">
+          </select>
+        </div>
+        <div style="float:left;padding-right:20px;margin-bottom:0px;">
+          <label>* Field (Context) Name:
+            <span class="xsv_populating xsv_context"> Populating...</span>
+          </label>
+          <select id="contextSelect" style="z-index: 999999999;">
+          </select>
+        </div>
+        <div style="float:left;padding-right:20px;margin-bottom:0px;">
+          <label>* Class Name:
+            <span class="xsv_populating xsv_class"> Populating...</span>
+          </label>
+          <select id="classSelect" style="z-index: 999999999;">
+          </select>
+        </div>
+        <div class="buttons-wrapper clearfix" style="margin-left:20px;margin-top:20px;display:inline-block;">
+           <a id="submitButton" class="btn btn-primary pull-right" href="#" style="display:inline;margin-bottom:10px;">Submit</a>
+        </div>
+      </div>
+    </html>
+  </row>   
+  <row>   
+    <html>
+      <div class="row-fluid">
+        <div class="control-group" style="float:left;padding-right:0px;width:100%;">
+          <div><p>Saved Searches for Selected Context:</p></div>
+          <table id="savedSearches" class="table table-chrome table-striped wrapped-results" style="table-layout: fixed;">
+            <thead>
+              <tr class="">
+                <th class="" style="width:100px;">XS Command</th>
+                <th class="" style="width:100px;">App</th>
+                <th class="" style="width:100px;">Search Name</th>
+              </tr>
+            </thead>
+            <tbody id="savedSearchBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="searchChartModal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="searchChartModalLabel">Information</h4>
+            </div>
+            <div class="modal-body">
+              <div id="searchChartModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </html>
+  </row>
+</form>

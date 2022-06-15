@@ -1,0 +1,122 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}D3 Charts{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/WebAnalytics/common.css" />
+    <style>
+        #mypiechart {
+            height: 250px;
+        }
+        /*Page styles for the Toolkit charts*/
+        #mysankeychart, #mypcchart {
+            height: 500px;
+        }
+        #mysunburstchart {
+            height: 500px;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="dashboard-body container-fluid main-section-body">
+
+    <!-- Search 1 -->
+    <div class="row">
+        <div class="dashboard-header">
+            <h3>Datalicious Web Site - Last 90 days</h3>
+        </div>
+    </div>
+
+    <!-- Add a sankey chart here -->
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-head">
+                        <h3>Sankey Conversion Funnel</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="mysankeychart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> 
+{% endblock content%}
+
+{% block js %}    
+<script>
+    var deps = [
+        "splunkjs/ready!",
+        "splunkjs/mvc/searchmanager",
+        "splunkjs/mvc/chartview",
+
+        // Use this if the /components folder is copied to your app:
+        "jquery",
+        "WebAnalytics/components/sankey/sankey",
+        // "WebAnalytics/components/parallelcoords/parallelcoords",
+        // "WebAnalytics/components/parallelsets/parallelsets",
+        // "WebAnalytics/components/sunburst/sunburst"
+
+        // Use this if the SWFToolkit is installed on the same Splunk instance:
+        // "jquery",
+        // "splunk_wftoolkit/components/sankey/sankey",
+        // "splunk_wftoolkit/components/bubblechart/bubblechart",
+        // "splunk_wftoolkit/components/sunburst/sunburst"
+
+    ];
+    require(deps, function(mvc) {
+        // Load individual components
+        var SearchManager = require("splunkjs/mvc/searchmanager");
+        var ChartView = require("splunkjs/mvc/chartview");
+
+        // If the /components folder is copied to your app:
+        var SankeyChart = require("WebAnalytics/components/sankey/sankey");
+        // var ParallelCoordsChart = require("WebAnalytics/components/parallelcoords/parallelcoords");
+        // var ParallelSetsChart = require("WebAnalytics/components/parallelsets/parallelsets");
+        // var SunburstChart = require("WebAnalytics/components/sunburst/sunburst");
+
+        // If the SWFToolkit is installed on the same Splunk instance:
+        // var SankeyChart = require("splunk_wftoolkit/components/sankey/sankey");
+        // var BubbleChart = require("splunk_wftoolkit/components/bubblechart/bubblechart");
+        // var SunburstChart = require("splunk_wftoolkit/components/sunburst/sunburst");
+
+        // Create search managers and views
+
+        var sankeymysearch1 = new SearchManager({
+            id: "example-sankeysearch1",
+            preview: true,
+            cache: true,
+            search: "index=datalicious source=web* (event.hierarchy.1=\"http\" OR event.hierarchy.1=\"https\" OR event.hierarchy.1=\"page\") event.origin.id=\"*www.datalicious.com*\" earliest=-7d@h | stats count by event.origin.id event.id | search event.id=\"*start-live-chat\" OR event.id=\"*submit-enquiry\" OR event.id=\"*subscribe-to-newsletter\" OR event.id=\"*contact*\" | sort limit=20 - count"
+        });
+
+        // Create Toolkit charts here
+        var mysankeychart = new SankeyChart({
+            id: "example-chart-sankey",
+            managerid: "example-sankeysearch1",
+            el: $("#mysankeychart")
+        }).render();
+
+        // var mysbchart = new SunburstChart({
+        //     id: "example-chart-sb",
+        //     managerid: "example-sankeysearch1",
+        //     el: $("#mysunburstchart")
+        // }).render();
+
+        // var mypschart = new ParallelSetsChart({
+        //     id: "example-chart-ps",
+        //     managerid: "example-sankeysearch1",
+        //     el: $("#mypschart")
+        // }).render();
+
+    });
+</script>
+{% endblock js %}
+

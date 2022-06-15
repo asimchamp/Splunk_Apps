@@ -1,0 +1,279 @@
+<form script="autodiscover.js">
+  <label>Messages</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+  </fieldset>
+  <search id="spellcheck_all_words">
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+    <query>
+      <![CDATA[
+
+| pivot Minecraft_log_messages Chat_messages 
+     values(message) AS "message" 
+     SPLITROW _time AS _time PERIOD second 
+     SPLITROW name AS name 
+        SORT 100000 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1
+| eval message=replace(lower(message),"[#,!.*?()$\- ):0-9<>]|'s"," ")  
+| makemv delim=" " message 
+| mvexpand message 
+| rename message as token 
+| where token!="" AND length(token)>2 
+| lookup dictionary_check word as token OUTPUT classification 
+| sort token 
+| join type=left token 
+[
+    | pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+       | mvexpand name 
+       | eval name=replace(lower(name),"[0-9]","") 
+    | append 
+    [
+       | pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+       | mvexpand name 
+       | eval name=lower(name) 
+    ] 
+    | dedup name 
+    | rename name as token 
+    | eval classification="username" 
+]
+| stats
+     count(eval(classification="correct_spelling")) as correct
+     count(eval(isNull(classification))) as incorrect 
+     count(eval(classification="slang")) as slang 
+     count(eval(classification="swearing")) as swearing 
+     count(eval(classification="username")) as username 
+       by name    
+]]>
+    </query>
+  </search>
+  <search id="word_cloud_popular_words_correct">
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+    <query>
+      <![CDATA[
+
+| pivot Minecraft_log_messages Chat_messages 
+     count(Chat_messages) AS "count" 
+     SPLITROW message AS message SORT 100000 message ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+| makemv delim=" " message
+| mvexpand message 
+| eval token=replace(lower(message),"[#,!.*?()$\-):{}0-9_<>]","") 
+| lookup dictionary_check word as token OUTPUT classification 
+| where token!="" AND classification="correct_spelling"
+| stats count by token
+| sort - count
+| head 100
+| eval sort_key=md5(token)
+| sort sort_key
+| fields - sort_key
+   
+]]>
+    </query>
+  </search>
+  <search id="word_cloud_popular_words_incorrect">
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+    <query>
+      <![CDATA[
+
+| pivot Minecraft_log_messages Chat_messages 
+     count(Chat_messages) AS "count" 
+     SPLITROW message AS message 
+         SORT 100000 message ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+| makemv delim=" " message
+| mvexpand message 
+| eval token=replace(lower(message),"[#,!.*?()$\-):{}0-9_<>]|'s","") 
+| lookup dictionary_check word as token OUTPUT classification 
+| where token!="" AND isNull(classification) AND length(token) >= 2 AND length(token) < 15
+| stats count by token
+| sort - count
+| head 100
+| eval sort_key=md5(token)
+| sort sort_key
+| fields - sort_key
+   
+]]>
+    </query>
+  </search>
+  <search id="word_cloud_popular_words_slang">
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+    <query>
+      <![CDATA[
+
+| pivot Minecraft_log_messages Chat_messages 
+     count(Chat_messages) AS "count" 
+     SPLITROW message AS message SORT 100000 message ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+| makemv delim=" " message
+| mvexpand message 
+| eval token=replace(lower(message),"[#,!.*?()$\-):{}0-9_<>]","") 
+| lookup dictionary_check word as token OUTPUT classification 
+| where token!="" AND classification="slang"
+| stats count by token
+| sort - count
+| head 100
+| eval sort_key=md5(token)
+| sort sort_key
+| fields - sort_key
+   
+]]>
+    </query>
+  </search>
+  <search id="word_cloud_popular_words_swearing">
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+    <query>
+      <![CDATA[
+
+| pivot Minecraft_log_messages Chat_messages 
+     count(Chat_messages) AS "count" 
+     SPLITROW message AS message SORT 100000 message ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 
+| makemv delim=" " message
+| mvexpand message 
+| eval token=replace(lower(message),"[#,!.*?()$\-):{}0-9_<>]","") 
+| lookup dictionary_check word as token OUTPUT classification 
+| where token!="" AND classification="swearing"
+| stats count by token
+| sort - count
+| head 250
+| eval sort_key=md5(token)
+| sort sort_key
+| fields - sort_key
+   
+]]>
+    </query>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <h2>Good words</h2>
+        <div id="tagcloud" class="splunk-view" data-require="app/minecraft/tagcloud/tagcloud" data-options="{           &quot;managerid&quot;: &quot;word_cloud_popular_words_correct&quot;,           &quot;minFontSize&quot;: 10,           &quot;maxFontSize&quot;: 50,           &quot;valueField&quot;: &quot;count&quot;,           &quot;labelField&quot;: &quot;token&quot;         }">
+        </div>
+     </html>
+    </panel>
+    <panel>
+      <html>
+        <h2>Spelting miskates</h2>
+        <div id="tagcloud" class="splunk-view" data-require="app/minecraft/tagcloud/tagcloud" data-options="{           &quot;managerid&quot;: &quot;word_cloud_popular_words_incorrect&quot;,           &quot;minFontSize&quot;: 10,           &quot;maxFontSize&quot;: 50,           &quot;valueField&quot;: &quot;count&quot;,           &quot;labelField&quot;: &quot;token&quot;         }">
+        </div>
+     </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Spell check all words</title>
+        <search base="spellcheck_all_words">
+          <query></query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Spell check word instances</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Chat_messages count(Chat_messages) AS "count" SPLITROW message AS message SPLITROW name AS name SORT 10000 message ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | eval message=replace(lower(message),"[#,!.*?()$\- ):0-9&lt;&gt;]|'s"," ")  | makemv delim=" " message | mvexpand message | rename message as token | where token!="" AND length(token)&gt;2 | dedup token name | lookup dictionary_check word as token OUTPUT classification | sort token | join type=left token [| pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | mvexpand name | eval name=replace(lower(name),"[0-9]","") | append [| pivot Minecraft_log_messages Login_location values(name) AS "name" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | mvexpand name | eval name=lower(name) ] | dedup name | rename name as token | eval classification="username" | eval swear_word="FALSE" ] | eval classification=if(isNull(classification),"incorrect_spelling",classification) | stats count(eval(classification="correct_spelling")) as correct count(eval(classification="incorrect_spelling")) as incorrect count(eval(classification="slang")) as slang count(eval(classification="swearing")) as swearing count(eval(classification="username")) as username by name</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Number of chat messages</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Login_location count(Login_location) AS "count" SPLITROW name AS name SORT 100 name ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | eval count=0 | append [| pivot Minecraft_log_messages Chat_messages count(Chat_messages) AS "count" SPLITROW name AS name SORT 10000 name ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1] | stats sum(count) by name</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Potty mouths</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Chat_messages count(Chat_messages) AS "count" SPLITROW message AS message SPLITROW name AS name SORT 100000 message ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | eval message=replace(lower(message),"[#,!.*?()$\- ):0-9&lt;&gt;]"," ")  | makemv delim=" " message | mvexpand message | rename message as token | where token!="" AND length(token)&gt;2  | lookup dictionary_check word as token OUTPUT classification | where classification="swearing" | table name token</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="message_filter">
+        <label>Search messages</label>
+        <default>*</default>
+      </input>
+      <table>
+        <title>Player chat</title>
+        <search>
+          <query>| pivot Minecraft_log_messages Chat_messages count(Chat_messages) AS "count" SPLITROW _time AS _time PERIOD second SPLITROW message AS message SPLITROW name AS name SORT 100000 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1 | sort - _time | fields - count | search message=*$message_filter$*</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">100</option>
+      </table>
+    </panel>
+  </row>
+</form>

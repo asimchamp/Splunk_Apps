@@ -1,0 +1,68 @@
+<html><body><div><h1>Alert Monitoring Setup</h1>
+
+<p>There is no default configuration for alert monitoring. Alert monitoring is 
+configured in <span class="rf-field">Configuration &#8594; Configuration &#8594; Alerting Rules</span>. </p>
+
+<p>When monitoring alerts, the Recorded Future App will poll the Recorded Future 
+API for alerts which match the configured criteria.</p>
+
+<p>By default, the alerts are fetched on the fly when needed by a dashboard.</p>
+
+<h2>Add Alert Monitoring</h2>
+
+<p>To add alert monitoring, click on <span class="rf-field">Add Alerting Rule</span> and 
+select the Alerting Rule to fetch alerts from. The following fields then appear:</p>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/recorded_future_alerting_rule.png" alt="Add a new Alerting Rule" title="Alerting Rule tab"></p>
+
+<table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Significance</th>
+  <th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Name</strong></td>
+  <td>Alerting Rule name</td>
+  <td>Name of the Alerting Rule input.</td>
+</tr>
+<tr>
+  <td><strong>Alert Status</strong></td>
+  <td>Matches any alert status by default</td>
+  <td>The filter can be configured as needed.</td>
+</tr>
+<tr>
+  <td><strong>Time Range</strong></td>
+  <td>Filters on the timestamp of the alert.</td>
+  <td>Default is anytime. The notation is the same as in the Recorded Future web client. Ex: 1. "-2d to now" 2. "-2h to -1h" 3. "yesterday"</td>
+</tr>
+<tr>
+  <td><strong>Limit</strong></td>
+  <td>Amount of alerts to fetch</td>
+  <td>Default is 10. This should be adjusted depending on the amount of alerts that trigger for this rule.</td>
+</tr>
+<tr>
+  <td><strong>Alerting Rule</strong></td>
+  <td>Which alerting rule to fetch</td>
+  <td>This is the rule that you selected when creating the Alerting Rule input.</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Manage Alerting Rules</h2>
+
+<p>To edit a configured Alerting Rule, just click on <span class="rf-field">Edit</span> and the fields will unlock.
+Click <span class="rf-field">Save</span> when done editing the settings.</p>
+
+<p>To remove an Alerting Rule, select the corresponding <span class="rf-field">Delete Alerting Rule</span> checkbox and click on <span class="rf-field">Save</span>.</p>
+
+<h1>Further Help</h1>
+
+<p>"Recorded Future App for Splunk" has been developed by Recorded Future.   </p>
+
+<p>Further information and support can be found on our Support web site:
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360003588753">support.recordedfuture.com</a> </p>
+</div></body></html>

@@ -1,0 +1,93 @@
+<form stylesheet="custom.css">
+  <label>WHOIS Lookup - bulkwhoisapi.com</label>
+  <searchTemplate>| script whoisbulk __EXECUTE__ "$input$"</searchTemplate>
+  <description>Enter the domain below (Big thanks to bulkwhoisapi.com)</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>Domain:</label>
+      <suffix></suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Registrar</title>
+        <searchPostProcess>table Registrar, RegistrarURL, CreationDate, RegistrarRegistrationExpirationDate, RegistrarAbuseContactEmail, RegistrarAbuseContactPhone | transpose | rename column as Field, "row 1" as Value</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Registrant</title>
+        <search base="global">
+          <query>table RegistryRegistrantID, RegistrantName, RegistrantOrganization, RegistrantStreet, RegistrantCity,  RegistrantState/Province, RegistrantPostalCode, RegistrantCountry, RegistrantPhone,  RegistrantPhoneExt, RegistrantFax, RegistrantFaxExt, RegistrantEmail | transpose | rename column as Field, "row 1" as Value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Registrant Admin</title>
+        <search base="global">
+          <query>table RegistryAdminID, AdminName, AdminOrganization, AdminStreet, AdminCity, AdminState/Province, AdminPostalCode, AdminCountry, AdminPhone, AdminPhoneExt, AdminFax, AdminFaxExt, AdminEmail | transpose | rename column as Field, "row 1" as Value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Registrant Tech</title>
+        <search base="global">
+          <query>table RegistryTechID, TechName, TechOrganization, TechStreet, TechCity, TechState/Province, TechPostalCode, TechCountry, TechPhone, TechPhoneExt, TechFax, TechFaxExt, TechEmail | transpose | rename column as Field, "row 1" as Value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Name Servers</title>
+        <searchPostProcess>table NameServer, DNSSEC | transpose | rename column as Field, "row 1" as Value</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Raw Results</title>
+        <searchPostProcess>table raw_data | rename raw_data as "Raw Data" | rename column as Field, "row 1" as Value</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

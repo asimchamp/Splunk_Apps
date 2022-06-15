@@ -1,0 +1,72 @@
+<dashboard stylesheet="xsv.css">
+<label>Instant Anomaly Detection</label>
+<row>
+<html>
+<div> <img src="/static/app/xsv/images/Scianta_Analytics_150.png" style="display:inline-block;"/>
+  <h2 style="display:inline-block;padding-left:20px;color:#0069C2;font-size:20px;font-weight:bold;">Using Extreme Search to Find Anomalous Events</h2>
+</div>
+<br />
+<p> <span class="head3">Introduction</span> </p>
+<p>Much has been said recently about detecting anomalies in Big Data sets using Splunk. A lot of work has been done in this area. Today it's possible to invest a great deal of money on machine learning systems that use statistical analysis to &quot;learn&quot; to detect outliers in Splunk data sets. The question is: Is this necessary?</p>
+<p>Scianta Analytics is a cognitive computing company. Our bread and butter is machine learning. We're big proponents of using machine learning where it's appropriate. In fact we deliver systems that apply proprietary machine-learning-based adaptive learning techniques to model complex behavior to identify &quot;bad actors&quot; in Splunk. In these kinds of use cases, looking at behavior for example, machine learning systems deliver results that cannot be obtained any other way.</p>
+<p>However, what most people mean when they talk about detecting anomalies in Splunk, is not detecting anomalous behavior. What most people mean by anomaly detection, and what most existing machine-learning-based systems actually do, is object or event classification. This use case is about detecting outliers  – events whose values are atypical in the data set at hand. There's very good news for this use case in Splunk. Extreme Search for Splunk, which currently ships as part of the Splunk App for Enterprise Security, can detect anomalies in Splunk data sets based upon data Splunk already &quot;knows&quot; about, without the need to take the time to learn from new, incoming data. Extreme Search does &quot;instant&quot; anomaly detection in the time it takes to run a search in Splunk. And if you're reading this page, you probably already own it. Here's how it works:</p><br />
+<p><span class="head3">The Anomaly Driven Context</span></p>
+<p>The most frequent use cases in Extreme Search involve classification of events by a <strong>Context</strong> comprised of some number of contiguous <strong>Concept</strong>s.  Most <strong>Context</strong>s used in Extreme Search look like the one in Figure 1, below. This <strong>Context</strong> is comprised of five <strong>Concepts</strong> which have been named <em>minimal</em>, <em>low</em>, <em>medium</em>, <em>high</em> and <em>extreme</em>.</p>
+<p style="text-align: center"><img
+          src="/static/app/xsv/images/five_concepts.png"
+          width="600"
+          height="192"
+          alt="five-concepts" /><br />
+Figure 1</p>
+<p>In this <strong>Context</strong>, anomalies or outliers in the data set have membership in the &quot;end&quot; <strong>Concepts</strong>, <em>minimal</em> or <em>extreme</em>. An &quot;xswhere&quot; search can easily be crafted to find outliers that have degrees of membership in  <em>minimal</em> or <em>extreme</em>. This is somewhat less than intuitive, however. Extreme Search actually provides a method to detect outliers, which is much more straightforward: The Anomaly Driven Context.</p>
+<p style="text-align: center"><img
+          src="/static/app/xsv/images/anomalous_context.png"
+  		   width="600"
+          height="192"
+          alt="anomalous context" /><br />
+Figure 2<br />
+Anomaly Detection Context</p>
+<p>The <strong>Anomaly Driven Context</strong> is comprised of two <strong>Concepts</strong>. As with any other <strong>Context</strong> in Extreme Search, the two <strong>Concept</strong>s may be named whatever you like. In our example we'll call them <em>normal</em> and <em>anomalous</em>.</p>
+<p style="text-align: center"><img
+          src="/static/app/xsv/images/anomalous_normal.png"
+  		   width="600"
+          height="192"
+          alt="normal" /><br />
+Figure 3<br />
+Concept = Normal</p>
+<p style="text-align: left">The center <strong>Concept</strong> in the range of values is defined as a shape called an &quot;s-trapezoid&quot; and is used to represent values that are <em>normal</em>... or <em>not anomalous</em>.</p>
+<p style="text-align: center"><img
+          src="/static/app/xsv/images/anomalous_anomalous.png"
+  		   width="600"
+          height="192"
+          alt="anomalous" /><br />
+Figure 4<br />
+Concept = Anomalous</p>
+<p style="text-align: left">The areas on either end of the value range represent a single <strong>Concept</strong>, which we're calling <em>anomalous</em> in this example. (In fact, this <strong>Concept</strong> is identical to the hedged <strong>Concept</strong><em> not normal</em>). Remember that, in Extreme Search, the end <strong>Concept</strong>s extend infinitely along all possible values of X. That means that any values in the data, even new values that were not in the Universe of Discourse of the original baseline data set, are members of at least one <strong>Concept</strong>. If the current values of a <strong>Context</strong> range from 100 to 1000, if a new value of 90 appears in the data set, it has 100% membership in the concept <em>anomalous</em>. </p>
+<p style="text-align: left">This makes detecting anomalies in Splunk very easy and fast. Simply follow these steps:</p>
+<ol>
+  <li>Create an <strong>Anomaly Driven Context</strong> in the knowledge domain. This may be a user defined <strong>Context</strong> or a Data Defined <strong>Context</strong> which establishes the "baseline" for the domain.</li>
+  <li>Perform an "xswhere [field] is anomalous" search using the <strong>Anomaly Driven Context</strong> you created. Note that all Extreme Search capabilities are available to you including hedges and synonyms. You might want to search for values that are "very anomalous" or "somewhat anomalous". Since all of this happens within Splunk search, the results can be used for anything you'd like in Splunk including driving dashboards or generating notable events.</li>
+  <li>When appropriate, update your <strong>Anomaly Driven Context</strong> to "re-baseline" the <strong>Context</strong> based upon the "new normal" in your environment.
+  This can be done manually, or in a periodic scheduled search.</li>
+</ol><br />
+<p><span class="head3">The Context Wizard</span></p>
+<p>Like any <strong>Context</strong>, an <strong>Anomaly Driven Context</strong> can be created directly in Splunk Search. A new command, <a href="/app/xsv/xsCreateADContext">xsCreateADContext</a>, is included in XSV to make creation of contexts specifically designed to detect anomalous data very easy. XSV also provides a <a href="/app/xsv/xsv_create_wizard">Context Wizard</a> dashboard to assist you in creating all <strong>Context</strong> types, including<strong> Anomaly Driven Contexts</strong>. In the Context Wizard, select Anomaly Driven when asked to Select Creation Method.</p>
+<br />
+<p style="text-align: center"><img
+          src="/static/app/xsv/images/context_wizard_a.png"
+  		   width="600"
+          height="207"
+          alt="wizard" /><br />
+Figure 5<br />
+Context Wizard</p>
+<br />
+<br />
+<p>VERSION: 20150823.2<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+</html>
+</row>
+</dashboard>

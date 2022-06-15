@@ -1,0 +1,102 @@
+<div class="wrapper">
+    <div class="left_menu menu_two_row">
+        <div id='cssmenu'>
+            <div class="logo_top" />
+            <ul id="patternsList" />
+            <ul class="bg">
+                <li>
+                    <a href='dbir_help'><span class="fontb"><span class="help_icon">
+                    <img class="lalign help" src="/static/app/DBIR_splunk_app/images/help.png" alt="">
+                    </span>Help</span></a>
+                </li>
+                <li>
+                    <a href='http://www.verizonenterprise.com/DBIR/2015/' target="blank">
+                    <span class="fontb"><span class="download_icon">
+                    <img class="lalign download" src="/static/app/DBIR_splunk_app/images/download.png" alt="">
+                    </span>Download DBIR</span></a>
+                </li>
+            </ul>
+            <div class="logo_bot" />
+        </div>
+    </div>
+    <div class="right_side">
+        <div class="top_section">
+            <div class="top_section_box">
+                <div class="top_box">
+                    <h1 class="top_title">WEB APP ATTACKS</h1>
+                    <div class="filter_indus">
+                        <ul>
+                            <li id="allIndustryList">
+                                <a class="noborder" href="#"><span class="filter_icon">
+                                <img class="lalign" src="/static/app/DBIR_splunk_app/images/filter.png" alt=""></span>
+                                <span id="all_industry_span" class="filter_title">All Industry</span></a>
+                                <ul class="fallback" id="industryList" />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mid_box">
+                    <p>
+                        <b>Any incident in which a web application was the vector of attack. This includes exploits of code-level vulnerabilities in the
+                            application as well as thwarting authentication mechanisms.</b>
+                    </p>
+                    <br />
+                    <p>Get a complete inventory of every component of your web presence (honestly, it's not that hard) and ensure they are all in a
+                        regular patch cycle. Three-quarters of web app compromises are opportunistic, so this falls squarely under "the cost of doing
+                        business."</p>
+                    <br />
+                    <p>To combat Web App Attacks head-on, we recommend strengthening authentication. The use of two-factor authentication for web
+                        applications-even by customers-will go a long way toward keeping your organization from being used and abused.</p>
+                    <br />
+                </div>
+                <h2>Relevant Dashboards</h2>
+            </div>
+        </div>
+        <div class="left_box">
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/authentication">Credential Activity</a>
+                </h3>
+                <p>Monitor and query authentication success and failure counts by application or user account per host.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/account_changes">Credential Changes</a>
+                </h3>
+                <p>Track changes to credentials, including creation, deletion, and account locks.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/vpn_access_profile">VPN Profile</a>
+                </h3>
+                <p>Chart and map the number of VPN logins from distinct cities in a given time window to track potentially compromised accounts.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/dns_explorer">DNS Explorer</a>
+                </h3>
+                <p>View DNS queries and answers by time, host, or by specific query or answer.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/vulnerabilities_overview">Vulnerability Overview</a>
+                </h3>
+                <p>An overview of vulnerability counts by severity and host, including a table of vulnerabilities displayed by signature, severity,
+                    and count.</p>
+            </div>
+            <div class="box_model">
+                <h3>
+                    <a href="/app/DBIR_splunk_app/vulnerability_explorer">Vulnerability Explorer</a>
+                </h3>
+                <p>Investigate vulnerabilities by specifying customized search parameters for time range, host, signature, and/or severity.</p>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                loadIndustryList();
+                loadPatternsList(false);
+                loadPercentages();
+            });
+        </script>
+    </div>
+</div>

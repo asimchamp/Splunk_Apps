@@ -1,0 +1,83 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsDeleteConcept</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsDeleteConcept</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Deletes a concept from a context.  </span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsDeleteConcept concept FROM context [IN container] [BY class] [SCOPED scope]</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">| xsDeleteConcept late FROM ArrDelay IN MyArrDelay BY Tuesday SCOPED app</span> 
+      </p>
+      <p>
+        <span class="explanation">Deletes the concept 'late' from context 'ArrDelay' in container 'MyArrDelay' by class 'Tuesday' with the scope 'app'.</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext">concept, context, container, class, scope</span>
+      </p>
+      <p>
+        <span class="para">concept</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the concept to delete.</span>
+      </p>
+      <p>
+        <span class="para">context</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the context containing the concept.</span>
+      </p>
+      <p>
+        <span class="para">container</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the container containing the context.</span>
+      </p>
+      <p>
+        <span class="para">class</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the class.</span>
+      </p>
+      <p>
+        <span class="para">scope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the container is stored.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The concept is deleted.</span>
+      </p>
+<br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150817.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

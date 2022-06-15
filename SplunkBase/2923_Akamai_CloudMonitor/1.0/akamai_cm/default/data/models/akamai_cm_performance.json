@@ -1,0 +1,289 @@
+{
+    "modelName": "akamai_cm_performance",
+    "displayName": "akamai_cm_performance",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 1,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "cm",
+            "displayName": "cm",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "bytes",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "bytes",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "cp",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "cp",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "geo.city",
+                    "owner": "cm",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "geo.country",
+                    "owner": "cm",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "country",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "geo.lat",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "lat",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "geo.long",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "long",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "message.status",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "status",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "netPerf.downloadTime",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "downloadTime",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "netPerf.lastMileRTT",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "lastMileRTT",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "netPerf.netOriginLatency",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "netOriginLatency",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "message.cliIP",
+                    "owner": "cm",
+                    "type": "ipv4",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "src",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "akadebug.forward-origin-ip",
+                    "owner": "cm",
+                    "type": "ipv4",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "originIP",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "uri_path",
+                            "owner": "cm",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "uri_path",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "dvs4qu662vtjra4i",
+                    "owner": "cm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "urldecode('message.reqPath')"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "response_time",
+                            "owner": "cm",
+                            "type": "number",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "response_time",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "u1oj4peat9be29",
+                    "owner": "cm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "'netPerf.downloadTime'+'netPerf.netOriginLatency'"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "response",
+                            "owner": "cm",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "response",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "tecaewe01z6w29",
+                    "owner": "cm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(status < 399, \"sucess\", \"failure\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "index=akamai_cm",
+                    "owner": "cm"
+                }
+            ],
+            "lineage": "cm"
+        }
+    ],
+    "objectNameList": [
+        "cm"
+    ]
+}

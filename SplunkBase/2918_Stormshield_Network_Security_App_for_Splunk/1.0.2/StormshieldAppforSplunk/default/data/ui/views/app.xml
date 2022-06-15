@@ -1,0 +1,141 @@
+<form version="1.1">
+  <label>Application Dashboard</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time Period</label>
+      <default>
+        <earliest>-4h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="appliance" searchWhenChanged="true">
+      <label>Appliance</label>
+      <default>*</default>
+      <prefix>fw="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">ALL</choice>
+      <search>
+        <query>index=sns | stats values(fw) as label | mvexpand label</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>label</fieldForValue>
+    </input>
+    <input type="text" token="src" searchWhenChanged="true">
+      <label>Source IP</label>
+      <prefix>src="</prefix>
+      <suffix>"</suffix>
+      <default></default>
+    </input>
+    <input type="text" token="dst" searchWhenChanged="true">
+      <label>Destination IP</label>
+      <default></default>
+      <prefix>dst="</prefix>
+      <suffix>"</suffix>
+    </input>
+    <input type="dropdown" token="user" searchWhenChanged="true">
+      <label>User</label>
+      <default></default>
+      <prefix>user="</prefix>
+      <suffix>"</suffix>
+      <search>
+        <query>index=sns logtype=alarm | stats values(user) as label | mvexpand label</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>label</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Applications</title>
+        <search>
+          <query>index=sns $appliance$ $src$ $dst$ $user$ logtype=alarm classification=1| top msg</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Malwares</title>
+        <search>
+          <query>index=sns $appliance$ $src$ $dst$ $user$ logtype=alarm classification=2 | top msg</query>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Vulnerable Applications</title>
+        <search>
+          <query>index=sns $appliance$ $src$ $dst$ $user$ logtype=pvm | top product</query>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Vulnerabilities</title>
+        <search>
+          <query>index=sns $appliance$ $src$ $dst$ $user$ logtype=pvm | top msg</query>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>SN Vulnerability manager</title>
+        <search>
+          <query>index=sns logtype=monitor $appliance$ $src$ $dst$ $user$             |  rex field=_raw "Pvm=(?&lt;vuln_total&gt;.*?),(?&lt;vuln_remote&gt;.*?),(?&lt;vuln_local&gt;.*?),(?&lt;vuln_crit&gt;.*?),(?&lt;vuln_minor&gt;.*?),(?&lt;vuln_major&gt;.*?),(?&lt;vuln_remedy&gt;.*?),(?&lt;info_total&gt;.*?),(?&lt;info_minor&gt;.*?),(?&lt;info_major&gt;.*?),(?&lt;info_host&gt;.*?) "              | timechart mean(vuln_total), mean(info_total)</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.axisTitleY.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+</form>

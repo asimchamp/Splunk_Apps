@@ -1,0 +1,92 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsUpdateConcept</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsUpdateConcept</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Updates Concept(s) for an existing Context with specified parameters.  </span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsUpdateConcept conceptName FROM Context [IN container] [BY class] [SCOPED scope] WITH points=double[,double]+ [shape=(pi|trapezoid|triangle|curveincrease|curvedescrease|linearincrease|lineardecrease)] [; points=double[,double]+ [shape=(pi|trapezoid|triangle|curveincrease|curvedescrease|linearincrease|lineardecrease)] ]*</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">| xsUpdateConcept teeny FROM Height WITH points="0,40" shape=pi scope=app</span>
+      </p>
+      <p>
+        <span class="explanation">Updates a concept called 'teeny' in the context 'Height' with a value range of 0 to 40.  </span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext"> concept, container, class, points, scope, shape</span>
+      </p>
+      <p>
+        <span class="para">concept</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new concept.</span>
+      </p>
+      <p>
+        <span class="para">context</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the context that contains the concept.</span>
+      </p>
+      <p>
+        <span class="para">container</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the container that contains the context.</span>
+      </p>
+      <p>
+        <span class="para">class</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the class.</span>
+      </p>
+      <p>
+        <span class="para">points</span>
+      </p>
+      <p>
+        <span class="explanation">The values describing the shape to be graphed.  There must be at least 2 points (min, max).  Each shape supports a different number of points (linear has 2 points, min and max; curve supports 3 points, min, inflection point, max; pi supports 5 points, min, inflection left, center, inflection right, max; trapezoid supports 4 points, min, topleft, topright, max; triangle supports 3 points, min, top, max).</span>
+      </p>
+      <p>
+        <span class="para">scope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the container is stored.</span>. 
+      </p> 
+      <p>
+        <span class="explanation">The shape of the concept.  This defaults to pi</span>. 
+      </p> 
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The concept updated by xsUpdateConcept is displayed in table or chart format.  See <a href="xsDisplayConcept">xsDisplayConcept</a> for details about display of the created Concept. <br /> </span>
+      </p>
+      <br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150817.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

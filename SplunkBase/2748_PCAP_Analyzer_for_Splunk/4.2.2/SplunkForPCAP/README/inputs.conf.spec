@@ -1,0 +1,2 @@
+[pcap://<name>]
+path = <value>

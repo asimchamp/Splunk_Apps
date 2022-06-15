@@ -1,0 +1,108 @@
+/* Cal-HeatMap CSS */
+
+
+.graph
+{
+    clear: both;
+    display: block;
+    font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+    overflow: hidden;
+}
+
+.graph-label
+{
+    fill: #999;
+    font-size: 10px
+}
+
+.graph, .graph-legend rect {
+    shape-rendering: crispedges
+}
+
+.graph-rect
+{
+    fill: #ededed;
+}
+
+.graph rect:hover
+{
+    stroke: #000;
+    stroke-width: 1px
+}
+
+.subdomain-text {
+    font-size: 8px;
+    fill: #999;
+    pointer-events: none;
+}
+
+.hover_cursor:hover {
+    cursor: pointer;
+}
+
+.qi {
+    background-color: #999;
+    fill: #999;
+}
+
+.q0
+{
+    background-color: #fff;
+    fill: #fff;
+    stroke: #ededed
+}
+
+.q1
+{
+    background-color: #ff0000;
+    fill: #ff0000}
+
+.q2
+{
+    background-color: #ff6600;
+    fill: #ff6600
+}
+
+.q3
+{
+    background-color: #f6ff00;
+    fill: #f6ff00
+}
+
+.q4
+{
+    background-color: #84ff00;
+    fill: #84ff00}
+
+.q5
+{
+    background-color: #025b00;
+    fill: #025b00
+}
+
+rect.highlight
+{
+    stroke:#444;
+    stroke-width:1;
+}
+
+text.highlight
+{
+    fill: #444;
+}
+
+rect.now
+{
+    stroke: red;
+}
+
+text.now
+{
+    fill: red;
+    font-weight: 800;
+}
+
+.domain-background {
+    fill: none;
+    shape-rendering: crispedges;
+}

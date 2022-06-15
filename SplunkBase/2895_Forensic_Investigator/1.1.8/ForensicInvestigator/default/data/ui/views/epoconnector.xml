@@ -1,0 +1,42 @@
+<form stylesheet="custom.css">
+  <label>ePO Connector</label>
+  <searchTemplate>| script epoconnector __EXECUTE__ "$input$" "$operation$" "$tagname$"</searchTemplate>
+  <description>Interact with ePO</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input">
+      <label>Hostname / IP / MAC / Username</label>
+      <suffix></suffix>
+    </input>
+    <input type="dropdown" token="operation">
+      <label>Operation</label>
+      <default>Query</default>
+      <choice value="query">Query</choice>
+      <choice value="wakeup">Wake up</choice>
+      <choice value="settag">Set Tag</choice>
+      <choice value="cleartag">Clear Tag</choice>
+    </input>
+    <input type="dropdown" token="tagname">
+      <label>Tag to set (Hostname/IP required)</label>
+      <choice value="quarantine">Quarantine</choice>
+      <choice value="Blank">Blank</choice>
+      <initialValue>Blank</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Raw Response</title>
+        <search base="global">
+          <query>| table Key,Value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

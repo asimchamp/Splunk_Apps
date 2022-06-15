@@ -1,0 +1,59 @@
+<form script="check_data_availability.js,findsearchdetails.js">
+  <label>Per Search View</label>
+  <fieldset submitButton="true">
+    <input type="text" token="searchid" searchWhenChanged="true">
+      <label>Search ID</label>
+    </input>
+    <input type="time" token="field2">
+      <label/>
+      <default>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h2>Search String</h2>
+      <pre id="searchstringplaceholder">Waiting/Loading</pre>
+      <p><a id="searchstringencoded" href="javascript:alert('Still Loading')">Launch search</a>. Note that the field extractions, installed apps, data sources and more could all be different -- this will at best give you an idea of the experience.</p>
+    </html>
+  </row>
+  <row>
+      <table>
+        <title>User Details</title>
+        <searchString>|inputlookup LDAPSearch | search [search `auditindex` `auditsourcetype` searchid="$searchid$" user!="splunk-system-user" | stats values(user) as sAMAccountName] | fields - _time | transpose | rename column as Field "row 1" as Value</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">30</option>
+      </table>
+      <table>
+        <title>Search Details</title>
+        <searchString>| tstats `SearchActivitySummaries` values(Search_History.actualsearch) as actualsearch values(Search_History.NumExports) as NumExports values(Search_History.WasShared) as WasShared values(Search_History.searchspan_s) as searchspan_s values(Search_History.searchspan_m) as searchspan_m values(Search_History.searchspan_h) as searchspan_h values(Search_History.searchspan_d) as searchspan_d values(Search_History.total_run_time) as total_run_time values(Search_History.result_count) as result_count values(Search_History.scan_count) as scan_count values(Search_History.searchtype) as searchtype values(Search_History.search_status) as search_status values(Search_History.savedsearch_name) as savedsearch_name values(Search_History.searchcommands) as searchcommands values(Search_History.user) as user values(Search_History.ManagerDN) as ManagerDN values(Search_History.email) as email values(Search_History.distinguishedName) as distinguishedName values(Search_History.name) as name values(Search_History.description) as description values(Search_History.city) as city values(Search_History.location) as location values(Search_History.organization) as organization values(Search_History.state) as state values(Search_History.title) as title values(Search_History.ManagementChain) as ManagementChain values(Search_History.ManagerName) as ManagerName values(Search_History.SearchHead) as SearchHead from `SA_SearchHistory` where Search_History.searchid="$searchid$" | `SARename` | makemv user | transpose | rename column as "Field" "row 1" as Value</searchString>
+        <earliestTime>1217105920.000</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">30</option>
+      </table>
+  </row>
+  <row>
+      <table>
+        <title>Audit Details (Only Accessible With Audit Access)</title>
+        <searchString>`auditindex` `auditsourcetype` searchid="$searchid$" | stats values(user) as user values(actualsearch) as actualsearch values(savedsearch_name) as savedsearch_name | transpose | rename column as Field "row 1" as Value</searchString>
+        <earliestTime>1217105920.000</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+  </row>
+</form>

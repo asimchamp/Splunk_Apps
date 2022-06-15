@@ -1,0 +1,88 @@
+<form>
+  <label>Create Snapshot</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="time1">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+
+    <input type="dropdown" token="index_name" searchWhenChanged="false">
+      <label>Select an index:</label>
+      <default>main</default>
+      <search>
+        <query>| eventcount summarize=false index=* | dedup index | fields index </query>
+      </search>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+    </input>
+
+    <input type="text" token="source_name">
+      <label>Source</label>
+      <default>*</default>
+    </input>
+
+    <input type="text" token="snapshot_name">
+      <label>Snapshot Name</label>
+    </input>
+
+    <input type="text" token="type">
+      <label>Fields to save - comma separated list</label>
+    </input>
+    <input type="text" token="field_extraction">
+      <label>Search Parameters - no quotes</label>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table depends="$type$">
+        <title>Stage Snapshot</title>
+        <search>
+          <query>index=$index_name$ source=$source_name$ $field_extraction$ | table $type$ </query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Existing Snapshots...</title>
+        <search>
+          <query>| zkread command="get_children" path="/unique/" | rename children: as snapshot | fields snapshot | table snapshot</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table depends="$snapshot_name$, $type$">
+        <title>Create Snapshot</title>
+        <search>
+          <query>index=$index_name$ source=$source_name$ $field_extraction$ | zkwrite command="ensure_path" namespace="unique" path="/$snapshot_name$/fields/" fields="$type$" append_fieldname="true" | zkwrite command="ensure_path" namespace="unique" path="$snapshot_name$/_transform_field" value="$field_extraction$"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

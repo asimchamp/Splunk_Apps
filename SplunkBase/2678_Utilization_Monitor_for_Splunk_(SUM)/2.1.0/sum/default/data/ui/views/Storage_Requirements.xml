@@ -1,0 +1,51 @@
+<form>
+  <!-- This dashboard and all searches were created by Mason Morales, Splunk Certified Architect. Contact: mason.s.morales@gmail.com -->
+  <label>Empirical Storage Calculator</label>
+  <fieldset autoRun="true">
+    <input searchWhenChanged="true" token="splunk_server" type="dropdown">
+      <label>Splunk Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <search>
+        <query>| rest /services/admin/indexes | fields splunk_server | stats count by splunk_server</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>splunk_server</fieldForLabel>
+      <fieldForValue>splunk_server</fieldForValue>
+    </input>
+    <input type="dropdown" token="index" searchWhenChanged="true">
+      <label>Index</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>| rest /services/admin/indexes | stats count by title | rename title as index</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Empirical Storage Requirement Calculator</title>
+        <search>
+          <query>
+             <![CDATA[| dbinspect index=* | stats sum(sizeOnDiskMB) as TotalSizeOnDiskMB, sum(rawSize) as TotalRawSize, min(startEpoch) as startEpochDate, max(endEpoch) as endEpochDate by splunk_server, index | eval DaysOfData=round((endEpochDate-startEpochDate)/86400) | convert ctime(startEpochDate), ctime(endEpochDate) | eval TotalSizeOnDiskMB=round(TotalSizeOnDiskMB) | eval TotalRawSizeMB=round(TotalRawSize/1024/1024) |eval CompressionRate=round(TotalSizeOnDiskMB/TotalRawSizeMB,2) | fields - startEpochDate endEpochDate TotalRawSize | join type=outer index splunk_server [search earliest=-3d@d latest=-0d@d index=_internal source=*license_usage.log type=Usage | eval KB=round(b/1024) | eval MB=round(KB/1024,2) | eval GB=round(MB/1024,2) | eval TB=round(GB/1024,2)  | bin _time span=1d | stats sum(MB) as Total by idx _time splunk_server | stats avg(Total) as AvgLicenseMBPerDayThisServer by idx splunk_server | eval AvgLicenseMBPerDayThisServer=round(AvgLicenseMBPerDayThisServer) | eventstats sum(AvgLicenseMBPerDayThisServer) as TotalLicenseMBPerDayThisIndex by idx | eval TotalLicenseMBPerDayThisIndex=round(TotalLicenseMBPerDayThisIndex) |  rename idx as index] | fillnull value=0 | join index, splunk_server [| rest /services/admin/indexes | table title maxTotalDataSizeMB frozenTimePeriodInSecs splunk_server | eval frozenTimePeriodInDays=frozenTimePeriodInSecs/86400 | rename title as index | table index maxTotalDataSizeMB frozenTimePeriodInDays splunk_server] | eval MBReqtoMeetRetention=AvgLicenseMBPerDayThisServer*frozenTimePeriodInDays*CompressionRate | eval GBReqtoMeetRetention=round(MBReqtoMeetRetention/1024 ,2) | eval ActualMBRequired=case(MBReqtoMeetRetention>maxTotalDataSizeMB, maxTotalDataSizeMB, MBReqtoMeetRetention<maxTotalDataSizeMB, MBReqtoMeetRetention) | eval ActualGBRequired=round(ActualMBRequired/1024,2) | rename maxTotalDataSizeMB as ConfiguredIndexSizeMB, TotalRawSizeMB as CurrentRawSizeMB, TotalSizeOnDiskMB as CurrentSizeOnDiskMB, DaysOfData as CurrentDaysRetention, frozenTimePeriodInDays as ConfiguredDaysRetention | table index splunk_server, AvgLicenseMBPerDayThisServer, TotalLicenseMBPerDayThisIndex, ConfiguredIndexSizeMB, ConfiguredDaysRetention, CurrentDaysRetention, CurrentRawSizeMB, CurrentSizeOnDiskMB, CompressionRate, AvgLicenseMBPerDayThisServer, MBReqtoMeetRetention, ActualMBRequired | eventstats sum(CurrentSizeOnDiskMB) as TotalCurrentIndexSizeOnDiskMB, sum(ConfiguredIndexSizeMB) as TotalIndexConfiguredSizeMB, sum(MBReqtoMeetRetention) as TotalIndexMBReqtoMeetRetention by index | eval TotalIndexCurrentStorageUtilPerc=round((CurrentSizeOnDiskMB/ConfiguredIndexSizeMB)*100,2) | fillnull value=0 | table index, splunk_server, AvgLicenseMBPerDayThisServer, TotalLicenseMBPerDayThisIndex, ConfiguredIndexSizeMB, ConfiguredDaysRetention, CurrentDaysRetention, TotalIndexCurrentStorageUtilPerc, CurrentRawSizeMB, CurrentSizeOnDiskMB, CompressionRate, AvgLicenseMBPerDayThisServer, MBReqtoMeetRetention, ActualMBRequired, TotalCurrentIndexSizeOnDiskMB, TotalIndexConfiguredSizeMB, TotalIndexMBReqtoMeetRetention | search splunk_server="$splunk_server$" index="$index$" | rename index as Index, splunk_server as "Splunk Server", ConfiguredIndexSizeMB as "Configured Index Size (MB)", ConfiguredDaysRetention as "Configured Retention (Days)", CurrentDaysRetention as "Current Retention (Days)", TotalIndexCurrentStorageUtilPerc as "Current Utilization of Index Size (%)", CurrentRawSizeMB as "Current Raw Index Size on Disk (MB)", CurrentSizeOnDiskMB as "Current Actual Index Size on Disk (MB)", CompressionRate as "Compression Rate", AvgLicenseMBPerDayThisServer as "Avg License Utilization per Day (MB)", TotalLicenseMBPerDayThisIndex as "Total License Utilization per Day (Across All Indexers) (MB)", MBReqtoMeetRetention as "Disk Required to Meet Retention (MB)", ActualMBRequired as "Actual Disk Splunk Will Use (MB)", TotalCurrentIndexSizeOnDiskMB as "Total Index Size on Disk (Across All Indexers) (MB)", TotalIndexConfiguredSizeMB as "Total Configured Index Size (Across All Indexers) (MB)", TotalIndexMBReqtoMeetRetention as "Total Disk Required to Meet Retention (Across All Indexers) (MB)", TotalAvgRawMBPerDay as "Total Raw Ingest per Day (Across All Indexers) (MB)"]]>
+          </query>
+          <earliest>-60m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">25</option>
+      </table>
+    </panel>
+  </row>
+</form>

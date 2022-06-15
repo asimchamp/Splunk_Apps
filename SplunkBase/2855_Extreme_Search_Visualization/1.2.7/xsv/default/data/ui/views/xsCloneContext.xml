@@ -1,0 +1,101 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsCloneContext</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsCloneContext</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Makes a full copy of a Context, including all concepts.</span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsCloneContext oldContext [IN oldContainer] [BY oldClass] [SCOPED oldScope] TO newContext [IN newContainer] [BY newClass] [SCOPED newScope]</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">| xsCloneContext ArrTime IN MyArrTime BY Monday SCOPED private TO ArrTime IN MyArrTime BY Tuesday SCOPED private</span>
+      </p>
+      <p>
+        <span class="explanation">Clones the context called 'ArrTime' stored in container "MyArrTime" by class 'Monday' within the scope 'private' TO a context with the same name in the same container in the same scope; but, a different class called 'Tuesday'.</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext">oldContext, oldContainer, oldClass, oldScope, newContext, newContainer, newClass, newScope</span>
+      </p>
+      <p>
+        <span class="para">oldContext</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the existing context.</span>
+      </p>
+      <p>
+        <span class="para">oldContainer</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the container the existing context is stored.</span>
+      </p>
+      <p>
+        <span class="para">oldClass</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the class for the existing context.</span>
+      </p>
+      <p>
+        <span class="para">oldScope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the existing container is stored.</span>
+      </p>
+      <p>
+        <span class="para">newContext</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new Context.</span>
+      </p>
+      <p>
+      <span class="para">newContainer</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new container to store the context.</span>
+      </p>
+      <p>
+        <span class="para">newClass</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new class for the new context.</span>
+      </p>
+      <p>
+        <span class="para">newScope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the new container is stored.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The context is cloned. See <a href="xsRenameContext">xsRenameContext</a> for details about renaming a context. </span>
+      </p>
+<br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150816.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

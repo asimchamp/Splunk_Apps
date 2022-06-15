@@ -1,0 +1,86 @@
+<form stylesheet="dbir-0.4-16.css">
+  <label>Vulnerabilities Overview</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Vulnerabilities High_Critical_Vulnerabilities count(High_Critical_Vulnerabilities) AS "Count of High Or Critical Vulnerabilities" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="underLabel">Critical or High Vulnerabilities</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Vulnerabilities High_Critical_Vulnerabilities dc(dest) AS "Distinct Count of dest" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="underLabel">Hosts With High or Critical Vulns</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Vulnerabilities Vulnerabilities dc(dest) AS "Distinct Count of dest" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="underLabel">Hosts with Vulnerabilities</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| pivot Vulnerabilities Vulnerabilities count(Vulnerabilities) AS "Count of Vulnerabilities" ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="underLabel">Vulnerabilities Found</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Vulnerability Severity</title>
+        <search>
+          <query>| datamodel Vulnerabilities Vulnerabilities search | stats count by Vulnerabilities.signature Vulnerabilities.severity | sort +Vulnerabilities.severity | rename Vulnerabilities.signature AS Signature, Vulnerabilities.severity AS Severity, count AS Count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+            /app/DBIR_splunk_app/vulnerability_explorer?form.field1.earliest=0&form.field1.latest&form.dest=*&form.severity=$row.Severity$&form.signature=$row.Signature$&earliest=0&latest=0
+			]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

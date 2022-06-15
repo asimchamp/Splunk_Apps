@@ -1,0 +1,41 @@
+<form>
+  <label>Browse Snapshot Data</label>
+  <fieldset submitButton="true" autoRun="true">
+
+    <input type="dropdown" token="snap" searchWhenChanged="true">
+        <label>Snapshot...</label>
+        <search>
+          <query>| zkread command="get_children" path="/unique/" | rename children: as snapshot | table snapshot</query>
+        </search>
+        <fieldForLabel>snapshot</fieldForLabel>
+        <fieldForValue>snapshot</fieldForValue>
+    </input>
+
+    <input type="checkbox" depends="$snap$" token="fields" searchWhenChanged="true">
+      <label>Available Fields to compare</label>
+      <delimiter>|</delimiter>
+      <search>
+        <query>| zkread command="get_children" path="/unique/$snap$/fields" | rename children: as field | table field</query>
+      </search>
+      <fieldForLabel>field</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+    </input>
+
+  </fieldset>
+
+  <row>
+    <panel>
+      <table depends="$snap$, $fields$">
+        <title>Overview of snapshot $snap$</title>
+        <search>
+          <query>|zkread command=get_grandchildren path="unique/$snap$/fields/" | rename children: as Field | rename value as Field_Value | rename version as Count | regex Field="$fields$" | table Field, Field_Value, Count</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,325 @@
+@font-face {
+    font-family: CiscoSansTT;
+    src: url(../fonts/CiscoSansTTRegular.woff);
+}
+body{
+	font-family: CiscoSansTT !important;
+}
+.dashboard-body{
+  background-color:#f2f2f2 !important;
+}
+/*threats css*/
+#tableWithMultipleSparklineColors table tbody tr td[data-cell-index="0"] {
+    font-size: 12px !important;
+    text-align: center !important;
+    color: white !important;
+    width: 32px;
+    height: 1px;
+    border-radius: 50%;
+    padding: 0px;
+    vertical-align: middle;
+}
+#tableWithMultipleSparklineColors>.dashboard-row .dashboard-panel .panel-body .results-table table tr>td:last-child, .dashboard-row .dashboard-panel .panel-body .results-table table tr>th:last-child, .dashboard-row .dashboard-panel .panel-body .table td:last-child, .dashboard-row .dashboard-panel .panel-body .table th:last-child {
+    padding-right: 12px;
+    text-align: left;
+}
+
+body{
+	font-family: CiscoSansTT !important;
+}
+.dashboard-body{
+  background-color:#f2f2f2 !important;
+}
+.html h1{
+   color: #39393B !important;	
+   font-size: 24px !important;	
+   line-height: 33px !important;
+   font-weight: normal !important;
+   font-family: CiscoSansTT !important;
+}
+.html h3 {
+    font-size: 18px !important;
+    line-height: 25px!important;
+    font-weight: normal !important;
+    margin: 5px 0px 0px 5px !important;
+    color: #39393B !important;
+    font-family: CiscoSansTT !important;
+  }
+  .html h4 {
+    font-size: 16px !important;
+    line-height: 22px!important;
+    font-weight: normal !important;
+    margin: 5px 0px 0px 5px !important;
+    color: #39393B !important;
+    font-family: CiscoSansTT !important;
+  }
+  .html h5 {
+    font-size: 14px !important;
+    line-height: 19px!important;
+    font-weight: normal !important;
+    margin: 5px 0px 0px 5px !important;
+    color: #39393B !important;
+    font-family: CiscoSansTT !important;
+  }
+  .subheading{
+  color: #58585B;
+	font-family: CiscoSansTT;
+	font-size: 12px;
+	line-height: 16px;
+	margin: -8px 0px 0px 7px !important; 
+  }
+  .subheading1{
+  	color: #58585B;
+	font-family: CiscoSansTT;
+	font-size: 12px;
+	line-height: 16px;
+	margin: 3px 0px 4px -3px; 
+  }
+  .subheading2{
+    color: #58585B;
+  font-family: CiscoSansTT;
+  font-size: 12px;
+  line-height: 16px;
+  margin: 5px 0px 0px 6px; 
+  }
+/*Inputfield label Starting*/ 
+#fieldset1 label{
+	font-size: 14px!important;
+	color: #737373!important;
+	line-height: 19px!important;
+	font-weight: lighter;
+	font-family: CiscoSansTT !important;
+}
+/*Inputfield label end*/
+#input2 button, #input3 button, #input4 button, #input5 button, #input6 button{
+	background: #fff!important;
+	border-radius: 3px !important;
+	box-shadow: none!important;
+	border-color: #9D9CA1!important;
+	font-size: 14px!important;
+	color: #39393B!important;
+}
+#input1 input, #input7 input, #input2 input, #input6 input{
+  background: #fff!important;
+  border-radius: 3px !important;
+  box-shadow: none!important;
+  border-color: #9D9CA1!important;
+  font-size: 14px!important;
+  color: #39393B!important;
+}
+#input3,#input4{
+	width: 200px !important;
+}
+/*
+#input6 div:nth-child(2) [style]{
+  width: 220px !important;
+}*/
+
+#submit button.btn.btn-primary{
+	background-color: #049FD9!important;
+  font-size: 14px !important;
+  font-weight: normal!important;
+  font-family: CiscoSansTT !important;
+}
+#submit button.btn.btn-primary:hover{
+  background-color: #0083b3 !important;
+}
+tr{
+  font-family: CiscoSansTT !important;
+  font-weight: normal!important;
+}
+#fieldset1 .hide-global-filters{
+  display: none!important;
+}
+
+/*Spinner Starting*/
+
+.spinner {
+  margin: 0px auto 0;
+  width: 70px;
+  text-align: center;
+}
+
+.spinner > div {
+  width: 8px;
+  height: 8px;
+  background-color: #049fd9;
+
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% { 
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
+}
+
+/*Spinner End*/
+
+/*Progressbar hide*/
+
+.progress-bar{
+             visibility: hidden;
+           }
+           
+/*Progressbar hide*/           
+
+/*.splunk-header.splunk-view.splunk-header.splunk-view > div[data-view="views/shared/appbar/Master"] {
+  background-color: #ffffff !important;
+  padding-top: 10px !important;
+}
+.splunk-header.splunk-view.splunk-header.splunk-view > div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] {
+  margin-left: 27rem !important;
+}
+.splunk-header.splunk-view.splunk-header.splunk-view > div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppLabel"] {
+  float: right !important;
+  position: absolute !important;
+}
+.link---pages-enterprise---7-1-2---34IQK {
+    color: #58585B !important;
+    font-family: CiscoSansTT !important;
+    font-weight: 200!important;
+    display: block!important;
+    padding: 0 20px !important;
+    position: relative !important;
+    text-decoration: none !important;
+    margin-top: -4px!important;
+}
+.viewEnterprise---pages-enterprise---7-1-2---2Xt56 {
+    line-height: 38px !important;
+    font-size: 14px !important;
+    font-family: CiscoSansTT !important;
+    color: #39393B !important;
+    height: 44px;
+    box-sizing: border-box;
+}*/
+  
+div[data-view="views/shared/appbar/Master"] {
+  background-color: #ffffff !important;
+  padding-top: 10px !important;
+}
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] {
+  margin-left: 23rem !important;
+}
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppLabel"] {
+  float: right !important;
+  position: absolute !important;
+  margin-top: -4px!important;
+}
+
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > div > div > a > span[data-role="label"] {
+    color: #39393B !important;
+    font-family: CiscoSansTT !important;
+    font-weight: normal!important;
+    /*padding: 0 20px !important;*/
+    padding: 0px 8px 0px 0px!important;
+    position: relative !important;
+    text-decoration: none !important;
+    margin-top: -4px!important;
+}
+
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > div > a > span[data-role="label"] {
+    color: #39393B !important;
+    font-family: CiscoSansTT !important;
+    font-weight: normal!important;
+    padding: 0 20px !important;
+    position: relative !important;
+    text-decoration: none !important;
+    margin-top: -4px!important;
+}
+
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > a[data-active] > span[data-role="label"] {
+    color: #58585B !important;
+    font-family: CiscoSansTT !important;
+    font-weight: normal!important;
+    padding: 0 20px !important;
+    position: relative !important;
+    text-decoration: none !important;
+    margin-top: -4px!important;
+}
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > div > div > a[data-active]{
+    color: #58585B !important;
+    font-family: CiscoSansTT !important;
+    font-weight: normal!important;
+    /*padding: 0 20px !important;*/
+    padding: -1px 20px 0px 20px !important;
+    position: relative !important;
+    text-decoration: none !important;
+    /*margin-top: -4px!important;*/
+    
+}
+
+
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppLabel"] > a > div > span[data-role="app-label"] {
+    line-height: 38px !important;
+    font-family: CiscoSansTT !important;
+    color: #58585B !important;
+    height: 44px;
+    box-sizing: border-box;
+}
+
+
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > div > div > a[class^="viewEnterprise---simplexml---dev---"] {
+    color: #58585B !important;
+    font-family: CiscoSansTT !important;
+    font-weight: normal!important;
+    position: relative !important;
+    text-decoration: none !important;
+}
+
+div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > div > div > a > i[data-view="views/shared/Icon"]{
+  color: #58585B !important;
+}
+
+/*threats menu hover style*/
+
+/*div[data-view="views/shared/appbar/Master"] > div[data-view="views/shared/appbar/AppNav"] > div > div > a[data-active] > [class^="underline---pages-enterprise---7-1-2---bxeh0"]{
+  background-color:#0083B3 !important;
+  height: 4px !important;
+}*/
+a[data-view="views/shared/appbar/Button"][data-active="active"] div{
+  background-color:#0083B3 !important;
+  height: 4px !important;
+  margin-bottom: 1px !important;
+}
+
+/*threats menu hover style*/
+
+/*No result fount text*/
+
+.dashboard-row .dashboard-panel .panel-body .splunk-message-container .alert{
+  font-size: 14px !important;
+  font-family: CiscoSansTT !important;
+  color:#39393b !important; 
+}
+
+/*No result fount text*/
+
+/*Threats Events and Traffic over the last 24 hours hyperlink*/
+.panel-body.html .buttonRightAlign a{
+  color:#049FD9 !important;
+}
+/*Threats Events and Traffic over the last 24 hours hyperlink*/
+

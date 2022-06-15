@@ -1,0 +1,54 @@
+<form version="1.1">
+  <label>Logs Statistics</label>
+  <description></description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="selectedHost" searchWhenChanged="true">
+      <label>Select Appliance</label>
+      <search>
+        <query>index=luna_syslog1 | stats values(host) as Host by host</query>
+        <earliest>-2h@h</earliest>
+        <latest>now</latest>
+        <!--<done>-->
+        <!--  <set token="defaultHost">$result.host$</set>-->
+        <!--</done>-->
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <default></default>
+      <!--<default>$defaultHost$</default>-->
+      <change>
+        <condition match="len($value$) == 0"></condition>
+        <condition match="len($value$) > 0">
+          <set token="submittedHost">$value$</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Lush Command Frequency</title>
+      <chart>
+        <search>
+          <query>index=luna_syslog1 lunash_Command=* host=$submittedHost$ | top limit=20 lunash_Command</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>NTLS Response Code Count</title>
+      <chart>
+        <search>
+          <query>luna_syslog1 NTLS_ResponseCode=* host=$submittedHost$ | top limit=20 NTLS_ResponseCode</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

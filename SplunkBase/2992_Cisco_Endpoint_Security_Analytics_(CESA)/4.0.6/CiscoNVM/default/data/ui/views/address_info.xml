@@ -1,0 +1,29 @@
+<dashboard version="1.1" showsource="False" stylesheet="acnvm.css">
+  <label>Network Address Info</label>
+  <row>
+    <panel depends="$url:targetDomain$" id="nvmDomainInfo">
+      <title>Select the following source to view information for: $url:targetDomain$</title>
+      <html>
+          <div>
+              <a href="https://investigate.umbrella.com/domain-view/name/$url:targetDomain$/view" target="_blank"><h2>Cisco Umbrella</h2></a>
+              <a href="https://talosintelligence.com/reputation_center/lookup?search=$url:targetDomain$" target="_blank"><h2>Talos</h2></a>
+              <a href="https://visibility.amp.cisco.com/#/investigate?q=$url:targetDomain$" target="_blank"><h2>Cisco Threat Response</h2></a>
+	      <a href="https://www.virustotal.com/gui/domain/$url:targetDomain$/detection" target="_blank"><h2>VirusTotal</h2></a>
+          </div>
+        </html>
+    </panel>
+    
+    <panel depends="$url:targetAddr$" id="nvmAddrInfo">
+      <title>Select the following source to view information for: $url:targetAddr$</title>
+      <html>
+          <div>
+              <a href="https://investigate.umbrella.com/ip-view/$url:targetAddr$" target="_blank"><h2>Cisco Umbrella</h2></a>
+              <a href="https://talosintelligence.com/reputation_center/lookup?search=$url:targetAddr$" target="_blank"><h2>Talos</h2></a>
+              <a href="https://visibility.amp.cisco.com/#/investigate?q=$url:targetAddr$" target="_blank"><h2>Cisco Threat Response</h2></a>
+              <a href="https://www.virustotal.com/gui/domain/$url:targetDomain$/detection" target="_blank"><h2>VirusTotal</h2></a>
+          </div>
+        </html>
+    </panel>
+    
+  </row>
+</dashboard>

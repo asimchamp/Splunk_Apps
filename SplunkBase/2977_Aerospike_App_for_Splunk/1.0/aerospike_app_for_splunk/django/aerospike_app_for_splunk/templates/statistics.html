@@ -1,0 +1,266 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% load demoview %}
+
+{% block title %}Aerospike Statistics{% endblock title %}
+
+{% block css %}
+
+
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/style.css" />
+    <style>
+
+         @font-face
+         {
+             font-family: "Titillium Web";
+             font-style: normal;
+             font-weight: 400;
+             src: local("Titillium Web"), local("TitilliumWeb-Regular"), url("http://fonts.gstatic.com/s/titilliumweb/v4/7XUFZ5tgS-tD6QamInJTcZSnX671uNZIV63UdXh3Mg0.woff2") format("woff2");
+         }
+         body
+        {
+            font-family:'Titillium Web';
+        }
+
+
+        td {
+            text-align: center;
+        }
+
+        td {
+            font-size: 16px;
+            /*text-shadow: 1px 1px #aaa;*/
+            height:25px;
+            width:200px;
+            padding-top:5px;
+            padding-right:10px;
+            text-align: center;
+        }
+        th {
+            font-size: 18px;
+            text-shadow: 1px 1px #aaa;
+             height:30px;
+             text-align: center;
+        }
+
+    td.icon {
+        text-align: center;
+    }
+
+    td.icon i {
+        font-size: 30px;
+        text-shadow: 1px 1px #aaa;
+    }
+
+    td.icon .Active {
+        color: #006400;
+    }
+
+    td.icon .Inactive {
+        color: red;
+    }
+    .show_stat
+    {
+        color:#6E6E6E;
+    }
+    .show_stat:hover
+    {
+        color:#6E6E6E;
+    }
+    .show_stat:active
+    {
+        color:#6E6E6E;
+    }
+    .show_stat:visited
+    {
+        color:#6E6E6E;
+    }
+    .show_stat:link
+    {
+        color:#6E6E6E;
+    }
+  
+    .show_stat,.show_stat:hover,.show_stat:link,.show_stat:active,.show_stat:visited
+    {
+      padding-right: 10px !important;
+    }
+</style>
+
+{% endblock css %}
+
+{% block content %}
+
+<div class="dashboard-body container-fluid main-section-body" data-role="main" style="padding:0;margin:0;">
+
+    <!--Menu bar for Aerospike app -->
+
+
+    <!--Page Discription -->
+
+    <div class="dashboard-header clearfix">
+        <h2 style="color : #050505;text-shadow: 1px 1px #aaa">Aerospike Statistics</h2>
+
+    </div>
+
+    <!--Row 1 for nodes statstics -->
+
+    <div  class="dashboard-row dashboard-row1">
+        <div class="dashboard-cell" style="width: 100%">
+            <div id="table_connected_nodes" class="dashboard-panel ">
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" >
+                        <div class="panel-head" style="background-color : #6E6E6E;width: 100%;height :40px">
+                            <h3 style="color : #FAFAFA; text-align : center;padding-top :10px">Nodes Statistics</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% table id="table_node_searchresults" managerid="search_node_resulttable" drilldown="none"%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </div>
+
+     <!--Link for nodes all statistics -->
+
+     <div class="dashboard-row dashboard-row2" style="float:right;height :40px">
+          <a class="show_stat" href="/dj/aerospike_app_for_splunk/all_stat">Show all statistics</a>
+     </div>
+
+    <!--Row 2 for namespace statstics -->
+
+     <div  class="dashboard-row dashboard-row3" style="align :center;">
+        <div class="dashboard-cell" style="width: 100%">
+            <div id="table_connected_nodes" class="dashboard-panel " style="align :center">
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" >
+                        <div class="panel-head" style="background-color : #6E6E6E;width: 100%;height :40px">
+                            <h3 style="color : #FAFAFA; text-align : center;padding-top :10px">Namespace Statistics</h3>
+                        </div>
+                        <div class="panel-body" style="align :center">
+                            {% table id="table_namespace_searchresults" managerid="search_namespace_resulttable" drilldown="none"%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </div>
+
+    <!--Link for namespaces all statistcs -->
+
+     <div class="dashboard-row dashboard-row2" style="float:right;height :40px">
+          <a class="show_stat" href="/dj/aerospike_app_for_splunk/namespace">Show all statistics</a>
+     </div>
+
+     <!--Row 3 for XDR statstics -->
+
+     <div  class="dashboard-row dashboard-row1">
+        <div class="dashboard-cell" style="width: 100%">
+            <div id="table_connected_nodes" class="dashboard-panel ">
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" >
+                        <div class="panel-head" style="background-color : #6E6E6E;width: 100%;height :40px">
+                            <h3 style="color : #FAFAFA; text-align : center;padding-top :10px">XDR Statistics</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% table id="table_xdr_searchresults" managerid="search_xdr_resulttable" drilldown="none"%}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     </div>
+
+     <!--Link for ADR all statistics -->
+
+     <div class="dashboard-row dashboard-row2" style="float:right;height :40px;padding-bottom : 30px">
+          <a class="show_stat" href="/dj/aerospike_app_for_splunk/xdr">Show all statistics</a>
+     </div>
+</div>
+
+{% endblock content%}
+
+{% block managers %}
+
+    {# Search managers go here #}
+
+    {% searchmanager
+        id="search_node_resulttable"
+        search="sourcetype = \"aerospike\" stanza=\"*\" stanza!=\"cluster\" stanza!=\"Namespace\" |dedup stanza |rename stanza as Node Total_GB_memory as Total_Memory(GB) Used_GB_memory as Used_Memory(GB) Total_bytes_disk as Total_Disk(GB) Used_bytes_disk as Used_Disk(GB) |table Node Cluster_size Build_version Namespaces Total_Memory(GB) Used_Memory(GB) Total_Disk(GB) Used_Disk(GB) |rename Cluster_size as \"Cluster Size\" Build_version as \"Build Version\" Total_Memory(GB) as \"Total Memory(GB)\" Used_Memory(GB) as \"Used Memory(GB)\" Total_Disk(GB) as \"Total Disk(GB)\" Used_Disk(GB) as \"Used Disk(GB)\""
+        earliest_time="rt-30s"
+        latest_time="rt"
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_xdr_resulttable"
+        search="sourcetype =\"aerospike_xdr\" | dedup stanza | rename stanza AS Nodes esmt_bytes_shipped AS Bytes_Shipped free_dlog_pct AS Free_Dlog timediff_lastship_cur_secs AS Lag_Secs stat_recs_outstanding AS Req_Outstanding stat_recs_relogged AS Req_Relog stat_recs_shipped AS Req_Shipped cur_throughput AS Throughput xdr_uptime AS Uptime |table Status Nodes Bytes_Shipped Free_Dlog Lag_Secs Req_Outstanding Req_Relog Req_Shipped Throughput Uptime | rename Req_Relog as \"Req Relog\" Req_Shipped as \"Req Shipped\" Req_Outstanding as \"Req Outstanding\" Lag_Secs as \"Lag Secs\" Bytes_Shipped as \"Bytes Shipped\" Free_Dlog as \"Free Dlog\""
+        earliest_time="rt-30s"
+        latest_time="rt"
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_alert"
+        search="index=\"_audit\" action=\"alert_fired\" ss_app=\"splunk_app_for_aerospike\" | dedup ss_name | stats count"
+        earliest_time="rt-5m"
+        latest_time="rt"
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_alertinfo"
+         search="index=\"_audit\" action=\"alert_fired\" ss_app=\"splunk_app_for_aerospike\" | dedup ss_name | rename ss_name as Alert_Name | eval severity = case(severity == \"1\", \"Info\", severity == \"2\", \"Low\", severity == \"3\", \"Medium\", severity == \"4\", \"High\", severity == \"5\", \"Critical\") | table severity Alert_Name"
+        earliest_time="rt-5m"
+        latest_time="rt"
+        cache=True
+    %}
+
+    {% searchmanager
+        id="search_namespace_resulttable"
+        search="sourcetype = \"aerospike\" stanza=\"Namespace\" |dedup Namespace_name |rename  No_of_objects as Total_object Total_memory as Total_memory(GB) Used_memory as Used_memory(GB) |table Namespace_name Total_object Master_objects Replica_objects Total_memory(GB) Used_memory(GB) Ripple_factor Expired_object Evicted_object | rename Evicted_object as \"Evicted Object\" Expired_object as \"Expired Object\" Ripple_factor as \"Ripple Factor\" Used_memory(GB) as \"Used Memory(GB)\" Total_memory(GB) as \"Total Memory(GB)\" Replica_objects as \"Replica Objects\" Master_objects as \"Master Objects\" Total_object as \"Total Object\" Namespace_name as \"Namespace Name\" "
+        earliest_time="rt-30s"
+        latest_time="rt"
+        cache=True
+    %}
+
+{% endblock managers %}
+
+{% block js %}
+  <script>
+    require(["splunkjs/ready!", "underscore", "splunkjs/mvc/tableview"], function(mvc, _) {
+        var TableView = require("splunkjs/mvc/tableview");
+        var tableView1 = mvc.Components.getInstance("table_xdr_searchresults");
+
+        var ICONS = {
+            Inactive: 'alert-circle',
+            Active: 'check-circle'
+        };
+
+        var CustomIconCellRenderer = TableView.BaseCellRenderer.extend({
+            canRender: function(cell) {
+                return cell.field === 'Status';
+            },
+
+            render: function($td, cell) {
+                var icon = 'question';
+                if(ICONS.hasOwnProperty(cell.value)) {
+                    icon = ICONS[cell.value];
+                }
+                $td.addClass('icon').html(_.template('<i class="icon-<%-icon%> <%- range %>" title="<%- range %>"></i>', {
+                    icon: icon,
+                    range: cell.value
+                }));
+            }
+        });
+
+        tableView1.table.addCellRenderer(new CustomIconCellRenderer());
+        tableView1.table.render();
+    });
+</script>
+
+{% endblock js %}

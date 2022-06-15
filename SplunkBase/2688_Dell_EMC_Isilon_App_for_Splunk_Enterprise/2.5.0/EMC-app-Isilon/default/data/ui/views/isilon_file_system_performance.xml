@@ -1,0 +1,182 @@
+<form>
+  <label>File System Performance</label>
+  <search id="baseSearch">
+    <query>|`file_system_performance_details($cluster$)`</query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-2h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="cluster" searchWhenChanged="true">
+      <label>Cluster</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <search>
+        <query>|`cluster_list`</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>Cluster_Name</fieldForLabel>
+      <fieldForValue>Cluster_Name</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>File System Performance by Node over Time</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.bytes.*.rate" | `bytes_to_kb_mb_gb('stats.value'*8)`|  eval Node_ID="Node".'lnn' | timechart span=2m avg(bytes_mb)  by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Throughput (Mbps)</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Event Rate over Time</title>
+        <search base="baseSearch">
+          <query>| rename stats.key as key | `get_file_system_standard_events` | timechart span=2m sum(stats.value) AS Event_Rate | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Event Rate</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Event Rate by Event Type over time</title>
+        <search base="baseSearch">
+          <query>| rename stats.key as key | `get_file_system_standard_events` | `get_type_by_event_key`  | timechart span=2m max(stats.value) AS Value by Type | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Event Rate</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>File System Critical Events</title>
+        <search base="baseSearch">
+          <query>| rename stats.key as key |  `get_file_system_critical_events` | `get_type_by_event_key` | timechart max(stats.value) by Type | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Event Rate</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Event Rate by Node over time for Critical Events</title>
+        <search base="baseSearch">
+          <query>| rename stats.key as key |  `get_file_system_critical_events` |  eval Node_ID="Node".'lnn' | timechart max(stats.value) by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Event Rate</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Locked Events by Node</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.heat.lock.total" |  eval Node_ID="Node".'lnn' | timechart avg(stats.value) by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Blocked Events by Node</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.heat.blocked.total" |  eval Node_ID="Node".'lnn' | timechart avg(stats.value) by  Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Deadlocked Events by Node</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.heat.deadlocked.total" |  eval Node_ID="Node".'lnn' | timechart avg(stats.value) by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Contended Events by Node</title>
+        <search base="baseSearch">
+          <query>| search stats.key = "node.ifs.heat.contended.total" |  eval Node_ID="Node".'lnn' | timechart avg(stats.value) by Node_ID | fields - NULL</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+      </chart>
+    </panel>
+  </row>
+</form>

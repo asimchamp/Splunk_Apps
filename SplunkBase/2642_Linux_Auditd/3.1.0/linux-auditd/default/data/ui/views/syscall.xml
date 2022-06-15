@@ -1,0 +1,242 @@
+<form>
+  <label>System Call</label>
+  <description></description>
+  <fieldset submitButton="true">
+    <input type="text" token="host">
+      <label>Host</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="key">
+      <label>Key</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="user">
+      <label>Posix Username</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="cmd">
+      <label>Command</label>
+      <default>*</default>
+    </input>
+    <input type="multiselect" token="syscall">
+      <label>System Call</label>
+      <populatingSearch fieldForLabel="system_call" fieldForValue="system_call">| inputlookup arch_syscalls | dedup system_call</populatingSearch>
+      <choice value="*">Any</choice>
+      <default>*</default>
+      <valuePrefix>system_call=</valuePrefix>
+      <delimiter> OR </delimiter>
+    </input>
+    <input type="dropdown" token="subject_role">
+      <label>Subject Role</label>
+      <choice value="*">Any</choice>
+      <choice value="scontext_role=system_r">System Daemon</choice>
+      <choice value="scontext_role!=system_r">Non-System Daemon</choice>
+      <default>*</default>
+    </input>
+    <input type="multiselect" token="action">
+      <label>Action</label>
+      <choice value="success">Success</choice>
+      <choice value="failure">Failure</choice>
+      <default>success,failure</default>
+      <valuePrefix>action=</valuePrefix>
+      <delimiter> OR </delimiter>
+    </input>
+    <input type="text" token="other">
+      <label>Other Search Terms</label>
+      <default>*</default>
+    </input>
+    <input type="time" token="time_selector">
+      <label></label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Count by Host</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type=SYSCALL host=$host$ user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | timechart count by host</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Count by User</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type=SYSCALL host=$host$ user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | timechart count by user</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Count by Command</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type=SYSCALL host=$host$ user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | timechart count by comm</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Count by System Call</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type=SYSCALL host=$host$ user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | timechart count by system_call</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Count by Key</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type=SYSCALL host=$host$ user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | timechart count by key</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Count by Action</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type=SYSCALL host=$host$ user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | timechart count by action</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Correlated Events</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] host=$host$ type IN ("SYSCALL", "PATH", "CWD", "PROCTITLE") | transaction host event_id maxpause=1s | eval nametype=coalesce(nametype, objtype) | search user=$user$ comm=$cmd$ key=$key$ $syscall$ $subject_role$ $action$ $other$ | table _time host event_id key user ses cwd command process_name name system_call nametype success</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

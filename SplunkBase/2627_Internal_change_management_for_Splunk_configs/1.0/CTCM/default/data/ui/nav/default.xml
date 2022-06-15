@@ -1,0 +1,12 @@
+<nav search_view="search" color="#FF8C00">
+  <view name="ct_overview" default='true' />
+  <collection label="Dashboards">
+    <view name="ct_change_overview" />
+    <view name="ct_change_investigation" />
+    <view source="unclassified" match="ct_" />
+  </collection>
+  <collection label="About">
+    <view source="unclassified" match="about_" />
+  </collection>
+  <view name="search" />
+</nav>

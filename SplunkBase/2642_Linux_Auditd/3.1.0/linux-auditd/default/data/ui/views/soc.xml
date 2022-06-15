@@ -1,0 +1,166 @@
+<dashboard refresh="300">
+  <label>Security Operations Centre</label>
+  <row>
+    <panel>
+      <title>Canaries of Compromise</title>
+      <single>
+        <title>Number of Hosts</title>
+        <search>
+          <query>| tstats dc(host) WHERE [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] BY _time span=1d</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">auto</option>
+        <option name="underLabel">seen in the last day</option>
+      </single>
+      <single>
+        <title>Anomalous Event Volume</title>
+        <search>
+          <query>| tstats count WHERE [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] BY _time span=1h | predict count as prediction future_timespan=0 algorithm=LLP | rename lower95(prediction) as lower, upper95(prediction) as upper | eval range=upper-lower | eval difference=case(count&gt;lower AND count&lt;upper, 0, count&lt;lower, round((count-lower)/range,1), count&gt;upper, round((count-upper)/range,1)) | search difference=* | table _time difference</query>
+          <earliest>-7d@h</earliest>
+          <latest>@h</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+        <option name="rangeColors">["0xd93f3c","0x65a637","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[-1,0,1]</option>
+        <option name="trendInterval">auto</option>
+        <option name="underLabel">magnitude relative to trend</option>
+      </single>
+      <single>
+        <title>Access Vector Anomalies</title>
+        <search>
+          <query>| pivot Auditd AVC values(tcontext_type) AS tcontext_type SPLITROW _time PERIOD hour SPLITROW scontext_domain | mvexpand tcontext_type | eventstats count by scontext_domain, tcontext_type | timechart count(eval(count==1)) as indicator</query>
+          <earliest>-72h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,1,2]</option>
+        <option name="trendInterval">auto</option>
+        <option name="underLabel">detected in the last hour</option>
+      </single>
+      <single>
+        <title>Severe Events</title>
+        <search>
+          <query>| pivot Auditd Auditd count(Auditd) as count SPLITROW _time PERIOD hour SPLITROW severity | eval count=if(severity!="critical" AND severity!="high",0,count) | timechart span=1h sum(count) as total | fillnull</query>
+          <earliest>-72h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0xd93f3c"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="trendInterval">auto</option>
+        <option name="underLabel">detected in the last hour</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| set diff [| tstats values(host) AS host WHERE earliest=-24h [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] | mvexpand host limit=0 | fields host | fields - _*] [| inputlookup auditd_hosts | fields host | fields - _*] | search NOT [|inputlookup auditd_decommissioned_hosts] | lookup auditd_hosts host OUTPUT host AS host2 | eval status=if(isnull(host2),"new","missing") | table host status</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>host?form.host=$row.host$</link>
+        </drilldown>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <search>
+          <query>| tstats count WHERE [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] BY _time span=1h | predict count as prediction upper95=upper lower95=lower future_timespan=0 | rename upper(prediction) as upper | rename lower(prediction) as lower | eval range=upper-lower | eval difference=case(count&gt;lower AND count&lt;upper, 0, count&lt;lower, round((count-lower)/range,1), count&gt;upper, round((count-upper)/range,1)) | search difference&gt;=1 OR difference&lt;=-1 | table _time difference | sort -_time</query>
+          <earliest>-7d@h</earliest>
+          <latest>@h</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>search?earliest=$row._time$&amp;q=search [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes]</link>
+        </drilldown>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <search>
+          <query>| pivot Auditd AVC values(tcontext_type) AS tcontext_type SPLITROW _time PERIOD hour SPLITROW scontext_domain | mvexpand tcontext_type | eventstats count by scontext_domain, tcontext_type | where count==1 | sort -_time | table scontext_domain tcontext_type</query>
+          <earliest>-72h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>search?earliest=-72h&amp;q=`avc_table(*,$row.scontext_domain$)` | search tcontext_type=$row.tcontext_type$</link>
+        </drilldown>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <search>
+          <query>| pivot Auditd Auditd count(Auditd) as count FILTER severity in (critical, high) SPLITROW host SPLITROW type | fields - count</query>
+          <earliest>-72h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>search?earliest=-72h@h&amp;q=search [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] host=$row.host$ type=$row.type$</link>
+        </drilldown>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

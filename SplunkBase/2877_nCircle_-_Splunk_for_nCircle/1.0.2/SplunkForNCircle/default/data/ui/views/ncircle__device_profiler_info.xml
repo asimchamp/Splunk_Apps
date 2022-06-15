@@ -1,0 +1,14 @@
+<dashboard>
+  <label>nCircle - Device Profiler Info</label>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>earliest=-7d `vuln_index` `vuln_splunk_server` `vuln_sourcetype` source=*getDpStats.py | eval lastHeartbeat = strftime(lastHeartbeat, "%Y-%m-%d") | eval name=upper(name) | eval rebootCompleted = if(rebootCompleted == 0, "-", strftime(rebootCompleted , "%Y-%m-%d")) | eval rebootIssued = strftime(rebootIssued , "%Y-%m-%d") | eval rebootSuccess = if(rebootSuccess == 0,"-",strftime(rebootSuccess , "%Y-%m-%d")) | dedup name, IPAddress, id, rebootCompleted, rebootResult, rebootSuccess | table name, IPAddress, id, rebootCompleted, rebootResult, rebootSuccess | sort name</query>
+          <earliest>-30m@m</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</dashboard>

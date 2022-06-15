@@ -1,0 +1,141 @@
+<form script="cubism_wrap.js, dashboard.js, tabs.js, d3.v2.min.js" stylesheet="dashboard.css, tabs.js">
+  <label>GigaSMART</label>
+  <search id="base_stats">
+    <query>index=_internal | head 1</query>
+    <earliest>$time_range.earliest$</earliest>
+    <latest>$time_range.latest$</latest>
+  </search>
+  <search id="lookup_gigasmart">
+    <query>|inputlookup giga_smart | search clusterId=$clusterId$ alias=$alias$</query>
+  </search>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="dropdown" token="clusterId">
+      <label>Cluster</label>
+      <search>
+        <query>|inputlookup giga_smart | stats count by clusterId</query>
+      </search>
+      <fieldForLabel>clusterId</fieldForLabel>
+      <fieldForValue>clusterId</fieldForValue>
+    </input>
+    <input type="dropdown" token="alias" searchWhenChanged="true">
+      <label>Engine</label>
+      <search>
+        <query>|inputlookup giga_smart |search clusterId=$clusterId$| stats count by alias</query>
+      </search>
+      <fieldForLabel>alias</fieldForLabel>
+      <fieldForValue>alias</fieldForValue>
+    </input>
+    <input type="time" token="time_range">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row id="tabs">
+    <panel>
+      <html>
+	      <ul id="tabs" class="nav nav-tabs">
+            <li class="active">
+              <a href="#" class="toggle-tab" data-toggle="tab" data-elements="admin,parameters">Administrative</a>
+            </li>
+            <li>
+              <a href="#" class="toggle-tab" data-toggle="tab" data-elements="gigasmartstats">gsGroup Statistics</a>
+            </li>
+            <li>
+              <a href="#" class="toggle-tab" data-toggle="tab" data-elements="gigasmartstatsgsop">gsop Statistics</a>
+            </li>
+		   </ul>
+	      </html>
+    </panel>
+  </row>
+  <row id="admin">
+    <panel>
+      <single>
+        <title>Last Check</title>
+        <search base="lookup_gigasmart">
+          <query>fields timestamp</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>GigaSMART Engine Attributes</title>
+        <search base="lookup_gigasmart">
+          <query>fields alias gsop_alias ports params gsop_gsApps |fields - _key| transpose | rename column as "Key" "row 1" as Value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <drilldown>
+          <link><![CDATA[
+            	/app/GigamonForSplunk/Single_Port?form.time_range.earliest=-24h%40h&form.time_range.latest=now&earliest=0&latest=&form.clusterId=$clusterId$&form.portId=$click.value2$
+				]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row id="parameters">
+    <panel>
+      <table>
+        <title>GigaSMART Parameters</title>
+        <search base="lookup_gigasmart">
+          <query>mvexpand params_attr | eval p=split(params_attr,":")|eval parameter = mvindex(p,0) | eval option = mvindex(p,1) | eval value = mvindex(p,2) | fields parameter option value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>GigaSMART Operation Apps</title>
+        <search base="lookup_gigasmart">
+          <query>mvexpand gsop_gsApps_attr | eval p=split(gsop_gsApps_attr,":")|eval parameter = mvindex(p,0) | eval option = mvindex(p,1) | eval value = mvindex(p,2) | fields parameter option value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <search id="cubism_gsgroup">
+    <query>`giga_cubism_stats_gsgroup($clusterId$,$alias$)`| search NOT item="mtime" | eval item = replace(item,"$alias$_","")</query>
+    <earliest>$time_range.earliest$</earliest>
+    <latest>$time_range.latest$</latest>
+  </search>
+  <row id="gigasmartstats">
+    <panel>
+      <html>
+          <div class="cubism" data-managerid="cubism_gsgroup">
+            </div>
+            
+        </html>
+    </panel>
+  </row>
+  <search id="cubism_gsop">
+    <query>`giga_cubism_stats_gsop($clusterId$,$alias$)`| search NOT item="mtime" | eval item = replace(item,"$alias$_","")</query>
+    <earliest>$time_range.earliest$</earliest>
+    <latest>$time_range.latest$</latest>
+  </search>
+  <row id="gigasmartstatsgsop">
+    <panel>
+      <html>
+          <div class="cubism" data-managerid="cubism_gsop">
+            </div>
+            
+        </html>
+    </panel>
+  </row>
+</form>

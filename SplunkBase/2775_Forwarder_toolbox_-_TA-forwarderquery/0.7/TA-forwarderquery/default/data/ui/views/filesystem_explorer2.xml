@@ -1,0 +1,71 @@
+<form>
+  <!--  script="table_icons_rangemap2.js" stylesheet="table_decorations2.css" -->
+  <label>Filesystem explorer2</label>
+  <init>
+    <set token="path">/services/admin/file-explorer/</set>
+    <set token="root">/services/admin/file-explorer/</set>
+    <set token="prittypath">/services/admin/file-explorer/</set>
+    <set token="parentpath">/services/admin/file-explorer/</set>
+  </init>
+  <fieldset autoRun="false" submitButton="true">
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>host</label>
+      <search>
+        <query>| metadata type=hosts index=_internal</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+    <input type="dropdown" token="stanza">
+      <label>Password set</label>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>| rest splunk_server=local /servicesNS/nobody/TA-forwarderquery/properties/forwarderquery/  | search title!=mystanza</query>
+      </search>
+      <initialValue>default</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        you are here: <b>$prittypath$</b> <!-- parent: $parentpath$ path: $path$ -->
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Browse - click to navigate to path ( &lt; for back one step, / for root, + for opening a folder )</title>
+      <table>
+        <search>
+          <query>| gentimes start=-1 | eval alternate="$root$" | eval name=" / (navigate back to root) " | eval nav="/" | eval fullpath="/" | eval path="/"  
+| append [
+| gentimes start=-1 | eval alternate="$parentpath$" | eval name="$prittypath$  / (navigate one back) " | eval nav="&lt;" 
+]
+| append [
+|forwarderquery server="$host$" api="$path$" stanza="$stanza$" contenttype=json2 | eval fileSize=if(hasSubNodes="True", "(folder)", fileSize+" kb")   
+| eval alternate=if(hasSubNodes="True", alternate, "$path$")
+| eval nav=if(hasSubNodes="True","+","")
+]
+| table nav,name,fileSize,lastModifiedTime,alternate,fullpath | sort nav DESC</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["nav","name","fileSize","lastModifiedTime"]</fields>
+        <drilldown>
+          <set token="parentpath">$path$</set>
+          <set token="path">$row.alternate$</set>
+          <set token="form.path">$path$</set>
+          <set token="prittypath">$row.fullpath$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,125 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsMergeContexts</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsMergeContexts</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Merges two contexts into a new context.  The contexts must have the same number and name of concepts and be of the same context type.  The merge occurs in a weighted fashion, meaning the number of events that contributed to each context is taken into account when deciding how to create the new context.  If the context type is 'average_centered', the avg and stdev are weighted.  If the context type is 'domain', the min and max are weighted.  If the weight of both contexts are 0, then they are of equal weight and the new context count is set to 0.  If only one context is set to 0, the contexts will be of equal weight and the new context count will be set to 0.  </span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsMergeContexts contextA [IN containerA] [BY classA] [SCOPED scopeA] and contextB [IN containerB] [BY classB] [SCOPED scopeB] into contextC [IN containerC] [BY classC] [SCOPED scopeC]</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">| xsMergeContexts lastWeekTxn AND thisWeekTxn INTO weeklyTxn in app</span>
+      </p>
+      <p>
+        <span class="explanation">Merges the lastWeekTxn context and thisweekTxn context into weeklyTxn in the current app</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext">contextA, contextB, contextC, containerA, containerB, containerC, classA, classB, classC, scopeA, scopeB, scopeC</span>
+      </p>
+      <p>
+        <span class="para">contextA</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the first context to merge.</span>
+      </p>
+      <p>
+        <span class="para">contextB</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the second context to merge.</span>
+      </p>
+      <p>
+        <span class="para">contextC</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the merged context.</span>
+      </p>
+      <p>
+        <span class="para">containerA</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the container that contains the first context to merge.</span>
+      </p>
+      <p>
+        <span class="para">containerB</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the container that contains the second context to merge.</span>
+      </p>
+      <p>
+        <span class="para">containerC</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the container that containes the merged context.</span>
+      </p>
+      <p>
+        <span class="para">classA</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the class for the first context to merge.</span>
+      </p>
+      <p>
+        <span class="para">classB</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the class for the second context to merge.</span>
+      </p>
+      <p>
+        <span class="para">classC</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the class for the merged Context.</span>
+      </p>
+      <p>
+        <span class="para">scopeA</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the container for the first context is stored.</span>
+      </p>
+      <p>
+        <span class="para">scopeB</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the container for the second context is stored.</span>
+      </p>
+      <p>
+        <span class="para">scopeC</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the container for the merged context is stored.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The context is merged. See <a href="xsUpdateContext">xsUpdateContext</a> for details about updating a context. </span>
+      </p>
+      <br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150816.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

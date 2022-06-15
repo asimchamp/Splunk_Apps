@@ -1,0 +1,284 @@
+<dashboard>
+  <label>Geospatial Visualization</label>
+  <description>Choropleth maps to visualize how a metric varies across a (custom) geographic area</description>
+  <row>
+    <panel>
+      <html>
+      <p>In Splunk 6.3 we introduce an additional powerful geospatial mapping visualization: <strong>Choropleth Maps</strong>!</p>
+      <p>You can use choropleth maps to map a numeric or string based field across a geographic region. This allows you to spot patterns and quickly get a sense of the spatial fingerprint for your data. </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Builtin Polygon Definitions</h2>
+        We were looking for the most widely used definitions that describe the boundaries of the colored polygons. Splunk 6.3 comes with two polygon definitions right out of the box: 
+        <ol>
+          <li>
+            <strong>Countries of the world:</strong> a map that is based on the latest political boundaries.</li>
+          <li>
+            <strong>50 States of the US</strong> (and Washington D.C.)</li>
+        </ol>
+      </html>
+    </panel>
+    <panel>
+      <map>
+        <title>Countries of the World</title>
+        <search>
+          <query>| inputlookup geo_attr_countries | fields country, region_un | geom geo_countries featureIdField=country</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">5</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(34.89,-4.92)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">1</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+    <panel>
+      <map>
+        <title>50 States of the US</title>
+        <search>
+          <query>| inputlookup states_pop_density.csv |  fields state, region | geom geo_us_states featureIdField=state</query>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">5</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(37.72,-95.8)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">3</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Custom Polygon Definitions</h2>
+      <p>If the two builtin polygon definitions don't match your needs, you can define and upload your own! We support the widely used KMZ 
+        format. For example, the map on the right shows a map of San Francisco, broken down by neighborhoods. The KMZ was found on and downloaded from an official
+          City of San Francisco website. </p>
+        <h2>Point-In-Polygon lookups</h2>
+        <p>One of the great features in the context of geospatial visualizations is the point-in-polygon lookup. This allows you to map any latitude/longitude combination to one of your polygons, as defined
+          in the polygon definition. This works well with the choropleth maps, but you can even use it to drive standard charts, such as bar charts (see chart on the very right).</p>
+
+      </html>
+    </panel>
+    <panel>
+      <map>
+        <title>Median Price of a 2 bedroom apartment in the City of San Francisco ($)</title>
+        <search>
+          <query>| inputlookup craigslist_housing | lookup geo_sf_neighborhoods latitude AS location.lat, longitude AS location.long OUTPUT featureId AS neighborhood | stats median(price) by neighborhood | geom geo_sf_neighborhoods featureIdField=neighborhood</query>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">6</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(37.75,-122.41)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">11</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.tileLayer.url">http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="mapping.tileLayer.attribution">&amp;copy; &lt;a href="http://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors, &amp;copy; &lt;a href="http://cartodb.com/attributions"&gt;CartoDB&lt;/a&gt;</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top 13 neighborhoods</title>
+        <search>
+          <query>| inputlookup craigslist_housing | lookup geo_sf_neighborhoods latitude AS location.lat, longitude AS location.long OUTPUT featureId AS neighborhood | stats median(price) as median_price by neighborhood | search median_price &gt; 4200 | sort -median_price</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="height">400px</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Color Modes</h2>
+        <p>Not all maps are created equal. Depending on the use case, you will want to use one of three color modes:</p>
+        <ol>
+          <li>
+            <strong>Sequential:</strong> One color, different shades. Choose this to show the distribution of a variable across a geographic region.</li>
+          <li>
+            <strong>Divergent</strong> Two colors, different shades, converging at a white neutral point. Choose this to show how much a variable is above or below a neutral point.</li>
+          <li>
+            <strong>Categorical</strong> Different colors, one per category. Choose this to color areas of your maps according to different distinct values.</li>
+        </ol>
+
+        
+      </html>
+    </panel>
+    <panel>
+      <title>Sequential Color Mode</title>
+      <map>
+        <title>Median Price of a 2 bedroom apartment in the City of San Francisco ($)</title>
+        <search>
+          <query>| inputlookup craigslist_housing | lookup geo_sf_neighborhoods latitude AS location.lat, longitude AS location.long OUTPUT featureId AS neighborhood | stats median(price) by neighborhood | geom geo_sf_neighborhoods featureIdField=neighborhood</query>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">6</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(37.75,-122.41)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">11</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.tileLayer.url">http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="mapping.tileLayer.attribution">&amp;copy; &lt;a href="http://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors, &amp;copy; &lt;a href="http://cartodb.com/attributions"&gt;CartoDB&lt;/a&gt;</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+    <panel>
+      <title>Divergent Color Mode</title>
+      <map>
+        <title>Median Price of a 2 bedroom apartment in the City of San Francisco ($)</title>
+        <search>
+          <query>| inputlookup craigslist_housing | lookup geo_sf_neighborhoods latitude AS location.lat, longitude AS location.long OUTPUT featureId AS neighborhood | stats median(price) by neighborhood | geom geo_sf_neighborhoods featureIdField=neighborhood</query>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">9</option>
+        <option name="mapping.choroplethLayer.colorMode">divergent</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">3750</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(37.75,-122.41)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">11</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.tileLayer.url">http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="mapping.tileLayer.attribution">&amp;copy; &lt;a href="http://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors, &amp;copy; &lt;a href="http://cartodb.com/attributions"&gt;CartoDB&lt;/a&gt;</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+    <panel>
+      <title>Categorical Color Mode</title>
+      <map>
+        <title>Median Price of a 2 bedroom apartment in the City of San Francisco ($)</title>
+        <search>
+          <query>| inputlookup craigslist_housing | lookup geo_sf_neighborhoods latitude AS location.lat, longitude AS location.long OUTPUT featureId AS neighborhood | stats median(price) as price by neighborhood | rangemap field=price "1. low"=0-2000 "2. medium"=2001-3500 "3. high"=3501-5000 "4. very high"=5001-20000 | fields neighborhood, range | sort range  | geom geo_sf_neighborhoods featureIdField=neighborhood</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">6</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(37.75,-122.41)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">11</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.tileLayer.url">http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="mapping.tileLayer.attribution">&amp;copy; &lt;a href="http://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors, &amp;copy; &lt;a href="http://cartodb.com/attributions"&gt;CartoDB&lt;/a&gt;</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,210 @@
+<form>
+  <label>nCircle - Scan Detail</label>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="tkAudit" searchWhenChanged="false">
+      <label>Choose scan:</label>
+      <search>
+        <query>`vuln_search_detail` | fields audit | dedup audit | table audit | sort - audit</query>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>lblAudit</fieldForLabel>
+      <fieldForValue>audit</fieldForValue>
+    </input>
+  </fieldset>
+  <searchTemplate>
+    <![CDATA[earliest=-30d `vuln_search_detail` audit=$tkAudit$ ]]>
+  </searchTemplate>
+  <row>
+    <panel>
+      <single>
+        <title>Number of scanned hosts</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | stats dc(hostDetail.ipAddress)</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Score per scan</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | stats sum(score) as "Total Score" by audit | fields - audit</query>
+          <earliest>-30m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Score by OS Distribution</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | stats sum(score) by osDetail.name</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Port Distribution</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | eval protocol=lower(protocol) | eval service=protocol+"/"+port | top useother=true service</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Score per Hosts</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | stats sum(score) as "Total Score per Host" by hostDetail.ipAddress | sort - "Total Score per Host"</query>
+          <earliest>-30m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown>
+          <link>/app/SplunkForNCircle/ncircle__host_detail?form.tkHost=$click.value$</link>
+        </drilldown>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-90</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">1</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Scanned hosts - Detail</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | table hostDetail.ipAddress, hostDetail.name, hostDetail.ifaceMacAddress, hostDetail.netbiosName, osDetail.name, audit | dedup hostDetail.ipAddress, hostDetail.name, hostDetail.ifaceMacAddress, hostDetail.netbiosName, osDetail.name, audit | sort hostDetail.ipAddress</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown>
+          <link>/app/SplunkForNCircle/ncircle__host_detail?form.tkHost=$row.hostDetail.ipAddress$</link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>List of All identified vulnerabilities by Scan</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | rex field=VulnDetail.description "DESCRIPTION:(?&lt;Issue&gt;.*):SOLUTION" | rex field=VulnDetail.description "SOLUTION:(?&lt;Solution&gt;.*)" | stats count by VulnDetail.name,score,Issue,Solution | sort -score,- count</query>
+          <earliest>-30m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown>
+          <link>/app/SplunkForNCircle/ncircle__vulnerability_detail?form.tkVuln=$row.VulnDetail.name$</link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Hosts Vulnerabilities</title>
+        <search>
+          <query>earliest=-30d `vuln_search_detail` audit=$tkAudit$ | eval vuln="Score: "+score+", "+'VulnDetail.name' | stats count by hostDetail.ipAddress,vuln | sort hostDetail.ipAddress, -vuln  | stats values(vuln) by hostDetail.ipAddress | sort hostDetail.ipAddress</query>
+        </search>
+        <drilldown>
+          <link>/app/SplunkForNCircle/ncircle__host_detail?form.tkHost=$row.hostDetail.ipAddress$</link>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

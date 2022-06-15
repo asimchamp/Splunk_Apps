@@ -1,0 +1,42 @@
+<dashboard version="1.1" script="setup_dashboard.js">
+  <label>XtremIO Configuration</label>
+  <row>
+    <panel>
+      <html>
+        <div>
+          <div id="whitescreen" style="position: relative;">
+            <b>
+              <p id="loading" style="position: absolute;top: 50%;left: 50%;color:#32CD32;"/>
+            </b>
+          </div>
+          <div id="error_output" style="color: rgba(255, 0, 0, 1);display: none;"/>
+          <fieldset submitButton="true">
+            <label>Host
+              <span class="required">*</span>
+            </label>
+            <input type="text" id="host" token="host">
+            </input>
+            <label>Username
+              <span class="required">*</span>
+            </label>
+            <input type="text" id="username" token="username">
+            </input>
+            <label>Password
+              <span class="required">*</span>
+            </label>
+            <input type="password" id="pswd" token="pswd">
+            </input>
+            <label>Confirm password
+              <span class="required">*</span>
+            </label>
+            <input type="password" id="cpswd" token="cpswd">
+            </input>
+          </fieldset>
+        </div>
+        <div id="submit_button_container">
+          <button type="button" class="btn btn-primary" id="submit_button">Save</button>
+        </div>
+      </html>
+    </panel>
+  </row>
+</dashboard>

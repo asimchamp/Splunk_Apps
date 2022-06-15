@@ -1,0 +1,132 @@
+<div id="header">
+
+<h1>Cisco AnyConnect Network Visibility Module (NVM) App for Splunk</h1>
+
+</div>
+
+
+
+<br>
+
+<h2>Installation Guide</h2>
+
+
+
+
+
+<a href="#gettingstarted">Getting Started</a><br />
+
+<a href="#collectorinstall">Collector Install</a><br />
+
+<a href="#configurationoptions">Configuration Options</a><br />
+
+<a href="#collectorenhancements">Collector Enhancments</a><br />
+
+<a href="#docker">Docker Installation</a><br />
+
+<a href="#savedsearches">Search Frequency and Cron Configuration</a><br />
+
+<br>
+
+
+<a name="gettingstarted"></a>
+
+<h2>Getting started</h2>
+
+<p>
+    Cisco AnyConnect Network Visibility Module (NVM) App for Splunk is comprised of three components:
+
+    <ul>
+        <li>The <a href="https://splunkbase.splunk.com/app/2992/">Splunk App</a> with pre-designed Dashboards to visualize and view the data.</li>
+        <li>The <a href="https://splunkbase.splunk.com/app/4221/">Splunk Add-on</a> which provides data indexing and formatting inside Splunk Enterprise.</li>
+        <li>The NVM Collector Component which is responsible for collecting and translating all IPFIX (<a href="http:////blogs.cisco.com/security/an-introduction-to-the-new-cisco-network-visibility-flow-protocol-nvzFlow">nvzFlow</a>) data from the endpoints and forwarding it to the Splunk Add-on.</br>This is a manually installed component that runs on 64-bit Linux.</li>
+    </ul>
+</p>
+
+<br />
+
+
+<br>
+
+
+<a name="collectorinstall"></a>
+
+
+<h2>Collector Install</h2>
+
+<p>The collector runs on 64-bit Linux. For compatibility with other platforms, please see Docker Installation section below. CentOS and Ubuntu configuration scripts are included.  The CentOS install scripts and configuration files can also be used in Fedora and Redhat distributions as well.<br>The collector should be run on either a standalone 64-bit Linux system or on a 64-bit <a href="http:////docs.splunk.com/Splexicon:Forwarder"><i>Splunk Forwarder</i></a>.
+
+<p>The collector is packaged with the Cisco NVM Technology Add-On for Splunk. In order to install the collector you will need to copy the application in the <b>acnvmcollector.zip</b> file from, located in the <b>$APP_DIR$/appserver/addon/</b> directory to the system you plan to install it on.
+
+<br />Extract the tar file on the system where you plan to install the collector on and execute the install.sh script with super user privileges.  It is recommended to read the $PLATFORM$_README file in the .zip bundle before executing the install.sh script.  The $PLATFORM$_README file provides information on the relevant configuration settings that need to be verified and modified (if necessary) before the install.sh script is executed.  Failing to do so can cause the collector to not function accordingly.</p>
+
+<p>A collector can handle a minimum of 5000 flows per second on a properly sized system.</p>
+
+
+<br />
+
+
+<a name="configurationoptions"></a>
+
+<h2>Configuration Options</h2>
+
+<p>The collector needs to be configured and running before the Splunk App can be used.  By default, the collector receives flows from AnyConnect NVM endpoints on UDP port 2055.
+
+<br />Additionally, the collector produces three data feeds for Splunk, <i>Per Flow Data</i>, <i>Endpoint Identity Data</i> and <i>Endpoint Interface Data</i>, on UDP ports 20519, 20520 and 20521 respectively.</p>
+
+<p>Both the <i>receive</i> and <i>data feed</i> ports can be changed by altering the acnvm.conf file and restarting the collector instance.
+
+<br />Make sure that any network firewalls between endpoints and the collector or between the collector and Splunk system(s) are open for the configured UDP ports.
+
+<br />Also ensure that your AnyConnect NVM configuration matches your collector configuration.  Refer to the <a href="http:////www.cisco.com/c/en/us/support/security/anyconnect-secure-mobility-client/products-installation-and-configuration-guides-list.html">AnyConnect Administration Guide</a> for more information.</p>
+
+<p>
+    The Splunk App is NOT configured by default to receive data, however the inputs.conf file contains an example of three data feeds that are disabled, <i>Per Flow Data</i>, <i>Endpoint Identity Data</i> and <i>Endpoint Interface Data</i>, on UDP ports 20519, 20520 and 20521 respectively.
+
+    <br />To enabled these feeds change the settings inputs.conf file to remove the commented out default connections.
+</p>
+
+
+<br />
+
+<a name="#collectorenhancements"></a>
+
+<h2>Collector Enhancements</h2>
+
+<p>
+In addition to Ubuntu and CentOS install scripts, we have added Docker support so you can run the NVM Collector in a Docker Container. <br /> We�ve also added the ability to tune the multi-core behavior of the NVM Collector as well as include/exclude filtering capability � refer to the collector configuration help file in the Splunk App dashboard for more information.  <br /><br />The NVM Collector daemon now runs under a low rights user and group (acnvm) instead of a root process.  <br /><br />Finally, there is an SDK so that you can write your own streaming format.  In addition to the built-in syslog format, we include an Apache Kafka C++ sample plugin to get you started. <br />If you have any questions or suggestions you can contact us at nvzFlow@cisco.com.   
+</p>
+
+<br />
+
+
+<a name="docker"></a>
+
+<h2>Docker Installation</h2>
+
+<p>CiscoNVMCollector_TA.zip includes a Dockerfile that can be used to build a Docker image for the collector. Before building, first make any configuration adjustments (as needed) to acnvm.conf.
+
+</p>
+
+
+
+<p>
+
+Build docker image from the directory containing Dockerfile: <br>
+
+<i>docker build -t nvmcollector .</i>
+
+</p>
+
+
+
+<p>
+
+Parameters for running the docker image depends on your acnvm.conf file. For the default config where collector listens on port 2055 and the syslog server is on the same host: <br>
+
+<i>docker run -t -p 2055:2055/udp --net="host" nvmcollector</i>
+
+</p>
+
+
+

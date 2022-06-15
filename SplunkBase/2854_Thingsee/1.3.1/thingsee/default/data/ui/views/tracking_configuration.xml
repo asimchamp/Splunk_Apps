@@ -1,0 +1,193 @@
+<dashboard>
+  <label>Tracking Configuration</label>
+  <row>
+    <panel>
+      <title>Description</title>
+      <html>
+        <p>You can use this use case to track the location of Thingsee devices.</p>
+        <p>The dashboard shows you the location history on a map and also as a table. The start and end time are displayed
+        the average speed.
+        The app also calculates the distance between the measure points and showes the total distance for the selected timerange.</p>
+        <p>Metrics used in dashboard:</p>
+	<ul>
+	  <li>Location</li>
+	  <li>Accuracy</li>
+	  <li>Altitude</li>
+        </ul>
+        <em>Note:</em>The app uses the haversine formula for calculating distances between two coordinates.
+        An implementation of the formula has to be installed. See instructions.
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Instructions</title>
+      <html>
+        <ol>
+          <li>Install haversine app https://splunkbase.splunk.com/app/936</li>
+          <li>Deploy Tracking profile.jsn below. Adjust <em>host</em> element to reflect your Splunk server</li>
+        </ol>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Example profile.jsn</title>
+      <html>
+        <pre>
+        <code>
+{
+  "pId": "1",
+  "apiVersion": "00.18",
+  "initPuId": 1,
+  "purposes": [
+    {
+      "puId": 1,
+      "name": "Tracking",
+      "initStId": 0,
+      "states": [
+        {
+          "stId": 0,
+          "name": "Collecting Data",
+          "events": [
+            {
+              "evId": 0,
+              "name": "Location",
+              "actions": {
+                "cloud": {
+                  "sendEvent": true,
+                  "host": "mysplunkserver.com",
+                  "port": 8079
+                }
+              },
+              "causes": [
+                {
+                  "sId": "0x00010100",
+                  "threshold": {
+                    "count": 1
+                  },
+                  "measurement": {
+                    "log": false,
+                    "interval": 10000
+                  },
+                  "thresholds": {
+                    "isAny": true
+                  }
+                },
+                {
+                  "sId": "0x00010200",
+                  "threshold": {
+                    "count": 1
+                  },
+                  "measurement": {
+                    "log": false,
+                    "interval": 10000
+                  },
+                  "thresholds": {
+                    "isAny": true
+                  }
+                }
+              ]
+            },
+            {
+              "evId": 2,
+              "name": "Speed",
+              "actions": {
+                "cloud": {
+                  "sendEvent": true,
+                  "host": "mysplunkserver.com",
+                  "port": 8079
+                }
+              },
+              "causes": []
+            },
+            {
+              "evId": 3,
+              "name": "Accuracy",
+              "actions": {
+                "cloud": {
+                  "sendEvent": true,
+                  "host": "mysplunkserver.com",
+                  "port": 8079
+                }
+              },
+              "causes": [
+                {
+                  "sId": "0x00010400",
+                  "threshold": {
+                    "count": 1
+                  },
+                  "measurement": {
+                    "log": false,
+                    "interval": 10000
+                  },
+                  "thresholds": {
+                    "isAny": true
+                  }
+                }
+              ]
+            },
+            {
+              "evId": 4,
+              "name": "Altitude",
+              "actions": {
+                "cloud": {
+                  "sendEvent": true,
+                  "host": "mysplunkserver.com",
+                  "port": 8079
+                }
+              },
+              "causes": [
+                {
+                  "sId": "0x00010300",
+                  "threshold": {
+                    "count": 1
+                  },
+                  "measurement": {
+                    "log": false,
+                    "interval": 10000
+                  },
+                  "thresholds": {
+                    "isAny": true
+                  }
+                }
+              ]
+            },
+            {
+              "evId": 5,
+              "name": "Battery Level",
+              "actions": {
+                "cloud": {
+                  "sendEvent": true,
+                  "host": "mysplunkserver.com",
+                  "port": 8079
+                }
+              },
+              "causes": [
+                {
+                  "sId": "0x00030200",
+                  "threshold": {
+                    "count": 1
+                  },
+                  "measurement": {
+                    "log": false,
+                    "interval": 3600000
+                  },
+                  "thresholds": {
+                    "isAny": true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+        </code>
+        </pre>
+      </html>
+    </panel>
+  </row>
+</dashboard>

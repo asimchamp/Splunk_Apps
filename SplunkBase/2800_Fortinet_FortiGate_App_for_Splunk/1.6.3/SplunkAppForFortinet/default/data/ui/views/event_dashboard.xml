@@ -1,0 +1,343 @@
+<form version="1.1">
+  <label>Event Dashboard</label>
+  <description></description>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true" token="time_token">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="devname">
+      <label>Device</label>
+      <choice value="*">ANY</choice>
+      <default>*</default>
+      <prefix>log.devname="</prefix>
+      <suffix>"</suffix>
+      <search>
+        <query>|`_ftnt_dropdown(log.system_event.system, log.devname)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+    </input>
+    <input type="dropdown" token="vdom">
+      <label>Virtual Domain</label>
+      <prefix>log.vd="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">ANY</choice>
+      <search>
+        <query>| `_ftnt_dropdown(log.system_event.system, log.vd)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="subtype">
+      <label>Subtype</label>
+      <prefix>(log.subtype="</prefix>
+      <suffix>" )</suffix>
+      <default>*</default>
+      <choice value="*">ANY</choice>
+      <choice value="system">SYSTEM</choice>
+      <choice value="router">ROUTER</choice>
+      <choice value="wad">WAD</choice>
+      <choice value="ha">HA</choice>
+    </input>
+    <input type="dropdown" token="level" searchWhenChanged="true">
+      <label>Level</label>
+      <prefix>log.system_event.system.level="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">ANY</choice>
+      <choice value="critical">CRITICAL</choice>
+      <choice value="error">ERROR</choice>
+      <choice value="information">INFORMATION</choice>
+      <choice value="notice">NOTICE</choice>
+      <choice value="warning">WARNING</choice>
+      <choice value="emergency">EMERGENCY</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="action">
+      <label>Action</label>
+      <choice value="*">ANY</choice>
+      <default>*</default>
+      <prefix>log.vendor_action="</prefix>
+      <suffix>"</suffix>
+      <search>
+        <query>| `_ftnt_dropdown(log.system_event.system, log.vendor_action)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Events</title>
+      <chart>
+        <search>
+          <query>|tstats summariesonly=true count FROM datamodel=ftnt_fos WHERE nodename="log.system_event.system" $subtype$ $level$ $vdom$ $devname$  $action$ groupby _time | timechart values(count)</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">System Events Count</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Notable Events</title>
+      <chart>
+        <search>
+          <query>|tstats summariesonly=true count AS Count FROM datamodel=ftnt_fos WHERE nodename="log.system_event.system" $subtype$ $vdom$ $devname$   (log.system_event.system.level=warning OR log.system_event.system.level=emergency OR log.system_event.system.level=critical) groupby log.vendor_action |  sort -Count</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                /app/SplunkAppForFortinet/search?q=`fortigate_system` (level=warning OR level=emergency OR level=critical) vendor_action="$click.value$"&earliest=$time_token.earliest$&latest=$time_token.latest$
+			]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Latest Events</title>
+      <table>
+        <search>
+          <query>| tstats summariesonly=true max(_time) AS NTime, values(log.devname) as Device, values(log.vd) as Virtual_Domain, values(log.subtype) as Subtype, values(log.system_event.system.level) as Level, values(log.vendor_action) as Action, values(log.msg) as Message from datamodel="ftnt_fos" where nodename="log.system_event.system" $subtype$ $level$ $vdom$ $devname$  $action$ groupby _time, log.devname, log.vd, log.subtype, log.system_event.system.level, log.vendor_action, log.msg | sort -_time | convert ctime(NTime) as Time | table Time, Device, Virtual_Domain, Subtype, Level, Action, Message | sort -_time</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                /app/SplunkAppForFortinet/search?q=| datamodel "ftnt_fos" "system" search | search (log.devname="$row.devname$" log.vd="$row.vd$" log.subtype="$row.subtype$" log.vendor_action="$row.action$" log.msg="$row.msg$")&earliest=$time_token.earliest$&latest=$time_token.latest$
+			]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>CPU</title>
+        <search>
+          <query>|tstats summariesonly=true last(log.system_event.system.cpu) AS cpus FROM datamodel=ftnt_fos WHERE nodename="log.system_event.system" $devname$ log.vendor_action=perf-stats groupby _time log.devname | timechart  values(cpus) by log.devname</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Memory</title>
+        <search>
+          <query>|tstats summariesonly=true last(log.system_event.system.mem) AS mems FROM datamodel=ftnt_fos WHERE nodename="log.system_event.system"  $devname$  log.vendor_action=perf-stats groupby _time log.devname | timechart  values(mems) by log.devname</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Session Setup Rate</title>
+        <search>
+          <query>|tstats summariesonly=true last(log.system_event.system.setuprate) AS setuprate FROM datamodel=ftnt_fos WHERE nodename="log.system_event.system"  $devname$ log.vendor_action=perf-stats groupby _time log.devname | timechart  values(setuprate) by log.devname</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Concurrent Sessions</title>
+        <search>
+          <query>|tstats summariesonly=true last(log.system_event.system.totalsession) AS totalsession FROM datamodel=ftnt_fos WHERE nodename="log.system_event.system"  $devname$ log.vendor_action=perf-stats groupby _time log.devname | timechart  values(totalsession) by log.devname</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

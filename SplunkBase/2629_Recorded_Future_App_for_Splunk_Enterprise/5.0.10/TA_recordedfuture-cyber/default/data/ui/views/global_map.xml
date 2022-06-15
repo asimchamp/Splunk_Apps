@@ -1,0 +1,406 @@
+<form stylesheet="css/recorded_future_correlation.css">
+  <label>Global Map</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="radio" token="gm_type" searchWhenChanged="true">
+      <label>Select source for IP data:</label>
+      <choice value="rf_ip_risklist">Data from IP risklist</choice>
+      <choice value="live_data">Correlated IP events</choice>
+      <default>Data from IP risklist</default>
+      <change>
+        <condition label="Data from IP risklist">
+          <set token="source_stmt">| inputlookup rf_ip_risklist.csv</set>
+          <set token="source_title">risklist</set>
+        </condition>
+        <condition label="Correlated IP events">
+          <set token="source_stmt">
+            sourcetype=netscreen:firewall earliest=-24h
+  	  | eval Name=dst
+  	  | eval Time=start_time
+  	  | lookup rf_ip_risklist.csv Name OUTPUT Risk, RiskString, EvidenceDetails
+  	  | search Risk != ""
+          </set>
+          <set token="source_title">Correlated IP's</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <init>
+    <set token="domain_updated">...</set>
+    <set token="domain_count">...</set>
+    <set token="ip_updated">...</set>
+    <set token="ip_count">...</set>
+    <set token="hash_updated">...</set>
+    <set token="hash_count">...</set>
+    <set token="url_updated">...</set>
+    <set token="url_count">...</set>
+    <set token="vuln_updated">...</set>
+    <set token="vuln_count">...</set>
+  </init>
+  <search id="core">
+    <query>
+      $source_stmt$
+  	  | eval RiskScore = Risk
+  	  | eval Rule = spath(EvidenceDetails,"EvidenceDetails{}.Rule")
+  	  | eval EvidenceString = spath(EvidenceDetails,"EvidenceDetails{}.EvidenceString")
+  	  | search Risk != ""
+    </query>
+    <earliest>-24h@h</earliest>
+    <latest>now</latest>
+  </search>
+  <row>
+    <panel>
+      <title>IP Threat Map ($source_title$)</title>
+      <map>
+        <search base="core">
+          <query>
+        	  | iplocation Name
+        	  | fields + Name, Risk, lat, lon, City, Country
+        	  | geostats count latfield=lat longfield=lon
+        	 </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="mapping.type">marker</option>
+        <option name="refresh.display">progressbar</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h1>
+          Active Threats
+        </h1>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <search>
+        <query>
+          | inputlookup rf_ip_risklist.csv
+          | stats count 
+          | appendcols [`get_updated_time(rf_ip_risklist)` | fields Time]
+        </query>
+        <done>
+          <condition match=" 'job.resultCount' != 0">
+            <set token="ip_updated">$result.Time$</set>
+            <set token="ip_count">$result.count$</set>
+          </condition>
+          <condition>
+            <set token="ip_updated">NA</set>
+            <set token="ip_count">0</set>
+          </condition>
+        </done>
+      </search>
+      <html>
+          <h1>
+            IP
+        <br/>
+        $ip_count$</h1>
+        <br/>
+        Last updated:<br/>$ip_updated$
+      </html>
+    </panel>
+    <panel>
+      <search>
+        <query>
+          | inputlookup rf_domain_risklist.csv
+          | stats count
+            | appendcols [`get_updated_time(rf_domain_risklist)` | fields Time]
+        </query>
+        <done>
+          <condition match=" 'job.resultCount' != 0">
+            <set token="domain_updated">$result.Time$</set>
+            <set token="domain_count">$result.count$</set>
+          </condition>
+          <condition>
+            <set token="domain_updated">NA</set>
+            <set token="domain_count">0</set>
+          </condition>
+        </done>
+      </search>
+      <html>
+          <h1>
+            Domain
+        <br/>
+        $domain_count$</h1>
+        <br/>
+        Last updated:<br/>$domain_updated$
+      </html>
+    </panel>
+    <panel>
+      <search>
+        <query>
+          | inputlookup rf_hash_risklist.csv
+          | stats count
+            | appendcols [`get_updated_time(rf_hash_risklist)` | fields Time]
+        </query>
+        <done>
+          <condition match=" 'job.resultCount' != 0">
+            <set token="hash_updated">$result.Time$</set>
+            <set token="hash_count">$result.count$</set>
+          </condition>
+          <condition>
+            <set token="hash_updated">NA</set>
+            <set token="hash_count">0</set>
+          </condition>
+        </done>
+      </search>
+      <html>
+          <h1>
+            Hash
+        <br/>
+        $hash_count$</h1>
+        <br/>
+        Last updated:<br/>$hash_updated$
+      </html>
+    </panel>
+    <panel>
+      <search>
+        <query>
+          | inputlookup rf_vulnerability_risklist.csv
+          | stats count
+            | appendcols [`get_updated_time(rf_vulnerability_risklist)` | fields Time]
+        </query>
+        <done>
+          <condition match=" 'job.resultCount' != 0">
+            <set token="vuln_updated">$result.Time$</set>
+            <set token="vuln_count">$result.count$</set>
+          </condition>
+          <condition>
+            <set token="vuln_updated">NA</set>
+            <set token="vuln_count">0</set>
+          </condition>
+        </done>
+      </search>
+      <html>
+          <h1>
+            Vulnerability
+        <br/>
+        $vuln_count$</h1>
+        <br/>
+        Last updated:<br/>$vuln_updated$
+      </html>
+    </panel>
+    <panel>
+      <search>
+        <query>
+          | inputlookup rf_url_risklist.csv
+          | stats count
+            | appendcols [`get_updated_time(rf_url_risklist)` | fields Time]
+        </query>
+        <done>
+          <condition match=" 'job.resultCount' != 0">
+            <set token="url_updated">$result.Time$</set>
+            <set token="url_count">$result.count$</set>
+          </condition>
+          <condition>
+            <set token="url_updated">NA</set>
+            <set token="url_count">0</set>
+          </condition>
+        </done>
+      </search>
+      <html>
+          <h1>
+            URL
+        <br/>
+        $url_count$</h1>
+        <br/>
+        Last updated:<br/>$url_updated$
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Countries ($source_title$)</title>
+      <chart>
+        <search base='core'>
+          <query>
+        	  | iplocation Name
+        	  | top Country
+          </query>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top IP Rule Hits</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup rf_ip_risklist.csv
+            | search Risk>80 
+            | eval ed=spath(EvidenceDetails, "EvidenceDetails{}") 
+            | mvexpand ed | spath input=ed 
+            | eval combined=Criticality.",".Rule 
+            | stats count by combined 
+            | sort -count 
+            | eval cr=split(combined,",") 
+            | eval Criticality=mvindex(cr,0), Rule=mvindex(cr,1) 
+            | rename count TO Count 
+            | head 10 
+            | table Rule, Count, Criticality
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <format type="color" field="Criticality">
+          <colorPalette type="map">{
+              "2":#FFCE00,
+              "3":#FF6B00,
+              "4":#CF0A2C,
+              "5":#CF0A2C,
+              "6":#CF0A2C
+            }
+          </colorPalette>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Top Domain Rule Hits</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup rf_domain_risklist.csv
+            | search Risk>80 
+            | eval ed=spath(EvidenceDetails, "EvidenceDetails{}") 
+            | mvexpand ed | spath input=ed 
+            | eval combined=Criticality.",".Rule 
+            | stats count by combined 
+            | sort -count 
+            | eval cr=split(combined,",") 
+            | eval Criticality=mvindex(cr,0), Rule=mvindex(cr,1) 
+            | rename count TO Count 
+            | head 10 
+            | table Rule, Count, Criticality
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <format type="color" field="Criticality">
+          <colorPalette type="map">{
+              "2":#FFCE00,
+              "3":#FF6B00,
+              "4":#CF0A2C,
+              "5":#CF0A2C,
+              "6":#CF0A2C
+            }
+          </colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Hash Rule Hits</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup rf_hash_risklist.csv
+            | search Risk>70
+            | eval ed=spath(EvidenceDetails, "EvidenceDetails{}") 
+            | mvexpand ed | spath input=ed 
+            | eval combined=Criticality.",".Rule 
+            | stats count by combined 
+            | sort -count 
+            | eval cr=split(combined,",") 
+            | eval Criticality=mvindex(cr,0), Rule=mvindex(cr,1) 
+            | rename count TO Count 
+            | head 10 
+            | table Rule, Count, Criticality
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <format type="color" field="Criticality">
+          <colorPalette type="map">{
+              "2":#FFCE00,
+              "3":#FF6B00,
+              "4":#CF0A2C,
+              "5":#CF0A2C,
+              "6":#CF0A2C
+            }
+          </colorPalette>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Top Vulnerability Rule Hits</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup rf_vulnerability_risklist.csv
+            | search Risk>80 
+            | eval ed=spath(EvidenceDetails, "EvidenceDetails{}") 
+            | mvexpand ed | spath input=ed 
+            | eval combined=Criticality.",".Rule 
+            | stats count by combined 
+            | sort -count 
+            | eval cr=split(combined,",") 
+            | eval Criticality=mvindex(cr,0), Rule=mvindex(cr,1) 
+            | rename count TO Count 
+            | head 10 
+            | table Rule, Count, Criticality
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <format type="color" field="Criticality">
+          <colorPalette type="map">{
+              "2":#FFCE00,
+              "3":#FF6B00,
+              "4":#CF0A2C,
+              "5":#CF0A2C,
+              "6":#CF0A2C
+            }
+          </colorPalette>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <title>Top URL Rule Hits</title>
+      <table>
+        <search>
+          <query>
+            | inputlookup rf_url_risklist.csv
+            | search Risk>80 
+            | eval ed=spath(EvidenceDetails, "EvidenceDetails{}") 
+            | mvexpand ed | spath input=ed 
+            | eval combined=Criticality.",".Rule 
+            | stats count by combined 
+            | sort -count 
+            | eval cr=split(combined,",") 
+            | eval Criticality=mvindex(cr,0), Rule=mvindex(cr,1) 
+            | rename count TO Count 
+            | head 10 
+            | table Rule, Count, Criticality
+          </query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <format type="color" field="Criticality">
+          <colorPalette type="map">{
+              "2":#FFCE00,
+              "3":#FF6B00,
+              "4":#CF0A2C,
+              "5":#CF0A2C,
+              "6":#CF0A2C
+            }
+          </colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

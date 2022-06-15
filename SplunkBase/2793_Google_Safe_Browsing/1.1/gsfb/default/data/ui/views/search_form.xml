@@ -1,0 +1,44 @@
+<form>
+  <label>Search Form</label>
+  <description>Search the designated logs against the Google Safe Browsing API.</description>
+  <fieldset submitButton="true">
+    <input type="text" token="gsfb_search" searchWhenChanged="false">
+      <default>sourcetype="proxy"</default>
+      <label>Initial search</label>
+    </input>
+    <input type="text" token="gsfb_url_field" searchWhenChanged="false">
+      <default>url</default>
+      <label>URL Field</label>
+    </input>
+    <input type="time" token="t_picker">
+      <label>Time picker</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>$gsfb_search$ | search $gsfb_url_field$=* $gsfb_url_field$!="-" | fields $gsfb_url_field$ | `GoogleSafeBrowsing($gsfb_url_field$)` </query>
+          <earliest>$t_picker.earliest$</earliest>
+          <latest>$t_picker.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

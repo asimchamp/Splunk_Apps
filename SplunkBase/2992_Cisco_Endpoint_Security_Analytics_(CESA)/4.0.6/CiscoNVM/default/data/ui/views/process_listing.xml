@@ -1,0 +1,120 @@
+<form version="1.1" showsource="False" stylesheet="acnvm.css,css/common.css">
+  <label>Process Listing</label>
+  <fieldset submitButton="true">
+    <input type="time" token="time">
+      <label></label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <input type="text" token="Application" searchWhenChanged="true">
+        <label>Filter Applications here</label>
+        <initialValue>*</initialValue>
+      </input>
+      <table id="nvmFilterApp">
+        <title id="exampe-title">Select row to drilldown and obtain more information on each Application</title>
+        <search>
+          <query>`nvm_flowdata_index` NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=_softwareupdate AND pap!=nobody AND pap!=_mdnsresponder AND pap!=_lp AND pap!=_locationd AND pap!=root AND pap!=UpdatusUser) AND pn="$Application$" | join udid [| inputlookup unique_endpoints ] | stats count values(osn) as osn by pn | rename pn AS Application, osn AS Platform | fields - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="Application">$row.Application$</set>
+          <!-- If we also set the form.sourcetype the input will get updated too -->
+          <set token="form.Application">$row.Application$</set>
+        </drilldown>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Process Hash Distribution for $Application$</title>
+      <chart id="nvmAppDistribution" depends="$Application$">
+        <title>Select a bar to obtain more information on the Application Hash</title>
+        <search>
+          <query>`nvm_flowdata_index` pn="$Application$" | top 15 ph | rename ph AS "Process Hash", count AS "Flows"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Log Scale</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="ApplicationHash">$row.Process Hash$</set>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Table of Destinations Reached by : $Application$</title>
+      <table id="nvmAppDetinations" depends="$Application$">
+        <title>Select an entry to obtain more information on the Destination</title>
+        <search>
+          <query>`nvm_flowdata_index` pn="$Application$" | eval destination = if(da6 != "", substr(da6,1,4).":".substr(da6,5,4).":".substr(da6,9,4).":".substr(da6,13,4).":".substr(da6,17,4).":".substr(da6,21,4).":".substr(da6,25,4).":".substr(da6,29,4), da) | stats count by dh, destination | rename dh as "Destination Domain", destination as "Destination Address" | fields - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <condition field="Destination Domain">\<link>/app/CiscoNVM/address_info?targetDomain=$row.Destination Domain$</link>
+          </condition>
+          <condition field="Destination Address">
+            <link>/app/CiscoNVM/address_info?targetAddr=$row.Destination Address$</link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="AppDetails" depends="$ApplicationHash$">
+        <title>Details for Application Hash: $ApplicationHash$</title>
+        <search>
+          <query>`nvm_flowdata_index` ph=$ApplicationHash$ | join udid [search `nvm_sysdata_index` earliest=0 | fields + udid, vsn] | stats count by vsn, liuid, pn, pa, ppn, ppa, mnl, mhl  | rename vsn AS "System Name", liuid AS "Logged In User", pn AS "Process Name", pa AS "Process Account", ppn AS "Parent Process Name", ppa AS "Parent Process Account", mnl AS "Module Name List", mhl AS "Module Hash List" | fields - count</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>/app/CiscoNVM/process_info?processName=$ApplicationHash$</link>
+        </drilldown>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

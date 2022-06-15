@@ -1,0 +1,63 @@
+<form>
+  <label>Search Head Scheduled PDF Delivery Errors</label>
+  <fieldset submitButton="false">
+    <input searchWhenChanged="true" token="timepicked" type="time">
+      <label>Time</label>
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+          <input searchWhenChanged="true" token="host" type="dropdown">
+      <label>Splunk Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="host" fieldForValue="host">index=_internal sourcetype=splunk_python | stats count by host | sort host</populatingSearch>
+    </input>
+ <!--   Info not available (yet)
+<input searchWhenChanged="true" token="app" type="dropdown">
+      <label>App</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="app" fieldForValue="app">index="_internal" source="*scheduler.log" run_time=* host=$host$ user="$user$" | fields app | dedup app | table app | sort app</populatingSearch>
+    </input>
+    <input searchWhenChanged="true" token="user" type="dropdown">
+      <label>User</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="user" fieldForValue="user">index="_internal" source="*scheduler.log" run_time=* app="$app$" | fields user | dedup user | table user | sort user</populatingSearch>
+    </input>
+-->
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Scheduled PDF Delivery Errors</title>
+        <searchString>index=_internal sourcetype=splunk_python ERROR sendemail* OR pdfgen_endpoint* host=$host$ | table _time _raw | appendpipe [stats count | eval _raw=if(count=0, "Good news! No errors were found in your selected time range", _raw)] | fields - count</searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+ <!--  <row>
+    <panel>
+      <table>
+        <title>Count of Scheduler Errors and Warnings</title>
+        <searchString>index="_internal" source="*scheduler.log" ERROR OR WARN NOT INFO | rex ".{30}(?&lt;Msg&gt;.+)$"| rex field=savedsearch_id "(?&lt;user&gt;[^;]+);(?&lt;app&gt;[^;]+);(?&lt;savedsearch_name&gt;[^;]+)" | search app="$app$" user="$user$" | stats count by Msg user app savedsearch_name | sort -count | head 100 | rename Msg as "Error Message" count as Count, user as User, app as App, savedsearch_name as "Saved Search Name"</searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row> -->
+</form>

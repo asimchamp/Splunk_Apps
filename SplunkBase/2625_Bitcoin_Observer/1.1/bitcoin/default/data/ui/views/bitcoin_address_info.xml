@@ -1,0 +1,160 @@
+<dashboard>
+  <label>Bitcoin Address Info</label>
+  <description>Top Reused Bitcoin Addresses - Last 24 Hours</description>
+  <row>
+    <html>
+      <p>Select a bitcoin address from the pie charts below to see transfer amounts for the last 24 hours and the possible transaction locations on the map below.</p>
+      <p>Bitcoin uses peer-to-peer connections to share the transaction database called the “Blockchain.” This app uses the Blockchain.info 
+        “Relayed by IP” address to determine location. Note that this is just the first IP address that blockchain.info saw broadcast the transaction, 
+        not necessarily the IP address that originated the transaction. Some bitcoin clients connect to peers that 
+        do not publish IP address information.</p>
+      <p>See this <a href="http://cointext.com/bitcoin-and-ip-address-privacy/">link</a> for more information on how IP Addresses are handled on the Bitcoin network.</p>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Receiving Addresses - Last 24 Hours</title>
+        <search>
+          <query>index=bitcoin eventcat=output_to startdaysago=1 | top out_address limit=20</query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="address">$row.out_address$</set>
+          <set token="dest1">out_address</set>
+          <set token="ecat">output_to</set>
+          <set token="val">out_value</set>
+          <!-- If we also set the form.sourcetype the input will get updated too -->
+          <set token="form.address">$row.out_address$</set>
+          <set token="dest1">out_address</set>
+          <set token="ecat">output_to</set>
+          <set token="val">out_value</set>
+          <set token="totlabel">tot_received</set>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Sending Addresses - Last 24 Hours</title>
+        <search>
+          <query>index=bitcoin eventcat=input_from startdaysago=1 | top in_address limit=20</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="address">$row.in_address$</set>
+          <set token="dest1">in_address</set>
+          <set token="ecat">input_from</set>
+          <set token="val">in_value</set>
+          <!-- If we also set the form.sourcetype the input will get updated too -->
+          <set token="form.address">$row.in_address$</set>
+          <set token="dest1">in_address</set>
+          <set token="ecat">input_from</set>
+          <set token="val">in_value</set>
+          <set token="totlabel">tot_sent</set>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Transfer Amount Per Transaction for Selected Bitcoin Address - $address$</title>
+        <search>
+          <query>index=bitcoin eventcat=$ecat$ startdaysago=1 $dest1$=$address$ | chart sum($val$) AS $totlabel$ by tx_index</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Transfer Amount</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <map>
+        <title>Possible Transaction Locations for Bitcoin Address - $address$</title>
+        <search>
+          <query>index=bitcoin eventcat=transaction [search index=bitcoin eventcat=$ecat$ startdaysago=7 $dest1$=$address$ | dedup tx_index | table tx_index] NOT tx_relayed_by=127.0.0.1 | iplocation tx_relayed_by allfields=true | geostats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="mapping.tileLayer.url">http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</option>
+        <option name="mapping.tileLayer.subdomains">[a,b,c]</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.maxZoom">18</option>
+        <option name="mapping.tileLayer.attribution">Map data (c) 2012 OpenStreetMap contributors, CC-BY-SA.</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+  </row>
+</dashboard>

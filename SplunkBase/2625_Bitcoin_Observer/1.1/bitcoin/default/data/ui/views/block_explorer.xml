@@ -1,0 +1,92 @@
+<form>
+  <label>Block Explorer</label>
+  <description>Choose a block number from the recent blocks below, or input a block height value to see the corresponding 
+    transactions for that block. Once a block has been selected, select a transaction object from the chart or table below to see individual bitcoin
+  address transfers. A transaction index # can also be entered in the text field below.</description>
+  <row>
+    <panel>
+      <input type="radio" token="block_height_tok" searchWhenChanged="true">
+      <label>Select a Recent Block (Last 60 Minutes):</label>
+      
+      
+  
+      
+      <!-- Define the other choices with a populating search -->
+      <search>
+        <query>
+          index=bitcoin eventcat=block startminutesago=60 | table block_height
+        </query>
+      </search>
+      <fieldForLabel>block_height</fieldForLabel>
+      <fieldForValue>block_height</fieldForValue>
+    </input>
+    
+       
+      </panel>
+    <panel>
+      <input type="text" token="block_height_tok">
+      <label>Specify a Block</label>
+      <default>Enter Block Height Number Here</default>
+    </input>
+    </panel>
+      </row>
+  <row>
+    <panel>
+      <chart>
+         <title>Transaction Objects for Block $block_height_tok$</title>
+        <search>
+          <query>
+            index=bitcoin eventcat=transaction block_height=$block_height_tok$ | eval transaction_time=strftime(tx_time,"%m/%d/%y %H:%M:%S")  | table tx_index, tx_size, transaction_time
+          </query>
+            
+        </search>
+        <option name="charting.axisTitleX.text">Transaction Index #</option>
+        <option name="charting.axisTitleY.text">Size (Bytes)</option>
+        <option name="table.sortColumn">tx_size</option>
+        <option name="drilldown">row</option>
+          <drilldown>
+          <set token="trans_index_tok">$row.tx_index$</set>
+        </drilldown>   
+      </chart>
+    </panel>
+  </row>
+  
+  <row>
+    <panel>
+      <table>
+         <title>Transaction Objects for Block $block_height_tok$</title>
+        <search>
+          <query>
+            index=bitcoin eventcat=transaction block_height=$block_height_tok$ | eval transaction_time=strftime(tx_time,"%m/%d/%y %H:%M:%S")  | table tx_index, tx_size, transaction_time
+          </query>
+        </search>
+        <option name="table.sortColumn">tx_size</option>
+        <option name="drilldown">row</option>
+          <drilldown>
+          <set token="trans_index_tok">$row.tx_index$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <input type="text" token="trans_index_tok">
+      <label>Specify a Transaction Object Here</label>
+      <default>Transaction Index #</default>
+    </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+         <title>Bitcoin Address Transfers for Transaction Index - $trans_index_tok$</title>
+        <search>
+          <query>
+            index=bitcoin (eventcat=output_to OR eventcat=input_from) tx_index=$trans_index_tok$ | table eventcat, in_address, out_address, in_value, out_value
+          </query>
+            
+        </search>
+        <option name="count">100</option>
+      </table>
+    </panel>
+    
+    </row>
+</form>

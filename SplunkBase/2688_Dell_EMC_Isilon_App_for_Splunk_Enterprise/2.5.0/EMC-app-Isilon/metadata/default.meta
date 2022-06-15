@@ -1,0 +1,438 @@
+
+# Application-level permissions
+
+[]
+access = read : [ * ], write : [ admin, power ]
+
+
+
+### PROPS
+
+[props]
+export = system
+
+
+### TRANSFORMS
+
+[transforms]
+export = system
+
+
+### VIEWSTATES: even normal users should be able to create shared viewstates
+
+[viewstates]
+access = read : [ * ], write : [ * ]
+export = system
+
+[app/ui]
+version = 6.2.0
+modtime = 1421017691.389024000
+
+[app/launcher]
+version = 6.2.0
+modtime = 1421017691.391354000
+
+[savedsearches/EMC-Isilon-Cluster-lookup]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425883140.636335000
+
+[views/isilon_file_system_performance]
+owner = admin
+version = 6.2.1
+modtime = 1425970750.361168000
+
+[views/isilon_file_system_cache_performance]
+owner = admin
+version = 6.2.1
+modtime = 1425970816.884796000
+
+[views/isilon_node_details]
+owner = admin
+version = 6.2.1
+modtime = 1425966534.904741000
+
+[views/isilon_protocol_details]
+owner = admin
+version = 6.2.1
+modtime = 1425951509.006040000
+
+[views/isilon_node_inventory]
+owner = admin
+version = 6.2.1
+modtime = 1424144425.746014000
+
+[views/isilon_cluster_overview]
+owner = admin
+version = 6.2.1
+modtime = 1426051539.235293000
+
+[savedsearches/EMC-Isilon-Cluster-Stats-lookup]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425883105.932538000
+
+[savedsearches/EMC-Isilon-Disk-lookup]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426256580.956277000
+
+[views/isilon_cluster_inventory]
+owner = admin
+version = 6.2.1
+modtime = 1425890683.776640000
+
+[transforms/ClusterNameLookup]
+version = 6.2.1
+modtime = 1425701730.701323000
+owner = admin
+export = system
+
+[transforms/ClusterStatsLookup]
+version = 6.2.1
+modtime = 1425701733.046922000
+owner = admin
+export = system
+
+[transforms/NodeMappingLookup]
+version = 6.2.1
+owner = admin
+export = system
+modtime = 1427246552.505951000
+
+[lookups/nodeMapping.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1427246610.802101000
+
+[savedsearches/EMC-Isilon-NodeMapping-lookup]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1427247207.549331000
+
+[macros/bytes_to_gb_tb_pb%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871092.647138000
+
+[macros/bytes_to_kb_mb_gb%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871119.895098000
+
+[macros/cluster_list]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871135.315324000
+
+[macros/cluster_overview]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871150.718266000
+
+[macros/events_list%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871163.773332000
+
+[macros/isilon_index]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871177.416020000
+
+[macros/node_details]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425871188.995488000
+
+[macros/cache_details]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425942860.704261000
+
+[macros/protocol_based_client_connections%282%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425949784.214667000
+
+[macros/protocol_based_operation_rate%282%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425950225.590900000
+
+[macros/protocol_list%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1425951500.191364000
+
+[macros/get_type_by_event_key%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426040831.939966000
+
+[macros/get_file_system_standard_events%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426040297.163941000
+
+[macros/get_file_system_critical_events%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426041336.665764000
+
+[macros/get_cluster_version_details%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426049965.703451000
+
+[macros/access_zone_details%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426050465.946543000
+
+[macros/storage_tiers_details%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426050901.456154000
+
+[macros/node_pools_details%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426051139.492799000
+
+[macros/license_details%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426051242.586090000
+
+[macros/disk_details]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426054394.590577000
+
+[macros/node_statistics%281%29]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426055006.452263000
+
+[macros/cache_details%281%29]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315178.765545000
+
+[macros/cluster_overview%281%29]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315193.175779000
+
+[macros/disk_details%281%29]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315216.040650000
+
+[macros/file_system_performance_details%281%29]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315237.435800000
+
+[macros/get_file_system_critical_events]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315638.259981000
+
+[macros/get_file_system_standard_events]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315651.401565000
+
+[macros/get_type_by_event_key]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315673.020714000
+
+[macros/node_details%281%29]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1468315688.841590000
+
+[lookups/clusterDetails.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426256852.430587000
+
+[lookups/clusterStats.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426256869.366556000
+
+[lookups/nodeDiskDetails.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426256920.447287000
+
+[transforms/DiskHealthLookup]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426483132.441661000
+
+[transforms/NodeHealthLookup]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426483143.791040000
+
+[lookups/diskHealth.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426483157.914349000
+
+[lookups/nodeHealth.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.2.1
+modtime = 1426483166.859369000
+
+[transforms/NodeDiskLookup]
+version = 6.2.1
+export = system
+owner = admin
+modtime = 1426483770.350267000
+
+[props/emc%3Aisilon%3Arest/FIELDALIAS-IsilonCluster-simulator]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.4.1
+modtime = 1467109314.592667000
+
+[savedsearches/EMC-Isilon-Users-Sid-lookup]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1467785428.343051000
+
+[lookups/usersSid.csv]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.4.1
+modtime = 1467293871.183153000
+
+[macros/seconds_to_time%281%29]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.3.2
+modtime = 1467720378.151824000
+
+[views/isilon_syslog_audit_config_logs]
+access = read : [ * ], write : [ admin, power ]
+owner = admin
+version = 6.4.1
+modtime = 1470117279.614806000
+
+[savedsearches/EMC-Isilon-Cluster-Summary]
+access = read : [ * ], write : [ admin, power ]
+owner = admin
+version = 6.4.1
+modtime = 1470128444.639869000
+
+[views/isilon_fs_audit_search_facility]
+access = read : [ * ], write : [ admin, power ]
+owner = admin
+version = 6.4.1
+modtime = 1470657166.644413000
+
+[views/isilon_fs_audit_logs]
+access = read : [ * ], write : [ admin, power ]
+owner = admin
+version = 6.4.1
+modtime = 1470665335.507432000
+
+[lookups/fail_codes.csv]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.4.1
+modtime = 1470660332.722614000

@@ -1,0 +1,146 @@
+<form stylesheet="custom.css">
+  <label>Network Adapter - Visualization</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="hostname" searchWhenChanged="true">
+      <label>Host Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="description" searchWhenChanged="true">
+      <label>Description (use * for wildcard)</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="adapter" searchWhenChanged="true">
+      <label>Adapter</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="MAC" searchWhenChanged="true">
+      <label>MAC address</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Network Adapter Descriptions</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ host="$hostname$" SystemInfoItem.networkArray.networkInfo.description="$description$" SystemInfoItem.networkArray.networkInfo.adapter="$adapter$" SystemInfoItem.networkArray.networkInfo.MAC="$MAC$"  | rare limit=100 SystemInfoItem.networkArray.networkInfo.description by host | eval percent = round(percent,2) | rename host AS "Host Name", SystemInfoItem.networkArray.networkInfo.description AS Description, count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Subnet Masks</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ host="$hostname$" SystemInfoItem.networkArray.networkInfo.description="$description$" SystemInfoItem.networkArray.networkInfo.adapter="$adapter$" SystemInfoItem.networkArray.networkInfo.MAC="$MAC$"  | rare limit=100 SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.subnetMask by host | eval percent = round(percent,2) | rename host AS "Host Name", SystemInfoItem.networkArray.networkInfo.ipArray.ipInfo.subnetMask AS "Subnet Mask", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare IP Gateways</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ host="$hostname$" SystemInfoItem.networkArray.networkInfo.description="$description$" SystemInfoItem.networkArray.networkInfo.adapter="$adapter$" SystemInfoItem.networkArray.networkInfo.MAC="$MAC$"  | rare limit=100 SystemInfoItem.networkArray.networkInfo.ipGatewayArray.ipGateway by host | eval percent = round(percent,2) | rename host AS "Host Name", SystemInfoItem.networkArray.networkInfo.ipGatewayArray.ipGateway AS "IP Gateway", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare DHCP Servers</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ host="$hostname$" SystemInfoItem.networkArray.networkInfo.description="$description$" SystemInfoItem.networkArray.networkInfo.adapter="$adapter$" SystemInfoItem.networkArray.networkInfo.MAC="$MAC$"  | rare limit=100 SystemInfoItem.networkArray.networkInfo.dhcpServerArray.dhcpServer by host | eval percent = round(percent,2) | rename host AS "Host Name", SystemInfoItem.networkArray.networkInfo.dhcpServerArray.dhcpServer AS "DHCP Server", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,193 @@
+<form stylesheet="custom_layout_overlay_single.css" script="custom_layout_width.js">
+  <label>Remote Monitoring of Asset</label>
+  <search id="baseSearch">
+    <query>sourcetype=opc TagName="*press*mach*" | stats latest(Value) as value by TagName</query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  <description></description>
+  <search id="pressure_1" base="baseSearch">
+    <query>| search TagName="*press*mach*1*" | fields - TagName</query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+    <preview>
+      <set token="pressure_1">$result.value$</set>
+    </preview>
+  </search>
+  <search id="pressure_2" base="baseSearch">
+    <query>| search TagName="*press*mach*2*" | fields - TagName</query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+    <preview>
+      <set token="pressure_2">$result.value$</set>
+    </preview>
+  </search>
+  <search id="pressure_3" base="baseSearch">
+    <query>| search TagName="*press*mach*3*" | fields - TagName</query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+    <preview>
+      <set token="pressure_3">$result.value$</set>
+    </preview>
+  </search>
+  <search id="pressure_output" base="baseSearch">
+    <query>| stats avg(value) as average | eval average = round(average,2)</query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+    <preview>
+      <set token="pressure_output">$result.average$</set>
+    </preview>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel id="image_overlay_panel">
+      <title>Plant Schematics with Set Points</title>
+      <html>
+              <div class="data_pipeline">
+                  <div class="image"/>
+                  <div class="singleValue" id="pressure_1">$pressure_1$</div>
+                  <div class="singleValue" id="pressure_2">$pressure_2$</div>
+                  <div class="singleValue" id="pressure_3">$pressure_3$</div>
+                  <div class="singleValue" id="pressure_output">$pressure_output$</div>
+              </div>
+      </html>
+    </panel>
+    <panel>
+      <title>Historical Data of Pressure</title>
+      <input type="text" token="designBaseline">
+        <label>Design Baseline</label>
+        <default>3000</default>
+      </input>
+      <input type="dropdown" token="pressureSelector">
+        <label>Pressure Selector</label>
+        <choice value="1">Pressure 1</choice>
+        <choice value="2">Pressure 2</choice>
+        <choice value="3">Pressure 3</choice>
+        <choice value="*">All</choice>
+        <default>*</default>
+      </input>
+      <chart>
+        <search>
+          <query>sourcetype=opc TagName="*press*mach*$pressureSelector$*" | timechart latest(Value) as Value by Tag | eval design = $designBaseline$</query>
+          <earliest>rt-5m</earliest>
+          <latest>rt</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">300</option>
+        <option name="charting.fieldColors">{"design":0xff0000}</option>
+      </chart>
+      <table>
+        <search>
+          <query>sourcetype=opc TagName="*press*mach***" | stats max(Value) as Max, avg(Value) as average, min(Value) as min, latest(Value) as Current by Tag</query>
+          <earliest>rt-5m</earliest>
+          <latest>rt</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Across the Map</title>
+      <map>
+        <search>
+          <query>sourcetype=opc longfield=* | geostats latest(Value) by Tag latfield=latfield longfield=longfield</query>
+          <earliest>rt-5m</earliest>
+          <latest>rt</latest>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">5</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(1.36,103.84)</option>
+        <option name="mapping.map.panning">true</option>
+        <option name="mapping.map.scrollZoom">false</option>
+        <option name="mapping.map.zoom">11</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.tileLayer.url">http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">marker</option>
+        <option name="drilldown">all</option>
+        <option name="height">300</option>
+      </map>
+    </panel>
+    <panel>
+      <title>Total Raw Material Used</title>
+      <chart>
+        <search>
+          <query>Tag="*Widget1.comp.raw*" | timechart span=1h sum(Value) AS "Total Material Used" by Tag</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">300</option>
+      </chart>
+    </panel>
+  </row>
+</form>

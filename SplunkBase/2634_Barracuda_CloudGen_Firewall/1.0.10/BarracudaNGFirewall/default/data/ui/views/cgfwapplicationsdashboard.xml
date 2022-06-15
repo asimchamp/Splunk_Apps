@@ -1,0 +1,118 @@
+<form>
+  <label>Applications</label>
+  <description>Barracuda CloudGen Firewall Applications Dashboard: Select a time range and host to begin.</description>
+  <fieldset submitButton="false">
+    <input type="time" token="timeRange" searchWhenChanged="true">
+      <label>Select a time:</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>Host:</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <search>
+        <query>sourcetype="fw_act" | fields host | dedup host | sort host</query>
+        <earliest>$timeRange.earliest$</earliest>
+        <latest>$timeRange.latest$</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Application Summary (All)</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" | chart count by application</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Application Summary (Blocked Only)</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" info="Block*" | chart count by application</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Application Summary (Allowed Only)</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" info!="Block*" | chart count by application</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top 10 Applications (All)</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" | rename application as Application | top limit=10 countfield="Hits" percentfield="Percentage" "Application" | eval Percentage=round(Percentage, 2) | table Application, Hits, Percentage</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top 10 Applications (Blocked Only)</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" info="Block*" | rename application as Application | top limit=10 countfield="Hits" percentfield="Percentage" "Application" | eval Percentage=round(Percentage, 2) | table Application, Hits, Percentage</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top 10 Applications (Allowed Only)</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" info!="Block*" | rename application as Application | top limit=10 countfield="Hits" percentfield="Percentage" "Application" | eval Percentage=round(Percentage, 2) | table Application, Hits, Percentage</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="appfilter" searchWhenChanged="true">
+        <label>Filter:</label>
+        <choice value="fwaction=&quot;*&quot;">All</choice>
+        <choice value="fwaction=&quot;Block&quot;">Blocked Only</choice>
+        <choice value="fwaction!=&quot;Block&quot; fwaction!=&quot;Drop&quot;">Allowed Only</choice>
+        <initialValue>fwaction="*"</initialValue>
+      </input>
+      <chart>
+        <title>Application Details</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act application="*" $appfilter$ | timechart count by application</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,113 @@
+<form>
+  <label>Sizing for IDF</label>
+  <row>
+    <panel>
+      <title>Introduction</title>
+      <html tokens="true">
+        <h2>This section allows you to size up your data Volume based on the IDFl</h2>
+      <ul>
+          <li>Each event is about 150kb</li>
+          <li>The default setting assumes 2000 Points at 60seconds (1 min) sampling rate</li>
+        <li>Note that each event will only be triggered upon a data change (OPC's behavior). Users can also group up Tags to provide different sampling rates. For example, mission critical stats will be sampled faster than say, KPI Values</li>
+        </ul>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Tag Sampling Rates (By default, OPC sends on COV, this is an estimate of full capacity)</title>
+      <input type="text" token="NTag">
+        <label>No of Tags</label>
+        <default>2000</default>
+      </input>
+      <input type="text" token="Rate">
+        <label>Sampling Rate (ms)</label>
+        <default>60000</default>
+      </input>
+      <input type="text" token="replicationFactor">
+        <label>Replication Factor (HA Setup)</label>
+        <default>1</default>
+      </input>
+      <single>
+        <title>Estimated Splunk License Requirement</title>
+        <search>
+          <query>sourcetype=opc | eval Usage = $NTag$ * (86400000 /$Rate$) * 150/1000000 * $replicationFactor$ | Table Usage | eval Usage=round(Usage,2)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+        <option name="afterLabel">GB</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+      <single>
+        <title>Estimated Storage Space</title>
+        <search>
+          <query>sourcetype=opc | eval Usage = $NTag$ * (86400000 /$Rate$) * 150/1000000 * $replicationFactor$ * 0.5 | Table Usage | eval Usage=round(Usage,2)</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="afterLabel">GB</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">true</option>
+        <option name="showTrendIndicator">true</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">false</option>
+        <option name="useThousandSeparators">true</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Current Usage for IDF</title>
+      <input type="time" token="field1">
+        <label></label>
+        <default>
+          <earliest>@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=* | chart count(TagName) by TagName</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

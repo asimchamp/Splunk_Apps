@@ -1,0 +1,48 @@
+<form>
+  <label>System info</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>choose forwarder host to inspect:</label>
+      <search>
+        <query>| metadata type=hosts index=_internal</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>|forwarderquery server=$host$ api="/services/server/info" stanza="default" contenttype="json" | spath path="entry{}" output=entry| fields - _raw | spath input=entry | fields - entry | rename content.* AS * | rename acl.* AS * | table host,activeLicenseGroup,cpu_arch,guid,mode,numberOfCores,numberOfVirtualCores,os_build,os_name_extended,os_version,physicalMemoryMB,product_type,startup_time,updated,version | transpose | rename column AS Key | rename "row 1" AS Value</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>messages</title>
+        <search>
+          <query>|forwarderquery server="$host$"    api="/services/messages/" contenttype="json" 
+| spath path="entry{}" output=entry | fields - _raw | mvexpand entry | spath input=entry | rename content.* AS * | table message,severity,timeCreated_iso</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">3</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,25 @@
+<dashboard script="dashboard.js" stylesheet="dashboard.css">
+  <label>Overview</label>
+  <row>
+    <panel>
+      <html>
+      <p>
+          <strong>NOTE: </strong>if you do not see any data, make sure your administrator has <a href="/app/GigamonForSplunk/GigaVUE-FM">Configured Credentials</a>
+        </p>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel ref="Gigamon - Nodes by Family" app="GigamonForSplunk"></panel>
+    <panel ref="Gigamon - Nodes by Status" app="GigamonForSplunk"></panel>
+    <panel ref="Gigamon - Nodes by Model" app="GigamonForSplunk"></panel>
+    <panel ref="Gigamon - Nodes by Software Version" app="GigamonForSplunk"></panel>
+  </row>
+  <row>
+    <panel ref="Gigamon - Nodes over Time" app="GigamonForSplunk"></panel>
+    <panel ref="Gigamon - Top 10 Utilized Ports" app="GigamonForSplunk"></panel>
+  </row>
+  <row>
+    <panel ref="Gigamon - Nodes by Family and Software Version" app="GigamonForSplunk"></panel>
+  </row>
+</dashboard>

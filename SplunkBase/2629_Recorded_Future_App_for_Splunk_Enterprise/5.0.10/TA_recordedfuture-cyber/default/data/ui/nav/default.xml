@@ -1,0 +1,58 @@
+<nav search_view="search">
+  <collection label="Enrich">
+    <view name="recorded_future_ip_enrichment"/>
+    <view name="recorded_future_domain_enrichment"/>
+    <view name="recorded_future_hash_enrichment"/>
+    <view name="recorded_future_vuln_enrichment"/>
+    <view name="recorded_future_malware_enrichment"/>
+    <view name="recorded_future_url_enrichment"/>
+  </collection>
+  <collection label="Correlate">
+    <view name="recorded_future_ip_correlations"/>
+    <view name="recorded_future_domain_correlations"/>
+    <view name="recorded_future_hash_correlations"/>
+    <view name="recorded_future_vuln_correlations"/>
+    <view name="recorded_future_url_correlations"/>
+  </collection>
+  <collection label="SOC">
+    <view name="recorded_future_alerts" default="true" />
+    <view name="global_map" />
+  </collection>
+  <collection label="Other">
+    <view name="recorded_future_explorer"/>
+    <view name="search"/>
+    <view name="data_models" />
+    <view name="reports" />
+    <view name="alerts" />
+    <view name="dashboards" />
+  </collection>
+  <collection label="Configuration">
+    <view name="configuration"/>
+  </collection>
+  <a href="https://app.recordedfuture.com/live" target="_blank">Go
+  to Recorded Future</a>
+  <collection label="Help">
+    <view name="recorded_future_help_enrichment_dashboards"/>
+    <view name="recorded_future_help_correlation_dashboards"/>
+    <view name="recorded_future_help_alert_dashboards"/>
+    <view name="recorded_future_help_splunk_explorer"/>
+    <collection label="Install and Configure">
+      <view name="recorded_future_help_setup"/>
+      <view name="recorded_future_help_upgrade"/>
+      <view name="recorded_future_help_setup_shc"/>
+      <view name="recorded_future_help_setup_risklists"/>
+      <view name="recorded_future_help_setup_alerts"/>
+      <view name="recorded_future_help_global_map"/>
+      <view name="recorded_future_help_troubleshooting"/>
+      <view name="recorded_future_help_release_notes"/>
+      <view name="recorded_future_help_changelog"/>
+      <view name="recorded_future_help_reports"/>
+    </collection>
+    <collection label="Adapt and Tune">
+      <view name="recorded_future_help_adapt_dashboards"/>
+      <view name="recorded_future_help_adapt_searches"/>
+      <view name="recorded_future_help_adapt_macros"/>
+    </collection>
+    <view name="recorded_future_help_about"/>
+  </collection>
+</nav>

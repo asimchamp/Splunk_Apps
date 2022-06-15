@@ -1,0 +1,67 @@
+<dashboard>
+  
+  <label>Introduction</label>
+
+
+  <!-- First row of a single comment -->
+  <row>
+
+    <!-- Static content, remove upon editing-->
+    <html>
+      <div style='color:#311b92'>
+      <h2><b>
+		Unleash the Power of Splunk on Finances Management
+        </b>
+      </h2>
+      </div>
+      <h3>
+        With the advances of technology and Big Data Analytics, it is now easy to keep a check on your finances. As easy as 1-2-3..!
+      </h3>
+
+      <h2>How?</h2>
+      <ol>
+<li>Keep a track of your or your Company's Finances in an Excel or Take an Export from your Finance Reporting Tool.</li>
+
+<li>Categorize them into Income / Expenditure.</li>
+
+<li>Categorize Income into various Types:
+<ul>  
+<li>Salary - Your fixed Salary (in case of personal use) or Sale (in case of company)</li>
+<li>Interest - Any Interest which may or may not be a steady income source</li>
+<li>Bonus - Any Extra Income is always welcome!</li>
+  </ul>
+</li>
+<li>Also, further categorize Expenses into 3 Types:
+<ul>  
+<li>Category A - Which are inevitable</li>
+<li>Category B - Which may not be entirely avoidable. But can have a bit of discretion!</li>
+<li>Category C - Which can be avoided with reasonable discretion!</li>
+  </ul>
+</li>
+<li>Provide Details and Amount Spent / Earned / Received.</li>
+
+<li>Save the Excel as CSV and Load into Splunk as per the format with sourcetype = 'FinanceTracker' or place them in the Directory which Splunk is monitoring.</li>
+<li>You can also upload your other statements like Credit Card Statements, Equity Holdings and your other Financial Statements. 
+  Make sure that your Input have the below columns or are re-mapped in Splunk through Alias:
+  <ul>
+    <li>Type - With data as Income/Expenditure 
+    </li>
+    <li>Category - Category A / B / C for Expenses as explained above or Salary / Interest / Bonus for Income
+    </li>
+    <li>Details - Text Details of your Income / Expense
+    </li>
+    <li>Value - Monetary value of the transaction
+    </li>
+    
+  </ul>
+        </li>
+
+  <li>Build up quick charts, pivots  to analyse the finances and take control!</li>      </ol>
+    </html>
+  <!-- End of static content -->
+
+  </row>
+  
+  
+
+</dashboard>

@@ -1,0 +1,118 @@
+<form>
+  <label>Indexer Cluster Storage Calculator</label>
+  <row>
+    <html>
+    <h1 align="center">Storage Requirements</h1>
+  </html>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="ingest" searchWhenChanged="true">
+        <label>Daily Ingest (GB)</label>
+        <default>100</default>
+      </input>
+      <input type="text" token="days" searchWhenChanged="true">
+        <label>Retention Period (Days)</label>
+        <default>365</default>
+      </input>
+      <input type="text" token="rf" searchWhenChanged="true">
+        <label>Replication Factor</label>
+        <default>3</default>
+      </input>
+      <input type="text" token="sf">
+        <label>Search Factor</label>
+        <default>2</default>
+      </input>
+      <input type="radio" token="raid" searchWhenChanged="true">
+        <label>Using RAID 10?</label>
+        <choice value="1">Yes</choice>
+        <choice value="0">No</choice>
+        <default>1</default>
+      </input>
+      <input type="radio" token="es" searchWhenChanged="true">
+        <label>Using Enterprise Security?</label>
+        <choice value="1">Yes</choice>
+        <choice value="0">No</choice>
+        <default>0</default>
+      </input>
+      <table>
+        <search>
+          <!-- Concerned these are inaccurate? Check-out Splunk Docs: http://docs.splunk.com/Documentation/Splunk/latest/Indexer/Systemrequirements#Storage_requirement_examples -->
+          <query>index=* | head 1 
+            | eval sum_ingest=$ingest$ 
+            | eval sum_days=$days$ 
+            | eval sum_rf=$rf$ 
+            | eval sum_sf=$sf$ 
+            | eval sum_raid=$raid$ 
+            | eval sum_es=$es$
+            | eval sum_raw_data_gb=sum_ingest*sum_days*sum_rf*0.15 
+            | eval sum_index_file_size=sum_ingest*sum_days*sum_sf*0.35
+            | eval sum_es_accel_data_model_storage_req=if(sum_es=1, (sum_ingest*3.4), 0)
+            | eval sum_total_usable_disk_req=(sum_raw_data_gb+sum_index_file_size+sum_es_accel_data_model_storage_req)
+            | eval sum_total_raw_disk_req=if(sum_raid=1, sum_total_usable_disk_req*2, sum_total_usable_disk_req) 
+            | table sum_raw_data_gb, sum_index_file_size sum_es_accel_data_model_storage_req sum_total_usable_disk_req sum_total_raw_disk_req 
+            | rename sum_raw_data_gb as "Raw Data File Size (GB)", sum_index_file_size as "Index File Size (GB)", sum_total_usable_disk_req as "Usable Disk Required (GB)", sum_es_accel_data_model_storage_req as "ES Data Model Disk Required (GB)", sum_total_raw_disk_req as "Raw Disk Required (GB)"</query>
+          <earliest>-10s</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <html>
+    <h1 align="center">Server Requirements</h1>
+  </html>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="max_disks">
+        <label>Maximum Disks per Server</label>
+        <default>16</default>
+      </input>
+      <input type="text" token="max_disk_capacity">
+        <label>Capacity per Disk (GB)</label>
+        <default>600</default>
+      </input>
+      <input type="text" token="cost_per_server">
+        <label>Server Cost (each)</label>
+        <default>20000</default>
+      </input>
+      <table>
+        <title>Server Calculator</title>
+        <search>
+          <query>index=* | head 1 
+            | eval sum_max_disks=$max_disks$
+            | eval sum_max_disk_capacity=$max_disk_capacity$ 
+            | eval sum_cost_per_server=$cost_per_server$
+            | eval sum_ingest=$ingest$
+            | eval sum_days=$days$
+            | eval sum_rf=$rf$
+            | eval sum_sf=$sf$
+            | eval sum_raid=$raid$
+            | eval sum_raw_data_gb=sum_ingest*sum_days*sum_rf*0.15 
+            | eval sum_index_file_size=sum_ingest*sum_days*sum_sf*0.35 
+            | eval sum_total_usable_disk_req=sum_raw_data_gb+sum_index_file_size 
+            | eval sum_total_raw_disk_req=if(sum_raid=1, (sum_total_usable_disk_req*2), sum_total_usable_disk_req)
+            | eval sum_raw_disk_per_server=sum_max_disks*sum_max_disk_capacity 
+            | eval sum_usable_disk_per_server=if(sum_raid=1, (sum_raw_disk_per_server/2), sum_raw_disk_per_server)
+            | eval sum_total_peers_required=ceil(sum_total_usable_disk_req/sum_usable_disk_per_server)
+            | eval sum_total_cost=sum_cost_per_server*sum_total_peers_required
+            | eval sum_total_disks_required=round(sum_total_raw_disk_req/sum_max_disk_capacity)
+            | eval sum_daily_ingest_per_indexer=round(sum_ingest/sum_total_peers_required)
+            | table sum_total_peers_required sum_daily_ingest_per_indexer sum_total_disks_required sum_raw_disk_per_server sum_usable_disk_per_server sum_total_cost
+            | rename sum_daily_ingest_per_indexer as "Daily Ingest Per Indexer (GB)",sum_total_disks_required as "Total Disks Required", sum_raw_disk_per_server as "Raw Disk per Indexer (GB)", sum_usable_disk_per_server as "Usable Disk per Indexer (GB)", sum_total_peers_required as "Number of Indexers Required", sum_total_cost as "Total Cost of All Indexers"</query>
+          <earliest>-10s</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

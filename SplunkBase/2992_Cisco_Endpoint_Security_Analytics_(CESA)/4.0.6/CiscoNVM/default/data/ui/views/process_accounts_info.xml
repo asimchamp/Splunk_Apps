@@ -1,0 +1,88 @@
+<form version="1.1" showsource="False" stylesheet="drilldownBkgd.css,css/common.css">
+  <init>
+    <set token="q">*</set>
+    <set token="processAccount">*</set>
+  </init>
+  <label>Process Accounts Info</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time:</label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <input type="text" token="processAccount" searchWhenChanged="true">
+        <label>Filter Process Accounts here</label>
+        <initialValue>*</initialValue>
+      </input>
+      <table id="expand_with_events">
+        <title>Select a row to drilldown and obtain more information on each Process Account</title>
+        <search>
+          <query>`nvm_flowdata_index` NOT pap=* OR (pap!=linuxuid_0 AND pap!=_softwareupdate AND pap!=nobody AND pap!=UNKNOWN AND pap!=_mdnsresponder AND pap!=_lp AND pap!=_locationd AND pap!=root AND pap!=UpdatusUser) pn!='' | regex pap!=".*\\\\x*" |  replace '' with "Unknown" | eval dh = if(dh="Unknown", da, dh) | stats count by pa | rename pa AS "Process Accounts"| fields - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="processAccount">$row.Process Accounts$</set>
+          <!-- If we also set the form.sourcetype the input will get updated too -->
+          <set token="form.processAccount">$row.Process Accounts$</set>
+          <eval token="q">replace('row.Process Accounts', "\\\\", "\\\\")</eval>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Details for Process Account : $processAccount$</title>
+      <table id="ProcessAccountDetails" depends="$processAccount$">
+        <title>Select a row to drilldown and obtain more information on each Application by Process Name</title>
+        <search>
+          <query>`nvm_flowdata_index` pn!='' pa="$q$" | join udid [search `nvm_sysdata_index` earliest=0 | fields + udid, vsn] | stats count by pn, ppn, ppa, vsn, liuid, user | rename vsn AS "System Name", pn as "Process Name", ppn AS "Parent Process Name", ppa AS "Parent Process Account", user As "User", liuid AS "Logged In User" | fields - count | replace '' with "Unknown"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <set token="Application">$row.Process Name$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Details for Application : $Application$</title>
+      <table id="AppDetails" depends="$Application$">
+        <title>Select a row to drilldown and obtain more information on each Application Hash</title>
+        <search>
+          <query>`nvm_flowdata_index` pa="$q$" pn="$Application$" | join udid [search `nvm_sysdata_index` earliest=0 | fields + udid, vsn] | stats count by pn, ppn, ppa, ph, vsn, liuid | rename vsn AS "System Name", pn as "Process Name", ppn AS "Parent Process Name", ppa AS "Parent Process Account", liuid AS "Logged In User", ph as "Hash" | fields - count | replace '' with "Unknown"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link>/app/CiscoNVM/process_info?processName=$row.Hash$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

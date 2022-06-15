@@ -1,0 +1,161 @@
+<html><body><div><h1>Searches</h1>
+
+<p>There are two types or searches within the Recorded Future App for Splunk, 
+correlation and enrichment. Both types are described in further detail below 
+together with instructions on how to modify them. </p>
+
+<h2>Correlation Searches</h2>
+
+<p>Recorded Future provides a compilation of sample searches on the support web 
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360000696993-Common-Splunk-Search-Strings-for-Recorded-Future-Risk-Lists">Common Splunk Search Strings for Recorded Future Risk Lists</a>
+which shows how to correlate Recorded Future Risk Lists with various log files. </p>
+
+<p>The Splunk feature "Workflow actions" allows for context dependent menu 
+entries for search results.</p>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/recorded_future_help_workflow_actions.png" alt="Workflow actions" title="Workflow actions"></p>
+
+<p>A description of the actions not covered in the default set can be be found in 
+the following article on the Recorded Future web site: 
+<a href="https://support.recordedfuture.com/hc/en-us/articles/115004027533-Pivoting-to-Recorded-Future-Enrichment-Data-in-Splunk">Pivoting to Recorded Future Enrichment Data in Splunk</a>.</p>
+
+<h3>Base Search</h3>
+
+<p>The base searches for the Correlation Dashboards follow the same format 
+and is used as a base for more specific searches.</p>
+
+<p>This is the default base search for the Recorded Future IP Log Correlation Dashboard:</p>
+
+<pre><code>    index=main sourcetype="netscreen:firewall" earliest=-24h 
+   | eval Name=dst
+   | join [|inputlookup default_ip_risklist.csv | table * ]
+   | search Risk != "" 
+   | sort -Risk
+</code></pre>
+
+<ul>
+<li><p><span class="rf-field">index=main sourcetype="netscreen:firewall" 
+earliest=-24h</span> selects the 'main' index, sets the sourcetype to 
+'netscreen:firewall' with a time stamp within the last 24 hours.</p></li>
+<li><p><span class="rf-field">eval Name=dst</span> renames the field 'dst' in the 
+logs to 'Name' by using the <a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Eval">eval</a> 
+statement.</p></li>
+<li><p><span class="rf-field">join [|inputlookup default_ip_risklist.csv | table * ]</span>
+<a href="http://docs.splunk.com/Documentation/Splunk/7.0.2/SearchReference/Join">join</a>s 
+the results of the previous search with a table containing all the fields
+available in the IP_risklist.csv lookup file. </p></li>
+<li><p><span class="rf-field">search Risk != ""</span> removes any results that do 
+not have any Risk assigned to them by 
+<a href="http://docs.splunk.com/Documentation/Splunk/7.0.2/SearchReference/Search">search</a>ing 
+for the items which have a value assigned to the field 'Risk'.</p></li>
+<li><p><span class="rf-field">sort -Risk</span> 
+<a href="http://docs.splunk.com/Documentation/Splunk/7.0.2/SearchReference/Sort">sort</a>s
+the results in descending Risk order, by adding a '-' before the field name, to 
+make sure that the highest risk results are displayed at the top of the list.</p></li>
+</ul>
+
+<p>A typical modification is to use a custom risk list. In the Recorded Future Risk 
+Lists, the main element is called Name. Its content depend on the type of Risk
+List so for instance it denotes domain in the domain Risk List and CVE in the 
+vulnerability Risk List.  To use a custom risk list, modify the second row to 
+match the field names of both the data in Splunk and the Risk List.</p>
+
+<p>Older versions of the Correlation Dashboards used the <a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Lookup">lookup</a> 
+which in the context of Recorded Future App for Splunk is much slower and will not
+remove any non-matching events from the result. It is faster to use 
+<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Join">join</a> 
+and
+<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchTutorial/Useasubsearch">subsearch</a> 
+with 
+<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Inputlookup">inputlookup</a>. </p>
+
+<h3>Subsearches</h3>
+
+<p>This is the search that determines the amount of unique rows in the base search. 
+The first statement does a <a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Stats">statistical</a> 
+distinct count, thus only counting the unique values in the field 'Name' and saves 
+the result in the field 'count'. This value is then colored by using the 
+<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Rangemap">rangemap</a> 
+statement.</p>
+
+<pre><code>    | stats dc(Name) as count
+    | rangemap field=count low=0-0 evelated=1-1 default=severe
+</code></pre>
+
+<p>The following subsearch creates the last table in the Correlation Dashboards 
+to display the number of occurrences for each value in the field 'Name'. 
+In comparison with <a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Stats">stats</a>,
+<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Eventstats">eventstats</a> 
+adds a new field 'Count' to each row in the results. All duplicate rows in 
+regards to 'Name' are removed with 'dedup Name'. The Recorded Future macro
+'format_evidence' parses the <a href="https://en.wikipedia.org/wiki/JSON">JSON</a> 
+object in the field 'EvidenceDetails', thus populating new fields with the data 
+contained there. Finally, the data is sorted in descending order and cleaned
+up by removing all decimals from Risk before creating a table showing the final 
+information.</p>
+
+<pre><code>    | eventstats Count BY Name
+    | dedup Name
+    | `format_evidence`
+    | sort -Risk
+    | eval Risk = round(Risk,0)
+    | table Risk, Name, Count, RiskString, Rule, Evidence
+</code></pre>
+
+<h2>Enrichment Searches</h2>
+
+<p>The Enrichment Dashboards use API credits to get more information about the 
+specific entity from the Recorded Future Connect API.</p>
+
+<h3>Base Search</h3>
+
+<p>The base search for each of the enrichment dashboards contains a 
+<a href="https://en.wikipedia.org/wiki/Representational_state_transfer">REST</a> call 
+to get the information about an entity. It is possible to customise the 
+information received from the API. By default all available fields selected to 
+be able to present as much data as possible to the user. The available fields can be 
+found at the <a href="https://api.recordedfuture.com/v2/">Recoded Future API</a> page. 
+The CDATA encapsulation, in other words "regular expression 
+in this search. The <a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Spath">spath</a> 
+statement is used to parse <a href="https://en.wikipedia.org/wiki/JSON">JSON</a> 
+objects so that the information can be used in searches. The last two 
+statements convert the timestamps to a more conventional format.</p>
+
+<pre><code>    &lt;![CDATA[
+    | rest /services/TA_recordedfuture-cyber/lookup_ip/$name$ fields="counts,risk,analystNotes,location,sightings,entity,timestamps,metrics,relatedEntities,riskyCIDRIPs,intelCard,threatLists" output_mode=json
+    | `unpack_metrics`
+    | rex field=risk.riskString ".*/(?&lt;rulesMax&gt;.+)"
+    | rename rulesMax TO risk.rulesMax
+    | spath input=timestamps 
+    | eval FirstSeen=strftime(strptime('timestamps.firstSeen', "%Y-%m-%dT%H:%M:%S.%NZ"), "%b %d, %Y") 
+    | eval LastSeen=strftime(strptime('timestamps.lastSeen', "%Y-%m-%dT%H:%M:%S.%NZ"), "%b %d, %Y")
+    ]]&gt;
+</code></pre>
+
+<h3>Subsearches</h3>
+
+<p>A lot of the subsearches in the enrichment dashboards are quite similar, 
+especially when it comes to the related entities tables. One example is the 
+one below for related domains:</p>
+
+<pre><code>    | `unpack_relatedEntities(RelatedInternetDomainName)`
+    | sort -count, name
+    | rename name as Domain
+    | rename count as References
+    | table Domain, References
+</code></pre>
+
+<p>The macro 'unpack_relatedEntities' parses the input <a href="https://en.wikipedia.org/wiki/JSON">JSON</a> 
+object. A macro is used to ensure that all related entity tables are handled 
+the same way. The result is <a href="http://docs.splunk.com/Documentation/Splunk/7.0.2/SearchReference/Sort">sort</a>ed 
+and <a href="http://docs.splunk.com/Documentation/Splunk/7.0.2/SearchReference/Rename">rename</a>d
+to get suitable headers. The last row creates the <a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Table">table</a> 
+which is displayed in the dashboard, showing the fields 'Domain' and 'References'.</p>
+
+<h2>Further Help</h2>
+
+<p>"Recorded Future App for Splunk" has been developed by Recorded Future. </p>
+
+<p>Further information and support can be found on our Support web site:
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360003588753">support.recordedfuture.com</a> </p>
+</div></body></html>

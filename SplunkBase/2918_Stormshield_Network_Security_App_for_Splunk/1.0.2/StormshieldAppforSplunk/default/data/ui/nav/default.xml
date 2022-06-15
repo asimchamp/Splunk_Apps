@@ -1,0 +1,47 @@
+<nav color="#0477BD">
+  <collection label="Stormshield Network Security">
+    <view name="overview" default="true" />
+    <collection label="Search Stormshield Network Security Logs">
+      <a href="search?q=index=sns">Search</a>
+      <a href="search?q=index=sns%20logtype%3Dalarm">Alarms</a>
+      <a href="search?q=index=sns%20logtype%3Dconnection">Network connections</a>
+      <a href="search?q=index=sns%20logtype%3Dfilter">Filter</a>
+      <a href="search?q=index=sns%20logtype%3Dplugin">Application connections (plugin)</a>
+      <a href="search?q=index=sns%20logtype%3Dauth">Authentication</a>
+      <a href="search?q=index=sns%20logtype%3Dweb">HTTP proxy</a>
+      <a href="search?q=index=sns%20logtype%3Dsmtp">SMTP proxy</a>
+      <a href="search?q=index=sns%20logtype%3Dpop3">POP3 proxy</a>
+      <a href="search?q=index=sns%20logtype%3Dssl">SSL proxy</a>
+      <a href="search?q=index=sns%20logtype%3Dftp">FTP proxy</a>
+      <a href="search?q=index=sns%20logtype%3Dsystem">System events</a>
+      <a href="search?q=index=sns%20logtype%3Dserver">Administration</a>
+      <a href="search?q=index=sns%20logtype%3Dpvm">Vulnerabilities</a>
+      <a href="search?q=index=sns%20logtype%3Dvpn">IPSec VPN</a>
+      <a href="search?q=index=sns%20logtype%3Dxvpn">SSL VPN</a>
+      <a href="search?q=index=sns%20logtype%3Dmonitor">Monitor</a>
+    </collection>
+  </collection>
+  
+  <collection label="System">
+    <view name="system" />
+    <view name="server" />
+  </collection>
+  
+  <collection label="Traffic">
+    <view name="interface" />
+    <view name="data" />
+  </collection>
+  
+  <collection label="Unified Threat Management">
+    <view name="app" />
+    <view name="web" />
+    <view name="mail" />
+  </collection>
+  
+  <collection label="Security">
+    <view name="alarms" />
+    <view name="threat" />
+  </collection>
+  
+
+</nav>

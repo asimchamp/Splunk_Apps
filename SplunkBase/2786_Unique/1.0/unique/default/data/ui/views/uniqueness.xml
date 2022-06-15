@@ -1,0 +1,76 @@
+<form>
+  <label>Uniqueness</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+
+    <input type="dropdown" token="index_name" searchWhenChanged="true">
+      <label>Select an index:</label>
+      <default>main</default>
+      <search>
+        <query>| eventcount summarize=false index=* | dedup index | fields index </query>
+      </search>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+    </input>
+
+    <input type="text" token="source_name">
+      <label>Source</label>
+      <default>*</default>
+    </input>
+
+    <input type="dropdown" token="snap" searchWhenChanged="true">
+        <label>Snapshot...</label>
+        <search>
+          <query>| zkread command="get_children" path="/unique/" | rename children: as snapshot | table snapshot</query>
+        </search>
+        <fieldForLabel>snapshot</fieldForLabel>
+        <fieldForValue>snapshot</fieldForValue>
+    </input>
+
+  </fieldset>
+  <row>
+    <panel>
+      <input type="dropdown" depends="$snap$" token="field_extraction" searchWhenChanged="true">
+        <label>Saved search parameter string</label>
+        <selectFirstChoice>true</selectFirstChoice>
+        <search><query>| zkread command="get" path="/unique/$snap$/_transform_field" | rename value as field | table field</query></search>
+        <fieldForLabel>field</fieldForLabel>
+        <fieldForValue>field</fieldForValue>
+      </input>
+
+      <input type="text" depends="$snap$" token="field_extraction">
+        <label>Search parameters - override</label>
+      </input>
+
+      <input type="checkbox" depends="$snap$" token="fields" searchWhenChanged="true">
+        <label>Available Fields to compare</label>
+        <delimiter>, </delimiter>
+        <search>
+          <query>| zkread command="get_children" path="/unique/$snap$/fields" | rename children: as field | table field</query>
+        </search>
+        <fieldForLabel>field</fieldForLabel>
+        <fieldForValue>field</fieldForValue>
+      </input>
+
+      <table depends="$snap$, $fields$">
+        <title>Unique Field entries for $snap$ on fields $fields$</title>
+        <search>
+          <query>index=$index_name$ source=$source_name$ $field_extraction$ | uniqueness snapshot=$snap$ fields="$fields$" | search unique != 0 | stats count by $fields$, unique | rename unique AS "Unique Field" | table $fields$ "Unique Field" </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

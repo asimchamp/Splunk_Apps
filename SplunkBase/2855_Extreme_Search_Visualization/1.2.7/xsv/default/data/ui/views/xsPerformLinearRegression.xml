@@ -1,0 +1,100 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsPerformLinearRegression</label>
+  <row>
+    <html>
+      <br />
+      <p>
+        <span class="head4">Command: </span>
+        <span class="cmd">xsPerformLinearRegression</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Statistical Reasoning</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Performs a non linear regression using the following formula: y= slope * x + intercept and sends the output to a specified file.</span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsPerformLinearRegression (x_field)+ OVER (y_field)+ [BY field] [OUTPUT filename] </span>
+      </p>
+      <br />
+      <br />
+      <span class="head4">Example: </span>
+      <span class="code">xsPerformLinearRegression AirTime OVER ArrDelay BY Carrier OUTPUT ArrDelay_auto</span>
+      <p>
+        <span class="explanation">Performs a linear regression where x=AirTime and y=ArrDelay by Carrier and sends the output to the lookup file ArrDelay_auto.csv.</span>
+      </p>
+      <p>
+        <span class="head4"> Example Output: </span>
+        <span class="code">
+          x,y,bf,bv,numRows,slope,intercept,errA,errB,R<br />
+	  ArrDelay,AirTime,Carrier,US,15850,0.0564407742,124.5891931895,0.0225071253,0.6151493233,0.0199158825<br />
+	  ArrDelay,AirTime,Carrier,UA,40254,0.0989102320,167.9584758827,0.0181335584,0.6385106643,0.0388211718<br />
+	  ArrDelay,AirTime,Carrier,OO,54160,0.0323036858,71.6142411295,0.0080257546,0.2856651392,0.0289065273<br />
+	  ArrDelay,AirTime,Carrier,MQ,22095,0.0242985635,79.7557340537,0.0052194693,0.2485128779,0.0342956182<br />
+	  ArrDelay,AirTime,Carrier,HA,997,0.0649157412,26.1821236576,0.0196158935,0.1811502524,0.1043406045<br />
+	  ArrDelay,AirTime,Carrier,FL,1065,0.0895427501,104.6696789231,0.0480687246,1.2074761785,0.0570418362<br />
+	  ArrDelay,AirTime,Carrier,EV,427,-0.0306985493,73.9966931499,0.0358537064,1.5811809426,0.0414968454<br />
+	  ArrDelay,AirTime,Carrier,YV,9203,-0.1066278505,68.9764650653,0.0128718120,0.3786613129,0.0860399124<br />
+	  ArrDelay,AirTime,Carrier,WN,4788,0.0736320476,100.5478056138,0.0228410401,0.8232790319,0.0465472108<br />
+        </span>
+      </p>
+      <p>
+       <span class="explanation">Where:</span>
+      </p>
+      <p>
+        <span class="explanation">x = x field<br />y = y field <br /> bf = BY field name<br /> bv = BY field value<br /> numRows = number of rows contributing to function<br /> slope = the slope factor of the equation <br /> intercept = the intercept of the equation<br /> </span>
+     </p>
+     <p>
+       <span class="head4">Parameters: </span>
+       <span class="bodytext"> (x_field)+ OVER (y_field)+ BY fieldname OUTPUT filename</span>
+     </p>
+     <p>
+       <span class="para">x_field (field name containing an X value)</span>
+      </p>
+      <p>
+        <span class="explanation">A field in the data set which will be used as x in the formula. You may specificy more than one field to perform regression against. Each field name is separated by a blank space.<span class="bodytext"> y= slope * x + intercept</span></span>
+      </p>
+      <p>
+        <span class="para">y_field (field name containing a Y value)</span>
+      </p>
+      <p>
+        <span class="explanation">A field in the data set which will be used as x in the formula. You may specificy more than one field to perform regression against. Each field name is separated by a blank space.<span class="bodytext"> y= slope * x + intercept</span></span>
+      </p>
+      <p>
+        <span class="explanation">The xsPerformLinearRegression function will return results for multiple values of x and y. Specify 1 to n fields in the data set, each of which will be used as x and y in the formula <span class="bodytext"> y= slope * x + intercept</span></span>
+      </p>
+      <p>
+        <span class="para">fieldname</span>
+      </p>
+      <p>
+        <span class="explanation">Specifies the field in the data set by which the regression will be performed.</span>
+      </p>
+      <p>
+        <span class="para">filename</span>
+      </p>
+      <p>
+        <span class="explanation">Specifies the lookup file to which the output will be written.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">Performs the requested regression and send the output in Comma Separated Value format to the specified file name. If the file exists, it will be overwritten.</span>
+      </p>
+      <br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150817.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

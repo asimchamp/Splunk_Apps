@@ -1,0 +1,85 @@
+<dashboard version="1.1">
+  <label>HSM Home</label>
+  <description>Home page</description>
+  <row>
+    <panel>
+      <title>HSM Information</title>
+      <table>
+        <search ref="HSM Information Stats Table"></search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <set token="showPartitionDetails">true</set>
+          <set token="submittedHost">$row.Appliance Hostname/IP$</set>
+          <set token="hsmSerial">$row.HSM Serial$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row depends="$showPartitionDetails$">
+    <panel>
+      <title>Partition Information - $submittedHost$</title>
+      <table>
+        <search>
+          <query>index=hsm_partition_info  host=$submittedHost$ hsmPartitionStorageAvailableByt=* OR hsmPartitionStorageAllocatedByt=* OR hsmPartitionActivated=* OR partitionid=* OR hsmPartitionLabel=* | head 2000 | stats  values(hsmPartitionLabel) as Label, values(host) as host, values(hsmPartitionStorageAllocatedByt) as "Allocated Storage Bytes", values(hsmPartitionStorageAvailableByt) as "Available Storage Bytes" ,  values(hsmPartitionActivated) as "Partition Activation Status"  by partitionid | rename partitionid as "Partition serial Number" | stats list("Partition serial Number") as "Partition serial Number", list(Label) as "Partition Label", list("Allocated Storage Bytes") as "Allocated Storage Bytes", list("Available Storage Bytes") as "Available Storage Bytes", list("Partition Activation Status") as "Partition Activation Status" by host | rename host as "Appliance IP" | join "Appliance IP" [search index=hsm_information hsmAdminLoginAttempts=* OR ECIES_capability=* OR Korean_support=*  OR hsmManuallyZeroized=* | head 500 | eval Korean_support1=case(Korean_support==0, "No", Korean_support==1, "Yes") | eval ECIES_capability1=case(ECIES_capability==0, "No", ECIES_capability==1, "Yes", ECIES_capability==NULL, "Unknown") | stats values(ECIES_capability1) as "ECIES Capable" , values(hsmAdminLoginAttempts) as "Admin Login Attempts Left", values(hsmManuallyZeroized) as "Manually Zeroized"  by host |  rename host as "Appliance IP"]</query>
+          <earliest>-2h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>HSM Usage Information</title>
+      <table>
+        <search ref="HSM Usage Information Stats Table"></search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <!-- <set token="showDeviceHealth">true</set> -->
+          <!-- <set token="deviceHost">$row.Appliance Hostname/IP$</set> -->
+          <link target="_blank">/app/deviceinformation/hsm_health?form.submittedHost=$row.Appliance Hostname/IP$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <!-- <row depends="$showDeviceHealth$">
+           <panel>
+      <title>Temperature Information</title>
+      <table>
+        <search>
+          <query>index=lunasa_appliance CPU_Temperature=*  | head 200 |  eval CPU_Temperature=CPU_Temperature/1000 | timechart cont=FALSE list(CPU_Temperature) by host</query>
+          <earliest>-2h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link taget="_blank">/app/deviceinformation/hsm_health</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row> -->
+</dashboard>

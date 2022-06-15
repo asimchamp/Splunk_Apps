@@ -1,0 +1,29 @@
+<form>
+  <label>Check connection to forwarder</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timerange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>List of systems failing for some reason, see details in returnvalue.</title>
+      <table>
+        <search>
+          <query>| metadata type=hosts index=_internal| fields host | forwarderquerystreaming api="/servicesNS/nobody/system/data/outputs/tcp/server/" | search returnvalue="*timeout*" OR returnvalue="*authorized*"| join host [ | search index=_internal source=*metrics.log* group=tcpin_connections | regex hostname!="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" | eval host=hostname | stats latest(arch) AS cpu_arch latest(fwdType) AS forwarder_type latest(os) AS os_name latest(version) AS version by host ]</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">25</option>
+      </table>
+    </panel>
+  </row>
+</form>

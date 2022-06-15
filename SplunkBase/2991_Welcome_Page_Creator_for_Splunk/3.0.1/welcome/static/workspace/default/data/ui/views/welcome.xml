@@ -1,0 +1,40 @@
+<dashboard version="1.1">
+  <label>Welcome</label>
+  <row>
+    <panel>
+      <html>
+        <h1>
+          <img src="/static/app/welcome/green_splunk_logo.png" height="50px" width="50px"/> Learn</h1>
+      </html>
+    </panel>
+    <panel>
+      <html>
+        <h1>
+          <img src="/static/app/welcome/green_splunk_logo.png" height="50px" width="50px"/> Get Help</h1>
+      </html>
+    </panel>
+    <panel>
+      <html>
+        <h1>
+          <img src="/static/app/welcome/green_splunk_logo.png" height="50px" width="50px"/> Go!</h1>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel ref="welcome_learning_splunk" app="welcome"></panel>
+    <panel ref="welcome_splunk_community" app="welcome"></panel>
+    <panel ref="welcome_waiting_on_your_splunk_admins" app="welcome"></panel>
+  </row>
+  <row>
+    <panel ref="welcome_splunk_videos" app="welcome"></panel>
+    <panel ref="welcome_internal_community" app="welcome"></panel>
+    <panel ref="welcome_start" app="welcome"></panel>
+  </row>
+  <row>
+    <panel ref="welcome_leaderboard-active-searchers" app="welcome"></panel>
+    <panel ref="welcome_popular_views" app="welcome"></panel>
+  </row>
+  <row>
+    <panel ref="welcome_data_exploration" app="welcome"></panel>
+  </row>
+</dashboard>

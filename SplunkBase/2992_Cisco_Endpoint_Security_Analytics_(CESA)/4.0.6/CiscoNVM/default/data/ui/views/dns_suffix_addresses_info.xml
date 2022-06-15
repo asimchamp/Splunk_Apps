@@ -1,0 +1,58 @@
+<form version="1.1" showsource="False" stylesheet="drilldownBkgd.css,css/common.css">
+  <label>DNS Suffix Addresses Info</label>
+  <fieldset submitButton="true">
+    <input type="time" token="time">
+      <label></label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <input type="text" token="Location">
+        <label>Filter Location here</label>
+        <initialValue>*</initialValue>
+      </input>
+      <table id="expand_with_events">
+        <title>Select row to drilldown and obtain more information on each Location</title>
+        <search>
+          <query>`nvm_flowdata_index` ds=$Location$ pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=_softwareupdate AND pap!=nobody AND pap!=_mdnsresponder AND pap!=_lp AND pap!=_locationd AND pap!=root AND pap!=UpdatusUser pn!='' | eval dh = if(dh="Unknown", da, dh) | replace '' with "Unknown" | stats count by ds | rename ds AS "Location" | fields - count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="Location">$row.Location$</set>
+          <!-- If we also set the form.sourcetype the input will get updated too -->
+          <set token="form.Location">$row.Location$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Details for Location : $Location$</title>
+      <table id="AppDetails" depends="$Location$">
+        <search>
+          <query>`nvm_flowdata_index` ds=$Location$ NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=softwareupdate AND pap!=nobody AND pap!=_mdnsreponder AND pap!=_lp AND pap!=_locationd AND pap!=root pap!=UpdateUser)  | eval dh = if(dh="Unknown", da, dh)| join udid [|search `nvm_sysdata_index` | fields vsn, iid,udid]  | replace '' with "Unknown" | stats count by vsn, liuid,user | rename vsn as "System Name", liuid as "Logged in User", user as "User"| fields - count</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

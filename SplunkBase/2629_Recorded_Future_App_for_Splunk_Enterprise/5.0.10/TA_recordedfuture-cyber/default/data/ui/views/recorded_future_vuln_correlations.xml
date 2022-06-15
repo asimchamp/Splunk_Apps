@@ -1,0 +1,129 @@
+<dashboard stylesheet="css/recorded_future_correlation.css" script="js/evidence.js">
+<label>Recorded Future Cyber Vulnerability Log Correlation</label>
+<!-- Original search using real data
+  <search id="core">
+    <query>
+      sourcetype="tenable:sc:vuln" earliest=-24h 
+      | eval Name=cve 
+      | join Name [|inputlookup rf_vulnerability_risklist.csv | table *]
+      | search EvidenceDetails != ""
+    </query>
+  </search>
+-->
+  <search id="core">
+    <query>
+      | rest splunk_server=local /services/TA_recordedfuture-cyber/sample_data type=vuln
+      | sort -Risk
+    </query>
+  </search>
+  <row>
+    <html>
+      <div class="help-link" style="float: right; text-align: right;">
+        <img src="/static/app/TA_recordedfuture-cyber/img/logo.svg" alt="Recorded Future, Inc logotype" style="height: 30px;"/><br/>
+        <a href="/app/TA_recordedfuture-cyber/recorded_future_help_correlation_dashboards" target="_blank">Help</a>
+      </div>
+      <div>
+        <h1>
+          This dashboard displays correlated Vulnerabilities with Recorded Future's Vulnerability Risk List.
+        </h1>
+      </div>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Summary</title>
+        <search base="core">
+          <query>
+            | stats count(Name) as count 
+            | fields count 
+            | rangemap field=count low=0-0 evelated=1-1 default=severe
+          </query>
+        </search>
+        <option name="underLabel">High Risk Vulnerabilities</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Vulnerability Rule Hits</title>
+        <search base="core">
+          <query>
+            | eval Rule=spath(EvidenceDetails,"EvidenceDetails{}.Rule")
+            | eval EvidenceString=spath(EvidenceDetails,"EvidenceDetails{}.EvidenceString")
+            | search Rule!=""
+            | top Rule limit=20 showperc=false
+          </query>
+        </search>
+        <option name="totalsRow">true</option>
+        <option name="wrap">false</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel id="topcount">
+      <table>
+        <title>Top Vulnerability Counts</title>
+        <search base="core">
+          <query>
+            | eval Rule = spath(EvidenceDetails,"EvidenceDetails{}.Rule")
+            | eval EvidenceString = spath(EvidenceDetails,"EvidenceDetails{}.EvidenceString") 
+            | sort -Risk 
+            | rename Name as Vulnerability
+            | top Vulnerability limit=20 showperc=false
+          </query>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="totalsRow">true</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <condition field="Vulnerability">
+            <link target="_blank">/app/TA_recordedfuture-cyber/search?q=search%20index%3D*%20$row.Vulnerability$</link>
+          </condition>
+          <condition>
+            <link target="_blank">/app/TA_recordedfuture-cyber/recorded_future_vuln_enrichment?form.name=$row.Vulnerability$</link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="etable">
+        <title>High Risk Vulnerabilities</title>
+        <search base="core">
+          <query>
+            | eventstats Count BY Name
+            | `format_evidence`
+            | sort -Risk
+            | eval Risk = round(Risk,0)
+            | rename RiskString AS Rules
+            | rename Name TO Vulnerability
+            | table Risk, Vulnerability, Count, Rules, Evidence
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <condition field="Vulnerability">
+            <link target="_blank">/app/TA_recordedfuture-cyber/search?q=search%20index%3D*%20$row.Vulnerability$</link>
+          </condition>
+          <condition>
+            <link target="_blank">/app/TA_recordedfuture-cyber/recorded_future_vuln_enrichment?form.name=$row.Vulnerability$</link>
+          </condition>
+        </drilldown>
+        <format type="color" field="Risk">
+          <colorPalette type="list">
+            ["0x777777","0xffce00","0xcf0a2c"]
+          </colorPalette>
+          <scale type="threshold">
+            30,71,100
+          </scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</dashboard>

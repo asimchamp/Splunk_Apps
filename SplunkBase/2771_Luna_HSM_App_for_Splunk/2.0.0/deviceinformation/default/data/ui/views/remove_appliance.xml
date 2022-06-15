@@ -1,0 +1,33 @@
+<dashboard script="javascript/remove_appliance.js" stylesheet="styles/remove_appliance.css" version="1.1">
+  <label>Remove Appliance</label>
+  <row>
+    <panel>
+      <html>
+        <h1>Configured Luna HSM Appliances</h1>
+        <hr />
+        <form id="remove_appliance_form">
+          <div class="luna-form-group-top-div">
+            <div class="luna-table">
+              <div class="luna-table-header">
+                <div class="luna-table-header-item">Configuration Name</div>
+                <div class="luna-table-header-item">Appliance IP/Hostname</div>
+                <div class="luna-table-header-item">Delete?</div>
+              </div>
+              <div class="luna-table-content luna-appliance-list-element">
+                <div class="luna-table-row-buttons">
+                  <div class="luna-table-data-buttons">
+                    <button name="cancel" id="lunaapp_cancel_button" type="button" class="btn btn-primary">Cancel</button>
+                    &#xA0;&#xA0;&#xA0;&#xA0;
+                    <button name="submit" id="lunaapp_submit_button" type="button" class="btn btn-primary">Delete</button>
+                  </div>
+                  <div class="luna-table-data-buttons">&#xA0;</div>
+                  <div class="luna-table-data-buttons">&#xA0;</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </html>
+    </panel>
+  </row>
+</dashboard>

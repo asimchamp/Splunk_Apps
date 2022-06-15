@@ -1,0 +1,37 @@
+<dashboard>
+  <label>nCircle - Active Scans</label>
+  <row>
+    <panel>
+      <title>Active Scans (Last 1h)</title>
+      <table>
+        <search>
+          <query>earliest=-1h `vuln_splunk_server` `vuln_index` `vuln_sourcetype` source=*getActiveScans.py | rename scanProfile.profile.scanProfile.@timezone as timezone, scanProfile.profile.scanProfile.@type as type, scanProfile.profile.scanProfile.constraints.scanWindow.@start as start, scanProfile.profile.scanProfile.constraints.scanWindow.@end as end, scanProfile.profile.scanProfile.constraints.scanFrequency.byMonth.@daysOfMonth as DayOfMonth | table scanProfile.name, timezone, type, DayOfMonth, start, end, network.name, network.include, network.exclude | dedup scanProfile.name, timezone, type, DayOfMonth, start, end, network.name, network.include, network.exclude</query>
+          <earliest>-30m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Historical Scans (Last 30 days)</title>
+      <table>
+        <search>
+          <query>earliest=-30d latest=-1h `vuln_splunk_server` `vuln_index` `vuln_sourcetype` source=*getActiveScans.py | rename scanProfile.profile.scanProfile.@timezone as timezone, scanProfile.profile.scanProfile.@type as type, scanProfile.profile.scanProfile.constraints.scanWindow.@start as start, scanProfile.profile.scanProfile.constraints.scanWindow.@end as end, scanProfile.profile.scanProfile.constraints.scanFrequency.byMonth.@daysOfMonth as DayOfMonth | table scanProfile.name, timezone, type, DayOfMonth, start, end, network.name, network.include, network.exclude | dedup scanProfile.name, timezone, type, DayOfMonth, start, end, network.name,network.include, network.exclude</query>
+          <earliest>-30m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,761 @@
+<form script="set_app_token.js,check_data_availability.js">
+  <label>Per User Search Activity</label>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="user" searchWhenChanged="true">
+      <label>User</label>
+      <search>
+        <query>| tstats `SearchActivitySummaries` count  from `SA_SearchHistory` groupby Search_History.user | fields - count | `SARename` | `ldapsearch_lookup(user, cn)` | eval name=coalesce(cn . " (" . user . ")", user) |  sort user</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+      </search>
+      <fieldForLabel>name</fieldForLabel>
+      <fieldForValue>user</fieldForValue>
+    </input>
+    <input type="multiselect" token="sh_clause">
+      <label>Search Head</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>| tstats `SearchActivitySummaries` count from `SA_SearchHistory` groupby Search_History.SearchHead | `SARename`</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>Search_History.SearchHead=</valuePrefix>
+      <delimiter> OR </delimiter>
+      <default>*</default>
+      <fieldForLabel>SearchHead</fieldForLabel>
+      <fieldForValue>SearchHead</fieldForValue>
+    </input>
+  </fieldset>
+  <search>
+    <query>| makeresults | eval search=$sh_clause|s$ | rex mode=sed field=search "s/Search_History.SearchHead/Log_Events.SearchHead/"  </query>
+    <done>
+      <set token="events_sh_clause">$result.search$</set>
+    </done>
+  </search> 
+  <search id="globalusermetrics">
+    <query>| tstats `SearchActivitySummaries` count avg(Search_History.total_run_time) as trt from `SA_SearchHistory` where Search_History.user=admin by Search_History.searchtype | join Search_History.searchtype [| tstats `SearchActivitySummaries` count from `SA_SearchHistory` where Search_History.user=admin by Search_History.searchtype _time span=1d | stats avg(count) as avg by Search_History.searchtype] | eval maxField = mvappend(mvappend('Search_History.searchtype' . "|Total|" . count, 'Search_History.searchtype' . "|AvgRT_Total|" . trt), 'Search_History.searchtype' . "|Avg|" . avg) | table maxField | mvexpand maxField | rex field=maxField "(?&lt;searchtype&gt;.*)\|(?&lt;metric&gt;.*)\|(?&lt;value&gt;.*)" | eval row="row", column="background_" . metric . searchtype | xyseries row column value | eval background_Totaladhoc = coalesce(round(background_Totaladhoc,2), ""), background_Avgadhoc = coalesce(round(background_Avgadhoc,2), ""), background_AvgRT_Totaladhoc = coalesce(round(background_AvgRT_Totaladhoc,2), ""), background_Totaldashboard = coalesce(round(background_Totaldashboard,2), ""), background_Avgdashboard = coalesce(round(background_Avgdashboard,2), ""), background_AvgRT_Totaldashboard = coalesce(round(background_AvgRT_Totaldashboard,2), ""), background_Totalrealtime = coalesce(round(background_Totalrealtime,2), ""), background_Avgrealtime = coalesce(round(background_Avgrealtime,2), ""), background_AvgRT_Totalrealtime = coalesce(round(background_AvgRT_Totalrealtime,2), ""), background_Totalscheduled = coalesce(round(background_Totalscheduled,2), ""), background_Avgscheduled = coalesce(round(background_Avgscheduled,2), ""), background_AvgRT_Totalscheduled = coalesce(round(background_AvgRT_Totalscheduled,2), ""), background_Totalsummarization = coalesce(round(background_Totalsummarization,2), ""), background_Avgsummarization = coalesce(round(background_Avgsummarization,2), ""), background_AvgRT_Totalsummarization = coalesce(round(background_AvgRT_Totalsummarization,2), ""), background_Totalsum = coalesce(round(background_Totalsum,2), ""), background_Avgsum = coalesce(round(background_Avgsum,2), ""), background_AvgRT_Totalsum = coalesce(round(background_AvgRT_Totalsum,2), "")</query>
+    <done>
+      
+<set token="background_Totaladhoc">$result.background_Totaladhoc$</set>
+<set token="background_Avgadhoc">$result.background_Avgadhoc$</set>
+<set token="background_AvgRT_Totaladhoc">$result.background_AvgRT_Totaladhoc$</set>
+	
+<set token="background_Totaldashboard">$result.background_Totaldashboard$</set>
+<set token="background_Avgdashboard">$result.background_Avgdashboard$</set>
+<set token="background_AvgRT_Totaldashboard">$result.background_AvgRT_Totaldashboard$</set>
+	
+<set token="background_Totalrealtime">$result.background_Totalrealtime$</set>
+<set token="background_Avgrealtime">$result.background_Avgrealtime$</set>
+<set token="background_AvgRT_Totalrealtime">$result.background_AvgRT_Totalrealtime$</set>
+	
+<set token="background_Totalscheduled">$result.background_Totalscheduled$</set>
+<set token="background_Avgscheduled">$result.background_Avgscheduled$</set>
+<set token="background_AvgRT_Totalscheduled">$result.background_AvgRT_Totalscheduled$</set>
+	
+<set token="background_Totalsummarization">$result.background_Totalsummarization$</set>
+<set token="background_Avgsummarization">$result.background_Avgsummarization$</set>
+<set token="background_AvgRT_Totalsummarization">$result.background_AvgRT_Totalsummarization$</set>
+	
+<set token="background_Totalsum">$result.background_Totalsum$</set>
+<set token="background_Avgsum">$result.background_Avgsum$</set>
+<set token="background_AvgRT_Totalsum">$result.background_AvgRT_Totalsum$</set>
+
+    </done>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <h1>Overview</h1>
+        <div id="HighLevelInfo">
+<h3>User Information</h3>
+
+<table style="width:100%">
+	<tr style="border:1px black solid;">
+		<td>Name:</td>
+		<td style="border-right:1px black solid;">$background_cn$</td>
+		<td>Company:</td>
+		<td style="border-right:1px black solid;">$background_company$</td>
+		<td>Department</td>
+		<td style="border-right:1px black solid;">$background_department$</td>
+		<td>Email</td>
+		<td>$background_mail$</td>
+	</tr>
+	<tr style="border:1px black solid;">
+		<td>Username</td>
+		<td style="border-right:1px black solid;">$background_splunk_username$</td>
+		<td>Title</td>
+		<td style="border-right:1px black solid;">$background_title$</td>
+		<td>Number of Reports</td>
+		<td style="border-right:1px black solid;">$background_NumReports$</td>
+		<td>Description</td>
+		<td>$background_description$</td>
+	</tr>
+	<tr style="border:1px black solid;">
+		<td>Phone:</td>
+		<td style="border-right:1px black solid;">$background_telephoneNumber$</td>
+		<td>Office Location:</td>
+		<td style="border-right:1px black solid;">$background_physicalDeliveryOfficeName$</td>
+		<td>Management Chain</td>
+		<td style="border-right:1px black solid;">$background_ManagementChain$</td>
+		<td>Number of Direct Reports:</td>
+		<td>$background_NumDirectReports$</td>
+	</tr>
+	<tr style="border:1px black solid;">
+		<td>Office</td>
+		<td style="border-right:1px black solid;">$background_o$</td>
+		<td>State</td>
+		<td style="border-right:1px black solid;">$background_st$</td>
+		<td>Location</td>
+		<td style="border-right:1px black solid;">$background_l$</td>
+		<td>Country</td>
+		<td>$background_c$</td>
+	</tr>
+</table>
+
+<h3>Search Information</h3>
+        <p>$background_somename$ was active for $background_NumDays$ day, and ran a total of $background_Totalsum$ searches ($background_Avgsum$ per day).</p>
+<table style="width:100%">
+	<tr>
+		<td style="border:1px black solid;">Search Type</td>
+		<td style="border:1px black solid;">Number of Queries Overall</td>
+		<td style="border:1px black solid;">Number of Queries Per Day</td>
+		<td style="border:1px black solid;">Average Runtime of Queries</td>
+	</tr>
+	<tr>
+		<td style="border:1px black solid;">AdHoc</td>
+		<td style="border:1px black solid;">$background_Totaladhoc$</td>
+		<td style="border:1px black solid;">$background_Avgadhoc$</td>
+		<td style="border:1px black solid;">$background_AvgRT_Totaladhoc$</td>
+	</tr>
+	<tr>
+		<td style="border:1px black solid;">Dashboard</td>
+		<td style="border:1px black solid;">$background_Totaldashboard$</td>
+		<td style="border:1px black solid;">$background_Avgdashboard$</td>
+		<td style="border:1px black solid;">$background_AvgRT_Totaldashboard$</td>
+	</tr>
+	<tr>
+		<td style="border:1px black solid;">Realtime</td>
+		<td style="border:1px black solid;">$background_Totalrealtime$</td>
+		<td style="border:1px black solid;">$background_Avgrealtime$</td>
+		<td style="border:1px black solid;">$background_AvgRT_Totalrealtime$</td>
+	</tr>
+	<tr>
+		<td style="border:1px black solid;">Scheduled</td>
+		<td style="border:1px black solid;">$background_Totalscheduled$</td>
+		<td style="border:1px black solid;">$background_Avgscheduled$</td>
+		<td style="border:1px black solid;">$background_AvgRT_Totalscheduled$</td>
+	</tr>
+	<tr>
+		<td style="border:1px black solid;">Summarization</td>
+		<td style="border:1px black solid;">$background_Totalsummarization$</td>
+		<td style="border:1px black solid;">$background_Avgsummarization$</td>
+		<td style="border:1px black solid;">$background_AvgRT_Totalsummarization$</td>
+	</tr> <!-- 
+	<tr>
+		<td  style="border:1px black solid;">Total</td>
+		<td  style="border:1px black solid;">$background_Totalsum$</td>
+		<td  style="border:1px black solid;">$background_Avgsum$</td>
+		<td  style="border:1px black solid;">$background_AvgRT_Totalsum$</td>
+	</tr> -->
+</table>
+        </div>
+        <p>Please note that the five indicators directly below cover only ad hoc searching, and are only intended as a general gauge of user experience.</p>
+        <p>This app has a capability of tracking groups of users (such as new users, or particular projects, or other categories of user). Click <a href="/app/search_activity/add_to_tagged_users">here</a> to tag $background_splunk_username$.
+          </p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Per User Timeline View</h2>
+        <p>To view $background_splunk_username$'s activity in chronological order, please visit the <a href="/app/search_activity/per_user_timeline?form.user=$background_splunk_username$">Per User Timeline View</a>.</p>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Search Complexity Score</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` avg(Search_History.search_command_complexity) as avg_complexity count from `SA_SearchHistory` where * $sh_clause$ Search_History.user=$user$ Search_History.searchtype=adhoc by _time span=1d</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Search Accuracy (slow searches)</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` avg(Search_History.Accuracy)  from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$ Search_History.total_run_time&gt;15 Search_History.result_count&gt;0 Search_History.searchtype=adhoc by _time span=1d</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Average Search Time (seconds)</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` avg(Search_History.total_run_time) as runtime from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$ Search_History.searchtype=adhoc by _time span=1d | eval runtime=round(runtime,0)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Failed Search Percentage</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count from `SA_SearchHistory` where * $sh_clause$  Search_History.user=$user$ by Search_History.search_status _time span=1d | stats sum(count) as count sum(eval(if('Search_History.search_status'!="completed",count,0))) as failed by _time | eval percentage = round(100*failed / count ,2) | table _time percentage</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>% Searches Needing Investigation</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count sum(Search_History.ShouldInvestigate) as investigate from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ by _time span=1d | eval percentage = round(100*investigate / count,2) | table _time percentage</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Comparison to Organization</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count sum(Search_History.total_run_time) as total_run_time sum(Search_History.Accuracy) as Accuracy sum(Search_History.search_command_complexity) as Complexity sum(Search_History.ShouldInvestigate) as ShouldInvestigate from `SA_SearchHistory` where * $sh_clause$  groupby _time Search_History.user Search_History.searchtype span=1d
+| stats sum(count) as NumSearches count(eval('Search_History.searchtype'="adhoc")) as NumAdHocSearches sparkline(sum(count)) as UsageTrend sum(total_run_time) as HoursOfSearchTime sum(eval(if('Search_History.searchtype'="adhoc", total_run_time,0))) as HoursOfAdHocSearchTime sum(Accuracy) as Accuracy sum(Complexity) as Complexity sum(ShouldInvestigate) as ShouldInvestigate avg(eval(if('Search_History.searchtype'="adhoc", total_run_time,0))) as AvgSearchTime by Search_History.user
+| join type=left Search_History.user [ | tstats `SearchActivitySummaries` sum(Log_Events.is_exported) as "# Exports" sum(Log_Events.is_shared) as "# Shares"  from `SA_Events` where $events_sh_clause$ groupby Log_Events.user  | rename Log_Events.user as Search_History.user]
+| eval Accuracy = Accuracy / NumSearches, Complexity=Complexity / NumSearches
+    | eval HoursOfSearchTime = round(HoursOfSearchTime/3600,2) 
+    | eval HoursOfAdHocSearchTime = round(HoursOfAdHocSearchTime/3600,2) 
+   | eval comment = "I need to add exports back in, once that datamodel is set"
+   | sort 0 "Accuracy" | streamstats count as "Accuracy Order" | eventstats count(eval(isnotnull('Accuracy') AND 'Accuracy'&gt;=0)) as "NumAccuracyUsers" | eval "Accuracy Order" = 'Accuracy Order' . " out of " . NumAccuracyUsers 
+   | sort 0 "Complexity" | streamstats count as "Complexity Order" | eventstats count(eval(isnotnull('Complexity') AND 'Complexity'&gt;=0)) as "NumComplexityUsers"| eval "Search Complexity Order" = 'Complexity Order' . " out of " . NumComplexityUsers 
+   | sort 0 - "ShouldInvestigate" | streamstats count as "ShouldInvestigate Order" | eventstats count(eval(isnotnull('ShouldInvestigate') AND 'ShouldInvestigate'&gt;=0)) as "NumShouldInvestigateUsers" | eval "Questionable Search Order" = 'ShouldInvestigate Order' . " out of " . NumShouldInvestigateUsers 
+   | sort 0 - "AvgSearchTime" | streamstats count as "AvgSearchTime Order" | eventstats count(eval(isnotnull('AvgSearchTime') AND 'AvgSearchTime'&gt;=0)) as "NumAvgSearchTimeUsers"| eval "Slow Search Runtime Order" = 'AvgSearchTime Order' . " out of " . NumAvgSearchTimeUsers
+   | rename Search_History.user as User
+   | `ldapsearch_lookup(User,mail)`
+| fields User NumSearches NumAdHocSearches UsageTrend "#*" HoursOfSearchTime HoursOfAdHocSearchTime "Accuracy Order" "Search Complexity Order"  "Questionable Search Order" "Slow Search Runtime Order" mail 
+| sort - NumSearches 
+| where NumSearches&gt;0  
+| fillnull value="N/A"
+| where User="$user$"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Search Type over Time</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$ by _time Search_History.searchtype  span=1d| timechart bins=50 count by Search_History.searchtype</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">"Median Search Run Time"</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Overall Details by Search Type</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count sum(Search_History.total_run_time)  from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ groupby Search_History.searchtype  | stats count sum(Search_History.total_run_time) by Search_History.searchtype</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Activity By Search Head</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$ groupby Search_History.searchtype, Search_History.SearchHead | chart count over Search_History.SearchHead by Search_History.searchtype</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Apps and Views Visited</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries`  prestats=t count values(Log_Events.user)  from `SA_Events` where $events_sh_clause$ Log_Events.type=weblog Log_Events.user=$user$ groupby Log_Events.myapp Log_Events.myview | stats count values(Log_Events.user) as user by Log_Events.myapp, Log_Events.myview| `SARename`  | stats sum(count) as "Total Hits" values(user) as "Users" list(count) as "Hits Per View" list(myview) as "Views" by myapp | rename myapp to "App" | sort - "Total Hits"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h1>Security</h1>
+        <p>The below cover security risks and configurations.</p>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Exported Search Results</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count dc(Log_Events.user) values(Log_Events.user) from `SA_Events` where Log_Events.user=$user$ Log_Events.is_exported=1 groupby Log_Events.searchid
+| tstats `SearchActivitySummaries` prestats=t append=t values(Search_History.actualsearch) values(Search_History.user) values(Search_History.result_count) from `SA_SearchHistory` where [| tstats `SearchActivitySummaries` count from `SA_Events` where Log_Events.user=$user$ Log_Events.is_exported=1 groupby Log_Events.searchid | rename Log_Events.searchid as Search_History.searchid | table Search_History.searchid ] groupby Search_History.searchid
+| eval searchid=coalesce('Log_Events.searchid', 'Search_History.searchid') 
+| stats count as Num_Exports dc(Log_Events.user) as Num_Users values(Log_Events.user)  as Users_Who_Exported values(Search_History.actualsearch) as Search_String values(Search_History.user) as User_Who_Started_Search values(Search_History.result_count) as Num_Results by searchid
+| table Num_Results Num_Exports Num_Users Users_Who_Exported User_Who_Started_Search Search_String searchid</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Shared Search Results History</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count dc(Log_Events.user) values(Log_Events.user) from `SA_Events` where [| tstats `SearchActivitySummaries` count from `SA_Events` where Log_Events.user=$user$ Log_Events.is_shared=1 groupby Log_Events.searchid | table Log_Events.searchid ] groupby Log_Events.searchid
+| tstats `SearchActivitySummaries` prestats=t append=t values(Search_History.actualsearch) values(Search_History.user) values(Search_History.result_count) from `SA_SearchHistory` where [| tstats `SearchActivitySummaries` count from `SA_Events` where Log_Events.user=$user$ Log_Events.is_shared=1 groupby Log_Events.searchid | rename Log_Events.searchid as Search_History.searchid | table Search_History.searchid ] groupby Search_History.searchid
+| eval searchid=coalesce('Log_Events.searchid', 'Search_History.searchid') 
+| stats dc(Log_Events.user) as Num_Users values(Log_Events.user)  as Users_Who_Exported values(Search_History.actualsearch) as Search_String values(Search_History.user) as User_Who_Started_Search values(Search_History.result_count) as Num_Results by searchid
+| table Num_Results Num_Users Users_Who_Exported User_Who_Started_Search Search_String searchid | rename "Num_Results" as "# Results" Users_Who_Exported as "Users who Accessed Results" Num_Users as "# Users who Accessed It" "User_Who_Started_Search" as "Sharing User" Search_String as "Search String"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Logins by Hour of Day</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count from `SA_Events` where $events_sh_clause$  Log_Events.type=login Log_Events.user=$user$ groupby Log_Events.date_hour | chart sum(count) as "Number of Logins" by Log_Events.date_hour | rename Log_Events.date_hour as "Hour of Day"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>System Configuration Changes</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries`  count from `SA_Events` where $events_sh_clause$ Log_Events.type=manager Log_Events.user=$user$ groupby _time Log_Events.uri_path | sort - _time | fields - count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h1>Search Performance Detail</h1>
+        <p>Credit for the below searches goes to the SOS team!</p>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Questionable Search Strings</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` values(Search_History.actualsearch) as actualsearch values(Search_History.savedsearch_name) as savedsearch_name max(Search_History.total_run_time) as trt from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ Search_History.ShouldInvestigate&gt;0 groupby Search_History.searchid | `SARename` | eval search = if(isnull(savedsearch_name) OR savedsearch_name="", actualsearch, "(" . savedsearch_name . ") --- " . actualsearch) | cluster labelonly=t field=search | stats count as "# of Runs" avg(trt) as "Avg Runtime" sum(trt) as "Total Runtime" first(search) as "Representative Search String" by cluster_label | fields - cluster_label | sort - "Total Runtime"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Common Search Commands</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count sum(Search_History.total_run_time) as total_run_time from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ by Search_History.searchcommands | `SARename` | sort - count | rename total_run_time as "Total Run Time For Searches Using Command" searchcommands as "Search Command" count as "# of Searches"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <searchTime>| tstats  `SearchActivitySummaries` count as "Number of Searches"  from `SA_SearchHistory` where  $sh_clause$ Search_History.user=$user$  groupby Search_History.searchcommands | `SARename` | sort - "Number of Searches"</searchTime>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Search Commands Associated with Expensive Searches</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` count sum(Search_History.total_run_time) as total_run_time avg(Search_History.total_run_time) as avg_total_run_time from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ Search_History.total_run_time&gt;300 by Search_History.searchcommands | `SARename` | sort - count | rename total_run_time as "Total Run Time For Searches Using Command" avg_total_run_time as "Average Total Run Time For Searches Using Command" searchcommands as "Search Command" count as "# of Searches"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <searchTime>| tstats `SearchActivitySummaries` count as "Number of Searches" avg(Search_History.total_run_time) as "Avg Run Time" stdev(Search_History.total_run_time) as "StDev Run Time" from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$ groupby Search_History.searchcommands | `SARename` | sort - "Avg Run Time" | rename searchcommands as "Search Command"</searchTime>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Aggregate Search Performance by Fuzzy Grouping (cluster)</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` values(Search_History.actualsearch) as actualsearch values(Search_History.savedsearch_name) as savedsearch_name values(Search_History.searchtype) as searchtype avg(Search_History.total_run_time) as total_run_time avg(Search_History.result_count) as result_count from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$  groupby Search_History.searchid | `SARename`| rex mode=sed field=savedsearch_name "s/_+\d*$//" | eval search = if(isnull(savedsearch_name) OR savedsearch_name="", actualsearch, "(" . savedsearch_name . ") --- " . actualsearch) | cluster labelonly=t field=search | stats count as "# Similar Searches" median(total_run_time) as "Median Run Time" avg(result_count) as "Avg Result Count" values(searchtype) as searchtype first(search) as "Representative Search String" by cluster_label | eval search=if(len(search)&gt;220, substr(search,1,220) . "[.......]", search)  | sort - "# Similar Searches" | fields - cluster_label</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["# Similar Searches","Median Run Time","Avg Result Count","Representative Search String"]</fields>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Expensive Searches</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` min(_time) as _time values(Search_History.actualsearch) as actualsearch values(Search_History.savedsearch_name) as savedsearch_name avg(Search_History.total_run_time) as "Search Run Time" avg(Search_History.result_count) as "Result Count" from `SA_SearchHistory` where $sh_clause$  Search_History.user=$user$  groupby Search_History.searchid | `SARename` | rex mode=sed field=savedsearch_name "s/_+\d*$//" | eval search = if(isnull(savedsearch_name) OR savedsearch_name="", actualsearch, "(" . savedsearch_name . ") --- " . actualsearch) | sort - "Search Run Time" | fields - actualsearch savedsearch_name | eval search=if(len(search)&gt;220, substr(search,1,220) . "[.......]", search)  | fields _time "Search Run Time" "Result Count" search searchid</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["_time","Search Run Time","Result Count","search"]</fields>
+        <drilldown>
+          <link>/app/search_activity/per_search_view?form.searchid=$row.searchid$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Average Search Time Span</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` avg(Search_History.searchspan_m) as searchspan_m  avg(Search_History.searchspan_h) as searchspan_h avg(Search_History.searchspan_d) as searchspan_d   from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ groupby Search_History.user | where 'Search_History.user'!="n/a" | `SARename`| rename searchspan_m as "Search Timespan (min)" searchspan_d as "Search Timespan (day)" searchspan_h as "Search Timespan (hour)" | foreach *Timespan* [ | eval "&lt;&lt;FIELD&gt;&gt;" = round('&lt;&lt;FIELD&gt;&gt;', 2)]</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Search Performance Metrics</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` sum(Search_History.total_run_time) as total_run_time avg(Search_History.accuracy) as accuracy sum(Search_History.result_count) as result_count sum(Search_History.event_count) as event_count sum(Search_History.scan_count) as scan_count sum(Search_History.searchspan_m) as searchspan_m  from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ groupby _time | `SARename` | eval EventsPerSecond=event_count / total_run_time | eval ScannedPerSecond=scan_count / total_run_time| timechart span=1d avg(accuracy) as accuracy avg(*PerSecond) as *PerSecond avg(searchspan_m) as searchspan_m  avg(result_count) as result_count  | eventstats avg(accuracy) as avgaccuracy avg(EventsPerSecond) as avgEventsPerSecond avg(ScannedPerSecond) as avgScannedPerSecond avg(searchspan_m) as avgsearchspan_m avg(result_count) as avgresult_count | eval accuracy=round(100*(accuracy/avgaccuracy)) | eval EventsPerSecond=round(100*(EventsPerSecond/avgEventsPerSecond)) | eval ScannedPerSecond=round(100*(ScannedPerSecond/avgScannedPerSecond)) | eval searchspan_m=round(100*(searchspan_m/avgsearchspan_m)) | eval result_count=round(100*(result_count/avgresult_count)) | fields - avg* | rename accuracy AS "Accuracy (% Delta)" EventsPerSecond as "Events/Second (% Delta)" ScannedPerSecond as "Scanned/Second (% Delta)" searchspan_m as "Timespan (% Delta)" result_count as "# Results (% Delta)" | timechart bins=50 avg(*) as *</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h1>Troubleshooting</h1>
+        <p>The below provide very general troubleshooting guidelines:</p>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Failed Searches</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count  from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ Search_History.search_status!=completed groupby Search_History.user Search_History.search_status _time span=1d  | timechart bins=50 count by Search_History.search_status</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Skipped Scheduled Searches (Beta)</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count from `SA_Events` where $sh_clause$ type=scheduler Log_Events.user=$user$ Log_Events.status=skipped groupby Log_Events.status _time span=1d | timechart bins=50 count by Log_Events.status</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Failed Searches with Runtime &gt; 0 seconds</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` prestats=t count  from `SA_SearchHistory` where $sh_clause$ Search_History.search_status=failed Search_History.total_run_time&gt;0 Search_History.user=$user$ groupby _time span=1d | timechart bins=50 count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Failed or Skipped Searches</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` min(_time) as _time values(Search_History.actualsearch) as actualsearch values(Search_History.savedsearch_name) as savedsearch_name values(Search_History.search_status) as status from `SA_SearchHistory` where $sh_clause$ Search_History.search_status=failed Search_History.user=$user$ groupby Search_History.user Search_History.searchid Search_History.search_status  | `SARename` | rex mode=sed field=savedsearch_name "s/_+\d*$//" | eval search = if(isnull(savedsearch_name) OR savedsearch_name="", actualsearch, "(" . savedsearch_name . ") --- " . actualsearch)       | eval search=if(len(search)&gt;220, substr(search,1,220) . "[.......]", search) | fields - savedsearch_name actualsearch | sort - _time</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <fields>["user", "search_status", "_time", "status", "search"]</fields>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link>/app/search_activity/per_search_view?form.searchid=$row.searchid$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Recent Searches (Last 7 Days) - $user$</title>
+        <search>
+          <query>| tstats `SearchActivitySummaries` min(_time) as _time values(Search_History.user) as user values(Search_History.search_status) as status values(Search_History.actualsearch) as actualsearch values(Search_History.savedsearch_name) as savedsearch_name from `SA_SearchHistory` where $sh_clause$ Search_History.user=$user$ groupby Search_History.searchid | `SARename` | rex mode=sed field=savedsearch_name "s/_+\d*$//" | eval search = if(isnull(savedsearch_name) OR savedsearch_name="", actualsearch, "(" . savedsearch_name . ") --- " . actualsearch)  | eval search=if(len(search)&gt;420, substr(search,1,420) . "[.......]", search)  | sort - _time | fields - actualsearch savedsearch_name</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["_time","status","search"]</fields>
+        <drilldown>
+          <link>/app/search_activity/per_search_view?form.searchid=$row.searchid$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

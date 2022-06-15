@@ -1,0 +1,13 @@
+<dashboard>
+  <label>Gossip info of last 15 minutes</label>
+  <description/>
+  <row>
+    <panel>
+      <table>
+        <searchString>index=cassandra_metrics sourcetype=cassandra_GOSSIP|dedup HOST|table HOST HOST_ID SCHEMA SEVERITY STATUS LOAD RPC_ADDRESS LOAD RACK</searchString>
+        <earliestTime>-15m</earliestTime>
+        <latestTime>now</latestTime>
+      </table>
+    </panel>
+  </row>
+</dashboard>
