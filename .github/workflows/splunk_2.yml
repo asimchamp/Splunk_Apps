@@ -27,4 +27,5 @@ jobs:
           SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
       - uses: EndBug/add-and-commit@v9
         with:
+          run: git config --global http.version HTTP/1.1
           default_author: github_actions
