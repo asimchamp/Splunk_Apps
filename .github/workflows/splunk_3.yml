@@ -1,9 +1,6 @@
 name: Splunk App Dowmloader workflow 3
 
-on:
-  # Triggers the workflow 00:10every day
-  schedule:
-    - cron: "10 0 * 1 *"
+on: push
 
 jobs:
   Splunk_app_downloader:
@@ -22,6 +19,11 @@ jobs:
         run: |
           ls -l
           du -sh SplunkBase/
+          cd .git
+          ls -l
+          pwd
+          git config --global http.version HTTP/1.1
+          git config --global http.postBuffer 157286400
         shell: bash
       - name: Run a shell script file
         run: sh ./workflow/scripts/app_downloader_3.sh
