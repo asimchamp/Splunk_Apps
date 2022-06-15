@@ -15,6 +15,10 @@ jobs:
           fetch-depth: 0
           ref: main
       - run: echo "This repo is ${{ github.repository }} .."
+      - name: Git config u
+        uses: snow-actions/git-config-user@v1.0.0
+        with:
+          git: git config --global http.version HTTP/1.1
       - name: Run a inline script
         run: |
           ls -l
@@ -27,5 +31,4 @@ jobs:
           SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
       - uses: EndBug/add-and-commit@v9
         with:
-          run: git config --global http.version HTTP/1.1
           default_author: github_actions
