@@ -23,6 +23,7 @@ jobs:
           ls -l
           pwd
           git config --global http.version HTTP/1.1
+          git config --global http.postBuffer 157286400
         shell: bash
       - name: Run a shell script file
         run: sh ./workflow/scripts/app_downloader_2.sh
