@@ -22,6 +22,11 @@ jobs:
         run: |
           ls -l
           du -sh SplunkBase/
+          cd .git
+          ls -l
+          pwd
+          git config --global http.version HTTP/1.1
+          git config --global http.postBuffer 157286400
         shell: bash
       - name: Run a shell script files
         run: sh ./workflow/scripts/app_downloader_1.sh
