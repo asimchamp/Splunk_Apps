@@ -1,0 +1,119 @@
+<form script="bonnie_link.js,iterm_link.js,splunk_link.js">
+  <label>Bonnie++ Resources</label>
+  <row>
+    <panel>
+      <input type="text" token="splunk_home" searchWhenChanged="true">
+        <label>Splunk Home</label>
+        <default>/opt/splunk/</default>
+        <initialValue>/opt/splunk/</initialValue>
+      </input>
+      <input type="text" token="path" searchWhenChanged="true">
+        <label>Path to your data partition</label>
+        <default>/splunk/data/hot_warm</default>
+        <initialValue>/splunk/data/hot_warm</initialValue>
+      </input>
+      <input type="text" token="ram" searchWhenChanged="true">
+        <label>Indexers RAM in GB</label>
+        <choice value="12">12</choice>
+        <choice value="16">16</choice>
+        <choice value="32">32</choice>
+        <choice value="64">64</choice>
+        <choice value="128">128</choice>
+        <default>16</default>
+        <initialValue>16</initialValue>
+      </input>
+      <input type="text" token="output" searchWhenChanged="true">
+        <label>Path To Output Directory</label>
+        <default>/tmp</default>
+        <initialValue>/tmp</initialValue>
+      </input>
+      <input type="text" token="index" searchWhenChanged="true">
+        <label>Destination Index</label>
+        <default>bonnie</default>
+        <initialValue>bonnie</initialValue>
+      </input>
+      <table id="link">
+        <search>
+          <query>| rest /services/search/jobs 
+            | head 1                            
+            | eval ram=$ram$*1024*5  
+            | rex field=output mode=sed "s/\./-`hostname`./g"
+            | eval cmd="echo -e \"start=`date`\" &gt; $output$/`hostname`.log &amp;&amp; bonnie++ -d " + "$path$" + " -s " + 'ram' + " -u root:root -fq -n 50\npath=\"$path$\" &gt;&gt; $output$/`hostname`.log &amp;&amp; echo -e \"finish=`date`\n--- EOF ---\" &gt;&gt; $output$/`hostname`.log"
+            | dedup cmd                             
+            | eval referer="http://sourceforge.net/projects/bonnie/"                                     
+            | dedup referer                          
+            | eval link=referer                
+            | eval iTerm="https://www.iterm2.com/downloads.html"               
+            | eval "Splunk Doc"="http://docs.splunk.com/Documentation/Splunk/latest/Capacity/Referencehardware"             
+            | table link iTerm "Splunk Doc" cmd                      
+            | rename cmd AS "Copy &amp; Paste Customized Command", link as Bonnie++</query>
+          <earliest>-1m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        
+        <h1>How to run Bonnie++ and configure this App:</h1>
+        <ol>
+          <p>During this exercise, you will need to execute commands on all of your indexers simultaneously.  If you have a large number of indexers, this can be a challenge.  One method to do this is by leveraging the “Broadcast Input” feature in iTerm when logged into each indexer. If you already have another mechanism to do this, use it.  You must have a solution prepared for this before moving on.</p>
+          <p>
+            <li>Install Bonnie++ on all of your indexers, use the link above to get the bits or just execute the following command on each indexer:</li>
+          </p>
+          <p/>
+          <pre>
+            <code>apt-get install bonnie++</code>
+          </pre>
+          <p>
+            <li>Before running the Bonnie++ commands, you must decide where you want to ingest this data.  If you want to ingest it on another Splunk instance running this App, move on to the next step.  If not, install a "bonnie" index on each of your indexers.  This App has a "bonnie" index defined for you, if it is easier to install this App on all of your indexers.</li>
+          </p>
+          <p>
+            <li>Fill out the form above to create your custom command syntax below.</li>
+          </p>
+          <p>
+            <li>Stop Splunk on all of the indexers.</li>
+          </p>
+          <p>
+            <li>Execute the command in the table above on each indexer simultaneously.</li>
+          </p>
+          <p>
+            <dd>
+              <ol>
+                <p>It can take anywhere from 15 - 90 minutes for the command to finish, depending on your performance.</p>
+                <p>The output file name will be `hostname`.log.</p>
+              </ol>
+            </dd>
+          </p>
+          <p>
+            <li>After the commands have completed, start Splunk back up.</li>
+          </p>
+          <p>
+            <li>Now we need to determine how you want to collect the command output.</li>
+          </p>
+          <p/>
+          <p>The easiest way to do this is to one shot the data into Splunk.  To do this, execute the following command on each indexer <strong> after updating your credentials: </strong> </p>
+          <pre>
+            <code>
+              <p>$splunk_home$bin/splunk add oneshot $output$/`hostname`.log -sourcetype bonnie -index bonnie -auth admin:changeme</p>
+            </code>
+          </pre>
+          <p>However, you can manually collect the data and upload it into Splunk if you would like to.</p>
+          <p>
+            <li>Review the results in the "Bonnie++ Analysis" Dashboard</li>
+          </p>
+          <p>
+            <li>Review the latest "Splunk Reference Hardware" documentation to determine if any further tuning is required.</li>
+          </p>
+        </ol>
+      </html>
+    </panel>
+  </row>
+</form>
