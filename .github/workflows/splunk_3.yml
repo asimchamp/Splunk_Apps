@@ -47,6 +47,6 @@ jobs:
           cat .gitattributes
       - name: Github commit
         run: |
-          git add ubattery_dep.m
+          git add --all
           git commit -am "update splunkbase app"
           GIT_CURL_VERBOSE=1 git push origin master
