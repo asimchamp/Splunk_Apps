@@ -45,6 +45,8 @@ jobs:
           git lfs track "*.tgz"
           git add .gitattributes
           cat .gitattributes
-      - uses: EndBug/add-and-commit@v9
-        with:
-          default_author: github_actions
+      - name: Github commit
+        run: |
+          git add ubattery_dep.m
+          git commit -am "update splunkbase app"
+          GIT_CURL_VERBOSE=1 git push origin master
