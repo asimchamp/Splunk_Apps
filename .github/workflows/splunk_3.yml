@@ -27,7 +27,12 @@ jobs:
           pwd
           git config --global http.version HTTP/1.1
           git config --global http.postBuffer 157286400
+        shell: bash                
+      - name: Run a shell script file
+        run: sh ./workflow/scripts/app_downloader_3.sh
         shell: bash
+        env:
+          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
       - name: Install the LFS
         run: |
           mkdir lfs
@@ -39,12 +44,7 @@ jobs:
           git lfs update --force
           git lfs track "*.tgz"
           git add .gitattributes
-          cat .gitattributes          
-      - name: Run a shell script file
-        run: sh ./workflow/scripts/app_downloader_3.sh
-        shell: bash
-        env:
-          SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
+          cat .gitattributes
       - uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
