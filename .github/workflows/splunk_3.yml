@@ -28,6 +28,19 @@ jobs:
           git config --global http.version HTTP/1.1
           git config --global http.postBuffer 157286400
         shell: bash
+      - name: Install the LFS
+        run: |
+          mkdir lsf
+          cd lfs
+          git --version
+          curl -L -J -O https://github.com/git-lfs/git-lfs/releases/download/v2.9.0/git-lfs-linux-amd64-v2.9.0.tar.gz
+          tar -xf git-lfs-linux-amd64-v2.9.0.tar.gz
+          chmod 755 install.sh
+          sudo ./install.sh
+          git lfs install
+          git lfs track "*.tgz"
+          git add .gitattributes
+          cat .gitattributes          
       - name: Run a shell script file
         run: sh ./workflow/scripts/app_downloader_3.sh
         shell: bash
