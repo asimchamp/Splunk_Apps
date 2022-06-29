@@ -43,7 +43,6 @@ jobs:
           tar -xf git-lfs-linux-amd64-v2.9.0.tar.gz
           chmod 755 install.sh
           git lfs update --force
-          git lfs track "*.tgz"
           git add .gitattributes
           cat .gitattributes
       - name: Github commit
