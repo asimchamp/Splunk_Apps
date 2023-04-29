@@ -1,1 +1,0 @@
-require.config({paths:{website_input_create_view:"../app/website_input/js/views/WebsiteInputCreateView"}});require(["jquery","underscore","splunkjs/mvc","website_input_create_view","splunkjs/mvc/simplexml/ready!"],function(c,a,d,e){var b=new e({el:"#input_view"});b.render()});

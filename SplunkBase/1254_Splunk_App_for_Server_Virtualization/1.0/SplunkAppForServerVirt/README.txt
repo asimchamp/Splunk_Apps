@@ -1,1 +1,0 @@
-This package is release 1.0 for the “Splunk App for Server Virtualization”.  This app relies on separate Technology Add-ons (TAs) to populate the servervirt index.  These TAs can be downloaded from splunk.com.  Currently there is a TA for Citrix XenServer and Microsoft Hyper-V.

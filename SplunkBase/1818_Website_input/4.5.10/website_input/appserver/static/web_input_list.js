@@ -1,1 +1,0 @@
-require.config({paths:{web_input_list:"../app/website_input/js/views/WebsiteInputListView"}});require(["jquery","underscore","backbone","web_input_list","splunkjs/mvc/simplexml/ready!"],function(c,b,e,d){var a=new d({el:c("#web_input_list")});a.render()});

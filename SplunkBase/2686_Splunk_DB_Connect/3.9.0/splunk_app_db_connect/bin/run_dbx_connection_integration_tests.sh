@@ -1,1 +1,0 @@
-pytest dbx_connection_mysql_integration_tests.py dbx_connection_mssql_integration_tests.py dbx_connection_postgres_integration_tests.py

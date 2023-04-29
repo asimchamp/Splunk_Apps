@@ -1,1 +1,0 @@
-require.config({paths:{custom_setup:"../app/website_input/js/views/AppSetupView"}});require(["jquery","custom_setup","splunkjs/mvc/simplexml/ready!"],function(c,b){var a=new b({el:c("#setupView")});a.render()});
