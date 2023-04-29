@@ -180,6 +180,19 @@ do
       app_download_func
 
    fi
+   
+ ## deleting the blank folder
+ delete_blank=$(ls $splunk_home/SplunkBase/ | grep -cw $e"_" )
+ 
+ if [ "$delete_blank" = "1" ];
+   then
+      echo "$delete_blank folder present."
+      rm -rf $splunk_home/SplunkBase/$e"_"
+
+   else
+      echo "$delete_blank Folder not Present."
+
+fi
 
 done
 
