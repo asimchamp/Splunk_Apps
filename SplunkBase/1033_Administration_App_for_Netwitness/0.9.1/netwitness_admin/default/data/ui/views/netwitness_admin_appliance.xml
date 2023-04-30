@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard refresh="300">
+  <label>RSA Netwitness Administration Appliances</label>
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" "/appliance/stats/temperature" | rex field=_raw max_match=16 "coretemp_\d+=(?&lt;coretemp&gt;\d+)" | timechart limit=0  avg(coretemp) as average by host
+</searchString>
+      <title>Average Temperature over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">C</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" "/appliance/stats/temperature" | rex field=_raw max_match=16 "coretemp_\d+=(?&lt;coretemp&gt;\d+)" | timechart limit=0 max(coretemp) as max  by host
+</searchString>
+      <title>Maximum Temperature over time(Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">C</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" "appliance" "/sys/stats" | eval mem=memory_process/1024/1024 | timechart max(mem) by host</searchString>
+      <title>Process Memory over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">MBytes</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>sourcetype="netwitness_admin" "appliance" "/sys/stats" | timechart max(cpu) by host usenull=f</searchString>
+      <title>Max CPU over time (Last day)</title>
+      <earliestTime>-1d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">%</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.secondaryAxisTitle.text"></option>
+      <option name="drilldown">none</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <searchString>search sourcetype=netwitness_admin appliance /sys/stats | stats max(cpu) as max_cpu min(cpu) as min_cpu max(running_since) as running_since  by host, hostname | fields host, hostname, max_cpu, min_cpu, running_since</searchString>
+      <title>Appliance Stats (Last hour)</title>
+      <earliestTime>-1h@m</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+</dashboard>

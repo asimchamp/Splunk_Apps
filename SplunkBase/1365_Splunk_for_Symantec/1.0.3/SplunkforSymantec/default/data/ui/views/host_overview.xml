@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+    <label>Host Overview</label>
+    <row>
+        <single>
+            <searchString>`host_overview_scans_today`</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="beforeLabel">Completed Scans Today: </option>
+            <option name="linkView">scan</option>
+        </single>
+        <single>
+            <searchString>`host_overview_allrisks_today`</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="beforeLabel">Risks Detected Today: </option>
+        </single>
+        <single>
+            <searchString>`host_overview_mostrisks_today`</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="beforeLabel">Hosts with Most Risks: </option>
+        </single>
+    </row>
+    <row>
+        <table>
+            <searchString>`host_overview_most_viruses_last_24hours`</searchString>
+            <title>Host with Most Virus Detections in last 24 hours</title>
+            <earliestTime>-24h@h</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="displayRowNumbers">true</option>
+            <option name="maxLines">10</option>
+            <option name="segmentation">outer</option>
+            <option name="softWrap">true</option>
+        </table>
+    </row>
+    <row>
+        <chart>
+            <searchString>`host_overview_scans_month`</searchString>
+            <title>Scans per day</title>
+            <earliestTime>-30d@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="charting.axisTitleX.text">Day</option>
+            <option name="charting.axisTitleY.text">Number of Scans</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.primaryAxisTitle.text"/>
+            <option name="charting.secondaryAxisTitle.text"/>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <drilldown>
+                <link>/app/SplunkforSymantec/scan</link>
+            </drilldown>
+        </chart>
+        <chart>
+            <searchString>`host_overview_risks_month`</searchString>
+            <title>Viruses/Spyware Detected Per Day</title>
+            <earliestTime>-30d@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="charting.axisTitleX.text">Day</option>
+            <option name="charting.axisTitleY.text">Risks Detected</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.primaryAxisTitle.text"/>
+            <option name="charting.secondaryAxisTitle.text"/>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <drilldown>
+                <link>/app/SplunkforSymantec/risks</link>
+            </drilldown>
+        </chart>
+    </row>
+    <row>
+        <chart>
+            <searchString>`host_overview_behavior_month`</searchString>
+            <title>Processes Blocked Per Day</title>
+            <earliestTime>-30d@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="charting.axisTitleX.text">Day</option>
+            <option name="charting.axisTitleY.text">Processes Blocked</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.primaryAxisTitle.text"/>
+            <option name="charting.secondaryAxisTitle.text"/>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <drilldown>
+                <link>/app/SplunkforSymantec/behavior</link>
+            </drilldown>
+        </chart>
+        <chart>
+            <searchString>`host_overview_proactive_month`</searchString>
+            <title>SONAR Detections Per Day</title>
+            <earliestTime>-30d@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="charting.axisTitleX.text">Day</option>
+            <option name="charting.axisTitleY.text">SONAR Detections</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.primaryAxisTitle.text"/>
+            <option name="charting.secondaryAxisTitle.text"/>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <drilldown>
+                <link>/app/SplunkforSymantec/proactive</link>
+            </drilldown>
+        </chart>
+    </row>
+</dashboard>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view onUnloadCancelJob="True" template="dashboard.html">
+	<label>Group Audit</label>
+	<module name="AccountBar" layoutPanel="appHeader" />
+	<module name="AppBar" layoutPanel="appHeader" />
+	<module name="SideviewUtils" layoutPanel="appHeader" />
+
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+
+	<module name="TitleBar" layoutPanel="viewHeader"/>
+
+	<module name="URLLoader" layoutPanel="panel_row1_col1">
+		<module name="TimeRangePicker" layoutPanel="panel_row1_col1_grp1" autoRun="True">
+			<param name="default">Last 60 minutes</param>
+			<param name="searchWhenChanged">True</param>
+			
+			<module name="Search">
+				<param name="search"><![CDATA[|`domain-dropdown`]]></param>
+				<module name="Pulldown" layoutPanel="panel_row1_col1_grp2">
+					<param name="name">nt_domain</param>
+					<param name="label">Account Domain:</param>
+					<param name="staticFieldsToDisplay"></param>
+					<param name="searchFieldsToDisplay">
+						<list>
+							<param name="label">nt_domain</param>
+							<param name="value">nt_domain</param>
+						</list>
+					</param>
+					<module name="TextField" layoutPanel="panel_row1_col1_grp3">
+						<param name="name">groupName</param>
+						<param name="label">Group Name:</param>
+						
+						<!-- R2C1 - LDAP Record -->
+						<module name="Search" layoutPanel="panel_row2_col1">
+							<param name="search"><![CDATA[|ldapsearch domain=$nt_domain$ search="(&(objectclass=group)(cn=$groupName$))"|fields *]]></param>
+							<module name="GenericHeader"><param name="label">Active Directory Record</param></module>
+							<module name="JobProgressIndicator"></module>
+							<module name="LDAPRecord"></module>
+
+						
+							<!--  R2C2 Group Membership -->
+							<module name="PostProcess" layoutPanel="panel_row2_col2">
+								<param name="search"><![CDATA[|ldapgroup|`split-ldapgroup`|table member_name,member_domain,member_type|sort member_name|rename member_name as "Username",member_domain as "Domain",member_type as "Membership Type"]]></param>
+								<module name="GenericHeader"><param name="label">Full Group Membership</param></module>
+								<module name="JobProgressIndicator"></module>
+								<module name="Pager">
+									<module name="SimpleResultsTable">
+										<param name="drilldown">row</param>
+										<module name="Redirector">
+											<param name="url">audit_user</param>
+											<param name="arg.nt_user">$click.cell0.value$</param>
+											<param name="arg.nt_domain">$click.cell1.value$</param>
+											<param name="arg.earliest">$search.timeRange.earliest$</param>
+											<param name="arg.latest">$search.timeRange.latest$</param>									
+										</module>
+									</module>
+								</module>
+							</module>
+						</module>
+						
+						<!-- R2C2 Recent Membership Changes -->
+						<module name="Search" layoutPanel="panel_row2_col2">
+							<param name="search">`group-changes-for-group("$nt_domain$","$groupName$")`</param>
+							<module name="GenericHeader"><param name="label">Recent Membership Changes</param></module>
+							<module name="JobProgressIndicator"></module>
+							<module name="Pager">
+								<module name="SimpleResultsTable">
+
+								</module>
+							</module>
+						</module>
+
+					</module> <!-- TextField#Group Name -->
+				</module> <!-- Pulldown#Domain -->
+			</module> <!-- Search driving Pulldown -->
+		</module> <!-- TimeRangePicker -->
+	</module> <!-- URLLoader -->
+</view>

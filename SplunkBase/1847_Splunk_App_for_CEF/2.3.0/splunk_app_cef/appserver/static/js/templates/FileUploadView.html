@@ -1,0 +1,30 @@
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label"><%- title %><span style="display:none" class="required">*</span></label>
+        <div class="controls">
+            <div id="file_select_input"></div>
+            <input type="file" name="file" class="file_input" id="file_input" />
+            <span class="help-block"><%- help_block %></span>
+            <div class="dropzone" id="<%- dropzone_id %>">
+                <svg class="dropzone-icon" width="45px" height="55px" viewBox="0 0 72 88" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                        <g class="fill">
+                            <path d="M50,27 L68.0005854,27 C70.2022516,27 72,28.7919267 72,31.0023804 L72,83.9976196 C72,86.2074215 70.2094011,88 68.0005854,88 L3.99941455,88 C1.79774843,88 0,86.2080733 0,83.9976196 L0,31.0023804 C0,28.7925785 1.79059889,27 3.99941455,27 L21,27 L21,32 L5.99898406,32 C5.4472604,32 5,32.4408979 5,32.9958767 L5,82.0041233 C5,82.5541308 5.44605521,83 5.99898406,83 L66.0010159,83 C66.5527396,83 67,82.5591021 67,82.0041233 L67,32.9958767 C67,32.4458692 66.5539448,32 66.0010159,32 L50,32 L50,27 Z"></path>
+                            <path d="M41.9634682,10 L41.9634682,28 L46.9634682,28 L46.9634682,5 L44.4634682,5 L23.9634682,5 L23.9634682,10 L41.9634682,10 Z" transform="translate(35.463468, 16.500000) rotate(-45.000000) translate(-35.463468, -16.500000) "></path>
+                            <rect x="33" y="3" width="5" height="51"></rect>
+                        </g>
+                </svg>
+                <div class="dropzone-text"><h2><%- _("Drag and drop file here").t() %></h2></div>
+            </div>
+            <div style="display:none;" class="upload-in-progress">
+                <div class="upload-spinner-container"></div>
+                <div class="upload-spinner-inprocess-message"><%- _("Uploading file...").t() %></div>
+            </div>
+            <div style="display:none;" class="upload-done">
+                <div class="alert alert-info">
+                    <i class="icon-alert"></i>
+                    <%- _("File upload successful").t() %>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

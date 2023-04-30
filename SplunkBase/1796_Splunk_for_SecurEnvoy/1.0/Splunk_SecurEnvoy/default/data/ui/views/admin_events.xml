@@ -1,0 +1,107 @@
+<form>
+  <label>Admin Events</label>
+  <description>Admin Events</description>
+  <fieldset autoRun="True" submitButton="False">
+    <input type="time" searchWhenChanged="True">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>WebSMS Gateway Events</title>
+        <searchString>sourcetype=2fa:securenvoy | rex field=_raw "^\d+\s+[A-Z][a-z]+\s+\d+:\d+:\d+\s+(?&lt;source_server&gt;(\w|-)+)\s(?&lt;facility&gt;.*)\sUserID=(?&lt;userid&gt;.*)@(?&lt;domain&gt;(\w|\.)+)\s(?&lt;status_msg&gt;.*)" | search facility="WebSMS Gateway"  | rex mode=sed field=date_mday "s/(\d+)/0000\1/" | rex mode=sed field=date_mday "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_hour "s/(\d+)/0000\1/" | rex mode=sed field=date_hour "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_minute "s/(\d+)/0000\1/" | rex mode=sed field=date_minute "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_second "s/(\d+)/0000\1/" | rex mode=sed field=date_second "s/0*([0-9]{2})/\1/" | eval userfriendly=date_mday." ".date_month." ".date_hour.":".date_minute.":".date_second." - ".status_msg." for user ".userid."@".domain | table userfriendly | rename userfriendly AS "Results"</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Local Admin Events</title>
+        <searchString>sourcetype=2fa:securenvoy  | rex field=_raw "^\d+\s+[A-Z][a-z]+\s+\d+:\d+:\d+\s+(?&lt;source_server&gt;(\w|-)+)\s(?&lt;facility&gt;.*)\sUserID=(?&lt;userid&gt;(\w|-)*[^\s])\s(?&lt;status_msg&gt;.*)" | search facility=admin  | rex mode=sed field=date_mday "s/(\d+)/0000\1/" | rex mode=sed field=date_mday "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_hour "s/(\d+)/0000\1/" | rex mode=sed field=date_hour "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_minute "s/(\d+)/0000\1/" | rex mode=sed field=date_minute "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_second "s/(\d+)/0000\1/" | rex mode=sed field=date_second "s/0*([0-9]{2})/\1/" | eval userfriendly=date_mday." ".date_month." ".date_hour.":".date_minute.":".date_second." - ".status_msg | table userfriendly | rename userfriendly AS "Results"</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Batch Server Events</title>
+        <searchString>sourcetype=2fa:securenvoy  | rex field=_raw "^\d+\s+[A-Z][a-z]+\s+\d+:\d+:\d+\s+(?&lt;source_server&gt;(\w|-)+)\s(?&lt;facility&gt;.*)\sUserID=(?&lt;userid&gt;(\w|-)*[^\s])\s(?&lt;status_msg&gt;.*)" | search facility="Batch Server"  | rex mode=sed field=date_mday "s/(\d+)/0000\1/" | rex mode=sed field=date_mday "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_hour "s/(\d+)/0000\1/" | rex mode=sed field=date_hour "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_minute "s/(\d+)/0000\1/" | rex mode=sed field=date_minute "s/0*([0-9]{2})/\1/" | rex mode=sed field=date_second "s/(\d+)/0000\1/" | rex mode=sed field=date_second "s/0*([0-9]{2})/\1/" | eval userfriendly=date_mday." ".date_month." ".date_hour.":".date_minute.":".date_second." - ".status_msg | table userfriendly | rename userfriendly AS "Results"</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </table>
+    </panel>
+  </row>
+</form>
+

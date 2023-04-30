@@ -1,0 +1,91 @@
+<form version="1.1">
+  <label>Passed Guest Authentications and Corp Guest Authentications for All Users</label>
+
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  
+  <row>
+    <panel>
+      <html>
+        <p>This dashboard and these panels display passed guest information by location and provide guest user details.</p>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <chart>
+        <title>Guest Access by Location</title>
+        <search><query>
+          eventtype=cisco-ise-guest-authentication | fillnull value="No Location" Location |
+          chart count by Location
+        </query></search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <search><query>
+          eventtype=cisco-ise-guest-authentication IdentityGroup="*" UserType="GuestUser" |
+    fillnull value="NULL" Framed_IP_Address | fillnull value="No Location" Location| 
+    table AuthenticationIdentityStore Calling_Station_ID EndPointMACAddress Framed_IP_Address IdentityGroup NAS_IP_Address PortalName UserName UserType _time |
+          `format_field_names`
+        </query></search>
+      </table>
+    </panel>
+  </row>
+  
+  <row>
+    <panel>
+      <chart>
+        <title>Corporate Guest Authentication</title>
+        <search><query>
+          eventtype=cisco-ise-guest-authentication UserType="CWA" UserName="*" |
+          chart count by UserName |
+    rename UserName AS "User Name"
+        </query></search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <search><query>
+          eventtype=cisco-ise-guest-authentication UserType="CWA" UserName="*" |
+    fillnull value="NULL" Framed_IP_Address |
+    table UserName Framed_IP_Address AuthenticationIdentityStore IdentityGroup UserType PortalName |
+          `format_field_names`
+        </query></search>
+      </table>
+    </panel>
+  </row>
+</form>

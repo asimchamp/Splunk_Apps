@@ -1,0 +1,96 @@
+<form version="1.1">
+  <label>Connection Details</label>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <input type="time" token="field10" searchWhenChanged="true">
+        <label>Time Search</label>
+        <default>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="fieldCN" searchWhenChanged="true">
+        <label>Computer Name</label>
+        <choice value="*">All Computers</choice>
+        <fieldForLabel>Computer_Name</fieldForLabel>
+        <fieldForValue>Computer_Name</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Non-Approved-Established-Connections"
+            | dedup Computer_Name | fields Computer_Name</query>
+          <earliest>$field10.earliest$</earliest>
+          <latest>$field10.latest$</latest>
+        </search>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="field21" searchWhenChanged="true">
+        <label>Process Search</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+        <choice value="*">All Processes</choice>
+        <fieldForLabel>Process</fieldForLabel>
+        <fieldForValue>Process</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Non-Approved-Established-Connections" NOT "Error*"
+            |dedup Process | fields Process 
+        </query>
+        </search>
+      </input>
+      <input type="dropdown" token="field22">
+        <label>Destination IP</label>
+        <choice value="*">All Target_IPs</choice>
+        <fieldForLabel>Target_IP</fieldForLabel>
+        <fieldForValue>Target_IP</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Non-Approved-Established-Connections"
+         | rex field=Target_IP "(?&lt;Target_IP&gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(?&lt;Port&gt;\d{1,7})" | dedup Target_IP | fields Target_IP</query>
+          <earliest>$field10.earliest$</earliest>
+          <latest>$field10.latest$</latest>
+        </search>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="fieldCountry">
+        <label>Country</label>
+        <choice value="*">All Countries</choice>
+        <fieldForLabel>Country</fieldForLabel>
+        <fieldForValue>Country</fieldForValue>
+        <search>
+          <query>`tanium_index` Question="Splunk-Non-Approved-Established-Connections"
+         | rex field=Target_IP "(?&lt;Target_IP&gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(?&lt;Port&gt;\d{1,7})" | iplocation Target_IP | dedup "Country" | fields "Country"</query>
+          <earliest>$field10.earliest$</earliest>
+          <latest>$field10.latest$</latest>
+        </search>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Non Approved Established Connections Table</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Non-Approved-Established-Connections"
+           Computer_Name=$fieldCN$ Process=$field21$ | rex field=Target_IP "(?&lt;Target_IP&gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(?&lt;Port&gt;\d{1,7})" | iplocation Target_IP | table _time,Computer_Name,Process,Tanium_Client_IP_Address,Target_IP,Port,Region,Country,City | search Target_IP=$field22$ | search Country="$fieldCountry$"</query>
+          <earliest>$field10.earliest$</earliest>
+          <latest>$field10.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Non-US Established Connections</title>
+      <table>
+        <search>
+          <query>`tanium_index` ( Question="Splunk-Non-Approved-Established-Connections" NOT "Error*" NOT Target_IP="[*" NOT "ip=192.*" NOT Country="United States") |  rex field=Target_IP "(?&lt;Dest_IP&gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(?&lt;Port&gt;\d{1,7})" | iplocation Dest_IP | table _time,Computer_Name,Process,Tanium_Client_IP_Address,Dest_IP,Port,Region,Country,City |search Country!="United States"</query>
+          <earliest>$field10.earliest$</earliest>
+          <latest>$field10.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

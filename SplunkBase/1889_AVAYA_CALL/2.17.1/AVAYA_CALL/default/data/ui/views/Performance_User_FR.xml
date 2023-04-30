@@ -1,0 +1,520 @@
+<form>
+  <label>Performance Utilisateur</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Période d'Analyse</label>
+      <default>
+        <earliest>@w0</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="TimeWindow">
+      <label>Fenêtre Temps Spécifique</label>
+      <choice value="&quot;&quot;">Tout le Temps</choice>
+      <choice value="`TimeWindow_WorkingDays`">Jours Ouvrés</choice>
+      <choice value="`TimeWindow_DayClosed`">Jours Fermés</choice>
+      <choice value="`TimeWindow_Weekend`">Weekend</choice>
+      <choice value="`TimeWindow_NightTime`">Nuits</choice>
+      <choice value="`TimeWindow_Lunch`">Déjeuner</choice>
+      <default>""</default>
+      <initialValue>""</initialValue>
+    </input>
+    <input type="text" token="Token_Party1Name" searchWhenChanged="true">
+      <label>Utilisateur</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="Token_Caller" searchWhenChanged="true">
+      <label>Numéro Appelant</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>TOP 10 - Appels Externes Reçus</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  AVAYA_Direction=I
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| TOP 10 AVAYA_Party1Name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>TOP 10 - Appels Externes Emis</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| TOP 10 AVAYA_Party1Name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>TOP 10 - Appels Internationaux Emis</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+(AVAYA_Dialled_Number="00*" OR
+AVAYA_External_Targeted_Number="00*")
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| lookup AVAYA_International_Prefix_US.csv AVAYA_Called_Number OUTPUTNEW Country
+| rename AVAYA_Party1Name AS "Utilisateur"
+| TOP 10  "Utilisateur"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>TOP 10 - Temps de Sonnerie des Appels Externes</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Direction="I"
+AVAYA_Is_Internal=0
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+`FR_DetailCall_RENAME`
+| sort - "Durée de Sonnerie"
+| table Date "Heure"  "Utilisateur"  "Durée de Sonnerie" "Numéro Appelant" "SIP Appelant"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>TOP 10 - Temps de Mise en Attente des Appels Externes</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Direction="I"
+AVAYA_Is_Internal=0
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+`FR_DetailCall_RENAME`
+| sort - "Durée d'Attente"
+| table Date "Heure" "Utilisateur" "Durée d'Attente" "Durée de Parcage" "Numéro Appelant" "SIP Appelant"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>TOP 10 - Appels Externes Non Répondus</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Party1Device="E*"
+AVAYA_Call_Duration="00:00:00"
+AVAYA_Direction="I"  AVAYA_Is_Internal=0
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| TOP 10 AVAYA_Party1Name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Appels Externes Reçus et Emis pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  (AVAYA_Direction=I OR AVAYA_Direction=O)
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| timechart count
+| rename count AS "Nbre Appels"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.chart">column</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>TOP 50 - Appels Externes Reçus et Emis pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  (AVAYA_Direction=I OR AVAYA_Direction=O)
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+ |  rename AVAYA_Party1Name AS "Utilisateur" 
+| Top 50 "Utilisateur" countfield="Nombre d'appels" percentfield="%"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="Number of Calls">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="number" field="%">
+          <option name="precision">0</option>
+        </format>
+        <format type="color" field="Nombre d'appels">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Durée Totale des Appels Externes Reçus et Emis pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  (AVAYA_Direction=I OR AVAYA_Direction=O)
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| convert dur2sec(AVAYA_Call_Duration)  AS AVAYA_Duration
+| stats count, avg(AVAYA_Duration) AS AVG_Duration, sum(AVAYA_Duration) AS Sum_Duration by  AVAYA_Party1Name
+| eval Total_AVG_Duration=tostring(AVG_Duration, "duration")
+| eval Total_Duration=tostring(Sum_Duration, "duration")
+| eval avg_split=split(Total_AVG_Duration,".")
+| eval "AVG_Call"=mvindex(avg_split,0)
+| eval "AVG_Call_ms"=mvindex(avg_split,-1)
+| sort -AVAYA_Duration_Hour
+| rename AVAYA_Party1Name AS "Utilisateur"  Total_Duration AS "Durée Totale d'Appel"  AVG_Call AS "Temps moyen d'appel" count AS "Total Appel" AVG_RingDuration AS "Temps moyen de Réponse"
+| Table "Utilisateur"  "Durée Totale d'Appel" "Temps moyen d'appel" "Total Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Appels Externes Reçus pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  (AVAYA_Direction=I)
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| timechart count
+| rename count AS "Nbre Appels"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>TOP 50 - Appels Externes Reçus pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  AVAYA_Direction=I
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+|  rename AVAYA_Party1Name AS "Utilisateur"
+| Top 50 "Utilisateur" countfield="Nombre d'appels" percentfield="%"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="Number of Calls">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="number" field="%">
+          <option name="precision">0</option>
+        </format>
+        <format type="color" field="Nombre d'appels">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Durée Totale des Appels Externes Reçus pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Is_Internal=0  AVAYA_Direction=I
+AVAYA_Party1Name!=" *"
+AVAYA_Party1Name!="VM Channel*"
+AVAYA_Party1Name!="U1 *"
+AVAYA_Party1Name!="Line *"
+AVAYA_Party1Name!="CO Channel *"
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| convert dur2sec(AVAYA_Call_Duration)  AS AVAYA_Duration
+| stats count, count(eval(AVAYA_Call_Duration="00:00:00")) AS Call_Lost, avg(AVAYA_Duration) AS AVG_Duration, avg(AVAYA_Ring_Duration) AS AVG_Ring, sum(AVAYA_Duration) AS Sum_Duration by  AVAYA_Party1Name
+| eval RingDuration=tostring(AVG_Ring, "Duration")
+| eval avgring_split=split(RingDuration,".")
+| eval "AVG_RingDuration"=mvindex(avgring_split,0)
+| eval "AVG_Ring_ms"=mvindex(avgring_split,-1)
+| eval Total_AVG_Duration=tostring(AVG_Duration, "duration")
+| eval Total_Duration=tostring(Sum_Duration, "duration")
+| eval avg_split=split(Total_AVG_Duration,".")
+| eval "AVG_Call"=mvindex(avg_split,0)
+| eval "AVG_Call_ms"=mvindex(avg_split,-1)
+| sort -AVAYA_Duration_Hour
+| rename AVAYA_Party1Name AS "Utilisateur"  Total_Duration AS "Durée Totale d'Appel"  AVG_Call AS "Temps moyen d'appel" count AS "Total Appel" AVG_RingDuration AS "Temps moyen de Sonnerie" Call_Lost AS "Total Appel Perdu"
+| Table "Utilisateur"  "Durée Totale d'Appel" "Temps moyen d'appel" "Temps moyen de Sonnerie" "Total Appel Perdu" "Total Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="User Name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Appels Externes Emis pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| timechart count
+| rename count AS "Nbre Appels"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.chart">column</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>TOP 50 - Appels Externes Emis pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+|  rename AVAYA_Party1Name AS "Utilisateur" 
+| Top 50 "Utilisateur" countfield="Nombre d'appels" percentfield="%"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="Number of Calls">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="number" field="%">
+          <option name="precision">0</option>
+        </format>
+        <format type="color" field="Nombre d'appels">
+          <colorPalette type="minMidMax" maxColor="#1E93C6" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Durée Totale des Appels Externes Emis pour la période sélectionnée</title>
+        <search>
+          <query>`sourcelog`
+`UserFilter`
+AVAYA_Is_Internal=0  AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+$TimeWindow$
+| convert dur2sec(AVAYA_Call_Duration)  AS AVAYA_Duration
+| stats count, avg(AVAYA_Duration) AS AVG_Duration, sum(AVAYA_Duration) AS Sum_Duration by  AVAYA_Party1Name
+| eval Total_AVG_Duration=tostring(AVG_Duration, "duration")
+| eval Total_Duration=tostring(Sum_Duration, "duration")
+| eval avg_split=split(Total_AVG_Duration,".")
+| eval "AVG_Call"=mvindex(avg_split,0)
+| eval "AVG_Call_ms"=mvindex(avg_split,-1)
+| sort -AVAYA_Duration_Hour
+| rename AVAYA_Party1Name AS "Utilisateur"  Total_Duration AS "Durée Totale d'Appel"  AVG_Call AS "Temps moyen d'appel" count AS "Total Appel"
+| Table "Utilisateur"  "Durée Totale d'Appel" "Temps moyen d'appel" "Total Appel"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="User Name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

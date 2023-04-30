@@ -1,0 +1,118 @@
+<form>
+  <label>EAPS Status</label>
+  <description/>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label/>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>  
+  <row>
+    <panel>
+      <chart>
+        <title>EAPS Ring Failures by Device</title>
+        <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=Info errLoc=EAPS errType=TransDmnState | rex max_match=0 "(?&lt;linkStatus&gt;=&gt;\sFailed|=&gt;\sLink-Down)" | mvexpand linkStatus | stats count by host</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>EAPS Ring Failures by Device</title>
+        <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=Info errLoc=EAPS errType=TransDmnState | rex max_match=0 "(?&lt;linkStatus&gt;=&gt;\sFailed|=&gt;\sLink-Down)" | mvexpand linkStatus | stats count by host</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Port Down by Device</title>
+        <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)\.(?&lt;errInfo&gt;\w+)&gt;\s" | mvexpand errInfo | search errInfo=portLinkStateDown | stats count by host</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Port Down by Device</title>
+        <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)\.(?&lt;errInfo&gt;\w+)&gt;\s" | mvexpand errInfo | search errInfo=portLinkStateDown | stats count by host</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Reboots by Device</title>
+        <searchString>index=extnet | rex max_match=0 "\s&lt;Warn:EPM\.(?&lt;errType&gt;\w+)&gt;\s"| mvexpand errType | search errType="reboot" | dedup host,_time | stats count by host</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <html>
+      <p>The preceding information is not gathered in real-time. Results are current to the most recent tech support report from each device.</p>
+    </html>
+  </row>
+</form>

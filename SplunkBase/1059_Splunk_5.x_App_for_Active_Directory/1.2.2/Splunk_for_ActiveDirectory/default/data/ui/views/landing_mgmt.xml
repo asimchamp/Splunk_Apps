@@ -1,0 +1,26 @@
+<view template="dashboard.html">
+  
+  <label>Home</label>
+  
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="MSADAppChecker" layoutPanel="appHeader">
+  	<param name="appName">sideview_utils</param>
+  	<param name="url">http://splunk-base.splunk.com/apps/36405/sideview-utils</param>
+  </module>
+  <module name="MSADAppChecker" layoutPanel="appHeader">
+  	<param name="appName">SA-ldapsearch</param>
+  </module>
+
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">2</param>
+  </module>
+
+  <module name="ServerSideInclude" layoutPanel="viewHeader">
+    <param name="src">index_mgmt.html</param>
+  </module>
+  
+</view>
+    

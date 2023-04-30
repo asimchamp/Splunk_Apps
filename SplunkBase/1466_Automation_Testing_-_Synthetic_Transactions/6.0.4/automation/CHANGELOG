@@ -1,0 +1,16 @@
+VERSION 1.0 (beta):
+
+  FEATURES:
+  [] added support for client-side certificates (_sessions_.conf)
+  [] added support for proxy servers (_sessions_.conf)
+
+VERSION 0.02:
+
+  FEATURES:
+  [] added lookup for status: status_description and status_type
+  [] timeout can now be specified for _pages_ and _sessions_; please see the the respective .conf files for details.  The timeout value will also be noted in the events, so you can adapt the setting for slow-loading pages that tend to time out.
+
+  FIXES:
+  [] http_status renamed to status
+  [] fixed an issue that was causing session_id to not update between intervals
+  [] error handling was broadened in a number of locations.  (It was possible for bad links being followed to cause an exception and abort the session's process.)

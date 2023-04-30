@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Setup</label>
+  <row>
+  	<html>
+        <h3>
+            The code below uses the Teradata bulk unload feature to pull the rows we want for usage monitoring.
+        </h3>
+        <p>
+            In production you would either want to execute this as a mosular input, a script or schedule this to run in Teradata on and pick it up from a target directory. 
+        </p>
+        <p>
+            You will need to adjust the frequency you execute this data load to meet your needs. If you want to keep a close watch on abuses for large data dumps you may want to run it more frequently.
+        </p>
+    </html>
+  </row>
+  <row>  
+  	<html>
+        <pre>
+DEFINE JOB daily_export_DBQLogTbl_Hst
+DESCRIPTION 'This job exports a single day of access information for logging and monitoring'
+(
+DEFINE SCHEMA schema_DBQLogTbl_Hst ( 
+CollectTimeStamp varchar(20) ,
+HostName VARCHAR(20),
+NumResultRows varchar(20),
+AppID VARCHAR(30),
+ClientID VARCHAR(30),
+ClientAddr VARCHAR(45),
+QueryText VARCHAR(10000)
+);
+
+DEFINE OPERATOR DAILY_EXPORT
+TYPE EXPORT
+SCHEMA schema_DBQLogTbl_Hst
+ATTRIBUTES (
+	UserName = @Uname,
+	UserPassword = @Pwd,
+	LogonMech = 'ldap',
+	TdpId = 'udwprod',
+	MaxSessions = 2,
+	MinSessions = 2,
+	SpoolMode='NoSpool',
+	SelectStmt ='SELECT
+	trim(CAST(CollectTimeStamp as VARCHAR(20))),
+	trim(CAST(''udwprod'' as VARCHAR(20))),
+	trim(CAST(NumResultRows as VARCHAR(20))),
+	trim(AppID),
+	trim(ClientID),
+	trim(ClientAddr),
+	trim(QueryText)
+from PDCRDATA.DBQLogTbl_Hst 
+where (LogDate = '@Qdate');' 
+);
+
+DEFINE OPERATOR FILE_WRITER_BN1
+TYPE DATACONNECTOR CONSUMER
+SCHEMA schema_DBQLogTbl_Hst
+ATTRIBUTES (
+	VARCHAR FILENAME = '/fstools/log_extract/data/daily_export_'||@Qdate,
+	VARCHAR Format = 'DELIMITED',
+	VARCHAR TextDelimiter='|',
+	VARCHAR	IndicatorMode= 'N',
+	VARCHAR OpenMode = 'Write'
+);
+APPLY TO OPERATOR (FILE_WRITER_BN1[1])
+	SELECT
+	CollectTimeStamp ,
+	HostName,
+	NumResultRows,
+	AppID,
+	ClientID,
+	ClientAddr,
+	QueryText
+	FROM OPERATOR (DAILY_EXPORT[1]);
+)
+;
+        </pre>
+	</html>
+  </row>
+</dashboard>

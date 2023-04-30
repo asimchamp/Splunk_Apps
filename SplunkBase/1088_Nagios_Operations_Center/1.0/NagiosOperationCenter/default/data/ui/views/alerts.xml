@@ -1,0 +1,299 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+
+	<label>Alert Report</label>
+	<module name="AccountBar" layoutPanel="appHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">splunk.search.job</param>
+		<param name="clearOnJobDispatch">True</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="TitleBar" layoutPanel="viewHeader">
+		<param name="actionsMenuFilter">dashboard</param>
+	</module>
+	<module name="HiddenSearch" layoutPanel="panel_row1_col1" autoRun="True">
+		<param name="search">
+			<![CDATA[
+			index="nagios_status" | fields * | search last_hard_state!=0
+			]]>
+		</param>
+
+					<module name="ServerSideInclude">
+						<param name="src">static_filter_basic.html</param>
+					</module>
+
+
+
+		<module name="TimeRangePicker" layoutPanel="panel_row1_col1">
+			<param name="searchWhenChanged">True</param>
+			<param name="selected">Last 15 minutes</param>
+
+			<module name="SubmitButton" layoutPanel="panel_row1_col1">
+				<param name="allowSoftSubmit">True</param>
+				<param name="label">Search</param>
+
+				<module name="HiddenPostProcess" layoutPanel="panel_row2_col1" group="Number of alerts by time" autoRun="True">
+						<param name="search">
+						<![CDATA[
+						eval State=if(last_hard_state=1,"WARNING",if(last_hard_state=2,"CRITICAL","UNKNOWN")) | eval new_field=host_name.",".service_description | timechart partial=false fixedrange=false span=8m dc(new_field) as Number_of_alerts by State
+						]]>
+					</param>
+					<param name="groupLabel">Number of alerts by time</param>
+					<module name="ViewstateAdapter">
+						<param name="suppressionList">
+							<item>charting.axisTitleY.text</item>
+							<item>drilldown</item>
+							<item>charting.chart</item>
+							<item>charting.axisTitleX.text</item>
+							<item>charting.chart.stackMode</item>
+						</param>
+						<module name="HiddenFieldPicker">
+							<param name="strictMode">True</param>
+							<module name="JobProgressIndicator">
+								<module name="EnablePreview">
+									<param name="enable">True</param>
+									<param name="display">False</param>
+									<module name="HiddenChartFormatter">
+										<param name="charting.chart">line</param>
+										<param name="charting.axisTitleX.text" />
+										<param name="charting.axisTitleY.text">Number</param>
+										<param name="charting.layout.splitSeries">True</param>
+										<param name="charting.chart.nullValueMode">zero</param>
+										<module name="FlashChart">
+											<param name="width">100%</param>
+											<module name="ConvertToDrilldownSearch">
+												<module name="ViewRedirector">
+													<param name="viewTarget">flashtimeline</param>
+												</module>
+											</module>
+										</module>
+										<module name="ViewRedirectorLink">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+
+				<module name="HiddenPostProcess" layoutPanel="panel_row2_col2" group="Different alerts by time" autoRun="True">
+					<param name="search">
+						<![CDATA[
+						eval subs=(last_check-last_hard_state_change) | where subs < 400 |  eval State=if(last_hard_state=1, "WARNING", if(last_hard_state=2, "CRITICAL", "UNKNOWN")) | dedup  current_problem_id,host_name,service_description sortby +_time  | timechart partial=false fixedrange=false span=8m count(last_hard_state) as Number_of_alerts by State
+						]]>
+					</param>
+					<param name="groupLabel">Different alerts by time</param>
+					<module name="ViewstateAdapter">
+						<param name="suppressionList">
+							<item>charting.axisTitleY.text</item>
+							<item>drilldown</item>
+							<item>charting.chart</item>
+							<item>charting.axisTitleX.text</item>
+							<item>charting.chart.stackMode</item>
+						</param>
+						<module name="HiddenFieldPicker">
+							<param name="strictMode">True</param>
+							<module name="JobProgressIndicator">
+								<module name="EnablePreview">
+									<param name="enable">True</param>
+									<param name="display">False</param>
+									<module name="HiddenChartFormatter">
+										<param name="charting.chart">line</param>
+										<param name="charting.axisTitleX.text" />
+										<param name="charting.axisTitleY.text">Numero</param>
+										<param name="charting.layout.splitSeries">True</param>
+										<param name="charting.chart.nullValueMode">zero</param>
+										<module name="FlashChart">
+											<param name="width">100%</param>
+											<module name="ConvertToDrilldownSearch">
+												<module name="ViewRedirector">
+													<param name="viewTarget">flashtimeline</param>
+												</module>
+											</module>
+										</module>
+										<module name="ViewRedirectorLink">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+
+				<module name="HiddenPostProcess" layoutPanel="panel_row4_col2" group="Duration of the alerts" autoRun="True">
+					<param name="search">
+						<![CDATA[
+						eval State = if(last_hard_state = 1, "WARNING", if(last_hard_state = 2, "CRITICAL", "UNKNOWN")) | dedup host_name,service_description,current_problem_id | eval seconds=last_check-last_hard_state_change | sort -num(seconds) | eval my_days=floor(seconds/86400) | eval my_hours=floor(seconds / 3600 - my_days * 24) | eval my_minutes = floor (seconds / 60 - my_hours * 60 - my_days *  1440) | eval my_seconds = seconds - my_days * 86400 - my_hours * 3600 - my_minutes * 60 | strcat my_days "d " my_hours "h " my_minutes "m " my_seconds "s" Time |  head 10 | rename host_name as Host | rename service_description as Service | table Time, Host, Service, State
+						]]>
+					</param>
+					<param name="groupLabel">Duration of the alerts</param>
+					<module name="ViewstateAdapter">
+						<module name="HiddenFieldPicker">
+							<param name="strictMode">True</param>
+							<module name="JobProgressIndicator">
+								<module name="EnablePreview">
+									<param name="enable">True</param>
+									<param name="display">False</param>
+									<module name="Paginator">
+										<param name="count">10</param>
+										<param name="entityName">results</param>
+										<param name="maxPages">5</param>
+
+										<module name="SimpleResultsTable">
+											<param name="count">6</param>
+											<param name="drilldown">row</param>
+											<param name="allowTransformedFieldSelect">True</param>
+											<module name="ConvertToDrilldownSearch">
+												<module name="ViewRedirector">
+													<param name="viewTarget">flashtimeline</param>
+												</module>
+											</module>
+										</module>
+										<module name="ViewRedirectorLink">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+									</module>
+
+								</module>
+
+							</module>
+						</module>
+					</module>
+				</module>
+
+
+
+				<module name="HiddenPostProcess" layoutPanel="panel_row3_col2" group="Duration of the alerts" autoRun="True">
+					<param name="search">
+						<![CDATA[
+						eval State = if(last_hard_state = 1, "WARNING", if(last_hard_state = 2, "CRITICAL", "UNKNOWN")) | dedup host_name,service_description,current_problem_id | eval Time=last_check-last_hard_state_change | eval Service=host_name." - ".service_description |  head 10 | table Service,Time
+						]]>
+					</param>
+					<param name="groupLabel">Duration of the alerts</param>
+					<module name="ViewstateAdapter">
+						<param name="suppressionList">
+							<item>drilldown</item>
+							<item>charting.chart</item>
+						</param>
+						<module name="HiddenFieldPicker">
+							<param name="strictMode">True</param>
+							<module name="JobProgressIndicator">
+								<module name="EnablePreview">
+									<param name="enable">True</param>
+									<param name="display">False</param>
+									<module name="HiddenChartFormatter">
+										<param name="charting.chart">ratioBar</param>
+										<param name="charting.axisTitleX.text" />
+										<param name="charting.axisTitleY.text" />
+										<module name="FlashChart">
+											<param name="width">100%</param>
+											<module name="ConvertToDrilldownSearch">
+												<module name="ViewRedirector">
+													<param name="viewTarget">flashtimeline</param>
+												</module>
+											</module>
+										</module>
+										<module name="ViewRedirectorLink">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+
+
+				<module name="HiddenPostProcess" layoutPanel="panel_row4_col1" group="More repetitive alerts" autoRun="True">
+					<param name="search">
+						<![CDATA[
+						eval State=if(last_hard_state=1, "WARNING", if(last_hard_state = 2, "CRITICAL", "UNKNOWN")) | dedup host_name,service_description,current_problem_id | rename host_name as Host | rename service_description as Service | stats count as Number by Host,Service | sort -num(Number)| table Number,Host,Service
+						]]>
+					</param>
+					<param name="groupLabel">More repetitive alerts</param>
+					<module name="ViewstateAdapter">
+						<module name="HiddenFieldPicker">
+							<param name="strictMode">True</param>
+							<module name="JobProgressIndicator">
+								<module name="EnablePreview">
+									<param name="enable">False</param>
+									<param name="display">False</param>
+									<module name="Paginator">
+										<param name="count">10</param>
+										<param name="entityName">results</param>
+										<param name="maxPages">5</param>
+
+										<module name="SimpleResultsTable">
+											<param name="count">10</param>
+											<param name="drilldown">row</param>
+											<param name="allowTransformedFieldSelect">True</param>
+											<module name="ConvertToDrilldownSearch">
+												<module name="ViewRedirector">
+													<param name="viewTarget">flashtimeline</param>
+												</module>
+											</module>
+										</module>
+										<module name="ViewRedirectorLink">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+
+
+				<module name="HiddenPostProcess" layoutPanel="panel_row3_col1" group="More repetitive alerts" autoRun="True">
+					<param name="search">
+						<![CDATA[
+						eval State=if(last_hard_state=1, "WARNING", if(last_hard_state=2, "CRITICAL", "UNKNOWN")) | dedup host_name,service_description,current_problem_id | eval Service=host_name." - ".service_description | stats count as Number by Service | sort -Number | head 10 | table Service,Number
+						]]>
+					</param>
+					<param name="groupLabel">More repetitive alerts</param>
+					<module name="ViewstateAdapter">
+						<param name="suppressionList">
+							<item>drilldown</item>
+							<item>charting.chart</item>
+						</param>
+						<module name="HiddenFieldPicker">
+							<param name="strictMode">True</param>
+							<module name="JobProgressIndicator">
+								<module name="EnablePreview">
+									<param name="enable">True</param>
+									<param name="display">False</param>
+									<module name="HiddenChartFormatter">
+										<param name="charting.chart">ratioBar</param>
+										<param name="charting.axisTitleX.text" />
+										<param name="charting.axisTitleY.text" />
+										<module name="FlashChart">
+											<param name="width">100%</param>
+											<module name="ConvertToDrilldownSearch">
+												<module name="ViewRedirector">
+													<param name="viewTarget">flashtimeline</param>
+												</module>
+											</module>
+										</module>
+										<module name="ViewRedirectorLink">
+											<param name="viewTarget">flashtimeline</param>
+										</module>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+</view>
+

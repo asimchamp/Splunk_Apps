@@ -1,0 +1,191 @@
+<form>
+  <label>Network Health</label>
+  <description/>
+  <fieldset autoRun="true" token="time1" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>High-Priority Logs</title>
+      <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=Crit OR errLevel=Warn OR errLevel=Erro | stats count by errLevel</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.fieldColors">{"Crit": 0xFF0000,"Erro": 0xFFA500,"Warn": 0xFFF000}</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_log_severity?form.errLevel=$click.value$</link>
+      </drilldown>
+    </chart>
+    <chart>
+      <title>Fan Warnings</title>
+      <searchString>index=extnet  fan failed  | rex max_match=0 "\s&lt;Warn:DM\.Warning&gt;(\s:\s|\s)Switch,\sCode\s5:\sFan\stray\s(?&lt;fanTray&gt;\d+),\sfan\s#(?&lt;fanNum&gt;\d+),\shas\sfailed\.\sRPM\s\((?&lt;fanRPM&gt;\d+)\)\sis\sout\sof\soperating\srange\swhich\sis\sat\sor\sabove\s(?&lt;fanOpRng&gt;\d+)\.\s\((?&lt;devModel&gt;\S+),\sP\/N:\s(?&lt;devNum&gt;\S+),\sS\/N:\s(?&lt;devSN&gt;\S+),\s(?&lt;revNum&gt;Rev:\s\d+\.\d+)\)" | eval eventTime=strftime(_time,"%Y-%m-%d %H:%M:%S") | dedup _time,host,fanTray,fanNum |  chart count(devSN) over devSN</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.axisTitleX.text">Serial Number</option>
+      <option name="charting.axisTitleY.text">Number of Warnings</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_fan_warnings?form.devSN=$click.value$</link>
+      </drilldown>
+      <option name="charting.axisLabelsY.majorUnit">2</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Low-Priority Logs</title>
+      <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=Info OR errLevel=Noti OR errLevel=Summ OR errLevel=Verb OR errLevel=Data OR errLevel=UNKNW | stats count by errLevel</searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.fieldColors">{"Noti": 0x0000FF,"Info": 0x00FF00,"Summ": 0x00FFCC,"Data": 0xFF99CC,"Verb": 0xFFCC99,"UNKNW": 0x666699}</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_log_severity?form.errLevel=$click.value$</link>
+      </drilldown>
+    </chart>
+    <chart>
+      <title>Temperature Warnings</title>
+      <searchString>index=extnet  Temperature | rex max_match=0 "&lt;Erro:DM\.Error&gt;\sSwitch:\sTemperature\s\((?&lt;curTemp&gt;(\d+|-\d+)\sC)\)\s(is\sreaching\s(?&lt;tempReaching&gt;(maximum|minimum))\slimit|above\soperating\srange)\s\((?&lt;tempLimit&gt;(\d+|-\d+|-\d+\sto\s\d+)\sCelsius)\)(\.|)\s\((?&lt;deviceName&gt;\S+),\sP\/N:\s(?&lt;deviceType&gt;\S+),\sS\/N:\s(?&lt;deviceSN&gt;\S+),\sRev:\s(?&lt;deviceRev&gt;\d+\.\d+)\)" | search curTemp=* | eval eventTime=strftime(_time,"%Y-%m-%d %H:%M:%S") | eval tempReaching=if(tempReaching="minimum" OR tempReaching="maximum",tempReaching,"ABOVE RANGE") | dedup _time,deviceSN,tempReaching | stats count by deviceSN</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_temperature_warnings?form.deviceSN=$click.value$</link>
+      </drilldown>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Log Severity Breakdown</title>
+      <searchString>index=extnet  | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=Crit OR errLevel=Warn OR errLevel=Erro OR errLevel=Noti OR errLevel=Info | chart count over host by errLevel useother=f</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">stacked100</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.fieldColors">{"Crit": 0xFF0000,"Erro": 0xFFA500,"Warn": 0xFFF000,"Noti": 0x0000FF,"Info": 0x00FF00,"Summ": 0x00FFCC,"Data": 0xFF99CC,"Verb": 0xFFCC99,"UNKNW": 0x666699}</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_device_health?form.host=$click.value$&amp;form.errLevel=$click.name2$&amp;form.errLoc=*</link>
+      </drilldown>
+      <option name="charting.axisTitleX.text">Host</option>
+    </chart>
+    <chart>
+      <title>Process Crashes</title>
+      <searchString>index=extnet | rex "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s" | search errLevel=Crit errLoc=Kern errType="Alert" | transaction host maxspan=0.2s maxpause=1s startswith="Code:" endswith="died" | rex "\sProcess\s(?&lt;dumpProcess&gt;\w+)\spid\s(?&lt;dumpPid&gt;\d+)\sdied\swith\ssignal\s(?&lt;dumpSignal&gt;\d+)" | dedup _time,host,dumpProcess | stats count by dumpProcess</searchString>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <drilldown>
+        <link>/app/extreme_networks_basic/drilldown_process_crashes?form.dumpProcess=$click.value$</link>
+      </drilldown>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Unexpected Reboots</title>
+      <searchString>index=extnet | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errType=UnexpctRebootDtect | chart count over host by errType</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.axisTitleX.text">Host</option>
+      <option name="charting.axisTitleY.text">Reboots</option>
+      <option name="charting.axisLabelsY.majorUnit">1</option>
+    </chart>
+  </row>
+  <row>
+    <html>
+      <p>The preceding information is not gathered in real-time. Results are current to the most recent tech support report from each device.</p>
+    </html>
+  </row>
+</form>

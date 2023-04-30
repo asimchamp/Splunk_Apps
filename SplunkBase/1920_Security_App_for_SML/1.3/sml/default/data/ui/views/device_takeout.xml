@@ -1,0 +1,136 @@
+<form script="autodiscover.js">
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <label>デバイス持出し</label>
+  <row>
+    <panel>
+      <chart>
+        <title>時間帯別持出しファイル数</title>
+        <searchString>index=smllog sourcetype=smllog_0 file_subtype=takeout 
+            | stats count(file1) AS 持出しファイル数 by date_hour 
+            | sort date_hour 
+            | eventstats avg(持出しファイル数) as average 
+            | eval average=round(average,0)
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>情報漏えい危険度</title>
+        <searchString>index=smllog sourcetype = smllog_0 file_subtype=takeout
+            | stats count by leak_category
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+            <link>
+            <![CDATA[
+                /app/sml/leak_by_user?form.sourcetype=0%20file_subtype%3Dtakeout&form.leak_category=$click.value$&earliest=$earliest$&latest=$latest$
+            ]]>
+            </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>持出しファイルの種類</title>
+        <searchString>index=smllog sourcetype = smllog_0 file_subtype=takeout
+            | rex field=file1 "(?&lt;file1_ext&gt;[^.]+)$" 
+            | eval file1_ext=lower(file1_ext) 
+            | top file1_ext 
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+        <html>
+            <h2>持出しファイル名キーワードTop100</h2>
+            <div id="takeout_kwds_search"
+                 class="splunk-manager splunk-searchmanager "
+                 data-require="splunkjs/mvc/searchmanager"
+                 data-options='{
+                        "app": "sml",
+                        "preview": true,
+                        "search": "index=smllog sourcetype=smllog_0 file_subtype=takeout | eval kwds_takeout=split(file_keywords,\"/\") | top limit=100 kwds_takeout | sort kwds_takeout"
+                    }'>
+            </div>
+            <div id="takeout_kwds"
+                 class="splunk-view"
+                 data-require="app/sml/components/tagcloud/tagcloud"
+                 data-options='{
+                        "minFontSize": 14,
+                        "maxFontSize": 55,
+                        "managerid": "takeout_kwds_search",
+                        "valueField": "count",
+                        "labelField": "kwds_takeout"
+                     }'>
+            </div>
+        </html>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,108 @@
+<%inherit file="//layout/base.html" />
+<%namespace name="lib" file="//lib.html" import="*" />
+
+
+<%def name="js()">
+
+
+
+    <script>
+        window.onbeforeunload = gobusy
+        function gobusy(){
+            $('#overlay').show()
+        }
+    </script>
+
+</%def>    
+
+<style>
+label { 
+      color:#07F;
+      font-size:15px;
+}
+body {font-size:70%}
+</style>
+
+<%def name="css()"> 
+    <%coreCSSFiles = ["/static/css/view.css", "/static/css/skins/default/default.css", "/modules/nav/AccountBar.css", "/static/css/print.css"] %>
+    <%lib:stylesheet_tags files="${coreCSSFiles}" />
+</%def>
+
+<link rel="stylesheet" href="${make_url('/static/app/tuneup/tuneup.css')}" type="text/css" />
+
+<body >
+
+  <div id="overlay">
+    <div id="loader" >
+      <img src="${make_url('/static/app/tuneup/ajax-loader.gif')}" />
+    </div>
+  </div>
+
+  <div class="appHeaderWrapper">
+    <div class="splClearfix" nothing="xlayoutRow xoneColRow xappHeader">       
+      <div class="SplunkModule AccountBar">
+	<font size="3">
+	  <a href="${make_url('/app/launcher/home')|h}" class="splIcon splIcon-close"></a>
+	  <div class="appLogoContainer popupAppLogoContainer">
+	    <a href="${make_url('/app/launcher/home')|h}" class="appLogo"></a>
+	    <span style="position: absolute; top: 3px; color:#0088FF" ><h1>${_('Tuneup')}</h1></span>
+	  </div>
+	</font>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin:4px; padding:4px">
+<!-- display messages -->
+% for mtype, msgs in messages.items():
+   % for msg in msgs:
+         <p class="${mtype|h}">${msg|h}</p>
+   % endfor
+% endfor
+
+  <form method="POST">
+    <label>Search History:</label>
+      <ul>
+	<input type="checkbox" name="allusers" value="allusers" onchange='this.form.submit()'
+	     %if allusers:
+	       checked="checked"
+	     %endif
+	     /> 
+      <b>All users</b> (rather than the current user's history)
+	<br/>
+	<b>Advanced:</b>
+	Custom search-history search: <input maxlength=200 size=60 type="text" id="customsearch" name="customsearch" value="${customsearch|h}" />
+    </ul>
+    ${csrf_hidden_input()}
+  </form>
+  <h3>
+  Consider adding knowledge objects to Splunk, based on the following common search patterns.
+  </h3>
+  <ul>
+    <% oldmsgtype = None %>
+    %for msg in tuneup:
+      <% msgtype = msg['type'] %>
+      %if msgtype != oldmsgtype:
+         </ul>
+         <h1>${msgtype|h}</h1>
+	 <ul> 
+      %endif
+      <% oldmsgtype = msgtype %>
+      <li>
+	%for k,v in msg.items():
+	   %if k != 'type':
+	      <b>${k|h}:</b> ${v|h}
+	   %endif
+	%endfor
+      </li>
+    %endfor
+  </ul>
+
+</div>
+      
+<center>
+<hr>
+Copyright &copy; Splunk 2005-2013.  All rights reserved. 
+</center>  
+</body>
+      

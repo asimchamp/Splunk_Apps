@@ -1,0 +1,157 @@
+<view autoCancelInterval="90" isVisible="true" onunloadCancelJobs="true" refresh="-1"  template="dashboard.html" isSticky="False">
+    <label>Configure Templates</label>
+    <module name="AccountBar" layoutPanel="appHeader" />
+    <module name="AppBar" layoutPanel="appHeader" />
+    <module name="SideviewUtils" layoutPanel="appHeader" />
+
+<!--
+    <module name="GenericFTR" layoutPanel="viewHeader">
+        <param name="configLink">/app/extrahop_metrics/setup</param>
+    </module>
+-->
+
+     <module name="SaveConfiguredDevices" layoutPanel="appHeader"/>
+     
+     
+    <module name="HTML" layoutPanel="viewHeader">
+        <param name="html">
+            <![CDATA[ <h1>Configure Templates</h1> ]]>
+        </param>
+    </module>
+    <module name="URLLoader" layoutPanel="panel_row1_col1" autoRun="True">
+    <module name="ValueSetter">
+        <param name="allowClobber">False</param>
+        <param name="name">template_name</param>
+        <param name="value">''</param>
+
+    <module name="HTML" layoutPanel="panel_row1_col1_grp1">
+        <param name="html">
+            <![CDATA[
+            <label for="Template_Name">Template Name</label><input type="text" id="Template_Name" name="Template_Name" size=25 value=$template_name$ />
+                <input type="button" value="Delete" id="myTemplateDeleteButton" class="myTemplateDeleteButton splButton-primary" onclick="deleteTemplate();"  >            ]]>
+        </param>
+    </module>
+    
+    <module name="Search"   layoutPanel="panel_row1_col1_grp1" autoRun="True">
+        <param name="search">| inputlookup metrics_lookup.csv | sort metric a</param>
+        <module name="Pulldown">
+            <param name="size">1</param>
+            <param name="width">15em</param>
+            <param name="name">Metric_Type</param>
+            <param name="label">Metric Type</param>
+            <param name="searchFieldsToDisplay">
+                <list>
+                    <param name="label">metric</param>
+                    <param name="value">metric</param>
+                </list>
+            </param>
+            <param name="staticFieldsToDisplay">
+                <list>
+                    <param name="value">blank</param>
+                    <param name="label">Please select a metric type</param>
+                </list>
+            </param>
+            <module name="Search" >
+                <param name="search">| inputlookup "$Metric_Type$_lookup.csv" | dedup device | sort device</param>
+                <module name="Pulldown">
+                    <param name="size">1</param>
+                    <param name="width">15em</param>
+                    <param name="name">Device_Type</param>
+                    <param name="label">Device Type</param>
+                    <param name="searchFieldsToDisplay">
+                        <list>
+                            <param name="label">device</param>
+                            <param name="value">device</param>
+                        </list>
+                    </param>
+                    <param name="staticFieldsToDisplay">
+                        <list>
+                            <param name="value">blank</param>
+                            <param name="label">Please select a device type</param>
+                        </list>
+                    </param>
+                    
+                    <module name="Search" >
+                                <param name="search">| inputlookup "$Metric_Type$_lookup.csv" | where device="$Device_Type$" | sort metric | eval mt=metric+":"+type</param>
+                                <module name="Pulldown">
+                                    <param name="size">10</param>
+                                    <param name="width">15em</param>
+                                    <param name="template">$value$</param>
+                                    <param name="separator">,</param>
+                                    <param name="outerTemplate">"$value$"</param>
+                                    <param name="name">Metrics</param>
+                                    <param name="label">Metrics</param>
+                                    <param name="searchFieldsToDisplay">
+                                        <list>
+                                            <param name="label">metric</param>
+                                            <param name="value">mt</param>
+                                        </list>
+                                    </param>
+                                    <param name="staticFieldsToDisplay">
+                                        <list>
+                                            <param name="value">blank</param>
+                                            <param name="label">Please select metric(s)</param>
+                                        </list>
+                                    </param>
+                                    <module name="HTML">
+                                        <param name="html">
+                                            <![CDATA[
+                                                Selected metric type is: <b id="metric_type">$Metric_Type$</b><br>
+                                                Selected device type is: <b id="device_type">$Device_Type$</b><br> 
+                                                Selected metric(s) is/are: <b id="metrics">$Metrics$</b><br><br>
+                                      <b>Please Note:</b> Using a template name that is the same as one that is already defined will update it<br><br>
+                                       <input type="button" value="Submit" class="myTemplateButton splButton-primary" onclick="addTemplate();">
+                                            ]]>
+                                        </param>
+                                    </module>
+                                </module>
+                            </module>
+                </module>
+            </module>
+        </module>
+    </module>
+    </module>
+    </module> 
+
+    <module name="GenericHeader" layoutPanel="panel_row2_col1">
+        <param name="label">Existing Templates</param>
+    </module>
+     <module name="Search"   layoutPanel="panel_row2_col1" autoRun="True">
+        <param name="search">| inputlookup ehm_templates.csv | sort template_name a
+        | table template_name, device, metric_type, metric
+        | rename template_name as "Template Name"
+        | rename device as "Device Type"
+        | rename metric as "Selected Metrics"
+        | rename metric_type as "Metric Type"
+        </param>
+        <module name="ViewstateAdapter">
+                <module name="HiddenFieldPicker">
+                    <param name="strictMode">True</param>
+                    <module name="JobProgressIndicator" />
+                    <module name="Paginator">
+                        <param name="count">15</param>
+                        <param name="entityName">results</param>
+                        <module name="EnablePreview">
+                            <param name="enable">True</param>
+                            <param name="display">False</param>
+                            <module name="SimpleResultsTable">
+                                <param name="count">15</param>
+                                <param name="entityName">results</param>
+                                <param name="allowTransformedFieldSelect">True</param>
+                                <param name="drilldown">cell</param>
+                                <param name="displayRowNumbers">false</param>
+                                <module name="Redirector">
+                                    <param name="popup">False</param>
+                                    <param name="url">configure_templates</param>
+                                    <param name="arg.template_name">$click.fields.Template Name$</param>
+                                    <param name="arg.Device_Type">$click.fields.Device Type$</param>
+                                    <param name="arg.Metric_Type">$click.fields.Metric Type$</param>
+                                </module>
+                            </module>
+                        </module>
+                    </module>
+                </module>
+            </module>
+     </module>
+     
+</view>

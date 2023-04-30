@@ -1,0 +1,6 @@
+#!/bin/bash
+CURRENT_DIR=`pwd` # etc/apps/faup/bin/ where faup.py is
+export LD_LIBRARY_PATH="$CURRENT_DIR/../opt/linux-x86_64/lib"
+export FAUP_DATA_DIR="$CURRENT_DIR/../opt/linux-x86_64/share/faup"
+$CURRENT_DIR/../opt/linux-x86_64/bin/faup $@
+

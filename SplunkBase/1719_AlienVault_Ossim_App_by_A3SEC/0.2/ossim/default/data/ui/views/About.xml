@@ -1,0 +1,43 @@
+<view autoCancelInterval="90" decomposeIntentions="false" isPersistable="true" isSticky="true" isVisible="true" objectMode="viewconf" onunloadCancelJobs="true" template="dashboard.html">
+  <label>About</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="HTML" layoutPanel="panel_row1_col1">
+    <param name="html">&lt;h2&gt;Disclaimers&lt;/h2&gt;
+
+      &lt;p&gt;
+       &lt;a href="http://www.a3sec.com"&gt;More Info &lt;/a&gt;.
+      &lt;/p&gt;
+      &lt;p&gt;
+        App for OSSIM by A3SEC
+		Author: Angel Israel Gutierrez Barreto
+      &lt;/p&gt;
+      	&lt;br&gt;
+		&lt;br&gt;
+		&lt;br&gt;
+      <![CDATA[
+                <code>
+                        More Info: www.a3sec.com
+                </code>
+                ]]>
+        &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+      <![CDATA[
+ 		<code>
+			Twitter: @a3sec
+		</code>
+		]]>
+      &lt;br&gt;
+		&lt;br&gt;
+		&lt;br&gt;
+    &lt;a rel=&quot;license&quot; href=&quot;http://creativecommons.org/licenses/by-nc-sa/3.0/deed.es_ES&quot;&gt;&lt;img alt=&quot;Licencia de Creative Commons&quot; style=&quot;border-width:0&quot; src=&quot;http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png&quot; /&gt;&lt;/a&gt;&lt;br /&gt;Este obra está bajo una &lt;a rel=&quot;license&quot; href=&quot;http://creativecommons.org/licenses/by-nc-sa/3.0/deed.es_ES&quot;&gt;licencia de Creative Commons Reconocimiento-NoComercial-CompartirIgual 3.0 Unported&lt;/a&gt;.
+    
+    </param>
+  </module>
+</view>

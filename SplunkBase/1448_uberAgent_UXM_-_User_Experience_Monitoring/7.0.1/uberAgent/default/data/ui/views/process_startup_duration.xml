@@ -1,0 +1,620 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, process_startup_duration.js" stylesheet="main.css, process_startup_duration.css">
+
+   <label>Process Startup</label>
+   <description>This dashboard displays detailed information about process startup performance.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Process_ProcessStartup</default>
+      </input>
+   </fieldset>
+   
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+            sum(StartupIOCount) as SumStartupIOCount
+            sum(StartupTimeS) as SumStartupTimeS
+            count(Process_ProcessStartup) as CountProcessStartup
+            splitrow
+               $ModeGroupBy$
+            $SearchFilter$
+            `uberAgent_filter_AppNameIsNotOS`
+         | stats
+            sum(SumStartupIOCount) as SumStartupIOCount
+            sum(SumStartupTimeS) as SumStartupTimeS
+            sum(CountProcessStartup) as CountProcessStartup
+            dc($ModeGroupBy$) as UniqueProcesses
+         | eval AvgStartupIOCount = round (SumStartupIOCount / CountProcessStartup,1)
+         | eval AvgStartupDurationS = round (SumStartupTimeS / CountProcessStartup,1)
+      </query>
+   </search>
+   
+   <search id="Search_New">
+      <query>
+         | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+            earliest(_time) as EventTime
+            sum(StartupIOCount) as SumStartupIOCount
+            sum(StartupTimeS) as SumStartupTimeS
+            count(Process_ProcessStartup) as CountProcessStartup
+            splitrow
+               ProcName
+            splitrow
+               AppName
+            $SearchFilter$
+            `uberAgent_filter_AppNameIsNotOS`
+         | eval EventTime = round (strptime (EventTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), 0) 
+         | eval ProcNameLower = lower(ProcName)
+         | lookup lookup_processstartup_processlist ProcName as ProcNameLower OUTPUTNEW FirstSeen
+         | where isNull(FirstSeen) OR (EventTime-FirstSeen &lt; 3600)
+         | stats
+            sum(SumStartupIOCount) as SumStartupIOCount
+            sum(SumStartupTimeS) as SumStartupTimeS
+            sum(CountProcessStartup) as CountProcessStartup
+            by
+               $ModeGroupBy$
+         | stats
+            sum(SumStartupIOCount) as SumStartupIOCount
+            sum(SumStartupTimeS) as SumStartupTimeS
+            sum(CountProcessStartup) as CountProcessStartup
+            dc($ModeGroupBy$) as UniqueProcessesOrApps
+         | eval AvgStartupIOCount = round (SumStartupIOCount / CountProcessStartup,1)
+         | eval AvgStartupDurationS = round (SumStartupTimeS / CountProcessStartup,1)
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>      
+      <!-- Column 1 -->
+      <panel>
+         <title>Overview</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">UniqueProcesses</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Unique $ModeGroupByPluralLower$:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">CountProcessStartup</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Total process starts:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgStartupDurationS</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Avg. startup duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgStartupIOCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Avg. startup IO count:</option>
+         </viz>
+      </panel>
+      
+      <!-- Column 2 -->
+      <panel>
+         <title>Overview - new $ModeGroupByPluralLower$</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_New" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">UniqueProcessesOrApps</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Unique new $ModeGroupByPluralLower$:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">CountProcessStartup</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Total new process starts:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgStartupDurationS</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Avg. startup duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgStartupIOCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Avg. startup IO count:</option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Startup duration (top 10)</title>
+         <input type="dropdown" token="Panel21GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <choice value="host">Host</choice>
+            <choice value="ProcUser">User</choice>
+            <default>$ModeGroupBy$</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="AppName">
+                  <set token="Panel21GroupByDisplay">$label$</set>
+                  <set token="Panel21Splitrow">
+                     splitrow AppName
+                  </set>
+               </condition>
+               <condition value="ProcName">
+                  <set token="Panel21GroupByDisplay">$label$</set>
+                  <set token="Panel21Splitrow"> </set>
+               </condition>
+               <condition value="host">
+                  <set token="Panel21GroupByDisplay">$label$</set>
+                  <set token="Panel21Splitrow">
+                     splitrow host
+                  </set>
+               </condition>
+               <condition value="ProcUser">
+                  <set token="Panel21GroupByDisplay">$label$</set>
+                  <set token="Panel21Splitrow">
+                     splitrow ProcUser
+                  </set>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel21Function1" id="Input_Panel21Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="max">maximum</choice>
+            <choice value="min">minimum</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+         </input>
+         <input type="radio" token="Panel21NewProcessesRadioButton">
+            <label>$RadioButtonLabel$</label>          
+            <choice value="1">Yes</choice>
+            <choice value="0">No</choice>
+            <default>No</default>
+            <change>
+            <condition label="Yes">
+               <set token="Panel21_OnlyNew">
+                  | eval ProcNameLower = lower(ProcName)
+                  | lookup lookup_processstartup_processlist ProcName as ProcNameLower OUTPUTNEW FirstSeen
+                  | where isNull(FirstSeen) OR (EventTime-FirstSeen &lt; 3600)
+               </set>
+            </condition>
+            <condition label="No">
+               <set token="Panel21_OnlyNew"> </set>
+            </condition>
+            </change> 
+         </input>
+         <chart id="Chart_Panel21">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                     earliest(_time) as EventTime
+                     max(StartupTimeS) as maxStartupTimeS
+                     min(StartupTimeS) as minStartupTimeS
+                     sum(StartupTimeS) as sumStartupTimeS
+                     count(Process_ProcessStartup) as countProcessStartup
+                     $Panel21Splitrow$
+                     splitrow
+                        ProcName
+                     $SearchFilter$
+                     `uberAgent_filter_AppNameIsNotOS`
+                  | eval EventTime = round (strptime (EventTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), 0) 
+                  $Panel21_OnlyNew$
+                  | stats
+                     max(maxStartupTimeS) as maxStartupTimeS
+                     min(minStartupTimeS) as minStartupTimeS
+                     sum(sumStartupTimeS) as sumStartupTimeS
+                     sum(countProcessStartup) as countProcessStartup
+                     by
+                        $Panel21GroupBy$
+                  | eval "$Panel21Function1$(StartupTimeS)" = if ("$Panel21Function1$" = "avg", round (sumStartupTimeS / countProcessStartup, 1), '$Panel21Function1$StartupTimeS')
+                  | sort limit=10 - "$Panel21Function1$(StartupTimeS)"
+                  | rename $Panel21GroupBy$ as $Panel21GroupByDisplay$
+                  | table 
+                     $Panel21GroupByDisplay$
+                     "$Panel21Function1$(StartupTimeS)"
+               </query>
+
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Startup IO count (top 10)</title>
+         <input type="dropdown" token="Panel22GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <choice value="host">Host</choice>
+            <choice value="ProcUser">User</choice>
+            <default>$ModeGroupBy$</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="AppName">
+                  <set token="Panel22GroupByDisplay">$label$</set>
+                  <set token="Panel22Splitrow">
+                     splitrow AppName
+                  </set>
+               </condition>
+               <condition value="ProcName">
+                  <set token="Panel22GroupByDisplay">$label$</set>
+                  <set token="Panel22Splitrow"> </set>
+               </condition>
+               <condition value="host">
+                  <set token="Panel22GroupByDisplay">$label$</set>
+                  <set token="Panel22Splitrow">
+                     splitrow host
+                  </set>
+               </condition>
+               <condition value="ProcUser">
+                  <set token="Panel22GroupByDisplay">$label$</set>
+                  <set token="Panel22Splitrow">
+                     splitrow ProcUser
+                  </set>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel22Function1" id="Input_Panel22Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="max">maximum</choice>
+            <choice value="min">minimum</choice>
+            <choice value="sum">sum</choice>
+            <default>sum</default>
+            <label>Function:</label>
+         </input>
+         <input type="radio" token="Panel22NewProcessesRadioButton">
+            <label>$RadioButtonLabel$</label>
+            <choice value="1">Yes</choice>
+            <choice value="0">No</choice>
+            <default>No</default>
+            <change>
+            <condition label="Yes">
+               <set token="Panel22_OnlyNew">
+                  | eval ProcNameLower = lower(ProcName)
+                  | lookup lookup_processstartup_processlist ProcName as ProcNameLower OUTPUTNEW FirstSeen
+                  | where isNull(FirstSeen) OR (EventTime-FirstSeen &lt; 3600)
+               </set>
+            </condition>
+            <condition label="No">
+               <set token="Panel22_OnlyNew"> </set>
+            </condition>
+            </change>
+         </input>
+         <chart id="Chart_Panel22">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                     earliest(_time) as EventTime
+                     max(StartupIOCount) as maxStartupIOCount
+                     min(StartupIOCount) as minStartupIOCount
+                     sum(StartupIOCount) as sumStartupIOCount
+                     count(Process_ProcessStartup) as countProcessStartup
+                     $Panel22Splitrow$
+                     splitrow
+                        ProcName
+                     $SearchFilter$
+                     `uberAgent_filter_AppNameIsNotOS`
+                  | eval EventTime = round (strptime (EventTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), 0) 
+                  $Panel22_OnlyNew$
+                  | stats
+                     max(maxStartupIOCount) as maxStartupIOCount
+                     min(minStartupIOCount) as minStartupIOCount
+                     sum(sumStartupIOCount) as sumStartupIOCount
+                     sum(countProcessStartup) as countProcessStartup
+                     by
+                        $Panel22GroupBy$
+                  | eval "$Panel22Function1$(StartupIOCount)" = if ("$Panel22Function1$" = "avg", round (sumStartupIOCount / countProcessStartup, 1), '$Panel22Function1$StartupIOCount')
+                  | sort limit=10 - "$Panel22Function1$(StartupIOCount)"
+                  | rename $Panel22GroupBy$ as $Panel22GroupByDisplay$
+                  | table
+                     $Panel22GroupByDisplay$
+                     "$Panel22Function1$(StartupIOCount)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Startup duration grouped</title>
+         <input type="dropdown" token="Panel31GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <choice value="host">Host</choice>
+            <choice value="ProcUser">User</choice>
+            <default>$ModeGroupBy$</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="AppName">
+                  <set token="Panel31GroupByDisplay">$label$</set>
+                  <set token="Panel31GroupByOther">ProcName</set>
+                  <set token="Panel31GroupByOtherDisplay">Process name(s)</set>
+                  <set token="Panel31Splitrow">
+                     splitrow AppName
+                  </set>
+                  <unset token="DrilldownFilterBy31"></unset>
+               </condition>
+               <condition value="ProcName">
+                  <set token="Panel31GroupByDisplay">$label$</set>
+                  <set token="Panel31GroupByOther">AppName</set>
+                  <set token="Panel31GroupByOtherDisplay">App name(s)</set>
+                  <set token="Panel31Splitrow"> </set>
+                  <unset token="DrilldownFilterBy31"></unset>
+               </condition>
+               <condition value="host">
+                  <set token="Panel31GroupByDisplay">$label$</set>
+                  <set token="Panel31GroupByOther">$ModeGroupBy$</set>
+                  <set token="Panel31GroupByOtherDisplay">$ModeGroupByAs$</set>
+                  <set token="Panel31Splitrow">
+                     splitrow host
+                  </set>
+                  <unset token="DrilldownFilterBy31"></unset>
+               </condition>
+               <condition value="ProcUser">
+                  <set token="Panel31GroupByDisplay">$label$</set>
+                  <set token="Panel31GroupByOther">$ModeGroupBy$</set>
+                  <set token="Panel31GroupByOtherDisplay">$ModeGroupByAs$</set>
+                  <set token="Panel31Splitrow">
+                     splitrow ProcUser
+                  </set>
+                  <unset token="DrilldownFilterBy31"></unset>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel31Function1" id="Input_Panel31Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="max">maximum</choice>
+            <choice value="min">minimum</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel31Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel31Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel31Function1Display">Max.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel31Function1Display">Min.</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel31Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <input type="radio" token="Panel31NewProcessesRadioButton">
+            <label>$RadioButtonLabel$</label>
+            <choice value="1">Yes</choice>
+            <choice value="0">No</choice>
+            <default>No</default>
+            <change>
+            <condition label="Yes">
+               <set token="Panel31_OnlyNew">
+                  | eval ProcNameLower = lower(ProcName)
+                  | lookup lookup_processstartup_processlist ProcName as ProcNameLower OUTPUTNEW FirstSeen
+                  | where isNull(FirstSeen) OR (EventTime-FirstSeen &lt; 3600)
+               </set>
+            </condition>
+            <condition label="No">
+               <set token="Panel31_OnlyNew"> </set>
+            </condition>
+            </change> 
+         </input>
+         <table id="Table_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                     earliest(_time) as EventTime
+                     max(StartupIOCount) as maxStartupIOCount
+                     min(StartupIOCount) as minStartupIOCount
+                     sum(StartupIOCount) as sumStartupIOCount
+                     max(StartupTimeS) as maxStartupTimeS
+                     min(StartupTimeS) as minStartupTimeS
+                     sum(StartupTimeS) as sumStartupTimeS
+                     count(Process_ProcessStartup) as countProcessStartup
+                     values($Panel31GroupByOther$) as "$Panel31GroupByOtherDisplay$"
+                     dc(host) as counthost
+                     $Panel31Splitrow$
+                     splitrow
+                        ProcName
+                     $SearchFilter$
+                     `uberAgent_filter_AppNameIsNotOS`
+                  | eval EventTime = round (strptime (EventTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), 0) 
+                  $Panel31_OnlyNew$
+                  | stats
+                     max(maxStartupIOCount) as maxStartupIOCount
+                     min(minStartupIOCount) as minStartupIOCount
+                     sum(sumStartupIOCount) as sumStartupIOCount
+                     max(maxStartupTimeS) as maxStartupTimeS
+                     min(minStartupTimeS) as minStartupTimeS
+                     sum(sumStartupTimeS) as sumStartupTimeS
+                     sum(countProcessStartup) as countProcessStartup
+                     values("$Panel31GroupByOtherDisplay$") as "$Panel31GroupByOtherDisplay$"
+                     first(counthost) as "#Hosts"
+                     by
+                        $Panel31GroupBy$
+                  | eval "$Panel31Function1Display$ startup IO count" = round (if ("$Panel31Function1$" = "avg", sumStartupIOCount / countProcessStartup, '$Panel31Function1$StartupIOCount') , 0)
+                  | eval "$Panel31Function1Display$ startup duration (s)"= round (if ("$Panel31Function1$" = "avg", sumStartupTimeS / countProcessStartup, '$Panel31Function1$StartupTimeS') , 1)
+                  | rename countProcessStartup as "#Startups"
+                  | eval sortfield = lower('$Panel31GroupBy$')
+                  | sort limit=0 sortfield
+                  | rename $Panel31GroupBy$ as $Panel31GroupByDisplay$
+                  | table
+                     "$Panel31GroupByDisplay$"
+                     "$Panel31GroupByOtherDisplay$"
+                     "$Panel31Function1Display$ startup duration (s)"
+                     "$Panel31Function1Display$ startup IO count"
+                     "#Startups"
+                     "#Hosts"
+               </query>
+            </search>
+            <option name="count">20</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <set token="DrilldownFilterBy31">$click.value$</set>
+            </drilldown>
+         </table>
+
+         <html src="process_startup_duration_explanation.html">
+         </html>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row depends="$DrilldownFilterBy31$">
+      <panel>
+         <title>Startup detail: $Panel31GroupByDisplay$ = $DrilldownFilterBy31$</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                     sum(StartupIOCount) as SumStartupIOCount
+                     sum(StartupTimeS) as SumStartupTimeS
+                     count(Process_ProcessStartup) as CountProcessStartup
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $SearchFilter$
+                     filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                     `uberAgent_filter_AppNameIsNotOS`
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     eval(round(sum(SumStartupTimeS) / sum(CountProcessStartup), 2)) as "Avg. startup duration (s)"
+                     eval(round(sum(SumStartupIOCount) / sum(CountProcessStartup), 2)) as "Avg. startup IO count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Avg. startup IO count"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">sec.</option>
+            <option name="charting.axisTitleY2.text">count</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+
+         <input type="multiselect" token="FieldFilter" id="Input_Panel41FieldFilter" searchWhenChanged="true">
+            <choice value='"User name"'>User name</choice>
+            <choice value='"App name"'>App name</choice>
+            <choice value='"App version"'>App version</choice>
+            <choice value='"Process name"'>Process name</choice>
+            <choice value='"Startup duration (s)"'>Startup duration (s)</choice>
+            <choice value='"Startup IO count"'>Startup IO count</choice>
+            <choice value='"Is elevated?"'>Is elevated?</choice>
+            <choice value='"Is protected?"'>Is protected?</choice>
+            <choice value='"HashMD5"'>HashMD5</choice>
+            <choice value='"HashSHA1"'>HashSHA1</choice>
+            <choice value='"HashSHA256"'>HashSHA256</choice>
+            <choice value='"HashIMP"'>HashIMP</choice>
+            <choice value='"Signature status"'>Signature status</choice>
+            <choice value='"Is signed by OS vendor?"'>Is signed by OS vendor?</choice>
+            <choice value='"Signer name?"'>Signer name?</choice>
+            <default>
+               "User name",
+               "App name",
+               "App version",
+               "Process name",
+               "Startup duration (s)",
+               "Startup IO count",
+               "Is elevated?",
+               "Is protected?"
+            </default>
+            <label>Fields to display:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <valuePrefix></valuePrefix>
+            <valueSuffix></valueSuffix>
+            <delimiter> </delimiter>
+         </input>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessStartup` Process_ProcessStartup
+                     latest(AppName) as "App name"
+                     latest(AppVersion) as "App version"
+                     latest(StartupIOCount) as "Startup IO count"
+                     latest(_time) as StartTime
+                     latest(IsElevated) as "Is elevated?"
+                     latest(IsProtected) as "Is protected?"
+                     latest(HashMD5) as HashMD5
+                     latest(HashSHA1) as HashSHA1
+                     latest(HashSHA256) as HashSHA256
+                     latest(HashIMP) as HashIMP
+                     latest(SignatureStatusDisplayName) as "Signature status"
+                     latest(IsSignedByOSVendor) as "Is signed by OS vendor?"
+                     latest(SignerName) as "Signer name?"
+                     $SearchFilter$
+                     filter $Panel31GroupBy$ is $DrilldownFilterBy31|s$
+                     splitrow ProcName as "Process name"
+                     splitrow StartupTimeS
+                     splitrow host as Host
+                     splitrow ProcUser as "User name"
+                  | eval "Start time" = strftime (strptime (StartTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Startup duration (s)" = round (StartupTimeS, 2)
+                  | table
+                     "Start time"
+                     "Host"
+                     $FieldFilter$
+                  | sort -"Start time"
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+</form>

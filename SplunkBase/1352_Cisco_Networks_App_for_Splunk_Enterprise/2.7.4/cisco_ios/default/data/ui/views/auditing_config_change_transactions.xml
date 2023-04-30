@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><form version="1.1">
+  <label>Configuration change transactions</label>
+  <search id="check_multi_tenancy">
+    <query>| `check_multi_tenancy`</query>
+    <done>
+      <condition match="$job.resultCount$ != 0">
+        <set token="multi_tenancy">true</set>
+      </condition>
+      <condition>
+        <unset token="multi_tenancy"></unset>
+      </condition>
+    </done>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="multiselect" token="tenant_indexes" depends="$multi_tenancy$">
+      <label>Tenant</label>
+      <fieldForLabel>tenant_name</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+      <search>
+        <query>| `get_tenants_for_user_role($env:user$)`</query>
+      </search>
+      <default>*</default>
+      <delimiter>,</delimiter>
+      <choice value="*">All</choice>
+    </input>
+    <input type="text" token="hostToken">
+      <label>Host</label>
+      <default>*</default>
+    </input>
+    <input type="time">
+      <default>Last 60 minutes</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Configuration change transactions</title>
+        <search>
+          <query>
+            <![CDATA[eventtype=cisco_ios host="$hostToken$" index IN ($tenant_indexes$) eventtype=cisco_ios-config_started OR eventtype="cisco_ios-cfglog_loggedcmd" | eval event_id=coalesce(event_id, strftime(_time, "%s%3Q")) | rex mode=sed field=event_id "s/(\d+)/0000000000000\1/" | rex mode=sed field=event_id "s/0*([0-9]{13})/\1/" | eval event_command=event_id + " " + command | transaction maxspan=15m host,user | rex field=event_command "(?<eid>\d+)\s(?<cmd>.+)" | eval cmd=if(isnull(cmd), "ARCHIVING NOT ENABLED ON THIS DEVICE", cmd) | table _time,host,config_source,user,line,src_ip,eid,cmd]]>
+          </query>
+        </search>
+        <option name="showPager">true</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+</form>

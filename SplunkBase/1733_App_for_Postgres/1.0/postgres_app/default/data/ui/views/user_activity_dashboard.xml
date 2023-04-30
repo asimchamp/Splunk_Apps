@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="dropdown" token="database">
+      <label>Database</label>
+      <default>*</default>
+      <choice value="*">*</choice> 
+      <populatingSavedSearch fieldForValue="database" fieldForLabel="database">@internal Databases</populatingSavedSearch>
+    </input>
+    <input type="dropdown" token="span">
+      <label>Time span</label>
+      <default>10m</default>
+      <choice value="1m">1m</choice>
+      <choice value="5m">5m</choice>
+      <choice value="10m">10m</choice>
+      <choice value="15m">15m</choice>
+      <choice value="30m">30m</choice>
+      <choice value="1h">1h</choice>
+      <choice value="2h">2h</choice>
+      <choice value="4h">4h</choice>
+    </input>
+    <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+  <label>User Activity</label>
+  <row>
+    <chart>
+      <searchString>| savedsearch "@internal Sessions by user" database="$database$" span="$span$"</searchString>
+      <title>Sessions by user</title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">default</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <searchString>| savedsearch "@internal Most errorneous users" database="$database$"</searchString>
+      <title>Most errorneous users</title>
+      <option name="count">10</option>
+      <option name="dataOverlayMode">heatmap</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+</form>

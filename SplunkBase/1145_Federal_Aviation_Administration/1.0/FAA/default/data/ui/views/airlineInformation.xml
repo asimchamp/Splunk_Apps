@@ -1,0 +1,189 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+  <label>Airline Information</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+  <module name="Message" layoutPanel="navigationHeader">
+    <param name="level">warn</param>
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+  </module>
+  
+  <module name="TimeRangePicker" layoutPanel="panel_row1_col1">
+    <param name="searchWhenChanged">True</param>
+    <param name="default">All Time</param>
+  <module name="HiddenSavedSearch" layoutPanel="panel_row2_col1" group="Top Airlines" autoRun="True">
+    <param name="savedSearch">top airlines</param>
+    <param name="groupLabel">Top Airlines</param>
+    <module name="ViewstateAdapter">
+      <param name="savedSearch">top airlines</param>
+      <param name="suppressionList">
+        <item>charting.chart</item>
+        <item>displayRowNumbers</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.layout.splitSeries</item>
+        <item>charting.secondaryAxis.scale</item>
+        <item>charting.secondaryAxis.maximumNumber</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.secondaryAxis.minimumNumber</item>
+        <item>charting.legend.placement</item>
+        <item>count</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">pie</param>
+              <param name="charting.chart.nullValueMode">gaps</param>
+              <param name="charting.layout.splitSeries">false</param>
+              <param name="charting.legend.placement">none</param>
+              <param name="charting.secondaryAxis.maximumNumber">""</param>
+              <param name="charting.chart.stackMode">default</param>
+              <param name="charting.secondaryAxis.minimumNumber">""</param>
+              <param name="charting.secondaryAxis.scale">""</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="HiddenSavedSearch" layoutPanel="panel_row2_col2" group="Airline Availability" autoRun="True">
+    <param name="savedSearch">Availability by Airline</param>
+    <param name="groupLabel">Airline Availability</param>
+    <module name="ViewstateAdapter">
+      <param name="savedSearch">Availability by Airline</param>
+      <param name="suppressionList">
+        <item>displayRowNumbers</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.layout.splitSeries</item>
+        <item>charting.secondaryAxis.scale</item>
+        <item>charting.secondaryAxis.maximumNumber</item>
+        <item>charting.axisTitleX.text</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.secondaryAxis.minimumNumber</item>
+        <item>charting.legend.placement</item>
+        <item>charting.primaryAxisTitle.text</item>
+        <item>count</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator"/>
+        <module name="Paginator">
+          <param name="count">50</param>
+          <param name="entityName">results</param>
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="SimpleResultsTable">
+              <param name="allowTransformedFieldSelect">True</param>
+              <param name="count">50</param>
+              <param name="drilldown">row</param>
+              <param name="entityName">results</param>
+              <param name="displayRowNumbers">true</param>
+              <module name="Gimp"/>
+              <module name="ConvertToDrilldownSearch">
+                <module name="ViewRedirector">
+                  <param name="viewTarget">flashtimeline</param>
+                </module>
+              </module>
+            </module>
+            <module name="ViewRedirectorLink">
+              <param name="viewTarget">flashtimeline</param>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="HiddenSavedSearch" layoutPanel="panel_row3_col1" group="Most Delayed Airlines" autoRun="True">
+    <param name="savedSearch">Top Delaying Airline</param>
+    <param name="groupLabel">Most Delayed Airlines</param>
+    <module name="ViewstateAdapter">
+      <param name="savedSearch">Top Delaying Airline</param>
+      <param name="suppressionList"/>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator"/>
+        <module name="Paginator">
+          <param name="count">10</param>
+          <param name="entityName">results</param>
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="SimpleResultsTable">
+              <param name="allowTransformedFieldSelect">True</param>
+              <param name="drilldown">row</param>
+              <param name="entityName">results</param>
+              <module name="Gimp"/>
+              <module name="ConvertToDrilldownSearch">
+                <module name="ViewRedirector">
+                  <param name="viewTarget">flashtimeline</param>
+                </module>
+              </module>
+            </module>
+            <module name="ViewRedirectorLink">
+              <param name="viewTarget">flashtimeline</param>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="HiddenSavedSearch" layoutPanel="panel_row4_col1" group="Top Earliest Airlines" autoRun="True">
+    <param name="savedSearch">Top Earliest Airlines</param>
+    <param name="groupLabel">Top Earliest Airlines</param>
+    <module name="ViewstateAdapter">
+      <param name="savedSearch">Top Earliest Airlines</param>
+      <param name="suppressionList"/>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator"/>
+        <module name="Paginator">
+          <param name="count">10</param>
+          <param name="entityName">results</param>
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="SimpleResultsTable">
+              <param name="allowTransformedFieldSelect">True</param>
+              <param name="drilldown">row</param>
+              <param name="entityName">results</param>
+              <module name="Gimp"/>
+              <module name="ConvertToDrilldownSearch">
+                <module name="ViewRedirector">
+                  <param name="viewTarget">flashtimeline</param>
+                </module>
+              </module>
+            </module>
+            <module name="ViewRedirectorLink">
+              <param name="viewTarget">flashtimeline</param>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  </module>
+</view>
+

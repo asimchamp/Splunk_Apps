@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Overview</label>
+
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+  </fieldset>
+
+  <row>
+    <html>
+      <h1>LoginIDS</h1>
+      <h2>Overview</h2>
+      This view displays an overview over all recently logged alerts and activities.
+
+      <h2>Efficiency</h2>
+      View alerts and logged services over time.
+
+      <h2>User info</h2>
+      Search for detailed information about a user.
+    </html>
+  </row>
+  <row>
+    <single>
+      <title>Number of Alerts:</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_Alerts" | stats count</searchTemplate>
+      <option name="afterLabel"> alerts raised</option>
+    </single>
+    <single>
+      <title>Logged services:</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_DetailedLog" | stats distinct_count(Service)</searchTemplate>
+      <option name="afterLabel"> services logged</option>
+    </single>
+    <single>
+      <title>Logged events:</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_DetailedLog" | stats count</searchTemplate>
+      <option name="afterLabel"> events logged</option>
+    </single>
+  </row>
+  <row>
+    <table>
+      <title>Most recent alerts</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_Alerts" | table Timestamp, Service, Alert_Name, Loginname, Source, Destination, Alert_Id</searchTemplate>
+      <option name="count">25</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">all</option>
+      <option name="maxLines">25</option>
+      <option name="segmentation">outer</option>
+      <option name="softWrap">true</option>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <title>Alert history</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_Alerts" | timechart count by Alert_Name</searchTemplate>
+      <option name="charting.axisTitleX.text">Date</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.legend.placement">top</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Alerts by service</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_Alerts" | chart count by Service</searchTemplate>
+      <option name="charting.chart">pie</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">none</option>
+    </chart>
+    <chart>
+      <title>Alerts by destination</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_Alerts" | chart count by Destination</searchTemplate>
+      <option name="charting.chart">pie</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">all</option>
+    </chart>
+    <chart>
+      <title>Alerts by source</title>
+      <searchTemplate>index="loginids" sourcetype="loginIDS_Alerts" | chart count by Source</searchTemplate>
+      <option name="charting.chart">pie</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+</form>

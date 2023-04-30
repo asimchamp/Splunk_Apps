@@ -1,0 +1,430 @@
+<endpoint name="data/inputs/web_input">
+	<header>Retrieve information from web-pages</header>
+	
+	<breadcrumb>
+	    <parent hidecurrent="False">datainputstats</parent>
+	    <name>Web-pages</name>
+	</breadcrumb>
+	
+	<elements>
+		<element name="inputFields" type="fieldset">
+	      <view name="list"/>
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+	      	
+	        <element name="name" label="Name">
+	          <view name="list"/>
+	          <view name="create"/>
+	        </element>
+	        
+	        <element name="url" type="textfield" label="URL">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">The URL to connect to (must be be either HTTP or HTTPS protocol)</key>
+	        </element>
+	        
+	        <element name="interval" type="textfield" label="Interval">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">The interval defining how often to perform the check; can include time units (e.g. 15m for 15 minutes, 8h for 8 hours)</key>
+	        </element>
+	        
+	        <element name="title" type="textfield" label="Title">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">A short description (typically just the domain name)</key>
+	        </element>
+	        
+	        <element name="selector" type="textfield" label="Selector">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">A <![CDATA[<a target="_blank" href="http://www.w3schools.com/cssref/css_selectors.asp">]]>CSS selector<![CDATA[</a>]]> that will match the data you want to retrieve</key>
+	        </element>
+	        
+		  	  <element name="web_input_preview_dialog" type="web_input_preview_dialog">
+		  	    <view name="create"/>
+	          <view name="edit"/>
+		  	  </element>
+		  	
+	        <element name="raw_content" type="checkbox" label="Include Raw Content">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">Include the original raw content returned by the server in the result (useful if you want to do your own parsing)</key>
+	        </element>
+
+	        <element name="empty_matches" type="checkbox" label="Include Empty Matches">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">Include matches that don't include anything (otherwise, they are excluded)</key>
+	        </element>
+		  	
+	      </elements>
+	  	</element>
+	  	
+		<element name="outputFields" type="fieldset">
+		  <key name="legend">Output Formatting</key>
+	      <view name="list"/>
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+	      
+	        <element name="name_attributes" type="textfield" label="Name Attributes (to use HTML attributes to assign field names)">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">The value of the field name will be set to the value of the attribute in the matching element; enter multiple attributes separated by commas</key>
+	        </element>
+	        
+	        <element name="use_element_name" type="checkbox" label="Use Tag Name as Field Name">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText"><![CDATA[Sets the name of the field to the tag of the matching element (e.g. a match under a "&lt;volts&gt;12.6&lt;/volts&gt;" element would be put in a field named "volts")]]></key>
+	        </element>
+	        
+	        <element name="output_as_mv" type="checkbox" label="Output as Multi-value Field">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText"><![CDATA[Outputs the matches as a multi-value field (otherwise, separate fields will be created)]]></key>
+	        </element>
+	        
+	        <element name="text_separator" type="textfield" label="Text Separator">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText"><![CDATA[Sets the string that will be placed between the extracted values (e.g. a separator of ":" for a match against "&lt;a&gt;tree&lt;/a&gt;&lt;a&gt;frog&lt;/a&gt;" would return "tree:frog")]]></key>
+	        </element>
+	        
+	        <element name="hide_optional_output" type="website_input_hide_optional_settings">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="fieldset_wrapper_id">item-outputFields</key>
+	          <key name="check_policy"><![CDATA[$('#name_attributes_id').val() !== "" || $('#text_separator_id').val() !== "" || !$('#output_as_mv_id').is(":checked") || $('#use_element_name_id').is(":checked") ]]></key>
+	        </element>
+	        
+	      </elements>
+	    </element>
+	  	
+		<element name="authFields" type="fieldset">
+		  <key name="legend">Authentication</key>
+	      <view name="list"/>
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+	        
+					<element name="secure_password_storage" type="website_input_secure_password_storage">
+						<view name="edit"/>
+	          <view name="create"/>
+						<key name="prefix">web_input://</key>
+						<key name="passwordExampleText">The password to use for authenticating</key>
+						<key name="usernameExampleText">The username to use for authenticating</key>
+					</element>
+
+	        <element name="username_field" type="textfield" label="Username Field">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">The name of the username field on the login form (only needed for forms authentication)</key>
+	        </element>
+
+	        <element name="password_field" type="textfield" label="Password Field">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">The name of the password field on the login form (only needed for forms authentication)</key>
+	        </element>
+
+	        <element name="authentication_url" type="textfield" label="Login page URL">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">The URL of the login form (only needed for forms authentication)</key>
+	        </element>
+
+	        <element name="hide_optional_auth" type="website_input_hide_optional_settings">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="fieldset_wrapper_id">item-authFields</key>
+	        </element>
+	      </elements>
+	  	</element>
+	  	
+		<element name="browserFields" type="fieldset">
+		  <key name="legend">HTTP Client</key>
+	      <view name="list"/>
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+	      
+	        <element name="browser" type="select" label="Browser">
+	          <view name="edit"/>
+	          <view name="create"/>
+		        <options>
+		      	   <opt value="integrated_client" label="Built-in client"/>
+		      	   <opt value="firefox" label="Firefox"/>
+		        </options>
+	          <key name="exampleText">The browser to use when performing the HTTP request; make sure to have the necessary browser installed if you do not use the built-in client</key>
+	        </element>
+	        
+	        <element name="timeout" type="textfield" label="Timeout">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">How long (in seconds) to wait until ending the extraction; increase this if you are using a browser to execute Javascript and the view doesn't render quickly enough</key>
+	        </element>
+	        
+	        <element name="hide_optional_browser" type="website_input_hide_optional_settings">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="fieldset_wrapper_id">item-browserFields</key>
+	          <key name="check_policy"><![CDATA[($('#browser_id').val() !== "" && $('#browser_id').val() !== "integrated_client") || $('#timeout_id').val() !== "5"]]></key>
+	        </element>
+	      </elements>
+	  	</element>
+	  	
+		<element name="selectionPolicyFields" type="fieldset">
+		  <key name="legend">Web Crawler</key>
+	      <view name="list"/>
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+	      
+	        <element name="page_limit" type="textfield" label="Page Limit">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">A limit on the number of pages that will be auto-discovered</key>
+	        </element>
+	        
+	        <element name="depth_limit" type="textfield" label="Depth Limit">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">A limit on how deep to go when looking for pages</key>
+	        </element>
+	        
+	        <element name="url_filter" type="textfield" label="URL Filter">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="exampleText">A wild-card that will indicate which pages it should search for matches in</key>
+	        </element>
+	        
+	        <element name="hide_optional_crawl" type="website_input_hide_optional_settings">
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <key name="fieldset_wrapper_id">item-selectionPolicyFields</key>
+	          <key name="check_policy">$('#page_limit_id').val() !== "1"</key>
+	        </element>
+	        
+	      </elements>
+	  	</element>
+	  	
+		<element name="advancedFields" type="fieldset">
+		  <key name="legend">Advanced</key>
+	      <view name="list"/>
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+	      
+	        <element name="user_agent" type="textfield" label="User-agent">
+	          <view name="edit"/>
+	          <view name="create"/>
+	        </element>
+	        
+		  	<element name="selection_dialog" type="website_input_selection_dialog">
+		  		<key name="title">Select a user-agent</key>
+		  		<key name="field_to_populate">user_agent_id</key>
+		  		<key name="description">Select a predefined user-agent string:</key>
+		  		<key name="options">
+		  		{
+		  			"Internet Explorer 11.0" : "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko",
+		  			"Internet Explorer 10.0" : "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)",
+		  			"Internet Explorer 9.0" : "Mozilla/5.0 (Windows; U; MSIE 9.0; WIndows NT 9.0; en-US)",
+		  			"Internet Explorer 8.0" :"Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; InfoPath.2)",
+		  			"Internet Explorer 7.0" :"Mozilla/5.0 (Windows; U; MSIE 7.0; Windows NT 6.0; en-US)",
+		  			"Internet Explorer 6.0" :"Mozilla/5.0 (compatible; MSIE 6.0; Windows NT 5.1)",
+		  			"Internet Explorer 5.5" :"Mozilla/4.0 (compatible; MSIE 5.5;)",
+		  			"Internet Explorer 5.0" :"Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)",
+		  			
+		  			"Safari 7.0" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.75.14 (KHTML, like Gecko) Version/7.0.3 Safari/7046A194A",
+		  			"Safari 6.0" : "Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25",
+		  			"Safari 5.0" : "Mozilla/5.0 (Windows; U; Windows NT 6.1; es-ES) AppleWebKit/533.18.1 (KHTML, like Gecko) Version/5.0 Safari/533.16",
+		  			"Safari 4.0" : "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US) AppleWebKit/528.16 (KHTML, like Gecko) Version/4.0 Safari/528.16",
+		  			"Safari 3.0" : "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US) AppleWebKit/523.15 (KHTML, like Gecko) Version/3.0 Safari/523.15",
+		  			"Safari 2.0" : "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en_US) AppleWebKit/412 (KHTML, like Gecko) Safari/412",
+		  			"Safari 1.0" : "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-us) AppleWebKit/85.7 (KHTML, like Gecko) Safari/85.6",
+		  			
+		  			"Firefox 36" : "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0",
+		  			"Firefox 33" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0",
+		  			"Firefox 31" : "Mozilla/5.0 (X11; Linux i586; rv:31.0) Gecko/20100101 Firefox/31.0",
+		  			"Firefox 29" : "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0",
+		  			"Firefox 28" : "Mozilla/5.0 (X11; OpenBSD amd64; rv:28.0) Gecko/20100101 Firefox/28.0",
+		  			"Firefox 27" : "Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0",
+		  			"Firefox 25" : "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0",
+		  			
+		  			"Chrome 41" : "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
+		  			"Chrome 37" : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.124 Safari/537.36",
+		  			"Chrome 36" : "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.67 Safari/537.36",
+		  			"Chrome 35" : "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36",
+		  			"Chrome 34" : "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1866.237 Safari/537.36",
+		  			"Chrome 33" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.517 Safari/537.36",
+		  			"Chrome 32" : "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36",
+		  			
+		  			"Googlebot 2.1" : "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+		  			"Default (Splunk Website Input)" : "Splunk Website Input (+https://splunkbase.splunk.com/app/1818/)"
+		  			
+		  		}
+		  		</key>
+		  	    <view name="create"/>
+	            <view name="edit"/>
+	            <key name="exampleText">A custom user-agent is only used when the built-in HTTP client is used</key>
+		  	</element>
+
+				<element name="output_results" type="select" label="Output Results">
+	          <view name="edit"/>
+	          <view name="create"/>
+		        <options>
+		      	   <opt value="always" label="Always"/>
+		      	   <opt value="when_matches_change" label="Only when the matches change"/>
+							 <opt value="when_contents_change" label="Only when the contents of the raw web-pages change"/>
+		        </options>
+	          <key name="exampleText">Output results only when the data changes</key>
+	        </element>
+	        
+	      </elements>
+	  	</element>
+	  	
+	  	<!-- The sourcetype selection content is typically in the page by default -->
+	    <element name="spl-ctrl_EnableAdvanced" type="checkbox" 
+		     label="More settings" class="spl-mgr-advanced-switch">
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <onChange>
+	        <key name="_action">showonly</key>
+	        <key name="0">NONE</key>
+	        <key name="1">ALL</key>
+	        <group_set>
+	          <group name="advanced"/>
+	        </group_set>
+	      </onChange>
+	    </element>
+	    <element name="sourcetype_selection_fix" type="website_input_sourcetype_selection_fix">
+		  <view name="create"/>
+	      <view name="edit"/>
+		</element>
+	    <element name="advanced" type="fieldset" class="spl-mgr-advanced-options">
+	      <view name="edit"/>
+	      <view name="create"/>
+	      <elements>
+		    <element name="sourcetypeFields" type="fieldset">
+		      <view name="list"/>
+		      <view name="edit"/>
+		      <view name="create"/>
+		      <elements>
+		        <element name="spl-ctrl_sourcetypeSelect" type="select" label="Set the source type">
+		          <onChange>
+		            <key name="auto">NONE</key>
+		            <key name="_action">showonly</key>
+		            <group_set>
+		              <group name="sourcetype"/>
+		              <group name="spl-ctrl_from_list"/>
+		            </group_set>
+		            <key name="sourcetype">sourcetype</key>
+		            <key name="spl-ctrl_from_list">spl-ctrl_from_list</key>
+		          </onChange>
+		          <options>
+		            <opt value="auto" label="Automatic"/>
+		            <opt value="sourcetype" label="Manual"/>
+		            <opt value="spl-ctrl_from_list" label="From list"/>
+		          </options>
+		          <view name="edit"/>
+		          <view name="create"/>
+		          <key name="exampleText">When this is set to automatic, Splunk classifies and 
+		          		assigns the sourcetype automatically, and gives unknown sourcetypes 
+		          		placeholder names.</key>
+		          <key name="processValueEdit">[[ e for e in ['sourcetype'] 
+		                        if form_defaults.get(e) ][0]]</key>
+		          <key name="processValueAdd">[[ e for e in ['sourcetype'] 
+		                        if form_defaults.get(e) ][0]]</key>
+		        </element>
+		        <element name="sourcetype" type="textfield" label="Source type">
+		          <view name="list"/>
+		          <view name="edit"/>
+		          <view name="create"/>
+		          <key name="processValueList">_('Automatic') if (value==None or value=='') else value</key>
+		          <key name="submitValueAdd">value if 
+		                        form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' 
+		          		else (form_data.get('spl-ctrl_from_list') 
+		          		if form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list' 
+		                        else '')</key>
+		          <key name="submitValueEdit">value if 
+		                        form_data.get('spl-ctrl_sourcetypeSelect')=='sourcetype' 
+		            	        else (form_data.get('spl-ctrl_from_list') 
+		            	        if form_data.get('spl-ctrl_sourcetypeSelect')=='spl-ctrl_from_list' 
+		                        else '')</key>
+		          <key name="labelList">Source type</key>
+		        </element>
+		        <element name="spl-ctrl_from_list" type="select" label="Select source type from list">
+		          <view name="edit"/>
+		          <view name="create"/>
+		          <key name="exampleText">Splunk classifies all common data types automatically, 
+		            	but if you're looking for something specific, you can find more source types 
+			    	in the <![CDATA[<a href="../../../apps/remote">Splunkbase apps browser</a>]]> 
+		            	or online at <![CDATA[<a href="http://www.splunkbase.com/" 
+				target="_blank">www.splunkbase.com</a>]]>.</key>
+		          <key name="requiredIfVisible" />
+		          <key name="dynamicOptions" type="dict">
+		            <key name="prefixOptions" type="list">
+		              <item type="list">
+		                <item></item>
+		                <item>Choose...</item>
+		              </item>
+		            </key>
+		            <key name="keyName">title</key>
+		            <key name="keyValue">title</key>
+		            <key name="splunkSource">/saved/sourcetypes</key>
+		            <key name="splunkSourceParams" type="dict">
+		              <key name="count">-1</key>
+		              <key name="search">'pulldown_type=true'</key>
+		            </key>
+		          </key>
+		        </element>
+		      </elements>
+		      <key name="legend">Source type</key>
+		      <key name="helpText">Tell Splunk what kind of data this is so you can group it with 
+		                        other data of the same type when you search. Splunk does this 
+		                        automatically, but you can specify what you want if Splunk gets it 
+		                        wrong.</key>
+		    </element>
+	        <element name="hostFields" type="fieldset">
+	          <key name="legend">Host</key>
+	          <view name="list"/>
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <elements>
+	            <element name="host" type="textfield" label="Host field value">
+	              <view name="edit"/>
+	              <view name="create"/>
+	            </element>
+	          </elements>
+	        </element>  
+	        <element name="indexField" type="fieldset">
+	          <key name="legend">Index</key>
+	          <key name="helpText">Set the destination index for this source.</key>
+	          <view name="list"/>
+	          <view name="edit"/>
+	          <view name="create"/>
+	          <elements>
+	            <element name="index" type="select" label="Index">
+	              <view name="list"/>
+	              <view name="edit"/>
+	              <view name="create"/>
+	              <key name="dynamicOptions" type="dict">
+	                <key name="keyName">title</key>
+	                <key name="keyValue">title</key>
+	                <key name="splunkSource">/data/indexes</key>
+	                <key name="splunkSourceParams" type="dict">
+	                  <key name="search">'isInternal=false disabled=false'</key>
+	                  <key name="count">-1</key>
+	                </key>
+	              </key>
+	            </element>
+	          </elements>
+	        </element>
+	      </elements>
+	    </element>
+	  	
+      </elements>
+</endpoint>

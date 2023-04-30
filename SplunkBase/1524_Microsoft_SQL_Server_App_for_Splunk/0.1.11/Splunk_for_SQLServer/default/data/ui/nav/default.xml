@@ -1,0 +1,44 @@
+<nav color="#000000" search_view="search">
+    <view name="flashtimeline"/>
+    <collection label="Operations">
+        <view name="ops_status" default="true"/>
+        <divider/>
+        <view name="ops_databaselist"/>
+        <view name="ops_hostlist"/>
+        <view name="ops_instancelist"/>
+        <divider/>
+        <collection label="Index Performance">
+            <view name="ops_index_missing"/>
+            <view name="ops_index_underused"/>
+        </collection>
+		<view name="ops_upgradelist"/>
+    </collection>
+    <collection label="Security">
+        <view name="sec_serverlogons"/>
+        <view name="sec_failedlogons"/>
+        <view name="sec_dbops"/>
+        <view name="sec_rarequeries"/>
+        <divider/>
+        <view name="ops_user"/>
+    </collection>
+    <collection label="Documentation">
+        <view source="unclassified" match="docs_"/>
+    </collection>
+    <collection label="Searches &amp; Reports">
+        <collection label="Lookup Generators">
+			<view name="lookup_rebuilder" />
+			<divider/>
+			<saved name="Lookup - MSSQL Instances"/>
+			<saved name="Lookup - MSSQL Databases"/>
+			<saved name="Lookup - MSSQL Hosts"/>
+			<saved name="Lookup - MSSQL Users"/>
+			<saved name="Lookup - Last Login Time"/>
+        </collection>
+        <collection label="Saved Searches">
+            <saved source="unclassified"/>
+        </collection>
+        <collection label="Saved Dashboards">
+            <view source="unclassified"/>
+        </collection>
+    </collection>
+</nav>

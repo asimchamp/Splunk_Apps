@@ -1,0 +1,45 @@
+<form version="1.1">
+  <label>Physical ports</label>
+  <description>Filter using any field [ switchname=All Switches/select one from dropdown ]</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="filterPorts" searchWhenChanged="true">
+      <label>filter:</label>
+      <default>*</default>--&gt;<choice value="*">All Switches</choice>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_inventory" | stats count by switchname | sort switchname</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+    <input type="time" token="portsTime" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Matching Events</title>
+      <table>
+        <search>
+          <query>
+            sourcetype="arista_switch_inventory" AristaSwitchCapacity switchname=$filterPorts$ | stats 
+            earliest(ports_used) as ports_used_earliest,
+            latest(ports_used) as ports_used_latest,
+            earliest(ports_unused) as ports_unused_earliest,
+            latest(ports_unused) as ports_unused_latest
+            by switchname | table switchname, ports_used_earliest, ports_used_latest, ports_unused_earliest, ports_unused_latest
+          </query>
+          <earliest>$portsTime.earliest$</earliest>
+          <latest>$portsTime.latest$</latest>
+        </search>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

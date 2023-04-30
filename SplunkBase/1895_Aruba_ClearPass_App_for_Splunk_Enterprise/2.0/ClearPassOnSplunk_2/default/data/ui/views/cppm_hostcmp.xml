@@ -1,0 +1,78 @@
+<form>
+  <label>Compare Servers</label>
+
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+
+    <input type="checkbox" token="servers">
+      <label>ClearPass Servers</label>
+      <delimiter> OR </delimiter>
+      <valuePrefix>cphost=</valuePrefix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <populatingSearch fieldForValue="cphost" fieldForLabel="cphost">
+        <![CDATA[eventtype=cppm | stats count by cphost]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+  
+  <row>
+    <chart>
+      <title>Logins by Server</title>
+      <searchTemplate>eventtype=cppm-authentication $servers$ | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+    <chart>
+      <title>Failures by Server</title>
+      <searchTemplate>eventtype=cppm-fail-authentication $servers$ | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+    <chart>
+      <title>Protocol by Server</title>
+      <searchTemplate>eventtype=cppm-pass-authentication $servers$ | eval host_req=req_source +" Auth on "+ cphost | stats count by host_req </searchTemplate>
+      <option name="charting.chart">bar</option>
+    </chart>
+
+    <table>
+      <title>Services by Server</title>
+      <searchTemplate>eventtype=cppm-radius $servers$ | stats count by cphost,service_name </searchTemplate>
+      <option name="charting.chart">bar</option>
+    </table>
+
+  </row>
+  <row>
+    <table>
+      <title>Health Status by Server</title>
+      <searchTemplate>eventtype=cppm-posture $servers$ | stats count by cphost, spt</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </table>
+
+    <chart>
+      <title>NAS Devices by Server</title>
+      <searchTemplate>eventtype=cppm-pass-authentication $servers$ | dedup nas_ip | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+    <chart>
+      <title>Unique MACs by Server</title>
+      <searchTemplate>eventtype=cppm-pass-authentication $servers$ | dedup mac_address | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+    <chart>
+      <title>Unique Users by Server</title>
+      <searchTemplate>eventtype=cppm-pass-authentication $servers$ | dedup user_name | stats count by cphost</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+
+  </row>
+
+
+</form>

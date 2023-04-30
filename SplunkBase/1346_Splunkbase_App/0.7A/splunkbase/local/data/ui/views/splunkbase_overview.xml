@@ -1,0 +1,83 @@
+<dashboard>
+ <label>Basic Splunkbase Dashboard</label>
+
+
+
+ <row>
+   <html>
+     <h2>What Apps on Splunkbase best suite your data?</h2>
+
+This page analyzing your data to determine which apps on splunkbase might be relevant.
+
+<ul>
+<li>It analyzes data you already have indexed, as well as data that is in your file system but not yet indexed.</li>
+
+<li>It determines which apps you have installed and suggests other apps based on what other Splunk users have installed at similar installations. </li>
+</ul>
+
+Beyond this page, this app also adds a "workflow action" beside each event in the standard search interface. Selecting "Suggest App for This Event!" beside to any event will suggest apps relevant to data like yours.  It matches your event based on the sources, sourcetypes, fields, field-values, tags, regular expressions, etc.
+
+
+   </html>
+
+   <table>
+     <title>Apps Installed at Installations like Yours</title>
+     <searchTemplate>
+       | rest /services/apps/local count=0 | table label, title | appsuggest mode=app | sort 30 -score | table app score
+     </searchTemplate>
+     <option name="count">5</option>
+     <drilldown>
+       <link field="app">http://splunk-base.splunk.com/apps/$click.value$</link>
+     </drilldown>
+   </table>
+
+ </row>    
+
+ <row>
+   <chart>
+     <title>Top Apps Suggested by Indexed Sources</title>
+     <searchString>
+       | metadata sources | appsuggest mode=source | eval app=coalesce(app,"no match") | top 7 app 
+     </searchString>
+     <option name="charting.chart">pie</option>
+     <drilldown>
+       <link field="app">http://splunk-base.splunk.com/apps/$click.value$</link>
+     </drilldown>
+   </chart>
+
+   <table>
+     <title>Apps Suggested from Recently Indexed Sources</title>
+     <searchTemplate>
+       | metadata sources | sort - recentTime | appsuggest mode=source | where mvcount(app)>0 | table app source | eval app=mvindex(app,0,2) | mvexpand app
+     </searchTemplate>
+     <option name="count">5</option>
+     <drilldown>
+       <link field="app">http://splunk-base.splunk.com/apps/$click.value$</link>
+     </drilldown>
+   </table>
+ </row>    
+
+
+ <row>
+   <chart>
+     <title>Top Apps Suggested by Indexed Data</title>
+     <searchString>
+       * | head 10000 | dedup 10 source | appsuggest mode=event | eval app=coalesce(app,"no match") | top 7 app 
+     </searchString>
+     <option name="charting.chart">pie</option>
+     <drilldown>
+       <link field="app">http://splunk-base.splunk.com/apps/$click.value$</link>
+     </drilldown>
+   </chart>
+
+   <table>
+     <title>Apps Suggested from Unindexed Files</title>
+     <searchTemplate>
+       | crawl | appsuggest mode=source | table app source | dedup app | mvexpand app
+     </searchTemplate>
+     <drilldown>
+       <link field="app">http://splunk-base.splunk.com/apps/$click.value$</link>
+     </drilldown>
+   </table>
+ </row>    
+</dashboard>

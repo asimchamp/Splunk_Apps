@@ -1,0 +1,40 @@
+<form version="1.1">
+  <label>Switch Power Consumption</label>
+  <description>Filter using any field [ switchname=All Switches/select one from the dropdown ]</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="switchName" searchWhenChanged="true">
+      <label>filter:</label>
+      <default>*</default>--&gt;<choice value="*">All Switches</choice>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_inventory" | stats count by switchname | sort switchname</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+    <input type="time" token="timerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Matching Events</title>
+      <table>
+        <search>
+          <query>
+            sourcetype="arista_switch_inventory" AristaPSUPowerConsumption switchname=$switchName$ | stats latest(totalInputPower) as inputPower, latest(totalOutputPower) as outputPower, latest(totalPowerEfficiency) as powerEfficiency(%), sparkline(max(totalInputPower)) as inputPowerHistory, sparkline(max(totalOutputPower)) as outputPowerHistory, sparkline(max(eval(rtrim(totalPowerEfficiency,"%")))) as powerEfficiencyHistory by switchname | table switchname,inputPower,inputPowerHistory,outputPower,outputPowerHistory,powerEfficiency(%),powerEfficiencyHistory
+          </query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="count">50</option>
+      </table>
+    </panel>
+  </row>
+</form>

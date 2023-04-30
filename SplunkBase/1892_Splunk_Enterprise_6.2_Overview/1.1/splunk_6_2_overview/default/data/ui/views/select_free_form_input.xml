@@ -1,0 +1,65 @@
+<dashboard>
+  <label>Free Form Input Support within Dropdown and Multi-select</label>
+  <description></description>
+  <row>
+    <panel>
+    <input type="multiselect" token="risk">
+      <label>Risk Level</label>
+      <choice value="High Risk">High Risk</choice>
+      <choice value="Moderate Risk">Moderate Risk</choice>
+      <choice value="Low Risk">Low Risk</choice>
+      <default>High Risk</default>
+      <allowCustomValues>true</allowCustomValues>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>risk_category="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+    </input>
+      <table>
+        <title>Top Violation Types</title>
+        <searchString>index="sf_food_health" sourcetype=sf_food_violations $risk$ neighborhood="*"
+| stats values(risk_category) as risk count by description
+| sort -count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime></latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Free Form Input Support within Dropdown and Multi-select</h2>
+        <p>Enable users to enter free form text within dropdown and multi-select inputs.</p>
+        <p>This allows users to</p>
+        <ul>
+          <li>Enter free form value that includes wildcards, like "*Risk"</li>
+          <li>Useful for host selections, where users can enter partial domains, partial hostnames, and more</li>
+        </ul>
+        <p>This feature is controls via the option, <code><![CDATA[<allowCustomValues>]]></code></p>
+        <p>Default is set to false.</p>
+        <br/>
+        <pre>
+<![CDATA[
+    <input type="multiselect" token="risk">
+      <label>Risk Level</label>
+      <choice value="High Risk">High Risk</choice>
+      <choice value="Moderate Risk">Moderate Risk</choice>
+      <choice value="Low Risk">Low Risk</choice>
+
+      <default>High Risk</default>
+
+      <allowCustomValues>true</allowCustomValues>
+
+      <change>
+         <set token="risk" prefix="(" suffix=")" delimiter=" OR ">risk_category=$value|s$</set>
+      </change>
+
+    </input>
+]]>
+        </pre>
+        
+      </html>
+    </panel>
+  </row>
+</dashboard>

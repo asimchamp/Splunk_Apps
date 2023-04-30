@@ -1,0 +1,68 @@
+<%page expression_filter="h"/>
+<%inherit file="//layout/base.html" />
+<%namespace name="lib" file="//lib.html" import="*"/>
+<%namespace name="helpers" file="//view/_helpers.html" import="*"/>
+
+<%def name="css()">
+    <%coreCSSFiles = [
+        "/static/css/view.css", 
+        "/static/css/skins/default/default.css" 
+    ] %>
+    <%lib:stylesheet_tags files="${coreCSSFiles}" />
+</%def>
+
+<%def name="custom_css()">
+    <%lib:stylesheet_tags files="${['/static/app/%s/application.css' % app]}" />
+    <%lib:script_tags files="${['/static/app/%s/ssh_setup.js' % app]}" />
+</%def>
+
+<%def name="gen_form(method='POST', action=None, id=None)">
+    <form method="${method}" action="${action if action else ''}" ${'id=' + id if id else ''}>
+</%def>
+
+<%def name="gen_row(input)">
+<tr><td>${input['type']}</td><td>${input['fprint']}</td><td>${input['keylen']}</td></tr>
+</tr>
+
+</%def>
+<div class="sshfsContainer">
+  <div class="sshfsOverview">
+    <h1><b>Add a new SSH connection</b></h1>
+    <h7>&nbsp;</h7>
+    <div>
+    <div class="newRight">
+    <h2>Details</h2>
+    <p id="fingerprints">
+        <table><tr><th>Key Type</th><th>Fingerprint</th><th>Key length</th></tr>
+        % for m in fprint:
+            ${gen_row(m)}
+        % endfor
+        </table>
+    </p>
+    <p id="attention" style="text-color:#400000">
+        Please check these fingerprints. Enter password or private key <b>only</b> if they identify host that you want to connect to.<br />Make sure that you have secure connection with Splunk Web Server
+    </p>
+    </div>
+    <div class="newLeft">
+    ${gen_form(method='POST', action=make_url(['custom', app , 'sshfs', app, 'query']), id="ssh_form")}
+    ${csrf_hidden_input()}
+    <input type="hidden" name="name" value="${name}" />
+    <input type="hidden" name="user" value="${username}" />
+    <input type="hidden" name="address" value="${address}" />
+    <input type="hidden" name="port" value="${port}" />
+    <input type="hidden" name="root" value="${root}" />
+    <input type="hidden" id="auth" name="auth" value="PASS" />
+    <input type="hidden" name="keyscan" value="${keyscan}" />
+    <h2>Enter private key or SSH password</h2>
+    <input type="radio" id="_privkey" name="type" value="Private key" onclick="$('#password').hide().val('');$('#privkey').show();" />
+    <label for="_privkey">Enter private key</label><br />
+    <input type="radio" id="_password" name="type" value="Password" checked="checked" onclick="$('#password').show();$('#privkey').hide().val('');" />
+    <label for="_password">Enter password</label><br />
+    <input type="password" id="password" name="password" value="" />
+    <textarea style="display:none" id="privkey" name="privkey" value="" cols="69" rows="8"/></textarea>
+    <br/><h2>&nbsp;</h2>
+    <button class="splButton-primary" type="submit">Add this host</button>
+    </div>
+    </div>
+    <p style="min-height:200px"><div>&nbsp;</div></p>
+  </div>

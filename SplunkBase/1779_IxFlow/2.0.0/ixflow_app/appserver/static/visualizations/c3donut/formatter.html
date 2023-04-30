@@ -1,0 +1,134 @@
+<form class="splunk-formatter-section" section-label="General">
+    <!-- Add html here to create formatter options -->
+    <div class="control-group">
+
+      <label class="control-label">Legend</label>
+      <div class="controls controls-fill">
+
+        <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.legend_show" value="true">
+            <option value=1>Yes</option>
+            <option value=0>No</option>
+        </splunk-radio-input>
+      </div>
+    </div>
+
+    <div class="control-group">
+
+      <label class="control-label">Position</label>
+      <div class="controls controls-fill">
+
+        <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.legend_position" value="bottom">
+            <option value="bottom">Bottom</option>
+            <option value="right">Right</option>
+        </splunk-radio-input>
+      </div>
+    </div>
+  </form>
+
+<form class="splunk-formatter-section" section-label="Donut">
+    <!-- Add html here to create formatter options -->
+    <div class="control-group">
+
+      <label class="control-label">Expand on hover</label>
+      <div class="controls controls-fill">
+
+        <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.expand" value="true">
+            <option value=1>Yes</option>
+            <option value=0>No</option>
+        </splunk-radio-input>
+      </div>
+    </div>
+
+    <div class="control-group">
+
+      <label class="control-label">Width</label>
+      <div class="controls controls-fill">
+        <splunk-text-input name="display.visualizations.custom.ixflow_app.c3donut.width"></splunk-text-input>
+      </div>
+    </div>
+
+  </form>
+
+  <form class="splunk-formatter-section" section-label="Label">
+      <!-- Add html here to create formatter options -->
+      <div class="control-group">
+
+        <label class="control-label">Show</label>
+        <div class="controls controls-fill">
+
+          <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.label_show" value="true">
+              <option value=1>Yes</option>
+              <option value=0>No</option>
+          </splunk-radio-input>
+        </div>
+      </div>
+
+      <div class="control-group">
+
+        <label class="control-label">Data</label>
+        <div class="controls controls-fill">
+
+          <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.label_value" value="ratio">
+              <option value="value">Value</option>
+              <option value="ratio">Ratio</option>
+          </splunk-radio-input>
+        </div>
+      </div>
+
+      <div class="control-group">
+
+        <label class="control-label">Label Format</label>
+        <div class="controls controls-fill">
+          <splunk-text-input name="display.visualizations.custom.ixflow_app.c3donut.label_format"></splunk-text-input>
+        </div>
+      </div>
+
+      <div class="control-group">
+
+        <label class="control-label">Threshold</label>
+        <div class="controls controls-fill">
+          <splunk-text-input name="display.visualizations.custom.ixflow_app.c3donut.label_threshold"></splunk-text-input>
+        </div>
+      </div>
+
+    </form>
+
+
+  <form class="splunk-formatter-section" section-label="Tooltip">
+      <!-- Add html here to create formatter options -->
+      <div class="control-group">
+
+        <label class="control-label">Show</label>
+        <div class="controls controls-fill">
+
+          <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.tooltip_show" value="true">
+              <option value=1>Yes</option>
+              <option value=0>No</option>
+          </splunk-radio-input>
+        </div>
+      </div>
+
+      <div class="control-group">
+
+        <label class="control-label">Data</label>
+        <div class="controls controls-fill">
+
+          <splunk-radio-input name="display.visualizations.custom.ixflow_app.c3donut.tooltip_value" value="default">
+              <option value="default">Default</option>
+              <option value="value">Value</option>
+              <option value="ratio">Ratio</option>
+          </splunk-radio-input>
+        </div>
+      </div>
+
+      <div class="control-group">
+
+        <label class="control-label">Tooltip Format</label>
+        <div class="controls controls-fill">
+          <splunk-text-input name="display.visualizations.custom.ixflow_app.c3donut.tooltip_format"></splunk-text-input>
+        </div>
+      </div>
+
+      
+
+    </form>

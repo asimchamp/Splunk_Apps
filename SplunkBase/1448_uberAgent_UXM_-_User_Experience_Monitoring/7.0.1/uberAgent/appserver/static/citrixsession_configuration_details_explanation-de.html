@@ -1,0 +1,133 @@
+<div class="TableCaptionSSI PaddingSSI">
+
+   <a id="ExplanationLink">Erklärung der Daten in der Tabelle</a>
+
+   <div id="Explanation" class="hidden">
+      <p>
+         <dl>
+            <dt>User</dt>
+            <dd>Benutzerkonto eingelogged in dieser Sitzung.</dd>
+            <dt>Host</dt>
+            <dd>Name des Computers, auf dem die Sitzung lief.</dd>
+            <dt>Logon-Zeit</dt>
+            <dd>Uhrzeit, wann sich der Benutzer angemeldet hat.</dd>
+            <dt>Last seen</dt>
+            <dd>Zeitpunkt, an dem uberAgent das letzte Mal Daten über diese Sitzung lieferte</dd>
+            <dt>Last state</dt>
+            <dd>Letzter aufgezeichneter Zustand. Typischerweise <em>active</em> oder <em>disconnected</em>.</dd>
+            <dt>Client-Name(n)</dt>
+            <dd>Namen des Clients, der für die Verbindung zur Sitzung, verwendet wird.</dd>
+            <dt>Client-IP(s)</dt>
+            <dd>IP-Addressen des Clients, die für die Verbindung zur Sitzung, verwendet wird.</dd>
+            <dt>Client-Plattform(en)</dt>
+            <dd>Plattformen des Clients, die für die Verbindung zur Sitzung, verwendet wird.</dd>
+            <dt>Client-Version(en)</dt>
+            <dd>Versionsnummern der Citrix-Clientkomponenten (aka Workspace app, Receiver, ..), die für die Verbindung zur Sitzung, verwendet wird.</dd>
+            <dt>Pub. name</dt>
+            <dd>Name der veröffentlichten Anwendung, die für das Starten zur Sitzung, verwendet wird.</dd>
+            <dt>Pub. app(s)</dt>
+            <dd>Namen von allen veröffentlichten Anwendungen, die in der Sitzung laufen.</dd>
+            <dt>Verschlüsselung</dt>
+            <dd>Verschlüsselungsstufe des Remoting-Protokolls.</dd>
+            <dt>Mikrofonumleitungsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Mikrofonumleitung.</dd>
+            <dt>Audioumleitungsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Audioumleitung.</dd>
+            <dt>Audio-Kanal-Prioritätsrichtlinien</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität vom virtuellen Kanal.</dd>
+            <dt>Audioqualitätsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Konfigurieren der Audioqualität.</dd>
+            <dt>Effektive Audiokanalpriorität</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>Clientlaufwerkumleitung</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Client-Laufwerkverbindung.</dd>
+            <dt>Schreibgeschützter Laufwerkszugriffsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen des schreibgeschützten Client-Laufwerkszugriffs.</dd>
+            <dt>CDM-Kanal-Prioritätsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Effektive CDM-Kanalpriorität</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>Verbundene Laufwerke</dt>
+            <dd>Laufwerke, die vom Client in die Sitzung verbunden wurden.</dd>
+            <dt>Anzeigemodus</dt>
+            <dd>Aktiver Anzeigemodus (e.g. Thinwire)</dd>
+            <dt>Thinwire-FPS-Richtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der maximalen FPS.</dd>
+            <dt>Thinwire-Kanalprioritätsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Thinwire-Hardwarekodierungsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Hardwarekodierung.</dd>
+            <dt>Thinwire-Videocodecrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen vom Videocodec.</dd>
+            <dt>Thinwire-Bildqualitätsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen the Videoqualität.</dd>
+            <dt>Effektive Thinwire-Kanalpriorität</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>Thinwire-Farbtiefe (bit)</dt>
+            <dd>Angewandte Farbtiefe der Sitzung.</dd>
+            <dt>Thinwire-Komponentenencoder</dt>
+            <dd>Angewandte Videokomponentencodec.</dd>
+            <dt>Thinwire-Hardware kodieren</dt>
+            <dd>Zeigt ob die Hardware-Encoding aktiv ist.</dd>
+            <dt>Thinwire-Videocodectyp</dt>
+            <dd>Angewandter Videocodectyp, z.B. H264</dd>
+            <dt>Thinwire-Farbraum</dt>
+            <dd>Angewandter Farbraum der Sitzung, z.B. Yuv420.</dd>
+            <dt>Thinwire-Videocodecbenutzung</dt>
+            <dd>Angewandte Videocodeceinstellungen, z.B. für die sich aktiv ändernden Regionen.</dd>
+            <dt>Framehawk-Prioritätsrichtlinie (veraltet in CVAD 7 1811)</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Effektive Framehawk-Kanalpriorität (veraltet in CVAD 7 1811)</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>DCR-aero Umleitungsrichtlinien (veraltet in Citrix XA/XD 7.12)</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der DCR-aero-Umleitung.</dd>
+            <dt>DCR-Grafik-Qualitätsrichtlinien (veraltet in Citrix XenApp und XenDesktop 7.12)</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Desktopgestaltungsumleitungsqualität.</dd>
+            <dt>DCR-Kanal-Prioritätsrichtlinien (veraltet in Citrix XenApp und XenDesktop 7.12)</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Effektive DCR-Kanalpriorität (veraltet in Citrix XenApp und XenDesktop 7.12)</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>Benutzer beim Herabsetzen des Anzeigemodus benachrichtigen</dt>
+            <dd>Citrix-Richtlinie zum Benachrichtigen des Benutzers über das Herabsetzen der Bildqualität.</dd>
+            <dt>Anzeigemodusherabsetzensrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Konfigurieren des Herabsetzens der Bildqualität.</dd>
+            <dt>Legacy-Grafik-Kanalprioritätsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Effektive Legacygrafikmodus-Kanalpriorität</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>Sitzungsverbindungsverlässigkeitsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Sitzungverlässigkeit.</dd>
+            <dt>Sitzungsverlässigkeitsportsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Konfigurieren des Sitzungverlässigkeitsports.</dd>
+            <dt>Sitzungsverlässigkeitstimeoutsrichtlinie (s)</dt>
+            <dd>Citrix-Richtlinie zum Konfigurieren des Sitzungsverlässigkeitstimeouts.</dd>
+            <dt>ICA-Empfängerportrichtlinien</dt>
+            <dd>Citrix-Richtlinie zum Konfigurieren des ICA-Empfängerports.</dd>
+            <dt>EDT MTU</dt>
+            <dd>Angewandte Enlightened Data Transport MTU-Größe.</dd>
+            <dt>Verbunden über</dt>
+            <dd>IP-Adresse, von der man sich an die Sitzung verbunden hat.</dd>
+            <dt>Transportprotokoll</dt>
+            <dd>Transportprotokollkette der Sitzung.</dd>
+            <dt>Drucker-Umleitung erlaubt</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Druckerumleitung.</dd>
+            <dt>Automatische Druckerzuordnungsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Konfigurieren der automatischen Druckerzuordnung.</dd>
+            <dt>Druckerkanalprioritätsrichtlinie</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Effektive Druckerkanalpriorität</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+            <dt>Verbundene Drucker</dt>
+            <dd>Alle verbundenen Drucker in der Sitzung.</dd>
+            <dt>USB-PNP-Umleitungsrichtlinien</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der USB-PNP-Umleitung.</dd>
+            <dt>USB-Unterstützungsrichtlinien</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der USB-Unterstützung.</dd>
+            <dt>USB-Kanal-Prioritätsrichtlinien</dt>
+            <dd>Citrix-Richtlinie zum Einstellen der Priorität des virtuellen Kanals.</dd>
+            <dt>Effektive USB-Kanal-Priorität</dt>
+            <dd>Angewandte Priorität des virtuellen Kanals.</dd>
+         </dl>
+      </p>
+   </div>
+</div>

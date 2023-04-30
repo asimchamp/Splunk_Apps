@@ -1,0 +1,16 @@
+<view autoCancelInterval="100" isPersistable="false" isSticky="false" isVisible="true" objectMode="viewconf" onunloadCancelJobs="false" template="search.html">
+  <label>Setup</label>
+  <module name="AccountBar" layoutPanel="appHeader" />
+  <module name="AppBar" layoutPanel="navigationHeader" />
+
+ <module name="GenericFTR" layoutPanel="viewHeader">
+        <param name="configLink">/app/extrahop_metrics/about</param>
+    </module>
+ 
+ <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="showActionsMenu">False</param>
+  </module>
+  <module name="IFrameInclude" layoutPanel="viewHeader">
+    <param name="src">/custom/extrahop_metrics/EHMSetup/show</param>
+  </module>
+</view>

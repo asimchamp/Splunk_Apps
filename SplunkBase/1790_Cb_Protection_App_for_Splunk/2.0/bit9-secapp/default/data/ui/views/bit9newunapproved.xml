@@ -1,0 +1,250 @@
+<view template="dashboard.html" isSticky="True">
+	<label>New Unapproved Files</label>
+	<module name="AccountBar" layoutPanel="appHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+		<param name="level">warn</param>
+	</module>
+	<module name="TitleBar" layoutPanel="viewHeader">
+		<param name="actionsMenuFilter">dashboard</param>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="viewHeader" autoRun="true">
+		<param name="default">Last 30 days</param>
+		<param name="searchWhenChanged">True</param>
+		<module name="HiddenSearch" layoutPanel="panel_row2_col1" group="New Unapproved Files">
+			<param name="search">| savedsearch "New Unapproved Files"</param>
+			<param name="maxCount">10000000</param>
+			<module name="JobProgressIndicator">
+				<module name="HiddenPostProcess" layoutPanel="panel_row2_col1_grp1" group="New Unapproved Files">
+					<param name="search">| stats sum(count) as count | fieldformat count=tostring(count,"commas")</param>
+					<module name="SingleValue">
+						<param name="afterLabel">unapproved files</param>
+						<param name="linkView">../search/flashtimeline</param>
+						<param name="linkSearch">eventtype=bit9_event EventSubTypeId=1003</param>
+					</module>
+				</module>
+				<module name="HiddenPostProcess" layoutPanel="panel_row2_col1_grp1" group="New Unapproved Files">
+					<param name="search">| timechart bins=50 sum(count) as "New Unapproved Files"</param>
+					<module name="HiddenChartFormatter">
+						<param name="charting.chart">column</param>
+						<param name="charting.legend.placement">none</param>
+						<param name="charting.axisTitleX.text"></param>
+						<param name="charting.axisTitleX.visibility">collapsed</param>
+						<param name="charting.chart.stackMode">stacked</param>
+						<param name="charting.data.count">50000</param>
+						<param name="charting.seriesColors">[0x0000FF,0x00FF00]</param>
+						<module name="JSChart">
+							<module name="HiddenSearch">
+								<param name="search">eventtype=bit9_event EventSubTypeId=1003</param>
+								<module name="ConvertToIntention">
+									<param name="intention">
+										<param name="name">time</param>
+									</param>
+									<module name="ViewRedirector">
+										<param name="viewTarget">flashtimeline</param>
+									</module>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row2_col2" group="New Unapproved Files by Product Name">
+			<param name="search">eventtype=bit9_event EventSubTypeId=1003 | join FileHash [search eventtype=bit9_fileCatalog ProductName!="" | dedup FileHash | table FileHash, ProductName] | top 0 ProductName showperc=false | rename count as Count, ProductName as Product</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">eventtype=bit9_event EventSubTypeId=1003 | join FileHash [search eventtype=bit9_fileCatalog ProductName="$arg1$" | table FileHash, ProductName]</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">stringreplace</param>
+									<param name="arg">
+										<param name="arg1">
+											<param name="value">$click.value$</param>
+										</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row3_col1" group="Top New Unapproved File Hashes">
+			<param name="search">eventtype=bit9_event EventSubTypeId=1003 | top 0 FileHash showperc=false | rename FileHash as "File Hash", count as Count</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">eventtype=bit9_event EventSubTypeId=1003</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="FileHash">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row3_col2" group="Top New Unapproved File Names">
+			<param name="search">eventtype=bit9_event EventSubTypeId=1003 | top 0 FileName showperc=false | rename FileName as "File Name", count as Count</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">eventtype=bit9_event EventSubTypeId=1003</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="FileName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row3_col3" group="Potentially Malicious Files">
+			<param name="search">eventtype=bit9_event EventSubTypeId=1003 [search eventtype=bit9_fileCatalog ThreatId>0 | fields FileHash] | table Timestamp, HostName, FileName | rename HostName as Computer, FileName as File</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="SimpleDrilldown">
+							<param name="links">{"*": "/app/search/flashtimeline?q=search eventtype=bit9_event EventSubTypeId=1003 Timestamp=\"$click.value$\""}</param>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row4_col1" group="Top Computers">
+			<param name="search">| savedsearch "New Unapproved Files" | stats sum(count) as Count by HostName | sort -Count | rename HostName as Computer</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">eventtype=bit9_event EventSubTypeId=1003</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="HostName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row4_col2" group="Known Trust Values">
+			<param name="search">eventtype=bit9_event EventSubTypeId=1003 | join [search eventtype=bit9_fileCatalog TrustValue!="" | eval msgtime=strptime(MessageTime, "%m/%d/%Y %I:%M:%S %p") | sort -msgtime | stats first(TrustValue) as TrustValue by FileHash] | top 0 TrustValue showperc=f | rename TrustValue as "File Trust"</param>
+			<module name="JobProgressIndicator">
+				<module name="HiddenChartFormatter">
+				  <param name="charting.chart">pie</param>
+				  <param name="charting.chart.sliceCollapsingThreshold">0</param>
+					<module name="JSChart">
+						<module name="HiddenSearch">
+							<param name="search">eventtype=bit9_event EventSubTypeId=1003 | join [search eventtype=bit9_fileCatalog TrustValue!="" | eval msgtime=strptime(MessageTime, "%m/%d/%Y %I:%M:%S %p") | sort -msgtime | stats first(TrustValue) as TrustValue by FileHash]</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="TrustValue">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+		<module name="HiddenSearch" layoutPanel="panel_row4_col3" group="Top Users">
+			<param name="search">eventtype=bit9_event EventSubTypeId=1003 UserName!="" | top 0 UserName showperc=false | rename UserName as User, count as Count</param>
+			<module name="JobProgressIndicator">
+				<module name="Paginator">
+					<param name="entityName">results</param>
+					<module name="SimpleResultsTable">
+						<param name="entityName">results</param>
+						<param name="displayRowNumbers">off</param>
+						<param name="drilldown">row</param>
+						<module name="HiddenSearch">
+							<param name="search">eventtype=bit9_event EventSubTypeId=1003</param>
+							<module name="ConvertToIntention">
+								<param name="intention">
+									<param name="name">time</param>
+								</param>
+								<param name="intention">
+									<param name="name">addterm</param>
+									<param name="arg">
+										<param name="UserName">$click.value$</param>
+									</param>
+								</param>
+								<module name="ViewRedirector">
+									<param name="viewTarget">flashtimeline</param>
+								</module>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+</view>

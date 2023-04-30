@@ -1,0 +1,221 @@
+<form version="1.1">
+  <label>APEX Performance</label>
+  <description/>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" token="_time" searchWhenChanged="true">
+      <label/>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="USER_ID" searchWhenChanged="true">
+      <label>Username</label>
+      <choice value="*">All</choice>
+        <default>*</default>
+              <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>USER_ID</fieldForValue>
+            <search>
+        <query>
+     eventtype=sfdc-event-log EVENT_TYPE=ApexExecution | stats count by Name USER_ID | sort -count | eval label=Name." (".count.")" | eval USER_ID="USER_ID=".USER_ID
+     </query>
+             <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Apex Performance over time</title>
+             <search>
+        <query>
+        eventtype=sfdc-event-log EVENT_TYPE=ApexExecution $USER_ID$| eval rt = RUN_TIME/1000  | timechart count AVG(rt) AS "Average Run time" span=6h
+        </query>
+        <earliest>$_time.earliest$</earliest>
+        <latest>$_time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.overlayFields">"Average Run time"</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Slowest APEX Pages</title>
+                <search>
+        <query>
+          
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest  $USER_ID$ | stats AVG(RUN_TIME) MAX(RUN_TIME) by PAGE_NAME |rename AVG(RUN_TIME) AS a | rename MAX(RUN_TIME) AS m| eval avg = a/1000|  eval max=m/1000|  sort 10  -avg | fields - a m + URI  | rename avg  AS "Average Execution Time (sec)" max AS "Maximum Execution Time (sec)"
+          </query>
+        <earliest>$_time.earliest$</earliest>
+        <latest>$_time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <link>https://splunk.my.salesforce.com/?q=$click.value$</link>
+        </drilldown>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Slowest APEX Classes</title>
+                <search>
+        <query>
+          eventtype=sfdc-event-log EVENT_TYPE=ApexExecution ENTRY_POINT!="VF- /apex*" $USER_ID$ | stats AVG(RUN_TIME) MAX(RUN_TIME) by ENTRY_POINT| rename AVG(RUN_TIME) as a MAX(RUN_TIME) as m| eval avg=a/1000 | eval max =m/1000| sort 10 -avg | fields - a m|  rename avg AS "Average Execution time (sec)" | rename max as "Maximum Execution time (sec)"
+          </query>
+      
+        <earliest>$_time.earliest$</earliest>
+        <latest>$_time.latest$</latest>
+        </search>
+        
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Number of SOQL Queries per Entry Point</title>
+        
+                      <search>
+        <query>
+          eventtype=sfdc-event-log $USER_ID$ EVENT_TYPE=ApexExecution NUMBER_SOQL_QUERIES!=0 | stats sum(NUMBER_SOQL_QUERIES) by ENTRY_POINT | sort 10 -sum(NUMBER_SOQL_QUERIES) |   rename sum(NUMBER_SOQL_QUERIES) AS "Number of SOQL Queries"
+                          
+        </query>
+        <earliest>$_time.earliest$</earliest>
+        <latest>$_time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>S0QL Query</title>
+        
+                       <search>
+        <query>
+          eventtype=sfdc-event-log EVENT_TYPE=ApexExecution NUMBER_SOQL_QUERIES!=0 $USER_ID$ | eval rt=RUN_TIME/1000 | stats sum(NUMBER_SOQL_QUERIES) as total_number_of_queries  AVG(rt) as avg_runtime by ENTRY_POINT | eval load=avg_runtime*total_number_of_queries |  sort 10 -load |   rename sum(NUMBER_SOQL_QUERIES) AS "Number of SOQL Queries"
+        </query>
+        <earliest>$_time.earliest$</earliest>
+        
+        <latest>$_time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Application Load per API</title>
+        
+                        <search>
+        <query>
+          eventtype=sfdc-event-log EVENT_TYPE=API CLIENT_NAME!=""| stats count AS request_number sum(ROWS_PROCESSED) AS total_rows_processed by CLIENT_NAME, API_VERSION | eval avg_rows_per_call = total_rows_processed/request_number | sort 10 - avg_rows_per_call | rename CLIEN_NAME AS "Application Name" total_rows_processed AS "Total Rows Processed" request_number AS "Total Number of Requests" total_row_processed AS "Total Number of Rows Processed" avg_rows_per_call AS "Average Number of Rows per Call"
+          
+                         
+        </query>
+          <earliest>$_time.earliest$</earliest>
+        <latest>$_time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

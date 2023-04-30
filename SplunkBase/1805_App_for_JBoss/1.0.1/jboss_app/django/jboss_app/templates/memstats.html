@@ -1,0 +1,223 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}} Your page title goes here{% endblock title %}
+
+{% block css %}
+    <!-- Style sheets are loaded here -->
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <style>
+        /* Define any page styles here*/
+    </style>
+{% endblock css %}
+
+{% block content %}
+    <!-- You can use HTML and <div> tags for layout -->
+    <div class="dashboard-body container-fluid main-section-body" data-role="main">
+
+        <!-- HEADER --> 
+        <div class="dashboard-header clearfix">
+            <h2>Memory stats</h2>
+            <p class="description">Memory usage statistics</p>
+            <p>
+            {% timerange id="timerange1"
+                preset="Last 60 minutes"
+                earliest_time="$earlyval$"|token_safe
+                latest_time="$lateval$"|token_safe %}
+            </p>
+        </div>
+
+
+        <div class="dashboard-header clearfix">
+            <h3>OS Memory Stats</h3>
+        </div>
+
+        <div class="dashboard-row dashboard-row1">
+            <div class="dashboard-cell" style="width: 50%;">
+                <div class="dashboard-panel ">
+                    <div class="dashboard-element">
+                        <div class="panel-head">
+                            <h3>OS - physical memory usage</h3>
+                        </div>
+                        <div class="panel-body">
+                            {# Splunk views go here #}
+                            {% chart id="tchart_os_used_physicalmem" managerid="search_tchart_os_physicalmem_used" type="area" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-cell" style="width: 50%;">
+                <div class="dashboard-panel ">
+                    <div class="dashboard-element">
+                        <div class="panel-head">
+                            <h3>OS - swap space usage</h3>
+                        </div>
+                        <div class="panel-body">
+                            {# Splunk views go here #}
+                            {% chart id="tchart_os_used_swapspace" managerid="search_tchart_os_swap_used" type="area" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dashboard-header clearfix">
+            <h3>JVM Memory Stats</h3>
+        </div>
+
+        <div class="dashboard-row dashboard-row2">
+            <div class="dashboard-cell" style="width: 100%;">
+                <div class="dashboard-panel ">
+                    <div class="dashboard-element">
+                        <div class="panel-head">
+                            <h3>JVM - total used memory</h3>
+                        </div>
+                        <div class="panel-body">
+                            {# Splunk views go here #}
+                            {% chart id="tchart_jvm_used_mem" managerid="search_tchart_jvm_used_mem_total" type="area" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="dashboard-row dashboard-row3">
+            <div class="dashboard-cell" style="width: 50%;">
+                <div class="dashboard-panel ">
+                    <div class="dashboard-element">
+                        <div class="panel-head">
+                            <h3>JVM - Heap memory usage</h3>
+                        </div>
+                        <div class="panel-body">
+                            {# Splunk views go here #}
+                            {% chart id="tchart_jvm_used_mem_heap" managerid="search_tchart_jvm_used_mem_heap" type="area" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-cell" style="width: 50%;">
+                <div class="dashboard-panel ">
+                    <div class="dashboard-element">
+                        <div class="panel-head">
+                            <h3>JVM - NonHeap memory usage</h3>
+                        </div>
+                        <div class="panel-body">
+                            {# Splunk views go here #}
+                            {% chart id="tchart_jvm_used_mem_nheap" managerid="search_tchart_jvm_used_mem_nheap" type="area" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+{% endblock content%}
+
+{% block managers %}
+    {# Search managers go here #}
+
+
+    {% searchmanager
+        id="search_jvm_memstats-main"
+        search="index=jboss eventtype=jmxmemstats | eval memtotalmb=(used_hmem+used_nhmem)/1024/1024 | fields _time, memtotalmb, used_hmem, used_nhmem, max_hmem, max_nhmem"
+        earliest_time="$earlyval$"|token_safe
+        latest_time="$lateval$"|token_safe
+        cache=False
+    %}  
+
+    {% postprocessmanager
+        id="search_tchart_jvm_used_mem_total"
+        managerid="search_jvm_memstats-main"
+        search='timechart avg(memtotalmb) as "MB used"'
+    %}
+
+    {% postprocessmanager
+        id="search_tchart_jvm_used_mem_nheap"
+        managerid="search_jvm_memstats-main"
+        search='eval used_nhmem_mb=used_nhmem/1024/1024 | timechart avg(used_nhmem_mb) as "MB used" avg(max_nhmem_mb) as "MB total"'
+    %}
+
+    {% postprocessmanager
+        id="search_tchart_jvm_used_mem_heap"
+        managerid="search_jvm_memstats-main"
+        search='eval used_hmem_mb=used_hmem/1024/1024 | timechart avg(used_hmem_mb) as "MB used" avg(max_hmemb) as "MB Total"'
+    %}
+
+    {% searchmanager
+        id="search_os_memstats-main"
+        search="index=jboss eventtype=jmxosstats | eval TotalPhysicalMemorySizeMB=TotalPhysicalMemorySize/1024/1024 | eval FreePhysicalMemorySizeMB=FreePhysicalMemorySize/1024/1024 | eval UsedPhysicalMemorySizeMB=TotalPhysicalMemorySizeMB-FreePhysicalMemorySizeMB | eval TotalSwapSpaceSizeMB=TotalSwapSpaceSize/1024/1024 | eval FreeSwapSpaceSizeMB=FreeSwapSpaceSize/1024/1024 | eval UsedSwapSpaceSizeMB=TotalSwapSpaceSizeMB-FreeSwapSpaceSizeMB"
+        earliest_time="$earlyval$"|token_safe
+        latest_time="$lateval$"|token_safe
+        cache=False
+    %}
+
+    {% postprocessmanager
+        id="search_tchart_os_physicalmem_used"
+        managerid="search_os_memstats-main"
+        search='timechart avg(TotalPhysicalMemorySizeMB) as "MB total" avg(UsedPhysicalMemorySizeMB) as "MB used"'
+    %}
+
+    {% postprocessmanager
+        id="search_tchart_os_swap_used"
+        managerid="search_os_memstats-main"
+        search='timechart avg(TotalSwapSpaceSizeMB) as "MB total" avg(UsedSwapSpaceSizeMB) as "MB used"'
+    %}
+
+
+{% endblock managers %}
+
+{% block js %}
+    {# JavaScript goes here #}
+
+    <script>
+        var deps = [
+            "splunkjs/ready!"
+        ];
+        require(deps, function(mvc) {
+
+            var tchart_os_used_physicalmem = splunkjs.mvc.Components.getInstance("tchart_os_used_physicalmem");
+            tchart_os_used_physicalmem.settings.set({
+                "charting.axisTitleX.visibility": "collapsed",
+            });
+
+            var tchart_os_used_swapspace = splunkjs.mvc.Components.getInstance("tchart_os_used_swapspace");
+            tchart_os_used_swapspace.settings.set({
+                "charting.axisTitleX.visibility": "collapsed",
+            });
+
+            var tchart_jvm_used_mem = splunkjs.mvc.Components.getInstance("tchart_jvm_used_mem");
+            tchart_jvm_used_mem.settings.set({
+                "charting.axisTitleX.visibility": "collapsed",
+                "charting.axisTitleY.visibility": "collapsed",
+                "charting.seriesColors": "[0x956E96, 0xF7912C, 0x9AC23C, 0x998C55, 0xDD87B0, 0x5479AF, 0xE0A93B, 0x6B8930, 0xA04558, 0xA7D4DF, 0xFCDD77, 0xE89E8B, 0xBFA8C0, 0xFABD80, 0xC2DA8A, 0xC2BA99, 0xEBB7D0, 0x98AFCF, 0xECCB89, 0xA6B883, 0xC68F9B, 0x416E79, 0x967711, 0x823825, 0x59425A, 0x94571A, 0x5C7424, 0x5C5433, 0x85516A, 0x324969, 0x866523, 0x40521D, 0x602935, 0x6CB8CA, 0xFAC61D, 0xD85E3D]"
+            });
+
+            var tchart_jvm_used_mem_heap = splunkjs.mvc.Components.getInstance("tchart_jvm_used_mem_heap");
+            tchart_jvm_used_mem_heap.settings.set({
+                "charting.axisTitleX.text": " ",
+                "charting.axisTitleY.text": " ",
+                "charting.seriesColors": "[0xE89E8B, 0xBFA8C0, 0xFABD80, 0xC2DA8A, 0xC2BA99, 0xEBB7D0, 0x98AFCF, 0xECCB89, 0xA6B883, 0xC68F9B, 0x416E79, 0x967711, 0x823825, 0x59425A, 0x94571A, 0x5C7424, 0x5C5433, 0x85516A, 0x324969, 0x866523, 0x40521D, 0x602935, 0x6CB8CA, 0xFAC61D, 0xD85E3D, 0x956E96, 0xF7912C, 0x9AC23C, 0x998C55, 0xDD87B0, 0x5479AF, 0xE0A93B, 0x6B8930, 0xA04558, 0xA7D4DF, 0xFCDD77,]"
+            });
+
+            var a = splunkjs.mvc.Components.getInstance("tchart_jvm_used_mem_nheap");
+            a.settings.set({
+                "charting.axisTitleX.visibility": "collapsed",
+                "charting.axisTitleY.visibility": "collapsed",
+                "charting.seriesColors": "[0xFABD80, 0xC2DA8A, 0xC2BA99, 0xEBB7D0, 0x98AFCF, 0xECCB89, 0xA6B883, 0xC68F9B, 0x416E79, 0x967711, 0x823825, 0x59425A, 0x94571A, 0x5C7424, 0x5C5433, 0x85516A, 0x324969, 0x866523, 0x40521D, 0x602935, 0x6CB8CA, 0xFAC61D, 0xD85E3D, 0x956E96, 0xF7912C, 0x9AC23C, 0x998C55, 0xDD87B0, 0x5479AF, 0xE0A93B, 0x6B8930, 0xA04558, 0xA7D4DF, 0xFCDD77]"
+
+               
+            });
+
+        });
+    </script>
+
+{% endblock js %}

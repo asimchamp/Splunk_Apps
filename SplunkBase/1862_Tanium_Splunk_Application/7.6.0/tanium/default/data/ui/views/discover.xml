@@ -1,0 +1,248 @@
+<form version="1.1">
+  <label>Tanium Discover</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Lost Interface</title>
+      <single>
+        <search>
+          <query>`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*Lost*Interface"
+| stats dc(MacAddress)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0xd93f3c","0xd93f3c","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*Lost*Interface"  | stats dc(MacAddress) by HostName&amp;earliest=&amp;latest=</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <title>Discovered Interface</title>
+      <single>
+        <search>
+          <query>`tanium_index` "Question=Tanium-Discover" | stats dc(MacAddress)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x6db7c6","0xf7bc38","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20%22Question=Tanium-Discover%22%20%7C%20table%20computerid,%20hostname,%20ipaddress,%20natipaddress,%20macaddress,%20macorganization,%20os,%20osgeneration,%20ports,%20method,%20lastdiscoveredat,%20lastmanagedat,%20unmanageable&amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <title>New Managed Interface</title>
+      <single>
+        <search>
+          <query>`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*New*Managed*Interface"
+| stats dc(MacAddress)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x6db7c6","0x6db7c6","0x6db7c6"]</option>
+        <option name="rangeValues">[0,30]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*New*Managed*Interface" | stats dc(MacAddress) by HostName&amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <title>New Unmanaged Interface</title>
+      <single>
+        <search>
+          <query>`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*New*Unmanaged*Interface" | stats dc(MacAddress)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x6db7c6","0xf7bc38","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` (Question="Discover-Notifications" OR "Discover Notifications") Event="*New*Unmanaged*Interface"
+ | stats dc(MacAddress) by HostName&amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Unmanaged over Time by MAC Address</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" | timechart span=1d dc(MacAddress)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">MAC Addres</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Unmanaged OS Platform</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" Os!="null" | stats  dc(MacAddress) as count by Os</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Unmanaged Device Type</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" MacOrganization!="null" | stats dc(MacAddress) as count by MacOrganization</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Unmanaged Open Ports</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" Ports!="null" Ports!="" | stats count by Ports</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Managed OS Platform</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" Os!="null" |  stats dc(TaniumComputerId) as count by Os</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Managed Device Type</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" MacOrganization!="null" | stats dc(TaniumComputerId) as count by MacOrganization</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Managed Open Ports</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Tanium-Discover" Ports!="null" Ports!=""  | stats count by Ports</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Clients that haven't checked in over 10 days</title>
+        <search>
+          <query>`tanium_index` Question="Client-Status" 
+| dedup HostName | table HostName, LastRegistration | sort LastRegistration |eval timenow=now()  | eval first = strptime('LastRegistration', "%Y-%m-%d") | rex field=first  "(?&lt;first&gt;.*)\." | eval diff = tostring((timenow -  first), "duration") | rex field=diff "(?&lt;Time&gt;.*?)\+"  | table HostName, LastRegistration, Time | eval days_since_checkin=case(Time&gt;9 AND Time&lt;15, "10-15 days", Time&gt;14 AND Time&lt;30, "15-30 days", Time&gt;30 AND Time&lt;60, "&gt;30 days" ) | stats count by days_since_checkin</query>
+          <earliest>-60d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.fieldColors">{"10-15 days":0xf58f39, "Critical": 0xFF0000, "Informational":0xC0C0C0, "Medium":FFFF00, "Low":0xf7bc38, "Important":0xffc04c}</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">251</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <table>
+        <title>Clients that haven’t checked in by Name</title>
+        <search>
+          <query>`tanium_index`  Question="Client-Status"| dedup HostName | table HostName, LastRegistration | sort LastRegistration |eval timenow=now()  | eval first = strptime('LastRegistration', "%Y-%m-%d") | rex field=first  "(?&lt;first&gt;.*)\." | eval diff = tostring((timenow -  first), "duration") | rex field=diff "(?&lt;Time&gt;.*?)\+" | search Time&gt;9 | table HostName, LastRegistration</query>
+          <earliest>-60d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

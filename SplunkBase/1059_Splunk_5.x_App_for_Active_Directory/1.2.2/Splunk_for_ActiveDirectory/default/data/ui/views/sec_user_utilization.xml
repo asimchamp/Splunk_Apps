@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view onUnloadCancelJob="True" template="dashboard.html">
+	<label>User Utilization</label>
+	<module name="AccountBar" layoutPanel="appHeader" />
+	<module name="AppBar" layoutPanel="appHeader" />
+	<module name="SideviewUtils" layoutPanel="appHeader" />
+
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+
+	<module name="TitleBar" layoutPanel="viewHeader"/>
+		
+	<!-- The Time Range Picker feeds the picker for the MSADDomainSelector -->
+	<module name="TimeRangePicker" layoutPanel="panel_row1_col1" autoRun="True">
+		<param name="default">Last 24 hours</param>
+		<param name="searchWhenChanged">True</param>
+			
+		<!-- Search for the MSAD Topology so we can render it in the Domain Selector -->
+		<module name="Search">
+			<param name="search">|`domain-selector`</param>
+		
+			<module name="JobProgressIndicator" layoutPanel="panel_row1_col1"></module>
+
+			<module name="ColumnSelector" layoutPanel="panel_row1_col1">
+				<param name="drilldownPrefix">domainselection</param>
+				<param name="defaultState">true</param>
+				<param name="autoSelector">both</param>
+				<param name="loadFromCookie">true</param>
+				<param name="cookieName">domainselection</param>
+				<param name="columns">
+					<param name="ForestName">
+						<param name="title">Forest</param>
+						<param name="weight">0</param>
+					</param>
+					<param name="Site">
+						<param name="title">Site</param>
+						<param name="weight">1</param>
+					</param>
+					<param name="DomainDNSName">
+						<param name="title">Domain</param>
+						<param name="weight">2</param>
+					</param>
+					<param name="host">
+						<param name="title">Server</param>
+						<param name="weight">3</param>
+					</param>
+				</param>
+				
+				<module name="Search" layoutPanel="panel_row1_col1">
+					<param name="search"><![CDATA[(eventtype=msad-successful-user-logons OR eventtype=msad-failed-user-logons) dest_nt_domain!="NT AUTHORITY" $domainselection.host$|fillnull value="255" Logon_Type|lookup LogonTypeName Logon_Type|eval user_subject=dest_nt_domain."\\".user|fields *]]></param>
+					<module name="JobProgressIndicator"></module>
+					
+					<module name="PostProcess" layoutPanel="panel_row2_col1">
+						<param name="search"><![CDATA[|eval x=1|timechart per_minute(x) by Logon_TypeName]]></param>
+						<module name="GenericHeader"><param name="label">Logons over Time</param></module>
+						<module name="HiddenChartFormatter">
+							<param name="chart">area</param>
+							<param name="chart.stackMode">stacked</param>
+							<param name="chart.nullValueMode">zero</param>
+							<param name="legend.placement">bottom</param>
+							<param name="primaryAxisTitle.text">Time</param>
+							<param name="secondaryAxisTitle.text">Logons per Minute</param>
+							<module name="JSChart">
+								<param name="width">100%</param>
+								<param name="height">300px</param>
+								<param name="enableResize">True</param>
+							</module> <!-- JSChart -->
+						</module> <!-- HiddenChartFormatter -->
+					</module> <!-- PostProcess - chart for success vs. failed logons -->
+					
+					<module name="PostProcess" layoutPanel="panel_row2_col2">
+						<param name="search"><![CDATA[search eventtype=msad-successful-user-logons|top user,dest_nt_domain|rename user as "Username",dest_nt_domain as "Domain"]]></param>
+						<module name="GenericHeader"><param name="label">Top Users by Successful Logons</param></module>
+						<module name="SimpleResultsTable">
+							<param name="drilldown">row</param>
+							<param name="drilldownPrefix">click</param>
+							<module name="Redirector">
+								<param name="url">audit_user</param>
+								<param name="arg.nt_user">$click.cell0.value$</param>
+								<param name="arg.nt_domain">$click.cell1.value$</param>
+								<param name="arg.earliest">$search.timeRange.earliest$</param>
+								<param name="arg.latest">$search.timeRange.latest$</param>
+							</module>
+						</module>
+					</module> <!-- PostProcess - Top Users by Successful Logons -->
+					
+					<module name="PostProcess" layoutPanel="panel_row3_col2">
+						<param name="search"><![CDATA[search eventtype=msad-successful-user-logons|top src_nt_host|rename src_nt_host as Workstation]]></param>
+						<module name="GenericHeader"><param name="label">Top Authenticating Workstations</param></module>
+						<module name="SimpleResultsTable">
+							
+						</module>
+					</module>
+				</module> <!-- Search successful OR failed logons -->
+				
+				<module name="Search" layoutPanel="panel_row3_col1">
+					<param name="search">eventtype=msad-account-lockout $domainselection.host$|fillnull value="UNKNOWN" src_host|eval lockout=if(EventCode==644 OR EventCode==4740,"Yes","No")|stats latest(_time) as time,latest(src_host) as host,latest(lockout) as lockedout by dest_nt_domain,user|search lockedout="Yes"|eval ltime=strftime(time,"%c")|table ltime,dest_nt_domain,user,host|rename ltime as "Lockout Time",dest_nt_domain as "Domain",user as "Account Locked Out", host as "Workstation"</param>
+					<module name="GenericHeader"><param name="label">Locked Accounts</param></module>
+					<module name="Pager">
+						<module name="SimpleResultsTable">
+							<param name="drilldown">row</param>
+							<param name="drilldownPrefix">click</param>
+							<module name="Redirector">
+								<param name="url">audit_user</param>
+								<param name="arg.nt_user">$click.cell2.value$</param>
+								<param name="arg.nt_domain">$click.cell1.value$</param>
+								<param name="arg.earliest">$search.timeRange.earliest$</param>
+								<param name="arg.latest">$search.timeRange.latest$</param>
+							</module>
+						</module>
+					</module>
+				</module>
+			</module> <!-- ColumnSelector -->
+		</module> <!-- Search domain-selector -->
+	</module> <!-- TimeRangePicker -->
+</view>

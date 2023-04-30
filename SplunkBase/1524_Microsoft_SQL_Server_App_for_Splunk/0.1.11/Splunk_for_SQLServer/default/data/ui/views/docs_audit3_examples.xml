@@ -1,0 +1,77 @@
+<dashboard>
+	<label>Example Audit Specifications</label>
+	<row>
+		<html>
+<h3>Example 1: Base Server Security Audit</h3>
+
+<p>This audit specification will enable login and logout messages on all your SQL servers and should be
+considered a minimal audit specification.</p>
+
+<code><pre>
+USE [master]
+GO
+
+CREATE SERVER AUDIT SPECIFICATION [Server-Logons]
+FOR SERVER AUDIT [WinEventLog-Security]
+ADD (SERVER_ROLE_MEMBER_CHANGE_GROUP),
+ADD (SCHEMA_OBJECT_PERMISSION_CHANGE_GROUP),
+ADD (SERVER_PERMISSION_CHANGE_GROUP),
+ADD (SERVER_PRINCIPAL_IMPERSONATION_GROUP),
+ADD (FAILED_LOGIN_GROUP),
+ADD (SUCCESSFUL_LOGIN_GROUP),
+ADD (LOGOUT_GROUP),
+ADD (SERVER_OBJECT_CHANGE_GROUP),
+ADD (SERVER_PRINCIPAL_CHANGE_GROUP),
+ADD (SERVER_OPERATION_GROUP),
+ADD (LOGIN_CHANGE_PASSWORD_GROUP),
+ADD (SERVER_STATE_CHANGE_GROUP),
+ADD (SERVER_OBJECT_OWNERSHIP_CHANGE_GROUP)
+WITH (STATE = ON)
+GO
+</pre></code>
+
+<h3>Example 2: Database Operations Audit</h3>
+
+<p>This audit specification will enable audit messages for tracking database operations, including creation, deletion
+and permission changes.  These will appear in the <a href="/app/Splunk_for_SQLServer/sec_dbops">Database Operations</a> report.</p>
+
+<code><pre>
+USE [master]
+GO
+
+CREATE SERVER AUDIT SPECIFICATION [SQLServer-sys1]
+FOR SERVER AUDIT [WinEventLog-Security]
+ADD (DATABASE_CHANGE_GROUP),
+ADD (DATABASE_OBJECT_CHANGE_GROUP),
+ADD (SCHEMA_OBJECT_CHANGE_GROUP),
+ADD (SERVER_OBJECT_CHANGE_GROUP),
+ADD (DATABASE_OPERATION_GROUP),
+ADD (SERVER_STATE_CHANGE_GROUP)
+WITH (STATE = ON)
+GO
+</pre></code>
+
+<h3>Example 3: Database Audit Specification to cover Rare Queries</h3>
+
+<p>The following Audit Specification will enable audit messages for queries executed on a database.  Use this if
+you wish to run the <a href="/app/Splunk_for_SQLServer/sec_rarequeries">Rare Queries</a> report.</p>
+
+<code><pre>
+USE [<b>Your-Database-Name</b>]
+GO
+
+CREATE DATABASE AUDIT SPECIFICATION [<b>DBQuery-for-your-databasename</b>]
+FOR SERVER AUDIT [WinEventLog-Security]
+ADD (DELETE ON DATABASE::[<b>Your-Database-Name</b>] BY [public]),
+ADD (EXECUTE ON DATABASE::[<b>Your-Database-Name</b>] BY [public]),
+ADD (INSERT ON DATABASE::[<b>Your-Database-Name</b>] BY [public]),
+ADD (RECEIVE ON DATABASE::[<b>Your-Database-Name</b>] BY [public]),
+ADD (REFERENCES ON DATABASE::[<b>Your-Database-Name</b>] BY [public]),
+ADD (SELECT ON DATABASE::[<b>Your-Database-Name</b>] BY [public]),
+ADD (UPDATE ON DATABASE::[<b>Your-Database-Name</b>] BY [public])
+WITH (STATE = ON)
+GO
+</pre></code>
+		</html>
+	</row>
+</dashboard>

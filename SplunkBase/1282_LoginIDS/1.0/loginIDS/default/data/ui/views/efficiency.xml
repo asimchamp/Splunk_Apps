@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Efficiency</label>
+  
+  <fieldset autoRun="true">
+    <input type="dropdown" token="service">
+      <label>Select service:</label>
+      <choice value="*">all</choice>
+      <populatingSearch fieldForValue="Service" fieldForLabel="Service">
+        <![CDATA[index="loginids" | stats count by Service]]>
+      </populatingSearch>
+    </input>
+    
+    <input type="time">
+      <default>Last 7 days</default>
+    </input>
+    
+  </fieldset>
+  
+  <row>
+    <chart>
+      <title>Efficiency</title>
+      <searchTemplate>
+        index="loginids" sourcetype="loginIDS_DetailedLog" OR sourcetype="loginids_alerts" Service=$service$ | timechart count by sourcetype
+      </searchTemplate>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="charting.legend.placement">bottom</option>
+    </chart>
+
+    <chart>
+      <title>Logentries</title>
+      <searchTemplate>
+        index="loginids" sourcetype="loginIDS_DetailedLog" OR sourcetype="loginids_alerts" Service=$service$ | timechart count by Service
+      </searchTemplate>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="charting.legend.placement">bottom</option>
+    </chart>
+
+  </row>
+  
+  
+</form>

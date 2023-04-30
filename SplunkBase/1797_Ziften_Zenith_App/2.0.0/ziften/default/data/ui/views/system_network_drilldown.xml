@@ -1,0 +1,44 @@
+<form script="autodiscover.js,multi_select.js, multi_value_token.js">
+  <label>System: Network Drilldown</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="guid" searchWhenChanged="true">
+      <label>Select a Computer Name:</label>
+      <prefix>agentguid="</prefix>
+      <suffix>"</suffix>
+      <default>Computer Name</default>
+       <populatingSearch fieldForValue="agentguid" fieldForLabel="computername">
+        <![CDATA[sourcetype=ziften:zenith:networkconnect |stats count by agentguid |lookup system_info agentguid|eval computername=if(isnull(computername),agentguid,computername)|table agentguid computername]]>
+      </populatingSearch>
+    </input>
+    <input type="multiselect" token="basename_exclude" searchWhenChanged="true">
+      <choice value="chrome">chome</choice>
+      <choice value="iexplore">iexplore</choice>
+      <choice value="firefox">firefox</choice>
+      <delimiter>|</delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <default>chrome,iexplore,firefox</default>
+      <populatingSearch fieldForLabel="basename" fieldForValue="basename">|inputlookup image.csv|eval basename = replace(sample_path, ".*\\\\", "")|table basename</populatingSearch>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h2>System Network Connections</h2>
+      <h5>Note: Results are limited to 100</h5>
+      <div id="sunburstSearch" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options="{                   &quot;search&quot;: {                       &quot;type&quot;: &quot;token_safe&quot;,                       &quot;value&quot;: &quot;sourcetype=ziften:* message_type=networkconnect $$guid$$|eval basename = replace(imagefilepath, \&quot;.*\\\\\\\\\&quot;, \&quot;\&quot;)|stats values(imagefilemd5) as MD5s first(imagefilepath) as sample_path values(accountname) as users min(_time) as first_seen max(_time) as last_seen count by basename port ipaddress|convert ctime(first_seen) ctime(last_seen)|where NOT match(basename,\&quot;($$basename_exclude$$)\&quot;)|head 100&quot;},                   &quot;earliest_time&quot;: { &quot;type&quot;: &quot;token_safe&quot;, &quot;value&quot;: &quot;$$earliest$$&quot; },                   &quot;latest_time&quot;: { &quot;type&quot;: &quot;token_safe&quot;, &quot;value&quot;: &quot;$$latest$$&quot; },                   &quot;status_buckets&quot;: 0,                   &quot;cancelOnUnload&quot;: true,                   &quot;auto_cancel&quot;: 90,                   &quot;preview&quot;: true,                   &quot;tokens&quot;: true               }"/>
+      <div id="sunburstChart" class="splunk-view splunk-toolkit-sunburst" data-require="app/ziften/components/sunburst/sunburst" data-options="{                   &quot;managerid&quot;: &quot;sunburstSearch&quot;,                   &quot;nameField&quot;: &quot;tag&quot;,                   &quot;categoryFields&quot;: &quot;basename port ipaddress&quot;,                   &quot;valueField&quot;: &quot;count&quot;,                   &quot;width&quot;: 800,                   &quot;height&quot;: 800               }"/>
+    </html>
+  </row>
+  <row>
+    <html>
+      <div id="mytable" class="splunk-view" data-require="splunkjs/mvc/tableview" data-options="{           &quot;managerid&quot;:&quot;sunburstSearch&quot;       }"/>
+    </html>
+  </row>
+</form>

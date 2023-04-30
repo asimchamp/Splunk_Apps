@@ -1,0 +1,188 @@
+<form script="link_switcher.js, autodiscover.js">
+  <label>Traffic by Request</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+       <label>Time Picker</label>
+      <default>Last 24 hours</default>
+    </input>
+    <input type="text" token="s_ip">
+      <label>Virtual Server:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="n_ip">
+      <label>Node:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+  </fieldset>
+  <searchTemplate>index="a10networks" sourcetype="a10_slb" $s_ip$ $n_ip$ | stats count by c_ip sc_status n_ip s_ip cs_uri_stem cs_useragent _time</searchTemplate>
+  <row>
+    <html>
+      <h2>SLB Traffic by Request</h2>This report breaks down your SLB traffic by number of requests.</html>
+  </row>
+  <row/>
+  <row grouping="4">
+    <single>
+      <title>Request Stats</title>
+      <searchPostProcess>stats count</searchPostProcess>
+      <option name="afterLabel">Request(s)</option>
+      <option name="field">count</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>| stats dc(c_ip) as ips</searchPostProcess>
+      <option name="afterLabel">Client(s)</option>
+      <option name="field">ips</option>
+    </single>
+    <single>
+      <searchPostProcess>| stats dc(n_ip) as node</searchPostProcess>
+      <option name="afterLabel">Node(s)</option>
+      <option name="field">node</option>
+    </single>
+    <single>
+      <searchPostProcess>| stats dc(s_ip) as server_name</searchPostProcess>
+      <option name="afterLabel">Virtual Server(s)</option>
+      <option name="field">server_name</option>
+    </single>
+  </row>
+  <row grouping="4">
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Requests Over Time</b>
+      <div class="link-switcher" data-items="link1,link2,link3"/>
+    </html>
+    <chart id="link1">
+      <title>Requests by Server</title>
+      <searchPostProcess>timechart sum(count) as count by s_ip | head 10</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleX.text">Time</option>
+    </chart>
+    <chart id="link2">
+      <title>Requests by Node</title>
+      <searchPostProcess>timechart sum(count) as count by n_ip | head 10</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleX.text">Time</option>
+    </chart>
+    <chart id="link3">
+      <title>Request by Status</title>
+      <searchPostProcess>timechart sum(count) as count by sc_status</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleX.text">Time</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top Server</title>
+      <searchPostProcess>stats sum(count) as count by s_ip | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Top Node</title>
+      <searchPostProcess>stats sum(count) as count by n_ip | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top User Agent</title>
+      <searchPostProcess>stats sum(count) as count by cs_useragent | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Top Client</title>
+      <searchPostProcess>stats sum(count) as count by c_ip | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>URL Statistics</title>
+      <searchPostProcess>rename cs_uri_stem as URL | stats sum(count) as Requests dc(c_ip) as Clients dc(s_ip) as Servers dc(n_ip) as Nodes by URL | head 1000 | sort - requests</searchPostProcess>
+    </table>
+  </row>
+</form>

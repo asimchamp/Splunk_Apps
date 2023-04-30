@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Traffic Logs</label>
+
+  <fieldset>
+    <input type="dropdown" token="application">
+      	<label>Select Application</label>
+   	<populatingSearch fieldForValue="app" fieldForLabel="app">
+     		<![CDATA[sourcetype="DASP4" | where isnotnull(applicationID) | stats values(application) AS "app"]]>
+  	 </populatingSearch>
+    </input>
+    <input type="time" />
+  </fieldset>
+  <row>
+	<table>
+		<title>Traffic Logs</title>
+		<searchTemplate>sourcetype="DASP4" application="$application$" | convert ctime(_time) as date timeformat="%d/%m/%Y" | convert ctime(_time) as time timeformat="%H:%M:%S" | table date,time,source_ip,application,HTTP_response_code,HTTP_method,bytes_received,bytes_sent,URL,URL_options | rename date AS "Date", time AS "Time",source_ip AS "Source",application AS "Application",HTTP_response_code AS "Code", HTTP_method AS "Method", bytes_received AS "Bytes In", bytes_sent AS "Bytes Out", URL AS "URL", URL_options AS "Parameters"</searchTemplate>
+    </table>
+  </row>
+</form>

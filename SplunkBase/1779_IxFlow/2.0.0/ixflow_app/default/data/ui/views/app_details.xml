@@ -1,0 +1,157 @@
+<form>
+  <label>App Details</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="top_limit">
+      <label>Top</label>
+      <choice value="10">10</choice>
+      <choice value="25">25</choice>
+      <choice value="50">50</choice>
+      <default>10</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Top Layer 7 Applications</title>
+      <viz type="ixflow_app.c3donut">
+        <search>
+          <query>|tstats `svalue` count(Ixia_Flow.l7_application_name) AS "Count of Application" from datamodel=Ixia where (Ixia_Flow.l7_application_name!="") by Ixia_Flow.l7_application_name  |sort-"Count of Application"|head limit=$top_limit$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="ixflow_app.c3donut.expand">true</option>
+        <option name="ixflow_app.c3donut.label_format">%</option>
+        <option name="ixflow_app.c3donut.label_show">0</option>
+        <option name="ixflow_app.c3donut.label_threshold">0.05</option>
+        <option name="ixflow_app.c3donut.label_value">ratio</option>
+        <option name="ixflow_app.c3donut.legend_position">bottom</option>
+        <option name="ixflow_app.c3donut.legend_show">1</option>
+        <option name="ixflow_app.c3donut.tooltip_format">%</option>
+        <option name="ixflow_app.c3donut.tooltip_show">true</option>
+        <option name="ixflow_app.c3donut.tooltip_value">default</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Devices by Operating System</title>
+      <viz type="ixflow_app.c3donut">
+        <search>
+          <query>|tstats `svalue` count(Ixia_Flow.os_device_name) AS "Count by OS" from datamodel=Ixia where (Ixia_Flow.os_device_name!="") by Ixia_Flow.os_device_name  |sort-"Count by OS"|head limit=$top_limit$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="ixflow_app.c3donut.expand">true</option>
+        <option name="ixflow_app.c3donut.label_format">%</option>
+        <option name="ixflow_app.c3donut.label_show">0</option>
+        <option name="ixflow_app.c3donut.label_threshold">0.05</option>
+        <option name="ixflow_app.c3donut.label_value">ratio</option>
+        <option name="ixflow_app.c3donut.legend_position">bottom</option>
+        <option name="ixflow_app.c3donut.legend_show">1</option>
+        <option name="ixflow_app.c3donut.tooltip_format">%</option>
+        <option name="ixflow_app.c3donut.tooltip_show">true</option>
+        <option name="ixflow_app.c3donut.tooltip_value">default</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top $tok_label1$ Countries</title>
+      <input type="dropdown" token="place_country" searchWhenChanged="true">
+        <label>Top</label>
+        <choice value="source">Source</choice>
+        <choice value="destination">Destination</choice>
+        <change>
+          <set token="tok_label1">$label$</set>
+        </change>
+        <default>source</default>
+        <initialValue>source</initialValue>
+      </input>
+      <table>
+        <search>
+          <query>|tstats `svalue` sum(Ixia_Flow.octets) as "Total Bytes" from datamodel=Ixia where (Ixia_Flow.$place_country$_ip_country_name!="") by Ixia_Flow.$place_country$_ip_country_name|rename Ixia_Flow.$place_country$_ip_country_name as Country  |sort -"Total Bytes"|head limit=$top_limit$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">search?q=sourcetype="stream:netflow" $place_country$_ip_country_name="$row.Country$"&amp;earliest=$earliest$&amp;latest=$latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top $tok_label2$ Cities</title>
+      <input type="dropdown" token="place_city" searchWhenChanged="true">
+        <label>Top</label>
+        <choice value="source">Source</choice>
+        <choice value="destination">Destination</choice>
+        <change>
+          <set token="tok_label2">$label$</set>
+        </change>
+        <default>source</default>
+        <initialValue>source</initialValue>
+      </input>
+      <table>
+        <search>
+          <query>|tstats `svalue` sum(Ixia_Flow.octets) as "Total Bytes" from datamodel=Ixia where (Ixia_Flow.$place_city$_ip_city_name!="") by Ixia_Flow.$place_city$_ip_city_name|rename Ixia_Flow.$place_city$_ip_city_name as City  |sort -"Total Bytes"|head limit=$top_limit$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">search?q=sourcetype="stream:netflow" $place_city$_ip_city_name="$row.City$"&amp;earliest=$earliest$&amp;latest=$latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Browsers</title>
+      <viz type="ixflow_app.c3donut">
+        <search>
+          <query>|tstats `svalue` count(Ixia_Flow.browser_name) as "Count by Browser"  from datamodel=Ixia where (Ixia_Flow.browser_name!="") by Ixia_Flow.browser_name|sort -"Count by Browser"|head limit=$top_limit$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="ixflow_app.c3donut.expand">true</option>
+        <option name="ixflow_app.c3donut.label_format">%</option>
+        <option name="ixflow_app.c3donut.label_show">0</option>
+        <option name="ixflow_app.c3donut.label_threshold">0.05</option>
+        <option name="ixflow_app.c3donut.label_value">ratio</option>
+        <option name="ixflow_app.c3donut.legend_position">bottom</option>
+        <option name="ixflow_app.c3donut.legend_show">1</option>
+        <option name="ixflow_app.c3donut.tooltip_format">%</option>
+        <option name="ixflow_app.c3donut.tooltip_show">true</option>
+        <option name="ixflow_app.c3donut.tooltip_value">default</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Transaction Latency</title>
+      <table>
+        <search>
+          <query>|tstats `svalue`  max(Ixia_Flow.transaction_latency) as "Max. Latency in ms" , min(Ixia_Flow.transaction_latency) as "Min. Latency in ms" , avg(Ixia_Flow.transaction_latency) as Average from datamodel=Ixia where (Ixia_Flow.l7_application_name!="") by  Ixia_Flow.l7_application_name |rename Ixia_Flow.l7_application_name as Application |sort 0 Average |head limit=$top_limit$ |eval "Average Latency in ms"=round(Average,2)|table Application,"Max. Latency in ms","Average Latency in ms","Min. Latency in ms"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link target="_blank">search?q=sourcetype="stream:netflow" l7_application_name="$row.Application$"&amp;earliest=$earliest$&amp;latest=$latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard refresh="900">
+  <label>RSA Netwitness Administration Trends</label>
+  <row>
+    <chart>
+      <searchString>sourcetype=netwitness_admin decoder /database/stats earliest=-1d@h latest=-0h@h| streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | eval Key="Today"| append [search sourcetype=netwitness_admin decoder /database/stats earliest=-8d@h latest=-7d@h| streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | eval Key="1 Week Ago"| eval new_time=_time+(7*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-15d@h latest=-14d@h| streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | eval Key="2 Weeks Ago"| eval new_time=_time+(14*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-22d@h latest=-21d@h| streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | eval Key="3 Weeks Ago"| eval new_time=_time+(21*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-29d@h latest=-28d@h| streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | eval Key="4 Weeks Ago"| eval new_time=_time+(28*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-36d@h latest=-35d@h| streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | eval Key="5 Weeks Ago"| eval new_time=_time+(35*86400)] | eval _time=if(isnotnull(new_time), new_time, _time) | timechart span=1h sum(sessions) by Key</searchString>
+      <title>All Decoders Session Volume Last 5 Weeks vs. Today</title>
+      <option name="charting.axisTitleX.text">Last 24 Hours</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="height">1600</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=netwitness_admin decoder /database/stats | streamstats current=f global=f window=1 first(session_last_id) as next_last_id by host | eval sessions = next_last_id-session_last_id | timechart span=1d sum(sessions) by host</searchString>
+      <title>Decoder Session Volume Trend Last 31 Days</title>
+      <earliestTime>-31d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Sessions</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="height">1600</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>sourcetype=netwitness_admin decoder /database/stats earliest=-1d@h latest=-0h@h | streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | eval Key="Today"| append [search sourcetype=netwitness_admin decoder /database/stats earliest=-8d@h latest=-7d@h| streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | eval Key="1 Week Ago"| eval new_time=_time+(7*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-15d@h latest=-14d@h| streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | eval Key="2 Weeks Ago"| eval new_time=_time+(14*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-22d@h latest=-21d@h| streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | eval Key="3 Weeks Ago"| eval new_time=_time+(21*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-29d@h latest=-28d@h| streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | eval Key="4 Weeks Ago"| eval new_time=_time+(28*86400)] | append [search sourcetype=netwitness_admin decoder /database/stats earliest=-36d@h latest=-35d@h| streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | eval Key="5 Weeks Ago"| eval new_time=_time+(35*86400)] | eval _time=if(isnotnull(new_time), new_time, _time) | timechart span=1h sum(packets) by Key</searchString>
+      <title>All Decoders Packet Volume Last 5 Weeks vs. Today</title>
+      <option name="charting.axisTitleX.text">Last 24 Hours</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="height">1600</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=netwitness_admin decoder /database/stats | streamstats current=f global=f window=1 first(packet_last_id) as next_last_id by host | eval packets = next_last_id-packet_last_id | timechart span=1d sum(packets) by host</searchString>
+      <title>Decoder Packet Volume Trend Last 31 Days</title>
+      <earliestTime>-31d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Packets</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="height">1600</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>sourcetype=netwitness_admin concentrator /database/stats earliest=-1d@h latest=-0h@h| streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id | eval Key="Today"| append [search sourcetype=netwitness_admin concentrator /database/stats earliest=-8d@h latest=-7d@h| streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id  | eval Key="1 Week Ago"| eval new_time=_time+(7*86400)] | append [search sourcetype=netwitness_admin concentrator /database/stats earliest=-15d@h latest=-14d@h| streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id  | eval Key="2 Weeks Ago"| eval new_time=_time+(14*86400)] | append [search sourcetype=netwitness_admin concentrator /database/stats earliest=-22d@h latest=-21d@h| streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id  | eval Key="3 Weeks Ago"| eval new_time=_time+(21*86400)] | append [search sourcetype=netwitness_admin concentrator /database/stats earliest=-29d@h latest=-28d@h| streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id  | eval Key="4 Weeks Ago"| eval new_time=_time+(28*86400)] | append [search sourcetype=netwitness_admin concentrator /database/stats earliest=-36d@h latest=-35d@h| streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id  | eval Key="5 Weeks Ago"| eval new_time=_time+(35*86400)] | eval _time=if(isnotnull(new_time), new_time, _time) | timechart span=1h sum(metas) by Key</searchString>
+      <title>All Concentrators Meta Volume Last 5 Weeks vs. Today</title>
+      <option name="charting.axisTitleX.text">Last 24 Hours</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="height">1600</option>
+    </chart>
+    <chart>
+      <searchString>sourcetype=netwitness_admin concentrator /database/stats | streamstats current=f global=f window=1 first(meta_last_id) as next_last_id by host | eval metas = next_last_id-meta_last_id  | timechart span=1d sum(metas) by host</searchString>
+      <title>Concentrator Meta Volume Trend Last 31 Days</title>
+      <earliestTime>-31d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Meta</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="height">1600</option>
+    </chart>
+  </row>
+</dashboard>

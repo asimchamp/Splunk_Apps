@@ -1,0 +1,35 @@
+<%inherit file="//layout/base.html" />
+<%namespace name="lib" file="//lib.html" import="*" />
+
+<%def name="js()">
+	<script type="text/javascript">
+	</script>
+</%def>    
+
+<%def name="css()"> 
+    <%coreCSSFiles = ["/static/css/view.css", "/static/css/skins/default/default.css", '/modules/nav/AccountBar.css', '/static/css/print.css'] %>
+    <%lib:stylesheet_tags files="${coreCSSFiles}" />
+</%def>
+
+<body>
+
+<div class="appHeaderWrapper">
+    <div class="layoutRow oneColRow splClearfix appHeader">       
+        <div class="SplunkModule AccountBar">                        
+            <a href="#" class="splIcon splIcon-close"></a>
+            <div class="appLogoContainer popupAppLogoContainer">
+                <a href="javascript:void()" class="appLogo notLinked"></a>
+                <h1>${_('Tagger')}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- display messages -->
+% for mtype, msgs in messages.items():
+   % for msg in msgs:
+         <p class="${mtype|h}">${msg|h}</p>
+   % endfor
+% endfor
+
+</body>

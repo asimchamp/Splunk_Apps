@@ -1,0 +1,142 @@
+{% extends "sentry:template/sentry_base_with_full_controls.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}Sentry | {# INSERT YOUR WINDOW TITLE HERE #} {% endblock title %}
+{% block css %}
+    <!-- Style sheets are loaded here -->
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}sentry/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <style>
+
+    </style>
+{% endblock css %}
+
+{% block sentry_header %}
+<div class="dashboard-body">
+    <div class="row">
+        <div class="span12 dashboard-header clearfix">
+            <h2>{# INSERT YOUR PAGE TITLE HERE  #}</h2>
+        </div>
+    </div>
+</div>
+{% endblock sentry_header %}
+
+{% block content %}
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="tableTopTenUserAccounts-Example" style="width: 100%">
+                        <div class="panel-head">
+                            <div class="heading_wrapper">
+	                            <span class="heading_3">Top Ten User Accounts-Example</span>
+	                            <div id="help_icon" class="eyeIcon">i
+			                        <div id="help_info_outer" class="custom-dropdown-menu hidden">
+				                        <div id="help_info_inner" class="custom-dropdown-msg">
+							    {# Help Info - Example #}
+				                            This is an example help info pop-up. It should show relevant
+                                			    help information related to the view or data you're displaying.
+				                        </div>
+			                        </div>
+			            </div>
+	                    </div>
+	                </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content%}
+
+{% block managers %}
+    {# Placeholder search for scenarios #}
+
+    {# Todo: modify search query. Add comment about sel and triage boilerplate #}
+
+    {% searchmanager
+        id="searchTopTenUserAccounts-Example"
+        search='index="sentry_summary" report="example_report"  user_id="$selUserID$" cust_id="$selCustID$" app="$selApp$" NOT [| inputlookup triage $includeTriaged$ | fields user_id, cust_id, app ]'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+
+
+{% endblock managers %}
+
+{% block js %}
+<script>
+	require(["splunkjs/mvc"], function() {
+	    require.config({
+	        baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+	        waitSeconds: 0 // Disable require.js load timeout 
+	    });
+	
+		require(["splunkjs/ready!", 
+	             "splunkjs/mvc/simplexml/element/table",
+	             "splunkjs/mvc/simplexml/element/chart"], function(mvc, TableElement, ChartElement) {
+	    	
+	        // Initialization 
+	
+	        // Set the default time range 
+	        timerange.val({"earliest_time": "-7d@h", "latest_time": "now"});
+	        
+	        // Set default for the App dropdown 
+	        dropdownTriageApp.settings.set("default", "*");
+	        
+	        // Set default for the App dropdown 
+	        dropdownApp.settings.set("default", "*");
+
+	        
+	        // Start static views
+	        mvc.Components.getInstance("searchTopTenUserAccounts-Example").startSearch();
+	        
+	 
+	        // Views
+
+	        var tableTopTenUserAccounts-Example = new TableElement({
+	            "id": "tableTopTenUserAccounts-Example",
+	            "managerid": "searchTopTenUserAccounts-Example",
+	            "fields": "access_date,access_count,user_id,cust_id,emp_name,emp_job_title,emp_hr_dept,cust_name",
+	            "pageSize": "15",
+	            "drilldown": "row",
+	            "drilldownRedirect": "false",
+	            "link.inspectSearch.visible": false,
+	            "link.openSearch.visible": false,
+	            "el": $('#tableTopTenUserAccounts-Example')
+	        }, {tokens: true}).render();
+
+
+	        // Event Handlers
+
+	        {# Start a search based on a chart click - Example #}
+                /* Note: This chart event handler is not represented
+		   in the HTML code above. It is merely to show
+                   how to handle button clicks within a chart.
+		*/
+	        chartTopEmployee.on("click:chart", function(e) {
+	            e.preventDefault();
+	            tokens.set({"selUserID": e.value});
+	            tokens.set({"selTriageUserID": e.value});
+	            $("#buttonSearch").click();
+	        });
+
+
+		{# Redirect on click - Example #}
+
+	        TopTenUserAccounts-Example.on("click", function(e) {
+	            e.preventDefault();
+	            var earlyTime = tokens.get("earlyTime");
+	            var lateTime = tokens.get("lateTime");
+                    var selApp = tokens.get("selApp");
+	            redirector({'selUserID': e.data['row.user_id'], 'selCustID': e.data['row.cust_id'], 'selApp': selApp, 'earlyTime': earlyTime, 'lateTime': lateTime}, 'lookup');
+	        });
+
+
+		});
+    });
+</script>
+{% endblock js %}
+

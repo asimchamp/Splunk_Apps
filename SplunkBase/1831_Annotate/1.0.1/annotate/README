@@ -1,0 +1,64 @@
+Author: Matthew Wong | therealmatt.com | therealmattwong@gmail.com
+Release: 1.0
+
+### Description
+
+Annotate utilizes workflow actions to provide an easy way to remember and share events. Annotating an event associates a short note with the event, while flagging an event simply adds a searchable field value to it. Annotating adds a new annotate field to an event and sets a custom value or note as the value. Flagging an event simply sets the annotate field as 'flag'. 
+
+
+## ---_Important_---
+
+When performing an annotation, you __MUST__ wait for the search job to finish. Or else, Annotate cannot access the search ID to find the event. 
+
+
+### How to annotate events
+
+1. Perform a Splunk search using any application
+2. In the search string, add:   
+        _| eval annotate="YOUR NOTE"_ 
+	- What is typed inside the quotes will be added as the annotation to the event
+    - This will render the same search output, but allow us to add a custom field value
+3. Open an event, and find the Event Actions 
+	- Click "\*Annotate: " to annotate a single event
+	- Click "\*Annotate All: " to annotate all events found in that search job
+
+
+### How to flag events
+	
+1. Perform a Splunk search using any application
+2. Open an event, and find the Event Actions 
+    - Click "\*Flag: " to flag a single event
+	- Click "\*Flag All: " to flag all events found in that search job
+
+
+### View annotated events
+  
+- All
+	* Shows all the events that are annotated or flagged  
+- Annotations 
+    * By default shows all annotated events
+	* Allows you to search for annotated events
+	* For multi-worded annotations, you can search subsets of the annotation
+- Flags
+	* Shows all flagged events  
+- Search
+    * Just normal Splunk searching
+	
+
+### Removing annotations
+
+1. Navigate to splunk/etc/apps/annotate/lookups
+2. Open the file ticket_correlation.csv (text editor works just fine)
+3. Find the event(s) you want to delete, and remove the row(s)
+
+
+### Customizations
+
+- You can remove/disable workflow actions from Settings->Fields->Workflow Actions. If you don't think you will ever need an action, just disable it. 
+
+- The dashboards have been left in XML, which means you can still edit them using Splunk's Dashboard Editor. You can add panels and inputs to any of the dashboards. 
+
+
+### Contact
+
+Email: mtthwwng@gmail.com

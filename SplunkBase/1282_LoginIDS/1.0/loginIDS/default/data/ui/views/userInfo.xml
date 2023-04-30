@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>User info</label>
+  
+  <fieldset>
+    <input type="text" token="username">
+      <label>Enter username:</label>
+      <default>no user selected</default>
+    </input>
+    
+    <input type="dropdown" token="service">
+      <label>Filter service:</label>
+      <choice value="*">all</choice>
+      <populatingSearch fieldForValue="Service" fieldForLabel="Service">
+        <![CDATA[index="loginids" | stats count by Service]]>
+      </populatingSearch>
+    </input>
+    
+    <!--
+    <input type="time">
+      <default>All time</default>
+    </input>
+    -->
+    
+  </fieldset>
+  
+  <row>
+    <table>
+      <title>Alert history:</title>
+      <searchTemplate>
+        index="loginids" sourcetype="loginids_alerts" Loginname=$username$ Service=$service$
+         | table Timestamp, Service, Alert_Name, Source, Destination, Alert_Id
+      </searchTemplate>
+      <option name="count">5</option>
+    </table>
+
+  </row>
+  <row>
+    <table>
+      <title>Recorded connections:</title>
+      <searchTemplate>
+        index="loginids" sourcetype="loginids_longtimelog" Service=$service$ 
+         [ search index="loginids" sourcetype="loginids_alerts" Loginname=$username$
+           | top limit=1 User_Id | fields + User_Id
+         ] | table Source, Destination
+      </searchTemplate>
+      <option name="count">20</option>
+    </table>
+    
+    <chart>
+      <title>Timing details:</title>
+      <searchTemplate>
+        index="loginids" sourcetype="loginids_accesstimedetails"
+         [search index="loginids" sourcetype="loginids_longtimelog" Service=$service$ 
+          [ search index="loginids" sourcetype="loginids_alerts" Loginname=$username$
+            | top limit=1 User_Id | fields + User_Id
+          ] | fields + Longtime_Id
+         ] | table Day, Hour   
+      </searchTemplate>
+      <option name="charting.chart">scatter</option>
+      <option name="charting.axisTitleX.text">Day</option>
+      <option name="charting.axisTitleY.text">Hour</option>
+      <option name="charting.axisX.minimumNumber">1</option>
+      <option name="charting.axisX.maximumNumber">7</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.axisY.maximumNumber">24</option>
+    </chart>
+   
+  </row>
+  
+  
+</form>

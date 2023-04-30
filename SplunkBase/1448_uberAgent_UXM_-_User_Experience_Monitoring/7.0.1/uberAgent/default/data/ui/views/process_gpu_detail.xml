@@ -1,0 +1,375 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, process_gpu_detail.js" stylesheet="main.css">
+
+   <label>Process GPU</label>
+   <description>This dashboard displays detailed information about GPU usage per application or process.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Process_ProcessDetail</default>
+      </input>
+   </fieldset>
+
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <input type="dropdown" token="Panel11GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <default>$Tokenlink_Panel11$</default>
+            <label>Group by:</label>
+            <change>
+            <condition value="AppName">
+               <set token="Panel11GroupByDisplay">$label$</set>
+               <set token="Panel11Splitcol">
+                     splitcol
+                        AppName
+               </set>
+            </condition>
+            <condition value="ProcName">
+               <set token="Panel11GroupByDisplay">$label$</set>
+               <set token="Panel11Splitcol">
+                     splitcol
+                        ProcName
+               </set>
+            </condition>
+            </change>
+         </input>
+         <chart id="Chart_Panel11">
+         <title>GPU compute usage per $ModeLower$ over time</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                       avg(ProcGpuComputePercent) as "avg(ProcGpuComputePercent)"
+                    splitrow
+                       _time
+                       period $PivotPeriodAutoSolo$
+                    $Panel11Splitcol$
+                    $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">Avg. GPU compute (%)</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+         <chart id="Chart_Panel12">
+         <title>GPU memory usage per $ModeLower$ over time</title>
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                       avg(ProcGpuMemMB) as "avg(ProcGpuMemMB)"
+                    splitrow
+                       _time
+                       period $PivotPeriodAutoSolo$
+                    $Panel11Splitcol$
+                    $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">Avg. GPU memory (MB)</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>GPU compute usage per $ModeLower$ (top 10)</title>
+         <input type="dropdown" token="Panel21GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <default>$Tokenlink_Panel21$</default>
+            <label>Group by:</label>
+            <change>
+            <condition value="AppName">
+               <set token="Panel21GroupByDisplay">$label$</set>
+               <set token="Panel21Splitrow">
+                     splitrow
+                        AppName
+               </set>
+            </condition>
+            <condition value="ProcName">
+               <set token="Panel21GroupByDisplay">$label$</set>
+               <set token="Panel21Splitrow">
+                     splitrow
+                        ProcName
+               </set>
+            </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel21Function1" id="Input_Panel21Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel21">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     $Panel21Function1$(ProcGpuComputePercent) as "$Panel21Function1$(ProcGpuComputePercent)"
+                     $Panel21Splitrow$
+                     $SearchFilter$
+                     filter ProcGpuComputePercent is "*"
+                  | sort limit=10 - "$Panel21Function1$(ProcGpuComputePercent)"
+                  | rename $Panel21GroupBy$ as $Panel21GroupByDisplay$
+                  | fields
+                     $Panel21GroupByDisplay$
+                     "$Panel21Function1$(ProcGpuComputePercent)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>            
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>GPU memory usage per $ModeLower$ (top 10)</title>
+         <input type="dropdown" token="Panel22GroupBy" searchWhenChanged="true">
+            <choice value="AppName">Application</choice>
+            <choice value="ProcName">Process</choice>
+            <default>$Tokenlink_Panel22$</default>
+            <label>Group by:</label>
+            <change>
+            <condition value="AppName">
+               <set token="Panel22GroupByDisplay">$label$</set>
+               <set token="Panel22Splitrow">
+                     splitrow
+                        AppName
+               </set>
+            </condition>
+            <condition value="ProcName">
+               <set token="Panel22GroupByDisplay">$label$</set>
+               <set token="Panel22Splitrow">
+                     splitrow
+                        ProcName
+               </set>
+            </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel22Function1" id="Input_Panel22Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel22">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     $Panel22Function1$(ProcGpuMemMB) as "$Panel22Function1$(ProcGpuMemMB)"
+                     $Panel22Splitrow$
+                     $SearchFilter$
+                     filter ProcGpuComputePercent is "*"
+                  | sort limit=10 - "$Panel22Function1$(ProcGpuMemMB)"
+                  | rename $Panel22GroupBy$ as $Panel22GroupByDisplay$               
+                  | fields
+                     $Panel22GroupByDisplay$
+                     "$Panel22Function1$(ProcGpuMemMB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>            
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <input type="dropdown" token="Panel31Function1" id="Input_Panel31Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel31Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel31Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel31Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel31Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel31Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel31Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel31Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table id="Table_Panel31">
+            <search id="Search_TablePanel31">
+               <query>
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy31">$click.value$</set>
+            </drilldown>
+         </table>
+
+      <html src="process_gpu_detail_explanation.html">
+      </html>
+      </panel>
+   </row>
+   
+   <!-- Row 4 -->
+   <row depends="$DrilldownFilterBy31$">
+      <!-- Column 1 -->
+      <panel>
+         <title>GPU compute usage over time per engine for: $DrilldownFilterBy31$</title>
+         <chart id="Chart_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     $Panel31Function1$(ProcGpuComputePercent) as ProcGpuComputePercentRawValue
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     splitcol
+                        ProcGpuEngineMostUsedDisplayName
+                     filter $Tokenlink_Panel41$ is $DrilldownFilterBy31|s$
+                  | eval "$Panel31Function1$(ProcGpuComputePercent)" = round(ProcGpuComputePercentRawValue, 1)
+                  | fields - ProcGpuComputePercentRawValue
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>   
+      <!-- Column 2 -->
+      <panel>
+         <title>GPU memory usage over time for: $DrilldownFilterBy31$</title>
+         <chart id="Chart_Panel42">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     $Panel31Function1$(ProcGpuMemMB) as ProcGpuMemMBRawValue
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     filter $Tokenlink_Panel41$ is $DrilldownFilterBy31|s$
+                  | eval "$Panel31Function1$(ProcGpuMemMB)" = round(ProcGpuMemMBRawValue, 1)
+                  | fields - ProcGpuMemMBRawValue
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+</form>

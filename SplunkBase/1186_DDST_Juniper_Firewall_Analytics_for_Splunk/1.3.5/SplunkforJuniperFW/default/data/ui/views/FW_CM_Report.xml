@@ -1,0 +1,36 @@
+<view template="dashboard.html">
+  <label>Firewall CM Report</label>
+  <module name="AccountBar" layoutPanel="navigationHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TitleBar" layoutPanel="navigationHeader">
+    <param name="showActionsMenu">False</param>
+  </module>
+  <module name="TimeRangePicker" layoutPanel="panel_row2_col1" group="Change Management Report">
+    <param name="searchWhenChanged">True</param>
+    <param name="selected">Last 30 days</param>
+    <module name="HiddenSavedSearch" autoRun="True">
+      <param name="useHistory">false</param>
+      <param name="savedSearch">JuniperFW Change Report</param>
+      <module name="JobProgressIndicator"></module>
+      <module name="Paginator">
+        <param name="count">20</param>
+        <param name="maxPages">15</param>
+        <param name="entityName">results</param>
+        <module name="SimpleResultsTable">
+          <param name="drilldown">row</param>
+          <param name="entityName">results</param>
+          <module name="ConvertToDrilldownSearch">
+            <module name="ViewRedirector">
+              <param name="viewTarget">flashtimeline</param>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+</view>

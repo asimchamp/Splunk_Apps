@@ -1,0 +1,18 @@
+<setup>
+<block title="Add Nexus 9k Switch Credentials" endpoint="admin/cisco_Nexus_9k_server_setup" entity="cisco_Nexus_9k_server_setup_settings">
+  <input field="cisco_Nexus_9k_host">
+    <label>IP Address</label>
+    <type>text</type>
+  </input>
+  <text>Note: Provide valid IP Address without http or https</text>
+  <input field="cisco_Nexus_9k_username">
+    <label>Username</label>
+    <type>text</type>
+  </input>
+  <input field="password">
+    <label>Password</label>
+    <type>password</type>
+  </input>
+  <text> Note: To change the Credentials for switch which is already provided, first remove the entry from SPLUNK_HOME/etc/apps/cisco-app-Nexus-9k/local/passwords.conf and restart Splunk.</text>
+</block>
+</setup>

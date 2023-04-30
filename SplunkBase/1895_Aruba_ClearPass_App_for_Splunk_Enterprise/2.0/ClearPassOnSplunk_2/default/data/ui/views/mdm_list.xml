@@ -1,0 +1,47 @@
+<form>
+  <label>MDM List</label>
+
+  <description>
+	MDM List by Ownership
+  </description>
+
+  <fieldset autoRun="True">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+   <input type="dropdown" token="ownership">
+      <label>Ownership</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <choice value="Corporate">Corporate</choice>
+      <choice value="Employee">Employee</choice>
+    </input>
+  </fieldset>
+
+
+  <row>
+    <single>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known |dedup macAddress |stats count </searchString>
+      <option name="underLabel">MDM Records</option>
+    </single>
+    <single>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=Corporate |dedup macAddress |stats count </searchString>
+      <option name="underLabel">Corporate Devices</option>
+    </single>
+    <single>
+      <searchString>sourcetype=Aruba:CPPM:MDM  |where Ownership!=Corporate |dedup macAddress |stats count </searchString>
+      <option name="underLabel">Non-corporate Devices</option>
+    </single>
+  </row>
+
+  <row>
+    <table>
+      <searchString>sourcetype=Aruba:CPPM:MDM  status=known Ownership=$ownership$ |dedup macAddress |table MDM_Identifier Ownership Owner IMEI Phone_Number UDID macAddress Last_Check_In MDM_Enabled Manufacturer Model OS_Version Compromised Encryption_Enabled |sort Owner  </searchString>
+      <title>MDM Devices</title>
+    </table>
+  </row>
+
+</form>

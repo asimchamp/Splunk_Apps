@@ -1,0 +1,218 @@
+<form theme="dark">
+  <label>LDAP overview</label>
+  <description>Modify the the included macro `myLDAP` to match your environment to make this dashboard work.</description>
+  <search id="LDAP_base">
+    <query>
+      `myLDAP` | stats values(*) AS * by _time server
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search id="LDAP_rest">
+    <query>
+      | rest /servicesNS/-/-/data/inputs/myLDAP/ | stats count by title server disabled usessl password port response_test debug
+    </query>
+  </search>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Select time range:</label>
+      <default>
+        <earliest>-4h@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>LDAP inputs enabled</title>
+      <single>
+        <search base="LDAP_rest">
+          <query>| stats count sum(eval(if(disabled="0", 1, 0))) AS c_disabled by title 
+| eval bad=count-c_disabled 
+| streamstats count AS total 
+| eval count-{total}=bad, text="" 
+| filldown count-* 
+| foreach count-* 
+    [ eval text=if('&lt;&lt;FIELD&gt;&gt;'=="1", 'text'. " | 😱 | " , 'text'. " | 👍 | ")] 
+| reverse 
+| head 1 
+| table text</query>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.size">medium</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel>
+      <title>LDAPS</title>
+      <single>
+        <search base="LDAP_rest">
+          <query>| stats count sum(eval(if(usessl="1", 1, 0))) AS c_ssl by title 
+| eval bad=count-c_ssl 
+| streamstats count AS total 
+| eval count-{total}=bad, text="" 
+| filldown count-* 
+| foreach count-* 
+    [ eval text=if('&lt;&lt;FIELD&gt;&gt;'=="1", 'text'. " | 😱 | " , 'text'. " | 👍 | ")] 
+| reverse | head 1 | table text</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>debug disabled</title>
+      <single>
+        <search base="LDAP_rest">
+          <query>| stats count sum(eval(if(debug!="1", 1, 0))) AS c by title 
+| eval bad=count-c 
+| streamstats count AS total 
+| eval count-{total}=bad, text="" 
+| filldown count-* 
+| foreach count-* 
+    [ eval text=if('&lt;&lt;FIELD&gt;&gt;'=="1", 'text'. " | 😱 | " , 'text'. " | 👍 | ")] 
+| reverse | head 1 | table text</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>authenticated</title>
+      <single>
+        <search base="LDAP_rest">
+          <query>| stats count sum(eval(if(password!="0", 1, 0))) AS c_password by title 
+| eval bad=count-c_password 
+| streamstats count AS total 
+| eval count-{total}=bad, text="" 
+| filldown count-* 
+| foreach count-* 
+    [ eval text=if('&lt;&lt;FIELD&gt;&gt;'=="1", 'text'. " | 😱 | " , 'text'. " | 👍 | ")] 
+| reverse | head 1 | table text</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>index results</title>
+      <single>
+        <search base="LDAP_rest">
+          <query>| stats count sum(eval(if(response_test="1", 1, 0))) AS c by title 
+| eval bad=count-c 
+| streamstats count AS total 
+| eval count-{total}=bad, text="" 
+| filldown count-* 
+| foreach count-* 
+    [ eval text=if('&lt;&lt;FIELD&gt;&gt;'=="1", 'text'. " | 😱 | " , 'text'. " | 👍 | ")] 
+| reverse | head 1 | table text</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Average bind times in ms</title>
+      <single>
+        <search base="LDAP_base">
+          <query>
+            | timechart span=3min avg(ldap_bind) AS avg_bind by server
+          </query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">server</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Average search times in ms</title>
+      <single>
+        <search base="LDAP_base">
+          <query>
+            | timechart span=3min avg(ldap_search) AS avg_search  by server
+          </query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">server</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Average search times in ms</title>
+      <single>
+        <search base="LDAP_base">
+          <query>
+            | timechart span=3min avg(ldap_search) AS avg_search  by server
+          </query>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">server</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+</form>

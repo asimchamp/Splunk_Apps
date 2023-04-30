@@ -1,0 +1,19 @@
+<!-- ammap script-->
+  <script type="text/javascript" src="/static/app/beeware/ammap/swfobject.js"></script>
+	<div id="flashcontent3">
+		<strong>If you see this message you most likley need to adjust your HTML file in this view or you are trying to view the HTML directly instead of in a Splunk view module.</strong>
+	</div>
+
+	<script type="text/javascript">
+		// <![CDATA[		
+		var so = new SWFObject("/static/app/beeware/ammap/ammap.swf", "ammap", "100%", "350", "8", "#FFFFFF");
+		so.addVariable("path", "/static/app/beeware/ammap/");
+		so.addVariable("settings_file", escape("/static/app/beeware/ammap/settings.xml"));                  // you can set two or more different settings files here (separated by commas)
+		so.addVariable("data_file", escape("/static/app/beeware/xml_out/24h_threat_data.xml"));		
+		so.addVariable("preloader_color", "#999999");
+		so.addParam('wmode', 'transparent');
+		so.write("flashcontent3");
+
+		// ]]>
+	</script>
+<!-- end of ammap script -->

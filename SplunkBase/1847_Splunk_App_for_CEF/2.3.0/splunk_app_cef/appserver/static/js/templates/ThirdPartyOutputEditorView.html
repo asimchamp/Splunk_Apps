@@ -1,0 +1,210 @@
+<div id="download-dialog"></div>
+
+<div id="step-control-wizard"></div>
+
+
+<div class="warning-message-container">
+	<div id="warning-message" class="hide alert alert-error">
+		<i class="icon-alert"></i><span id="warning-message-text"></span>
+	</div>
+</div>
+
+<div style="overflow: hidden;" id="data_source_step" class="wizard-content">
+    <div class="hide-if-no-datamodels">
+        <h2>Select Data</h2>
+        <div class="help-text">Select the data model from which to retrieve the data. If necessary, <a href="../../manager/search/data_model_manager">define a data model</a> for the data you want to export. <a href="../../help?location=%5Bsplunk_app_cef:2.1.0%5DDefineDataModel" target="_blank" title="Splunk help">Learn more<i class="icon-external"></i></a></div>
+        
+        <div class="input input-dropdown" style="width:50%;" id="models-dropdown">
+            <label>Data Model</label>
+        </div>
+                    
+        <div class="input input-dropdown" style="width:50%;" id="objects-dropdown">
+            <label>Dataset</label>
+        </div>
+    </div>
+    <div id="no-datamodels-warning" style="display: none">
+        <div class="alert alert-warning">
+            <i class="icon-alert"></i>No data-models exist. First create or install a data-model in order to export data into CEF format.
+        </div>
+    </div>
+</div>
+
+<div class="hide wizard-content" style="overflow: visible;" id="field_mapping_step">
+    <h2>Map Fields</h2>
+    <div class="help-text">Identify which fields map to which attributes of the data model. Unmapped fields are excluded from the output.</div>
+    
+    <div class="info-panel">
+    	<strong>Selected Data Model:</strong><span class="selected-data-model">data model</span>
+    	<strong>Selected Dataset:</strong><span class="selected-dataset">dataset</span>
+    </div>
+    
+    <div id="field_mappings_select_data_model_first">
+        <i class="icon-info-circle icon-large"></i>Select data model and dataset before mapping fields
+    </div>
+    
+	<div class="fields-missing-warning-message-container">
+	    <div class="fields-missing-warning-message hide alert alert-error">
+	        <i class="icon-alert"></i><span class="missing-fields-message-text"></span>
+	    </div>
+	</div>
+    
+	<div>
+		<table class="hide table table-striped table-hover table-chrome" id="field_mappings">
+		    <thead>
+		        <tr>
+		            <th>
+		                Data Model Attribute
+		            </th>
+		            <th>
+                        Output Field (Common Event Format)
+                    </th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		    </tbody>
+		</table>
+	</div>
+</div>
+
+<div class="hide wizard-content" style="overflow: visible;" id="field_creation_step">
+    <h2>Create Static Fields</h2>
+    <div class="help-text">Define static values for fields.</div>
+    
+    <div class="info-panel">
+    	<strong>Selected Data Model:</strong><span class="selected-data-model">data model</span>
+    	<strong>Selected Dataset:</strong><span class="selected-dataset">dataset</span>
+    </div>
+    
+    <div class="fields-missing-warning-message-container">
+        <div class="fields-missing-warning-message hide alert alert-error">
+            <i class="icon-alert"></i><span class="missing-fields-message-text"></span>
+        </div>
+    </div>
+    
+    <div class="no_static_fields">No static fields exist yet. <a class="new_static_field" href="#">Add static field</a> </div>
+    
+    <div>
+        <table class="hide table table-striped table-hover table-chrome" id="static_field_mappings">
+            <thead>
+                <tr>
+                    <th>
+                        Field Value
+                    </th>
+                    <th>
+                        Output Field  (Common Event Format)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        
+        <div class="extra_options">
+            <a class="new_static_field" href="#"><i class="icon-plus"></i>Add static field</a>
+        </div>
+    </div>
+</div>
+
+<div class="hide wizard-content" style="overflow: hidden;" id="outputs_step">
+    <h2>Define Output Groups</h2>
+    <div class="help-text">Identify or create an output group to define where to send the data. Data is sent over TCP.</div>
+    
+    <div class="info-panel">
+    	<strong>Selected Data Model:</strong><span class="selected-data-model">data model</span>
+    	<strong>Selected Dataset:</strong><span class="selected-dataset">dataset</span>
+    </div>
+    
+    <div id="outputs_list">
+        <table class="hide table table-striped table-hover table-chrome" >
+            <thead>
+                <tr>
+                    <th colspan="2">
+                        Group Name
+                    </th>
+                    <th>
+                        Hosts
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+<div class="hide wizard-content" style="overflow: hidden;" id="finalize_step">
+    <h2>Save Search</h2>
+    <div class="help-text">Provide information about the search.</div>
+    
+    <div class="info-panel">
+    	<strong>Selected Data Model:</strong><span class="selected-data-model">data model</span>
+    	<strong>Selected Dataset:</strong><span class="selected-dataset">dataset</span>
+    </div>
+    
+    <div class="input input-text input-xlarge" style="width:50%;" id="search-name-input">
+        <label>Search Name</label>
+    </div>
+    
+    <div class="input" id="search-indexedrt-input">
+    	<label>Search Options</label>
+    </div>
+    
+    <label>Search Description (optional)</label>
+    <textarea class="input-xlarge" rows="5" id="search-description"></textarea>
+    
+    <div id="search-preview"></div>
+    
+</div>
+
+<div class="hide wizard-content" style="overflow: hidden;" id="download_step">
+    <h2>Finish and Export</h2>
+    <div class="help-text">Distribute updated outputs if necessary.</div>
+    
+    <div class="info-panel">
+    	<strong>Selected Data Model:</strong><span class="selected-data-model">data model</span>
+    	<strong>Selected Dataset:</strong><span class="selected-dataset">dataset</span>
+    </div>
+    
+    Successfully saved "<span id="saved-search-name"></span>".
+    
+    <div class="alert alert-warning output-group-changed">
+    	<i class="icon-alert"></i>
+    	<div><strong>Distribute Configurations Update</strong></div>
+    	You need to export and distribute your outputs because you made changes to the output groups.
+    	<div class="export-now-message">
+    		<a href="#" id="download-indexer-app" class="btn-primary btn download-indexer-app">Export outputs</a>
+    	</div>
+    </div>
+    
+    <div class="alert alert-info output-group-unchanged">
+    	<i class="icon-alert blue"></i>
+    	<div><strong>Distribute Configurations Update</strong></div>
+    	You do not need to export and distribute your outputs because you did not make any changes to the output groups.
+    	<div class="export-now-message">
+    		<a href="#" id="download-indexer-app" class="btn-primary btn download-indexer-app">Export outputs</a>
+    	</div>
+    </div>
+	
+	
+	<a href="#" class="return-to-list">Return to the list of CEF output searches.</a>
+    
+</div>
+
+<script type="text/x-template" id="search-description-template">
+    <% if( parses ){ %>
+    <div id="search-parse-status" class="alert alert-info hide search-preview">
+        <i class="icon-alert"></i>Search parses successfully
+    </div>
+    <% } else{ %>
+    <div id="search-parse-status" class="alert alert-error hide search-preview">
+        <i class="icon-alert"></i>Search does not parse
+    </div>
+    <% } %>
+
+    <pre class="search-preview"><%- search_string %></pre>
+
+    <div class="preview-link">
+    <a target="_blank" href="search?q=<%- encodeURIComponent(search_string) %>">Preview CEF events <i class="icon-external"></i></a>
+    </div>
+</script>

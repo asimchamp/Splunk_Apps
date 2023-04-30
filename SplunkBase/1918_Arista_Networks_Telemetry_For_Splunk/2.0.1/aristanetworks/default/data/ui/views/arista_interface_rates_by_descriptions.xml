@@ -1,0 +1,64 @@
+<form version="1.1">
+  <label>Single Interface Rates (by switchport description)</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="Switchport_Time" searchWhenChanged="true">
+      <default>All time</default>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="PortDescription" searchWhenChanged="true">
+      <label>Switch port description:</label>
+      <fieldForLabel>description</fieldForLabel>
+      <fieldForValue>description</fieldForValue>
+      <search>
+        <query>source="arista_switch_ifcounter" | stats count by description | dedup description | table description | sort description</query>
+        <earliest>$Switchport_Time.earliest$</earliest>
+        <latest>$Switchport_Time.latest$</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>source="arista_switch_ifcounter" $PortDescription$| chart max(inRate) AS inRate, max(outRate) AS outRate, max(inErrors) AS inErrors, max(outErrors) AS outErrors, max(inDiscards) AS inDiscards, max(outDiscards) as outDiscards over _time</query>
+          <earliest>$Switchport_Time.earliest$</earliest>
+          <latest>$Switchport_Time.latest$</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="height">350</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.chart.resultTruncationLimit">500000</option>
+        <option name="charting.data.count">50000</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Interface statistics for switchport $PortDescription$ over time</title>
+      <chart>
+        <search>
+          <query>source="arista_switch_ifcounter" $PortDescription$ | chart max(inRate) AS inRate, max(outRate) AS outRate, max(inErrors) AS inErrors, max(outErrors) AS outErrors, max(inDiscards) AS inDiscards, max(outDiscards) as outDiscards over _time</query>
+          <earliest>$Switchport_Time.earliest$</earliest>
+          <latest>$Switchport_Time.latest$</latest>
+        </search>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">1</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.overlayFields">in</option>
+        <option name="charting.axisTitleY.text">Throughput (bits/sec)</option>
+        <option name="height">550</option>
+        <option name="charting.axisTitleY2.text">Discards/Errors per second</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart.resultTruncationLimit">500000</option>
+        <option name="charting.data.count">50000</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+</form>

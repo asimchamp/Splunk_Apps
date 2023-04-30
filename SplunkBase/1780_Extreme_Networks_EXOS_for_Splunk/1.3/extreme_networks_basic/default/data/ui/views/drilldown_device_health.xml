@@ -1,0 +1,58 @@
+<form>
+  <label>Drilldown: Device Health</label>
+  <fieldset>
+    <!-- Define a simple dropdown form driven by a search -->
+    <input type="dropdown" token="level" searchWhenChanged="true">
+      <label>Select Log Severity</label>
+      <choice value="*">Any</choice>
+      <default>$form.errLevel$</default>
+      <populatingSearch fieldForValue="errLevel" fieldForLabel="errLevel">
+        <![CDATA[index=extnet sourcetype=log host=$form.host$ | rex "\s<(?<errLevel>\w+):(?<errLoc>\w+)\.(?<errType>\w+)>\s" | stats count by errLevel]]>
+      </populatingSearch>
+      <earliestTime>-60m@m</earliestTime>
+      <latestTime>now</latestTime>
+    </input>
+    <!-- Define a simple dropdown form driven by a search -->
+    <input type="dropdown" token="loc" searchWhenChanged="true">
+      <label>Select Module</label>
+      <choice value="*">Any</choice>
+      <default>$form.errLoc$</default>
+      <populatingSearch fieldForValue="errLoc" fieldForLabel="errLoc">
+        <![CDATA[index=extnet sourcetype=log host=$form.host$ | rex "\s<(?<errLevel>\w+):(?<errLoc>\w+)\.(?<errType>\w+)>\s" | search errLevel=$form.level$ | stats count by errLoc]]>
+      </populatingSearch>
+      <earliestTime>-60m@m</earliestTime>
+      <latestTime>now</latestTime>
+    </input>
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Logs by Type from $form.host$</title>
+      <searchString>index=extnet sourcetype=log host=$form.host$ | rex max_match=0 "\s&lt;(?&lt;errLevel&gt;\w+):(?&lt;errLoc&gt;\w+)\.(?&lt;errType&gt;\w+)&gt;\s"| search errLevel=$form.level$ errLoc=$form.loc$ | stats count by errType</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </chart>
+  </row>
+</form>

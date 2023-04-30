@@ -1,0 +1,74 @@
+<form script="multi_select_fw_name.js, multi_value_token_fw_name.js">
+  <label>Peer to Peer Traffic v1</label>
+  <description>Peer to Peer File sharing traffic</description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default/>
+    </input>
+  </fieldset>
+  <row grouping="2,1">
+    <html>
+      <label>Filter by Firewall Name:</label>
+      <div id="multi_value_input"/>
+    </html>
+    <table>
+      <title>Search of Firewalls</title>
+      <searchString>index=sonicwall | eval firewall_hostname=coalesce(firewall_hostname, host)| stats count by firewall_hostname | rename firewall_hostname as "Firewall", count as "Total Events" | fieldformat "Total Events"=tostring('Total Events',"commas")</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <chart>
+      <title>Top P2P Users</title>
+      <searchString>index=sonicwall TemplateID=257 OR tid=357 firewall_hostname="$multiTokenQuery$" app_cat_name=P2P | eval raw_total_octets=init_to_resp_octets+resp_to_init_octets | chart sum(init_to_resp_octets) as "Outbound", sum(resp_to_init_octets) as "Inbound", sum(raw_total_octets) as total_octets by src_ip | sort -total_octets | head 10</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="count">10</option>
+      <option name="list.drilldown">full</option>
+      <option name="list.wrap">1</option>
+      <option name="maxLines">5</option>
+      <option name="raw.drilldown">full</option>
+      <option name="rowNumbers">false</option>
+      <option name="table.drilldown">1</option>
+      <option name="table.wrap">1</option>
+      <option name="type">list</option>
+      <option name="wrap">true</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>P2P Users</title>
+      <searchString>index=sonicwall TemplateID=260  OR (TemplateID=257 OR tid=357 firewall_hostname="$multiTokenQuery$" app_cat_name=P2P) | eval raw_total_mb=(init_to_resp_octets+resp_to_init_octets)/1024/1024  | eval raw_out_mb=(init_to_resp_octets/1024/1024) | eval raw_in_mb=(resp_to_init_octets/1024/1024) | chart sum(raw_out_mb) as "Outbound", sum(raw_in_mb) as "Inbound", sum(raw_total_mb) as total_mb, values(app_name), last(user_id) by src_ip | sort -total_mb</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">15</option>
+    </table>
+  </row>
+</form>

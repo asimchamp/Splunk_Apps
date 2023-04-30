@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+{# Boilerplate for a Django Bindings template #}
+{% extends "splunkdj:base_with_app_bar.html" %}              
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}}{% endblock title %}
+{% block css %}
+<!-- Style sheets are loaded here -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/css/appensureStyle.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/css/standardAppsStyle.css" />
+
+<style>
+
+</style>
+
+{% endblock css %}
+{% block content %}
+<div class="overlay"></div> 
+<div class="dashboard-row dashboard-row1" id="popup">
+     <div class="dashboard-cell" style="width: 100%;">
+          <div>  <button type="button" id = "closeButton" onclick="functoCloseall()"></button></div>
+          <div  class="span31" id ="headingtxt"> Sign Up For AppEnsure License</div>
+          <div class="dashboard-panel" id="33mm">
+               <div class="dashboard-element">
+                    <div class="panel-body"  id ="txt12">
+                         <div  class="span3" id ="txt1"><b>Welcome! Manage and ensure the response time and throughput of every application you own in every location you run it </b>
+                              <br><br><ul><li><p>Discover, name and map every app in every location</p></li>
+                                   <li><p>Measure response time of every app hop by hop</p></li>
+                                   <li><p>Baseline response time thresholds and trigger alarms</p></li>
+                                   <li><p>Deliver root cause analysis with event correlation</p></li>
+                              </ul>
+                         </div>
+                    </div>
+               </div>
+          </div>
+          <div  class="buttonsdiv" >
+               <button type="button" id = "freemium_button" onclick="funcFreeRegistrationClosePopup()"></button>
+               <button type="button" id = "evaluation_button" onClick ="funcEvalRegistrationClosePopup()" ></button> </div>
+     </div>
+     <!--    <div  id ="closeButtondiv">
+             <button type="button" id = "signin" onclick="signin()">Sign In</button>
+         </div>-->
+</div>
+
+<div>
+
+     <div class="dashboard-cell" id="radioDiv"  style="width: 16%;">
+          <div class="dashboard-panel ">
+               <div class="dashboard-element">
+                    <div class="panel-head">
+                    </div>
+                    <div class="panel-body" id="Id_Radio" style="width: 100%;">
+                         {% radiogroup id="id_radio_group_Left" managerid="mID_leftListOfApps"  labelField="DisplayName" valueField="CAN" value="$app$"|token_safe default="*"%}
+                    </div>
+               </div>
+          </div>
+     </div>
+     <div class="dashboard-cell" style="width: 84%;" id="radioDiv3" >
+          <div class="dashboard-panel ">
+               <div class="dashboard-element">
+                    <div class="panel-body" id="RightDiv" >
+
+
+                         <!-- Tabs structure -->
+                         <div class="dashboard-row dashboard-row4" id="container" style="width: 99.3%;">
+                              <div class="tabs" id="dID_fourTabs" >
+                                   <ul class="classID_ul_FourTab-links">
+                                        <!--<li id="appname" style="min-width:12%; font-size:15px; margin-top: 0.8%; font-weight: bold"></a></li>-->                                
+                                        <li class="active" id="overview"><a href="#tab1">Overview</a></li>
+                                        <!--<li><a href="#tab2" id="appd">App Details</a></li>-->
+                                        <li><a href="#tab4" id="alarm">Alarms</a></li>
+                                        <li><a href="#tab3" id="userd">Users</a></li>
+                                        <li><a href="#tab5" id="topologyd">Topology</a></li>
+                                   </ul>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-row dashboard-row4" id="container1" style="width: 99.3%;float: right;margin-right: 11px;  ">
+
+                              <div class="tabs1" id="myscreen1">
+                                   <ul class="classID_ul_ThreeTab-links1">
+                                        <li class="classID_ThreeTabs" id="overview1"><a href="#tab1">Overview</a></li>
+                                        <li><a href="#tab4" id="alarm1">Alarms</a></li>
+                                        <li><a href="#tab4" id="users1">Users</a></li>
+                                   </ul>
+                              </div>
+
+                         </div>
+
+                         <div class="dashboard-row dashboard-row1" id="item">
+
+                              <div class="dashboard-cell" style="width:100%;margin-top:-14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" id="appbg">
+                                                  <table>
+                                                       <tr>
+                                                            <th><h3 id="allapps">All Applications</h3></th>
+                                                       </tr>
+                                                       <tr style="width: 100%">
+                                                            <th id="appname" style="width: 100%;position: static;margin-top:18px"></th>
+                                                            <th id="singledropdownvalue" style="width: 130%;"></th>
+
+                                                            <th style="width: 20%;position: static">
+                                                       <div  class="span2" id ="mlutidropdownval"> 
+                                                            <h4 style="font-size: 14px;padding-left: 45px;padding-bottom: 12px;">Select Host: </h4>
+                                                       </div>
+                                                       </th>
+
+                                                       <th id="newdrop" style="width: 60%;position: static;display: none">
+                                                       <div>{% dropdown id="id_dropUser_HostName"  value="$hostValue$"|token_safe  showClearButton=False selectFirstChoice=True  managerid="mID_dropUser_HostName" valueField="HN"|token_safe %} 
+                                                       </div></th>
+                                                       </tr>
+                                                  </table>
+                                             </div>
+
+                                             <div class="panel-body" id="time">
+
+                                                  <!--<div  class="span2" id ="txt"> </div> -->
+                                                  <!--{% timerange id="timerange" managerid="simplesearch1"  preset="All time"  earliest_time="0"|token_safe  latest_time="now"|token_safe %}-->
+              {% timerange id="timerange" managerid="simplesearch1" preset="Last 24 hours"   earliest_time="-24h@h"|token_safe latest_time="now"|token_safe %}
+                    
+                                                  
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <!--<span id="spanHostnewValue" class="splunk-tokensafe" data-value="$hostValue$"></span><br/>-->
+
+                         </div> 
+
+                         <!-- End of Tabs structure -->
+                         <!--Application Overview Info-->
+                         <div class="dashboard-row dashboard-row7" style="background-color:#fff;margin-top: 8px;padding-bottom: 10px;width: 99.1%" id="single_resTime_calls_users_alarm">
+                              <div class="dashboard-cell" style="width: 25%;margin-left: 0.8%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" >
+                                             </div>
+                                             <div class="panel-body" style="background-color: rgb(108,184,202);">
+                                                  {% single id="id_single_respTime" managerid="mID_single_respTime" beforeLabel="Response Time:" afterLabel="ms" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <div class="dashboard-cell" style="width: 25%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                             </div>
+                                             <div class="panel-body" style="background-color: rgb(178,228,138);">
+                                                  {% single id="id_single_allCalls" managerid="mID_single_allCalls" beforeLabel="Total Calls:"  %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+
+                              <div class="dashboard-cell" style="width: 25%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                             </div>
+                                             <div class="panel-body" style="background-color: rgb(149, 110, 150);">
+                                                  {% single id="id_single_users" managerid="mID_single_users" beforeLabel="Users:"  %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <div class="dashboard-cell" style="width: 24%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                             </div>
+                                             <div class="panel-body" style="background-color: rgb(252, 106, 106);">
+                                                  {% single id="id_single_Alarms" managerid="mID_single_Alarms" beforeLabel="Alarms:"  %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <!-- Chart and table  structure -->
+                         <div class="dashboard-row dashboard-row4" id="divID_chart_allapps">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Application Response Time</h3>
+                                             </div>
+                                             <div class="panel-body">
+
+                                                  <div> {% chart id="id_chart_allapps" managerid="mID_chart_allapps" type="column" drilldownRedirect=False%} </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <div class="dashboard-cell" style="width: 100%;" id="divID_table_allapps">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Application Details</h3>
+                                             </div>
+                                             <div class="panel-body" >
+
+                                                  <div> {% table id="id_table_allapps" managerid="mID_table_allapps" drilldownRedirect=False   %} </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                         </div>
+                         <!-- End of Chart and table  structure -->
+
+                         <!--Start: All Alarms Overview-->
+                         <div class="dashboard-row dashboard-row13" style="width: 100%;float: right;" id="alram_all_overview">
+
+
+                              <div class="dashboard-cell" style="width: 100%;margin-top:-14px" >
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" id="cpuhead">
+                                                  <h3 id="head">Alarm Count</h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% chart id="id_chart_Alarms_AllApps" managerid="mID_chart_Alarms_AllApps"  type="column" %}
+                                                  <!--{% table id="sID_table_Alarms_AllApps" managerid="mID_table_Alarms_AllApps"  fields=" HN,NID,sCPU " %}-->
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="dashboard-cell" style="width: 100%;margin-top:-14px" >
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" id="cpuhead">
+                                                  <h3 id="head">Diagnostic Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/diagnostic_30.png" id="diagnostic_img"></h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  <!--{% chart id="alarm_table" managerid="user_ses_latency Alarm_search_chart"  type="area" %}-->
+                                                  {% table id="id_table_Alarms_AllApps" managerid="mID_table_Alarms_AllApps"  fields=" Applications , \"Diagnostic Detail\" " %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                         </div>
+
+                         <!--start of All Users Overview-->
+                         <div class="dashboard-row dashboard-row13" style="width: 100%;float: right;" id="all_users_overview">
+
+                              <div class="dashboard-cell" style="width: 100%;margin-top:-14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" id="cpuhead">
+                                                  <h3 id="head"> User Count</h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% chart id="id_chart_Users_AllApps" managerid="mID_chart_Users_AllApps"  type="column" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="dashboard-cell" style="width: 100%;margin-top:-14px" >
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" id="cpuhead">
+                                                  <h3 id="usericon">User Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/user2_30.png" id="usercount_img"></h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% table id="id_table_Users_AllApps" managerid="mID_table_Users_AllApps"  fields=" Applications, UserIP , \"Response Time (ms)\",\"All Calls\",\"Open Calls\", \"Closed Calls\"   "%}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                         </div>
+                         <!--                    End of All Users Overview-->
+
+
+
+                         <!--when we click alarm to display below chart and table-->
+
+                         <div class="dashboard-row dashboard-row51" id="divID_chart_AllAlarms">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Application Alarm Count</h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  <!--{% chart id="chart_calls11" managerid="search_calls" type="line" %}-->
+                                                  {% chart id="id_chart_AllAlarms" managerid="mID_chart_AllAlarms" type="area" %}
+
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                         <!-- End of chart structure -->
+                         <!-- Start of Table structure -->
+                         <div class="dashboard-row dashboard-row51" id="divID_table_AllAlarms">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Application Diagnostic Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/diagnostic_30.png" id="diagnostic_img"></h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  <!--{% table id="table_searchresults51" managerid="mID_table_AllAlarms"  fields="\"Domain Name/IP\" Type Servers \"Response Time (ms)\" \"Availability (%)\" \"Throughput (KB/Min)\" Calls \"Slow Calls\"  \"Error Calls\" \"Very Slow Calls (%)\" "%}-->
+
+                                                  {% table id="id_table_AllAlarms" managerid="mID_table_AllAlarms" pageSize="10" fields=" \"Affected Servers\", \"Diagnostic Details\" " %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div><!-- End of Table structure -->
+                         <!--End of Alatms -when we click alarm to display above chart and table-->
+
+                         <!--Start users Chart --> 
+                         <div class="dashboard-row dashboard-row4" id="user_chart">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">User Response Time</h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% chart id="chart_user" managerid="mID_chart_user_AppRespTime" style="display:none; " type="column" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div><!--End users Chart --> 
+                         <div class="dashboard-row dashboard-row5" id="sID_table_userIPS">
+                              <div class="dashboard-cell" style="width:100%;margin-top: -11px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="usericon">User Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/user2_30.png" id="usercount_img"></h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% table id="id_table_userIPS" managerid="mID_table_userIPS" pageSize="10" fields=" UserIP,\"Response Time (ms)\", \"All Calls\",\"Open Calls\",\"Closed Calls\" " %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+
+                         <div class="dashboard-row dashboard-row6" id="dropdown_user">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -11px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+
+                                             <div class="panel-body">
+                                                  <div  class="span2" id ="txtuser"> <h4 style="font-size: 14px">Select User :</h4></div>
+                                                  <div>{% dropdown id="drop_users"  value="$user$"|token_safe showClearButton=False default="*" managerid="mID_table_userIPS" valueField="UserIP" %} </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div> 
+
+
+                         <div class="dashboard-row dashboard-row4" id="all_users">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -11px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">All User Calls</h3>
+                                             </div>
+                                             <div class="panel-body">
+
+                                                  {% chart id="chart_user_calls" managerid="user_app_calls" type="column" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         <div class="dashboard-row dashboard-row7" id="parti_user">
+                              <div class="dashboard-cell" style="width: 100%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">User Calls </h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% chart id="userchart" managerid="search_user" type="area" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+                         <!--End of User Info-->
+
+
+
+
+                         <!-- Application- Table structure -->
+                         <div class="dashboard-row dashboard-row2" id="tab_overview" style="margin-top: -20px">
+                              <div class="dashboard-cell" style="width: 100%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Application Details</h3>
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% table id="id_table_ListofIps" managerid="mID_table_ListofIps"  fields=" IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" " pageSize="10"%}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div><!-- End of Application- Table structure -->
+
+                         <!-- Application- Select Server Within Topology -->
+                         <div class="dashboard-row dashboard-row8" id="dropdownips">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -15px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+
+                                             <div class="panel-body">
+                                                  <div  class="span2" id ="txt123"> <h4 style="font-size: 14px">Select Server Within Topology&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h4></div>
+                                                  <div style="margin-top: 17px;">
+                                                       {% dropdown id="id_dropDown_ListofIps"  value="$IP$"|token_safe showClearButton=False default="*" managerid="mID_table_ListofIps" valueField="IP" %} </div>
+
+                                                  <!-- <div  class="span_button" id ="tierText" style="display:block; "></div> -->
+
+
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div> <!-- End of Application- Select Server Within Topology -->
+
+                         <!-- Application- chart structure -->
+                         <div class="dashboard-row dashboard-row3" id="over_all_restime">
+                              <div class="dashboard-cell" style="width: 100%;margin-top: -14px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head" id="head">
+                                                  <table>
+                                                       <th><h3 style="font-weight: 600;font-size: 14px">Response Time&nbsp :</h3></th><th><span id="tierText">All</span></th> 
+                                                       <th><img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/clusterIcon_26.png" id="web_img"></th>
+                                                       <th><img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/appIcon123_28.png" id="db_img"></th>
+                                                       <th><img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/appTier_28.png" id="app_img"></th>
+                                                  </table>
+
+                                             </div>
+                                             <div class="panel-body">
+
+                                                  {% chart id="chart_Res" managerid="overview_ResTime" type="area" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div><!-- End of Application- chart structure -->
+
+                         <!-- Start of Application- charts- throughput and calls structure -->
+                         <div class="dashboard-row dashboard-row4" id="over_thrput_calls" style="">
+
+                              <div class="dashboard-cell" style="width: 50%;margin-top: -15px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Throughput</h3>
+                                             </div>
+                                             <div class="panel-body">
+
+                                                  {% chart id="chart_Throughput" managerid="over_throughput" type="area" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <div class="dashboard-cell" style="width: 50%;margin-top: -15px">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <h3 id="head">Calls</h3>
+                                             </div>
+                                             <div class="panel-body">
+
+                                                  {% chart id="chart_calls" managerid="over_calls" type="area" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div> <!-- End of Application- charts- throughput and calls structure -->
+
+                         <div class="dashboard-row dashboard-row3" id="topology_div">
+                              <div class="dashboard-cell" style="width: 100%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+                                                  <!--<h3><center>Overview all Ip's Restime</center></h3>-->
+                                             </div>
+                                             <div class="panel-body">
+
+                                                  <h1></h1>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div><!-- End of Application- chart structure -->
+
+                         <div class="dashboard-row dashboard-row789" id="item789" style="display: none">
+                              <div class="dashboard-cell" style="width: 100%;">
+                                   <div class="dashboard-panel ">
+                                        <div class="dashboard-element">
+                                             <div class="panel-head">
+
+                                             </div>
+                                             <div class="panel-body">
+                                                  {% table id="id_table_TopologyID" managerid="mID_table_TopologyID" fields="id,AN,host" %}
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+
+
+
+                    </div><!-- end of right side Div1 --> 
+               </div><!-- end of right side Div2 --> 
+          </div><!-- end of right side Div3 --> 
+     </div><!-- end of right side Div4 --> 
+     <!--<br style="clear:both;"/>-->
+</div><!-- end of right side Div5 --> 
+
+{% endblock content %}
+
+{% block managers %}
+
+{% searchmanager
+autostart=false
+id="mID_chart_Alarms_AllApps"
+search="index=aealarms sourcetype=\"stdappalarms\" |dedup RC,id, CAN|sort -count | stats count(RC) as \"Alarm Count\" by CAN|rename CAN as \"Application\" |fields  \"Application\" , \"Alarm Count\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+{% searchmanager
+autostart=false
+id="mID_table_Users_AllApps"
+search="index=aeusers |dedup CAN, UserIP |stats sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls,values(UserIP) as Users,AVG(URT) as ResponseTime values(CAN) as Applications by UserIP |eval OpenCalls=if(OpenCalls<=0,0,OpenCalls )|rename OpenCalls as \"Open Calls\"|eval \"Response Time (ms)\" = round(ResponseTime,0)|rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" |rename Users as UserIP |fields Applications, UserIP , \"All Calls\",\"Response Time (ms)\",\"Open Calls\",\"Closed Calls\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+{% searchmanager
+autostart=false
+id="mID_chart_Users_AllApps"
+search="index=aeusers |dedup UserIP, CAN  | join id [ search index=aeappmetrics |dedup  id,CAN] |stats count as Users by CAN|rename CAN as Application | rename Users as \"User Count\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+
+{% searchmanager
+autostart=false
+id="mID_table_Alarms_AllApps"
+search="index=aealarms sourcetype=\"stdappalarms\"  |dedup RC,id, CAN|sort -count | stats values(DD) as \"Diagnostic Detail\" by CAN|rename CAN as Applications |fields Applications,\"Diagnostic Detail\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+<!-- left side list of applications search query -->
+{% searchmanager
+autostart=false
+id="mID_leftListOfApps"
+search="index=aeappmetrics |where AT=0 OR AT=10 | dedup  id,CAN |fields CAN,id"
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%} 
+
+<!--{% searchmanager
+autostart=false
+id="mID_leftListOfApps"
+search="index=aeappmetrics | dedup CAN | fields CAN"
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%} -->
+
+
+
+
+<!--Charts - throughput when IP is selected-->
+<!--{% searchmanager
+autostart=false
+id="over_throughput"
+search="index=aeapplist id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id] AT=0 OR AT=10 Ip=\"$IP$\"|timechart eval(avg(AC)) as \"Throughput (Calls/min)\" |eval \"Throughput (Calls/min)\"=round(('Throughput (Calls/min)'),0) "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="over_throughput"
+search="index=aeapplist CAN=\"$app$\" Ip=\"$IP$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN= selectedHostName AND Ip=selectedIP |timechart eval(avg(AC)) as \"Throughput (Calls/min)\" |eval \"Throughput (Calls/min)\"=round(('Throughput (Calls/min)'),2)"|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+
+
+
+<!--{% searchmanager
+autostart=false
+id="over_calls"
+search="index=aeapplist  id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id] AT=0 OR AT=10 Ip=\"$IP$\" |timechart eval(sum(AC)) as Calls |eval Calls=round((Calls),0) |fields _time, Calls  "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="over_calls"
+search="index=aeapplist  CAN=\"$app$\" Ip=\"$IP$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN= selectedHostName AND Ip=selectedIP |timechart eval(sum(AC)) as Calls |eval Calls=round((Calls),0) |fields _time, Calls  "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+<!--
+{% searchmanager
+autostart=false
+id="overview_ResTime"
+search="index=aeapplist id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id]  Ip=\"$IP$\"|timechart eval(avg(RT)) as ResponseTime |eval ResponseTime=round((ResponseTime),0) |rename ResponseTime as \"Response Time (ms)\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+
+{% searchmanager
+autostart=false
+id="overview_ResTime"
+search="index=aeapplist  CAN=\"$app$\" Ip=\"$IP$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN= selectedHostName AND Ip=selectedIP|timechart eval(avg(RT)) as ResponseTime |eval ResponseTime=round((ResponseTime),2) |rename ResponseTime as \"Response Time (ms)\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+<!--App- ResponseTime box-->
+{% searchmanager
+autostart=false
+id="mID_single_respTime"
+search="index =aeappmetrics CAN=\"$app$\" id=*[search index=aeapplist CAN=\"$app$\"  | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] | stats avg(RT) as RespTime | eval ResponseTime=round(RespTime,0) |fields ResponseTime "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+<!--App- Calls box-->
+{% searchmanager
+autostart=false
+id="mID_single_allCalls"
+search="index =aeappmetrics CAN=\"$app$\" id=*[search index=aeapplist CAN=\"$app$\"  | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] | stats sum(AC) as allcalls | eval Calls=round(allcalls,0) |fields Calls "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+<!-- App- Users box-->
+{% searchmanager
+autostart=false
+id="mID_single_users"
+search="index =aeusers CAN=\"$app$\" id=*[search index=aeapplist CAN=\"$app$\"  | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]|dedup UserIP |stats count(UserIP)"|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+<!-- App- Alerts box-->
+{% searchmanager
+autostart=false
+id="mID_single_Alarms"
+search="index =aealarms sourcetype=\"stdappalarms\" CAN=\"$app$\" id=*[search index=aeapplist CAN=\"$app$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]|dedup RC| stats count(RC) as AlarmsCount "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+{% searchmanager
+autostart=false
+id="search_user"
+search="index=aeusers UserIP= \"$user$\" id=*[search index=aeapplist  CAN=\"$app$\"  | eval HostName=\"$hostValue$\" | eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] | timechart sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls|rename OpenCalls as \"Open Calls\" |rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+<!--{% searchmanager
+autostart=false
+id="user_app_calls"
+search="index=aeusers id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id] | stats  sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls by UserIP|eval \"Response Time(ms)\" = round(ResponseTime,0)|rename OpenCalls as \"Open Calls\" |rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" |sort -\"All Calls\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="user_app_calls"
+search="index=aeusers id=*[search index=aeapplist  CAN=\"$app$\"  T=1  | eval HostName=\"$hostValue$\" | eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] | stats  sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls by UserIP|eval \"Response Time(ms)\" = round(ResponseTime,0)|rename OpenCalls as \"Open Calls\" |rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" |sort -\"All Calls\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+
+
+
+
+
+
+{% searchmanager
+autostart=false
+id="mID_table_userIPS"
+search="index=aeusers id=*[search index=aeapplist CAN=\"$app$\"  T=\"1\" |  eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]| stats avg(URT) as ResponseTime, values(UserIP) as IP, sum(AC) as \"All Calls\", sum(CC) as \"Closed Calls\", sum(OC) as \"Open Calls\" by UserIP |eval \"Response Time (ms)\" = round(ResponseTime,0) |rename IP as UserIP |fields UserIP , \"Response Time (ms)\", \"All Calls\",\"Closed Calls\",\"Open Calls\" |sort -\"Response Time (ms)\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+{% searchmanager
+autostart=false
+id="mID_chart_user_AppRespTime"
+search="index=aeusers id=*[search index=aeapplist  CAN=\"$app$\" T=\"1\"| eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]| stats avg(URT) as ResponseTime, values(UserIP) as \"User IP\" by UserIP   |eval \"Response Time (ms)\" = round(ResponseTime,0)|fields \"User IP\" , \"Response Time (ms)\"|sort -\"Response Time (ms)\"| head 50"|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+{% searchmanager
+autostart=false
+id="mID_chart_AllAlarms"
+search="index=aealarms  sourcetype=\"stdappalarms\" id=*[search index=aeapplist CAN=\"$app$\" |eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) |dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]| timechart count(RC) as AlarmsCount"|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+<!--{% searchmanager
+autostart=false
+id="mID_table_AllAlarms"
+search="index=aealarms sourcetype=\"stdappalarms\"  id=*[search index=aeapplist CAN=\"$app$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] |dedup RC |stats first(RC) as RootCause, values(DD) as \"Diagnostic Details\", values(AppID) as AppID,values(AS) as AffectedServers by RC|eval \"Affected Servers\" =if(AffectedServers <=0,\"--\",AffectedServers ) "|token_safe 
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="mID_table_AllAlarms"
+search="index=aealarms sourcetype=\"stdappalarms\"  id=*[search index=aeapplist CAN=\"$app$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] |stats values(HN) as \"Affected Servers\" by DD|rename DD as \"Diagnostic Details\" |fields \"Affected Servers\" \"Diagnostic Details\" "|token_safe 
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+{% searchmanager
+autostart=false
+id="list_agents"
+search="index=aeappmetrics |where AT=0 or AT=10 | dedup  id |fields AN,id"
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%} 
+
+
+<!--Charts - All Apps- ResponseTime Query  -->
+{% searchmanager
+autostart=false
+id="mID_chart_allapps"
+search="index=aeappmetrics | stats values(CAN) as Application, AVG(RT) as ResponseTime  by CAN |eval \"Response Time (ms)\"=round(ResponseTime,0)| fields Application, \"Response Time (ms)\" |sort -\"Response Time (ms)\" "
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+{% searchmanager
+autostart=false
+id="mID_table_allapps"
+search="index=aeappmetrics | stats values(CAN) as Applications, AVG(RT) as ResponseTime, AVG(AC) as Throughput, sum(AC) as Calls ,sum(FC) as \"Failed Calls\", sum(EC) as  \"Error Calls\", sum(SC) as \"Slow Calls\",  by CAN| eval \"Availability (%)\"=0 |eval \"Response Time (ms)\"=round(ResponseTime,0)|eval \"Throughput (Calls/min)\"=round(Throughput,0) | fields Applications,\"Response Time (ms)\",\"Throughput (Calls/min)\",Calls,\"Slow Calls\",\"Error Calls\" |sort -\"Response Time (ms)\" "
+cache=False 
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+<!--{% searchmanager
+autostart=false
+id="mID_table_ListofIps"
+search="index= aeapplist CAN=\"$app$\"  id=*[search index=aeapplist CAN=\"$app$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]|stats  avg(RT) as ResponseTime, sum(AC) as Calls, avg(AC) as Throughput,sum(SC) as \"Slow Calls\", sum(EC) as \"Error Calls\", values(T) as Type, values(Ip) as IP, values(SN) as Servers by Ip|eval Type=if(Type==1,\"Server_WEB\",if(Type==2,\"Server_APP\",if(Type==3,\"Server_DB\",if(Type==4,\"Server\",if(Type==5,\"Server_WEB\",\"--\")))))|eval \"Response Time (ms)\"=round((ResponseTime),0)|eval Servers=if(Servers==\" \",\"--\",Servers) |eval \"Throughput (Calls/min)\"=round((Throughput),0)|fields IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" | sort -\"Response Time (ms)\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="mID_table_ListofIps"
+search="index= aeapplist CAN=\"$app$\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) |where HN= selectedHostName AND Ip=selectedIP |stats  avg(RT) as ResponseTime, sum(AC) as Calls, avg(AC) as Throughput,sum(SC) as \"Slow Calls\", sum(EC) as \"Error Calls\", values(T) as Type, values(Ip) as IP, values(SN) as Servers by Ip|eval Type=if(Type==1,\"Server_WEB\",if(Type==2,\"Server_APP\",if(Type==3,\"Server_DB\",if(Type==4,\"Server\",if(Type==5,\"Server_WEB\",\"--\")))))|eval \"Response Time (ms)\"=round((ResponseTime),0)|eval Servers=if(Servers==\" \",\"--\",Servers) |eval \"Throughput (Calls/min)\"=round((Throughput),0)|fields IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" | sort -\"Response Time (ms)\" "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+
+
+
+
+
+
+<!--for topology-->
+<!--{% searchmanager
+autostart=false
+id="mID_table_TopologyID"
+search="index=aeappmetrics CAN=\"$app$\" |dedup id, AN|fields id,CAN,host "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="mID_table_TopologyID"
+search="index=aeappmetrics CAN=\"$app$\" id=*[search index=aeapplist CAN=\"$app$\"  | eval HostName=\"$hostValue$\" | eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) |where HN= selectedHostName AND Ip=selectedIP  | dedup id  |fields id]  |dedup id, AN|fields id,CAN,host "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+
+
+
+
+
+{% searchmanager
+autostart=false
+id="mID_chart_user_AppRespTime_test"
+search="index=aeusers AN=\"$app$\" | dedup UserIP  | fields UserIP  "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+<!--{% searchmanager
+autostart=false
+id="mID_dropUser_HostName"
+search="index=aeappmetrics CAN=\"$app$\" | dedup id | join id [search index=aeapplist CAN=\"$app$\" | dedup id] | eval HN=HN.\"/\".Ip | fields HN,T "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}-->
+
+{% searchmanager
+autostart=false
+id="mID_dropUser_HostName"
+search="index=aeappmetrics CAN=\"$app$\" | dedup id | join id [search index=aeapplist CAN=\"$app$\" T=1 | dedup id] | eval HN=HN.\"/\".Ip |dedup HN | fields HN,T "|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+
+
+{% searchmanager
+autostart=false
+id="mID_getappname"
+search="index=aeappmetrics  CAN=\"$app$\" |where AT=0 or AT=10 | dedup  id,CAN  |fields CAN"|token_safe
+cache=False
+earliest_time="-24h@h"
+latest_time="now"
+%}
+
+
+{% endblock managers %}
+
+{% block js %}
+
+<script>
+     var deps = [
+         "splunkjs/ready!",
+         "splunkjs/mvc/searchmanager"
+     ];
+     var count;
+     require(deps, function (mvc) {
+         var ccc;
+         // Load individual components
+         var SearchManager = require("splunkjs/mvc/searchmanager");
+         // Create the search manager
+         var mysearch = new SearchManager({
+             id: "search1",
+             app: "search",
+             cache: false,
+             search: " index=aeappmetrics OR index=aeremoteapp OR index=aeremotedesktop | dedup id | stats count(id) as id | fields id "
+         });
+         
+//         search: " index=aeappmetrics|dedup id |fields id "
+         mysearch.on('search:done', function (properties) {
+             // Print the search job properties
+             console.log("DONE!\nSearch job properties:", properties.content.eventCount);
+             count = properties.content.eventCount;
+//            count = 0;
+             if (count < 1) {
+//                localStorage.setItem("lastname", "false");
+                 $(".overlay").css({'position': 'absolute', 'top': '0', 'left': '0', 'right': '0', 'bottom': '0', 'width': '100%', 'height': '100%', 'z-index': '10', 'background-color': 'rgba(64,64,64,0.9)'});
+                 $(".overlay").show();
+                 initialPopup();
+             } else {
+//                localStorage.setItem("lastname", "true");
+                 $(".overlay").hide();
+             }
+         });
+     });
+</script> 
+
+<script>
+
+     var part_app = 0;
+     var overview = 0;
+     var all_apps = 0;
+     var app_apps_booleanVal = 0;
+     var count = 0;
+     var collection_data;
+     var sID_chart_user_AppRespTime_test;
+     var newdropdowndata;
+     var clickedAppName;
+     var hostNameDropdown;
+     var getappname;
+     var app_data;
+     var appval;
+     var id_selecetedApp_Tab_overview = 0;
+     require(["splunkjs/ready!", "splunkjs/mvc/chartview", "jquery", "splunkjs/mvc/radiogroupview"], function (mvc) {
+
+         all_apps = 1;
+         app_apps_booleanVal = 100;
+
+//        ****************************************Start : Create Search Instances****************************************************
+
+         var sID_leftListOfApps = mvc.Components.getInstance("mID_leftListOfApps");
+         var sID_radio_group_Left = mvc.Components.getInstance("id_radio_group_Left");
+         var search_dropAgents = mvc.Components.getInstance("list_agents");
+         var sID_table_allapps = mvc.Components.getInstance("mID_table_allapps");
+         var sID_chart_allapps = mvc.Components.getInstance("mID_chart_allapps");
+         var sID_table_AllAlarms = mvc.Components.getInstance("mID_table_AllAlarms");
+         var sID_chart_AllAlarms = mvc.Components.getInstance("mID_chart_AllAlarms");
+         var timerange1 = mvc.Components.getInstance("timerange");
+         var sID_chart_user_AppRespTime = mvc.Components.getInstance("mID_chart_user_AppRespTime");
+         var sID_table_userIPS = mvc.Components.getInstance("mID_table_userIPS");
+         var listofUsers = mvc.Components.getInstance("drop_users");
+         var allusers = mvc.Components.getInstance("user_app_calls");
+         var partuser = mvc.Components.getInstance("search_user");
+         var sID_table_TopologyID = mvc.Components.getInstance("mID_table_TopologyID");
+         var sID_dropUser_HostName = mvc.Components.getInstance("mID_dropUser_HostName");
+         var id_dropUser = mvc.Components.getInstance("id_dropUser_HostName");
+         var sID_single_respTime = mvc.Components.getInstance("mID_single_respTime");
+         var sID_single_allCalls = mvc.Components.getInstance("mID_single_allCalls");
+         var sID_single_users = mvc.Components.getInstance("mID_single_users");
+         var sID_single_Alarms = mvc.Components.getInstance("mID_single_Alarms");
+         var sID_table_ListofIps = mvc.Components.getInstance("mID_table_ListofIps");
+         var sID_dropDown_ListofIps = mvc.Components.getInstance("id_dropDown_ListofIps");
+         var overrestime = mvc.Components.getInstance("overview_ResTime");
+         var overthrput = mvc.Components.getInstance("over_throughput");
+         var overcalls = mvc.Components.getInstance("over_calls");
+         var sID_table_Alarms_AllApps = mvc.Components.getInstance("mID_table_Alarms_AllApps");
+         var sID_chart_Alarms_AllApps = mvc.Components.getInstance("mID_chart_Alarms_AllApps");
+         var sID_table_Users_AllApps = mvc.Components.getInstance("mID_table_Users_AllApps");
+         var sID_chart_Users_AllApps = mvc.Components.getInstance("mID_chart_Users_AllApps");
+         var sID_getappname = mvc.Components.getInstance("mID_getappname");
+         //       new dropdown code
+         newdropdowndata = sID_dropUser_HostName.data("preview", {count: 0, offset: 0});
+         getappname = sID_getappname.data("preview", {count: 0, offset: 0});
+
+//        *******************************************END  : Search Instances****************************************************
+
+
+//        ****************************************Start : Default Start Search ****************************************************
+         sID_leftListOfApps.search.set(timerange1.val());
+         sID_leftListOfApps.startSearch();
+         sID_table_allapps.search.set(timerange1.val())
+         sID_table_allapps.startSearch();
+         sID_chart_allapps.search.set(timerange1.val())
+         sID_chart_allapps.startSearch();
+//         sID_chart_user_AppRespTime.search.set(timerange1.val());
+//         sID_chart_user_AppRespTime.startSearch();
+
+//         ****************************************END : Default Search **********************************************************
+
+         /***************************************START :  tabs highlighed when clicked******************************************/
+         jQuery(document).ready(function () {
+
+             jQuery('.tabs .classID_ul_FourTab-links a').on('click', function (e) {
+                 var currentAttrValue = jQuery(this).attr('href');
+                 if (currentAttrValue != "#tab5") {
+                     // Show/Hide Tabs
+                     jQuery('.tabs ' + currentAttrValue).show().siblings().hide();
+                     // Change/remove current tab to active
+                     jQuery(this).parent('li').addClass('active').siblings().removeClass('active');
+                     e.preventDefault();
+                 }
+
+             });
+             jQuery('.tabs1 .classID_ul_ThreeTab-links1 a').on('click', function (e) {
+                 var currentAttrValue = jQuery(this).attr('href');
+                 // Show/Hide Tabs
+                 jQuery('.tabs1 ' + currentAttrValue).show().siblings().hide();
+                 // Change/remove current tab to active
+                 jQuery(this).parent('li').addClass('classID_ThreeTabs').siblings().removeClass('classID_ThreeTabs');
+                 e.preventDefault();
+             });
+
+         });// end of jquery
+
+         /***************************************END :  tabs highlighed when clicked******************************************/
+
+
+         /** -----------------START : If We Select All Applns [OR] Particular Appln to displaying logic below we have written.--- **/
+
+         sID_radio_group_Left.settings.set("choices", [
+             {value: "*", label: "All Applications"}
+         ]);
+
+
+         sID_radio_group_Left.on("change", function () {
+             part_app = 0;
+             all_apps = 1;
+             app_apps_booleanVal = 100;
+             console.log("standard Apps - clicked appname : " + $('input:radio:checked').next('label:first').html());
+             sID_table_TopologyID.search.set(timerange1.val());
+             sID_table_TopologyID.startSearch();
+             jQuery('#overview').addClass('active').siblings().removeClass('active');
+             jQuery('#overview1').addClass('classID_ThreeTabs').siblings().removeClass('classID_ThreeTabs');
+             if (sID_radio_group_Left.val() == "*") {
+                 $('#radio_groupId0').removeAttr('disabled');
+                 search_dropAgents.search.set(timerange1.val());
+                 search_dropAgents.startSearch();
+                 sID_table_allapps.search.set(timerange1.val());
+                 sID_table_allapps.startSearch();
+                 sID_chart_allapps.search.set(timerange1.val());
+                 sID_chart_allapps.startSearch();
+                 document.getElementById("divID_chart_allapps").style.display = "block";
+                 document.getElementById("divID_table_allapps").style.display = "block";
+                 document.getElementById("divID_table_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_AllAlarms").style.display = "none";
+                 document.getElementById("dID_fourTabs").style.display = "none";
+                 //            user tab info
+
+                 document.getElementById("user_chart").style.display = "none";
+                 document.getElementById("sID_table_userIPS").style.display = "none";
+                 document.getElementById("dropdown_user").style.display = "none";
+                 document.getElementById("all_users").style.display = "none";
+                 document.getElementById("parti_user").style.display = "none";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                 document.getElementById("tab_overview").style.display = "none";
+                 document.getElementById("dropdownips").style.display = "none";
+                 document.getElementById("over_all_restime").style.display = "none";
+                 document.getElementById("over_thrput_calls").style.display = "none";
+                 document.getElementById("topology_div").style.display = "none";
+                 document.getElementById("allapps").style.display = "block";
+                 document.getElementById("appname").style.display = "none";
+                 document.getElementById("newdrop").style.display = "none";
+                 document.getElementById("alram_all_overview").style.display = "none";
+                 document.getElementById("all_users_overview").style.display = "none";
+                 document.getElementById("myscreen1").style.display = "block";
+                 document.getElementById("mlutidropdownval").style.display = "none";
+                 document.getElementById("tierText").style.display = "none";
+                 document.getElementById("singledropdownvalue").style.display = "none";
+
+             } else {
+                  id_selecetedApp_Tab_overview = 1;
+                 sID_dropDown_ListofIps.val("*");
+                 listofUsers.val("*");
+                 // set the hostname for the dropdown to apply for correct selection when the left side on selection
+                 id_dropUser.val($('#hostNameDropdown').html());
+                 setDropdownVal();
+                 setDefaultDropdownVal();
+                 sID_dropUser_HostName.search.set(timerange1.val());
+                 sID_dropUser_HostName.startSearch();
+                 sID_getappname.search.set(timerange1.val());
+                 sID_getappname.startSearch();
+
+                 $(".choice:first-child").css("background", "white");
+                 part_app = 1;
+                 overview = 1;
+                 app_apps_booleanVal = 0;
+                 all_apps = 0;
+                 $("#appname").text(sID_radio_group_Left.val());
+                 sID_table_TopologyID.search.set(timerange1.val());
+                 sID_table_TopologyID.startSearch();
+//                 sID_table_AllAlarms.search.set(timerange1.val());
+//                 sID_table_AllAlarms.startSearch();
+                 sID_chart_AllAlarms.search.set(timerange1.val());
+                 sID_chart_AllAlarms.startSearch();
+                 overviewSearches();
+                 document.getElementById("divID_table_allapps").style.display = "none";
+                 document.getElementById("dID_fourTabs").style.display = "block";
+                 document.getElementById("divID_table_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_allapps").style.display = "none";
+                 //            user tab info
+                 document.getElementById("user_chart").style.display = "none";
+                 document.getElementById("sID_table_userIPS").style.display = "none";
+                 document.getElementById("dropdown_user").style.display = "none";
+                 document.getElementById("all_users").style.display = "none";
+                 document.getElementById("parti_user").style.display = "none";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "block";
+                 document.getElementById("tab_overview").style.display = "block";
+                 document.getElementById("dropdownips").style.display = "block";
+                 document.getElementById("over_all_restime").style.display = "block";
+                 document.getElementById("over_thrput_calls").style.display = "block";
+                 document.getElementById("allapps").style.display = "none";
+                 document.getElementById("appname").style.display = "block";
+                 document.getElementById("alram_all_overview").style.display = "none";
+                 document.getElementById("all_users_overview").style.display = "none";
+                 document.getElementById("myscreen1").style.display = "none";
+                 document.getElementById("tierText").style.display = "block";
+             }
+             $("#overview").click(function () {
+                  id_selecetedApp_Tab_overview = 1;
+                 sID_dropDown_ListofIps.val("*");
+                 listofUsers.val("*");
+
+//                   console.log("particular-overview");
+                 overview = 1;
+                 app_apps_booleanVal = 0;
+                 all_apps = 0;
+//                 sID_table_AllAlarms.search.set(timerange1.val());
+//                 sID_table_AllAlarms.startSearch();
+                 sID_chart_AllAlarms.search.set(timerange1.val());
+                 sID_chart_AllAlarms.startSearch();
+                 overviewSearches();
+                 document.getElementById("divID_table_allapps").style.display = "none";
+                 document.getElementById("dID_fourTabs").style.display = "block";
+                 document.getElementById("divID_table_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_allapps").style.display = "none";
+                 //            user tab info
+                 document.getElementById("user_chart").style.display = "none";
+                 document.getElementById("sID_table_userIPS").style.display = "none";
+                 document.getElementById("dropdown_user").style.display = "none";
+                 document.getElementById("all_users").style.display = "none";
+                 document.getElementById("parti_user").style.display = "none";
+                 document.getElementById("topology_div").style.display = "none";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "block";
+                 document.getElementById("tab_overview").style.display = "block";
+                 document.getElementById("dropdownips").style.display = "block";
+                 document.getElementById("over_all_restime").style.display = "block";
+                 document.getElementById("over_thrput_calls").style.display = "block";
+                 document.getElementById("allapps").style.display = "none";
+                 document.getElementById("appname").style.display = "block";
+                 document.getElementById("alram_all_overview").style.display = "none";
+                 document.getElementById("all_users_overview").style.display = "none";
+                 document.getElementById("tierText").style.display = "block";
+                 $(document).ready(function () {
+                     //  $('#Id_Radio').css({height: 1091 - 15});
+                 });
+             });
+             $("#userd").click(function () {
+                  id_selecetedApp_Tab_overview = 3;
+
+                 sID_dropDown_ListofIps.val("*");
+                 listofUsers.val("*");
+
+                 overview = 3;
+                 app_apps_booleanVal = 0;
+                 all_apps = 0;
+                 users_offsetHeight = document.getElementById('radioDiv3').offsetHeight;
+                 listofUsers.val("*");
+                   userSearches();
+//            allusers.startSearch();
+                 document.getElementById("divID_table_allapps").style.display = "none";
+                 document.getElementById("divID_table_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_AllAlarms").style.display = "none";
+                 document.getElementById("divID_chart_allapps").style.display = "none";
+                 document.getElementById("dID_fourTabs").style.display = "block";
+//            user tab info
+                 document.getElementById("user_chart").style.display = "block";
+                 document.getElementById("sID_table_userIPS").style.display = "block";
+                 document.getElementById("dropdown_user").style.display = "block";
+                 document.getElementById("all_users").style.display = "block";
+                 document.getElementById("parti_user").style.display = "none";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                 document.getElementById("tab_overview").style.display = "none";
+                 document.getElementById("dropdownips").style.display = "none";
+                 document.getElementById("over_all_restime").style.display = "none";
+                 document.getElementById("over_thrput_calls").style.display = "none";
+                 document.getElementById("topology_div").style.display = "none";
+                 document.getElementById("allapps").style.display = "none";
+                 document.getElementById("appname").style.display = "block";
+                 document.getElementById("alram_all_overview").style.display = "none";
+                 document.getElementById("all_users_overview").style.display = "none";
+                 document.getElementById("tierText").style.display = "block";
+                 $(document).ready(function () {
+                     // $('#Id_Radio').css({height: 1031 - 20});
+                 });
+             });
+             $("#alarm").click(function () {
+                  id_selecetedApp_Tab_overview = 2;
+
+                 sID_dropDown_ListofIps.val("*");
+                 listofUsers.val("*");
+
+                 overview = 2;
+                 app_apps_booleanVal = 0;
+                 all_apps = 0;
+                 alarms_offsetHeight = document.getElementById('radioDiv3').offsetHeight;
+                 //$('#Id_Radio').css({height: 632});
+                 console.log("right height" + "\t leftHeight " + alarms_offsetHeight);
+                 alarmSearches();
+                 document.getElementById("divID_table_allapps").style.display = "none";
+                 document.getElementById("dID_fourTabs").style.display = "block";
+                 document.getElementById("divID_table_AllAlarms").style.display = "block";
+                 document.getElementById("divID_chart_AllAlarms").style.display = "block";
+                 document.getElementById("divID_chart_allapps").style.display = "none";
+                //            user tab info
+
+                 document.getElementById("user_chart").style.display = "none";
+                 document.getElementById("sID_table_userIPS").style.display = "none";
+                 document.getElementById("dropdown_user").style.display = "none";
+                 document.getElementById("all_users").style.display = "none";
+                 document.getElementById("parti_user").style.display = "none";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                 document.getElementById("tab_overview").style.display = "none";
+                 document.getElementById("dropdownips").style.display = "none";
+                 document.getElementById("over_all_restime").style.display = "none";
+                 document.getElementById("over_thrput_calls").style.display = "none";
+                 document.getElementById("topology_div").style.display = "none";
+                 document.getElementById("allapps").style.display = "none";
+                 document.getElementById("appname").style.display = "block";
+                 document.getElementById("alram_all_overview").style.display = "none";
+                 document.getElementById("all_users_overview").style.display = "none";
+                 document.getElementById("tierText").style.display = "block";
+             });
+          
+         });
+         
+            $("#topologyd").click(function () {
+                 var idValue = $('#id_table_TopologyID tr td[data-cell-index="0"]').html(); // 
+                 var appNameValue = $('#id_table_TopologyID tr td[data-cell-index="1"]').html();
+                 var hostName = $('#id_table_TopologyID tr td[data-cell-index="2"]').html();
+                 var radioidValue = $('#id_radio_group_Left').html();
+//                 clickedAppName = $('input:radio:checked').next('label:first').html()
+                 console.log("standard Apps - clicked appname : " + $('input:radio:checked').next('label:first').html());
+                 var urlValue = "http://" + hostName.trim() + "/Apps/Topology/" + idValue.trim() + "/";
+                 
+//                var urlValue = "https://demo.appensure.com:25000/Apps/Topology/" + idValue.trim() + "/";
+                 var win = window.open(urlValue, '_blank');
+                 win.focus();
+             });
+
+
+         /** --------------   END : If We Select All Applns [OR] Particular Appln to displaying logic below we have written. --------------------  **/
+
+
+         /** --------Start : In All Applications, we have 3 tabs[overview Alarms Users],If we Click any tab, that tab related code below we have written.---------------- **/
+
+         $("#overview1").click(function () {
+             part_app = 0;
+             app_apps_booleanVal = 100;
+             search_dropAgents.search.set(timerange1.val());
+             search_dropAgents.startSearch();
+             sID_table_allapps.search.set(timerange1.val());
+             sID_table_allapps.startSearch();
+             sID_chart_allapps.search.set(timerange1.val());
+             sID_chart_allapps.startSearch();
+             document.getElementById("divID_table_allapps").style.display = "block";
+             document.getElementById("divID_table_AllAlarms").style.display = "none";
+             document.getElementById("divID_chart_AllAlarms").style.display = "none";
+             document.getElementById("divID_chart_allapps").style.display = "block";
+             document.getElementById("dID_fourTabs").style.display = "none";
+             //            user tab info
+             document.getElementById("user_chart").style.display = "none";
+             document.getElementById("sID_table_userIPS").style.display = "none";
+             document.getElementById("dropdown_user").style.display = "none";
+             document.getElementById("all_users").style.display = "none";
+             document.getElementById("parti_user").style.display = "none";
+             // App Over view
+             document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+             document.getElementById("tab_overview").style.display = "none";
+             document.getElementById("dropdownips").style.display = "none";
+             document.getElementById("over_all_restime").style.display = "none";
+             document.getElementById("over_thrput_calls").style.display = "none";
+             document.getElementById("topology_div").style.display = "none";
+             document.getElementById("allapps").style.display = "block";
+             document.getElementById("appname").style.display = "none";
+             document.getElementById("alram_all_overview").style.display = "none";
+             document.getElementById("all_users_overview").style.display = "none";
+             document.getElementById("tierText").style.display = "none";
+             document.getElementById("singledropdownvalue").style.display = "none";
+         });
+         $("#alarm1").click(function () {
+             part_app = 0;
+             app_apps_booleanVal = 2;
+             sID_table_Alarms_AllApps.search.set(timerange1.val());
+             sID_table_Alarms_AllApps.startSearch();
+             sID_chart_Alarms_AllApps.search.set(timerange1.val());
+             sID_chart_Alarms_AllApps.startSearch();
+             document.getElementById("alram_all_overview").style.display = "block";
+             document.getElementById("divID_table_allapps").style.display = "none";
+             document.getElementById("divID_table_AllAlarms").style.display = "none";
+             document.getElementById("divID_chart_AllAlarms").style.display = "none";
+             document.getElementById("divID_chart_allapps").style.display = "none";
+             document.getElementById("dID_fourTabs").style.display = "none";
+             //            user tab info
+             document.getElementById("user_chart").style.display = "none";
+             document.getElementById("sID_table_userIPS").style.display = "none";
+             document.getElementById("dropdown_user").style.display = "none";
+             document.getElementById("all_users").style.display = "none";
+             document.getElementById("parti_user").style.display = "none";
+             // App Over view
+             document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+             document.getElementById("tab_overview").style.display = "none";
+             document.getElementById("dropdownips").style.display = "none";
+             document.getElementById("over_all_restime").style.display = "none";
+             document.getElementById("over_thrput_calls").style.display = "none";
+             document.getElementById("topology_div").style.display = "none";
+             document.getElementById("allapps").style.display = "block";
+             document.getElementById("appname").style.display = "none";
+             document.getElementById("all_users_overview").style.display = "none";
+             document.getElementById("tierText").style.display = "none";
+         });
+         $("#users1").click(function () {
+             part_app = 0;
+             app_apps_booleanVal = 3;
+             sID_chart_Users_AllApps.search.set(timerange1.val());
+             sID_chart_Users_AllApps.startSearch();
+             sID_table_Users_AllApps.search.set(timerange1.val());
+             sID_table_Users_AllApps.startSearch();
+             document.getElementById("all_users_overview").style.display = "block";
+             document.getElementById("divID_table_allapps").style.display = "none";
+             document.getElementById("divID_table_AllAlarms").style.display = "none";
+             document.getElementById("divID_chart_AllAlarms").style.display = "none";
+             document.getElementById("divID_chart_allapps").style.display = "none";
+             document.getElementById("dID_fourTabs").style.display = "none";
+             //            user tab info
+             document.getElementById("user_chart").style.display = "none";
+             document.getElementById("sID_table_userIPS").style.display = "none";
+             document.getElementById("dropdown_user").style.display = "none";
+             document.getElementById("all_users").style.display = "none";
+             document.getElementById("parti_user").style.display = "none";
+             // App Over view
+             document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+             document.getElementById("tab_overview").style.display = "none";
+             document.getElementById("dropdownips").style.display = "none";
+             document.getElementById("over_all_restime").style.display = "none";
+             document.getElementById("over_thrput_calls").style.display = "none";
+             document.getElementById("topology_div").style.display = "none";
+             document.getElementById("allapps").style.display = "block";
+             document.getElementById("appname").style.display = "none";
+             document.getElementById("alram_all_overview").style.display = "none";
+             document.getElementById("tierText").style.display = "none";
+         });
+
+
+         /** ---------End : In All Applications, we have 3 tabs[overview Alarms Users].----- **/
+
+
+//-----Start :  When we select particular appln, in Overview Tab : if we want find WEB/APP/DB Tier then we will select IP based on IP, we are showing WEB/APP/DB Tier information (below code to find Tier info)----------    
+         sID_dropDown_ListofIps.settings.set("choices", [
+             {value: "*", label: "(All)"}
+         ]);
+         sID_dropDown_ListofIps.on("change", function () {
+             // start : get tier details
+             var collectionLength = 0;
+             var collection_data = null;
+             var mainTableSearch = splunkjs.mvc.Components.getInstance("mID_table_ListofIps");
+             var myResults_mainTableSearch = mainTableSearch.data("preview", {count: 0, offset: 0});
+             myResults_mainTableSearch.on("data", function () {
+                 collectionLength = myResults_mainTableSearch.collection().length;
+                 collection_data = myResults_mainTableSearch.data();
+                 for (var i = 0; i < collectionLength; i++) {
+                     if (sID_dropDown_ListofIps.val() == "*") {
+                         document.getElementById("tierText").innerHTML = "All";
+                         document.getElementById("web_img").style.display = "none";
+                         document.getElementById("db_img").style.display = "none";
+                         document.getElementById("app_img").style.display = "none";
+                     } else if (sID_dropDown_ListofIps.val() == collection_data.rows[i][0]) {
+                         if (collection_data.rows[i][1] == "Server_WEB") {
+                             document.getElementById("tierText").innerHTML = "Web Tier";
+                             document.getElementById("web_img").style.display = "block";
+                             document.getElementById("db_img").style.display = "none";
+                             document.getElementById("app_img").style.display = "none";
+                         } else if (collection_data.rows[i][1] == "Server_APP") {
+                             document.getElementById("tierText").innerHTML = "App Tier";
+                             document.getElementById("web_img").style.display = "none";
+                             document.getElementById("db_img").style.display = "none";
+                             document.getElementById("app_img").style.display = "block";
+                         } else if (collection_data.rows[i][1] == "Server_DB") {
+                             document.getElementById("tierText").innerHTML = "DB Tier";
+                             document.getElementById("web_img").style.display = "none";
+                             document.getElementById("db_img").style.display = "block";
+                             document.getElementById("app_img").style.display = "none";
+                         } else if (collection_data.rows[i][1] == "--") {
+                             document.getElementById("tierText").innerHTML = "--";
+                             document.getElementById("web_img").style.display = "none";
+                             document.getElementById("db_img").style.display = "none";
+                             document.getElementById("app_img").style.display = "none";
+                         }
+
+                     }// end of list of Ips
+
+                 }
+             });
+             /**   --------End :  When we select particular appln, in Overview Tab : if we want find WEB/APP/DB Tier then we will select IP based on IP, we are showing WEB/APP/DB Tier information----------  **/
+
+             /** --------  Start :Related to App/Web/DB Tier, If we select particular IP [OR] If we select All,then which tables and garphs we are showing (below code)--------- **/
+             if (sID_dropDown_ListofIps.val() == "*") {
+                 overrestime.search.set(timerange1.val());
+                 overrestime.startSearch();
+                 overthrput.search.set(timerange1.val());
+                 overthrput.startSearch();
+                 overcalls.search.set(timerange1.val());
+                 overcalls.startSearch();
+                 document.getElementById("over_all_restime").style.display = "block";
+                 document.getElementById("over_thrput_calls").style.display = "block";
+             } else {
+                 overrestime.search.set(timerange1.val());
+                 overrestime.startSearch();
+                 overthrput.search.set(timerange1.val());
+                 overthrput.startSearch();
+                 overcalls.search.set(timerange1.val());
+                 overcalls.startSearch();
+                 document.getElementById("over_all_restime").style.display = "block";
+                 document.getElementById("over_thrput_calls").style.display = "block";
+             }
+         });
+         /** -------------------  End :Related to App/Web/DB Tier, If we select particular IP [OR] If we select All,then which tables and garphs we are showing ---------------- **/
+
+
+
+         /** -----------------  Start :If we select particular appln and select Users-Tab, In Users-Tab,having Users dropdown contains users(below code) ---------------------- **/
+
+         listofUsers.settings.set("choices", [
+             {value: "*", label: "(All Users)"}
+         ]);
+
+
+         listofUsers.on("change", function () {
+
+             if (listofUsers.val() == "*") {
+
+                 allusers.search.set(timerange1.val());
+                 allusers.startSearch();
+                 document.getElementById("all_users").style.display = "block";
+                 document.getElementById("parti_user").style.display = "none";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                 document.getElementById("tab_overview").style.display = "none";
+                 document.getElementById("dropdownips").style.display = "none";
+                 document.getElementById("over_all_restime").style.display = "none";
+                 document.getElementById("over_thrput_calls").style.display = "none";
+             }
+             else {
+                 partuser.search.set(timerange1.val());
+                 partuser.startSearch();
+                 document.getElementById("all_users").style.display = "none";
+                 document.getElementById("parti_user").style.display = "block";
+                 // App Over view
+                 document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                 document.getElementById("tab_overview").style.display = "none";
+                 document.getElementById("dropdownips").style.display = "none";
+                 document.getElementById("over_all_restime").style.display = "none";
+                 document.getElementById("over_thrput_calls").style.display = "none";
+             }
+         });
+
+         /** --------------  End :If we select particular appln and select Users-Tab, In Users-Tab,having Users dropdown contains users(below code) ---------- **/
+
+
+         /**  ---------------START :If One appln using in multiple hosts,then those hosts takes in a dropdown.
+          *  So if we select particular host then we will display Selected host information below.-----   **/
+
+         id_dropUser.settings.set("choices", [
+         ]);
+         
+          id_dropUser.on("change", function () {
+               
+                sID_dropDown_ListofIps.val("*");
+                 listofUsers.val("*");
+                 
+
+             if (id_dropUser.val() == "*") {
+             } else {
+                  
+                  if(id_selecetedApp_Tab_overview==1){
+                       overviewSearches();
+                  }
+                  if(id_selecetedApp_Tab_overview==2){
+                       alarmSearches();
+                  }
+                  if(id_selecetedApp_Tab_overview==3){
+                       userSearches();
+                  }
+                  
+             }
+         
+     });
+         
+
+         function overviewSearches() {
+             sID_single_respTime.search.set(timerange1.val());
+             sID_single_respTime.startSearch();
+             sID_single_allCalls.search.set(timerange1.val());
+             sID_single_allCalls.startSearch();
+             sID_single_users.search.set(timerange1.val());
+             sID_single_users.startSearch();
+             sID_single_Alarms.search.set(timerange1.val());
+             sID_single_Alarms.startSearch();
+             sID_table_ListofIps.search.set(timerange1.val());
+             sID_table_ListofIps.startSearch();
+             overrestime.search.set(timerange1.val());
+             overrestime.startSearch();
+             overthrput.search.set(timerange1.val());
+             overthrput.startSearch();
+             overcalls.search.set(timerange1.val());
+             overcalls.startSearch();
+             sID_table_TopologyID.search.set(timerange1.val());
+             sID_table_TopologyID.startSearch();
+         }
+         
+         function alarmSearches(){
+                 sID_table_AllAlarms.search.set(timerange1.val());
+                 sID_table_AllAlarms.startSearch();
+                 sID_chart_AllAlarms.search.set(timerange1.val());
+                 sID_chart_AllAlarms.startSearch();
+         }
+ 
+           function userSearches(){
+                 sID_chart_user_AppRespTime.search.set(timerange1.val());
+                 sID_chart_user_AppRespTime.startSearch();
+                 sID_table_userIPS.search.set(timerange1.val());
+                 sID_table_userIPS.startSearch();
+                 allusers.search.set(timerange1.val());
+                 allusers.startSearch();
+                 partuser.search.set(timerange1.val());
+                 partuser.startSearch();
+           }
+
+
+         /** -----END :If One appln using in multiple hosts,then those hosts takes in a dropdown. So if we select particular host then we will display Selected host information below.-- **/
+
+         /** ----------Start searches: TimeRange ---------------------------------  **/
+
+         timerange1.on("change", function () {
+
+             //          Particular App Select: Start searches
+             if (part_app == 1) {
+
+                 sID_table_AllAlarms.search.set(timerange1.val());
+                 sID_table_AllAlarms.startSearch();
+                 sID_chart_AllAlarms.search.set(timerange1.val());
+                 sID_chart_AllAlarms.startSearch();
+                 sID_single_respTime.search.set(timerange1.val());
+                 sID_single_respTime.startSearch();
+                 sID_single_allCalls.search.set(timerange1.val());
+                 sID_single_allCalls.startSearch();
+                 sID_single_users.search.set(timerange1.val());
+                 sID_single_users.startSearch();
+                 sID_single_Alarms.search.set(timerange1.val());
+                 sID_single_Alarms.startSearch();
+                 sID_table_ListofIps.search.set(timerange1.val());
+                 sID_table_ListofIps.startSearch();
+                 overrestime.search.set(timerange1.val());
+                 overrestime.startSearch();
+                 overthrput.search.set(timerange1.val());
+                 overthrput.startSearch();
+                 overcalls.search.set(timerange1.val());
+                 overcalls.startSearch();
+                 sID_dropUser_HostName.search.set(timerange1.val());
+                 sID_dropUser_HostName.startSearch();
+
+                 setDropdownVal();
+                 setDefaultDropdownVal();
+                 sID_leftListOfApps.search.set(timerange1.val());
+                 sID_leftListOfApps.startSearch();
+                 sID_getappname.search.set(timerange1.val());
+                 sID_getappname.startSearch();
+
+
+                 if (overview == 1) {
+//                    console.log("part_app: Overview  " + overview);
+                     sID_leftListOfApps.search.set(timerange1.val());
+                     sID_leftListOfApps.startSearch();
+                     sID_table_AllAlarms.search.set(timerange1.val());
+                     sID_table_AllAlarms.startSearch();
+                     sID_chart_AllAlarms.search.set(timerange1.val());
+                     sID_chart_AllAlarms.startSearch();
+                     sID_single_respTime.search.set(timerange1.val());
+                     sID_single_respTime.startSearch();
+                     sID_single_allCalls.search.set(timerange1.val());
+                     sID_single_allCalls.startSearch();
+                     sID_single_users.search.set(timerange1.val());
+                     sID_single_users.startSearch();
+                     sID_single_Alarms.search.set(timerange1.val());
+                     sID_single_Alarms.startSearch();
+                     sID_table_ListofIps.search.set(timerange1.val());
+                     sID_table_ListofIps.startSearch();
+                     overrestime.search.set(timerange1.val());
+                     overrestime.startSearch();
+                     overthrput.search.set(timerange1.val());
+                     overthrput.startSearch();
+                     overcalls.search.set(timerange1.val());
+                     overcalls.startSearch();
+                 }
+
+                 if (overview == 2) {
+//                    console.log("part_app: Alarms  " + overview);
+
+                     sID_table_AllAlarms.search.set(timerange1.val());
+                     sID_table_AllAlarms.startSearch();
+                     sID_chart_AllAlarms.search.set(timerange1.val());
+                     sID_chart_AllAlarms.startSearch();
+                 }
+                 if (overview == 3) {
+//                    console.log("part_app: Alarms  " + overview);
+                     sID_chart_user_AppRespTime.search.set(timerange1.val());
+                     sID_chart_user_AppRespTime.startSearch();
+                     sID_table_userIPS.search.set(timerange1.val());
+                     sID_table_userIPS.startSearch();
+                     allusers.search.set(timerange1.val());
+                     allusers.startSearch();
+                     partuser.search.set(timerange1.val());
+                     partuser.startSearch();
+                 }
+             }
+
+//             All App Select: Start searches
+
+             if (all_apps == 1 || app_apps_booleanVal == 100) {
+
+//                console.log("all apps");
+                 sID_leftListOfApps.search.set(timerange1.val());
+                 sID_leftListOfApps.startSearch();
+                 search_dropAgents.search.set(timerange1.val());
+                 search_dropAgents.startSearch();
+                 sID_table_allapps.search.set(timerange1.val());
+                 sID_table_allapps.startSearch();
+                 sID_chart_allapps.search.set(timerange1.val());
+                 sID_chart_allapps.startSearch();
+                 if (app_apps_booleanVal == 2) {
+                     sID_table_Alarms_AllApps.search.set(timerange1.val());
+                     sID_table_Alarms_AllApps.startSearch();
+                     sID_chart_Alarms_AllApps.search.set(timerange1.val());
+                     sID_chart_Alarms_AllApps.startSearch();
+                 }
+                 if (app_apps_booleanVal == 3) {
+                     sID_chart_Users_AllApps.search.set(timerange1.val());
+                     sID_chart_Users_AllApps.startSearch();
+                     sID_table_Users_AllApps.search.set(timerange1.val());
+                     sID_table_Users_AllApps.startSearch();
+                 }
+             }
+         });
+
+
+         //------------------------End searches: TimeRange------------------------------------------------------------
+
+
+//              new dropdown features
+         /** setDefaultDropdownVal() @returns {undefined} */
+
+         function setDefaultDropdownVal() {
+//            console.log("defalut val")
+             $("#singledropdownvalue").text("--");
+             $("#appname").text("--");
+
+             document.getElementById("newdrop").style.display = "none";
+             document.getElementById("mlutidropdownval").style.display = "none";
+             document.getElementById("singledropdownvalue").style.display = "block";
+         }  // end of setDefaultDropdownVal()
+
+         /**
+          * setDropdownVal()
+          * @returns {undefined}
+          */
+         function setDropdownVal() {
+
+             getappname.on("data", function () {
+                 app_data = getappname.data();
+                 $("#appname").text(app_data.rows[0][0]);
+                 console.log("app_data ------------------- " + app_data.rows[0][0]);
+             });
+
+             console.log("app_data ------------------- " + app_data);
+
+             newdropdowndata.on("data", function () {
+
+
+//                console.log("data is available");
+                 count = newdropdowndata.collection().length;
+                 collection_data = newdropdowndata.data();
+                 hostNameDropdown = collection_data.rows[0][0];
+                 if (count == 1) {
+//                    $("#singledropdownvalue").css({"padding-left": "10%"});
+//                    alert("single");
+//                        console.log("value is single  :"+collection_data.rows[0][0])
+                     $("#singledropdownvalue").text("Host: " + collection_data.rows[0][0]);
+                     document.getElementById("newdrop").style.display = "none";
+                     document.getElementById("mlutidropdownval").style.display = "none";
+                     document.getElementById("singledropdownvalue").style.display = "block";
+                 } else
+                 {
+//                    alert("multiple");
+//                    $("#singledropdownvalue").css({"padding-left": "5%"});
+//                    $("#singledropdownvalue").text("");
+//                    $("#mlutidropdownval").text("Select Host:");
+//                console.log("multiple values " + count)
+                     document.getElementById("mlutidropdownval").style.display = "block";
+                     document.getElementById("newdrop").style.display = "block";
+                     document.getElementById("singledropdownvalue").style.display = "none";
+                 }
+             });
+         }// end of setDropdownVal()
+
+
+         /**
+          * Charts - components
+          */
+         splunkjs.mvc.Components.getInstance('id_chart_allapps').settings.set({
+             "charting.axisTitleY.text": "Response Time (ms)",
+             "charting.axisTitleX.text": "Applications",
+             "charting.seriesColors": "[0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA,0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA]",
+             "charting.legend.placement": "none"
+         });
+         splunkjs.mvc.Components.getInstance('chart_Res').settings.set({
+             "charting.axisTitleX.text": "Time",
+             "charting.axisTitleY.text": "Response Time (ms)",
+             "charting.seriesColors": "[0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA,0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA]",
+             "charting.legend.placement": "none"
+         });
+         splunkjs.mvc.Components.getInstance('chart_Throughput').settings.set({
+             "charting.axisTitleY.text": "Throughput (Calls/min)",
+             "charting.axisTitleX.text": "Time",
+             "charting.seriesColors": "[0x5479AF]",
+             "charting.legend.placement": "none"
+
+         });
+         splunkjs.mvc.Components.getInstance('chart_calls').settings.set({
+             "charting.axisTitleX.text": "Time",
+             "charting.axisTitleY.text": "Calls",
+             // "charting.seriesColors": "[0x6CB8CA,0x6B8930]"
+             "charting.seriesColors": "[0xB2E48A]",
+             "charting.legend.placement": "none"
+         });
+         splunkjs.mvc.Components.getInstance('id_chart_AllAlarms').settings.set({
+             "charting.axisTitleX.text": "Time",
+             "charting.axisTitleY.text": "Alarms",
+             "charting.seriesColors": "[0xFC6A6A]",
+             "charting.legend.placement": "none"
+         });
+         splunkjs.mvc.Components.getInstance('chart_user_calls').settings.set({
+             "charting.axisTitleX.text": "UserIP",
+             "charting.axisTitleY.text": "Calls",
+             "charting.seriesColors": "[0x6CB8CA,0x6B8930,0xD85E3D]", //green,blue,red,
+             "charting.legend.placement": "none"
+
+         });
+         splunkjs.mvc.Components.getInstance('userchart').settings.set({
+             //            'chart.nullValueMode': 'zero',
+             //            'chart.stackMode': 'stacked100',
+             //            'layout.splitSeries': 'false',
+             //            'legend.placement': 'right',
+             "charting.axisTitleX.text": "Time",
+             "charting.axisTitleY.text": "Calls",
+             "charting.seriesColors": "[0x6CB8CA,0x6B8930,0xD85E3D]",
+             "charting.legend.placement": "block"
+                     ////green,blue,red
+                     //"charting.seriesColors": "[0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA,0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA]"
+         });
+         splunkjs.mvc.Components.getInstance('id_chart_Alarms_AllApps').settings.set({
+             "charting.axisTitleX.text": "Applications",
+             "charting.axisTitleY.text": "Alarms",
+             "charting.seriesColors": "[0xFC6A6A]",
+             "charting.legend.placement": "none"
+         });
+         splunkjs.mvc.Components.getInstance('id_chart_Users_AllApps').settings.set({
+             "charting.axisTitleX.text": "Applications",
+             "charting.axisTitleY.text": "Users",
+             "charting.seriesColors": "[0x956E96]",
+             "charting.legend.placement": "none"
+         });
+         splunkjs.mvc.Components.getInstance('chart_user').settings.set({
+             "charting.axisTitleX.text": "UserIP",
+             "charting.axisTitleY.text": "Response Time (ms)",
+             "charting.seriesColors": "[0x6CB8CA]",
+             "charting.legend.placement": "none"
+         });
+
+     });
+     /**
+      * initialPopup()- displays at starting of page.
+      * @returns {Boolean}
+      */
+     function initialPopup() {
+         $(".overlay").show();
+         $("#popup").show('popup', null, null, {'screenColor': 'red', 'screenOpacity': .1});
+         return false;
+         $(".overlay").hide();
+     }
+
+     /**
+      * funcFreeRegistrationClosePopup()- this will redirects to address in other tab and closes the popup.
+      * @returns {undefined}
+      */
+     function  funcFreeRegistrationClosePopup() {
+//	          console.log("SignIN");
+         var win = window.open("http://www.appensure.com/free-registration/");
+         win.focus();
+         $(".overlay").hide();
+         $("#popup").hide("slow");
+         //checkIsDataPresent();
+     }
+
+     /**
+      * funcEvalRegistrationClosePopup()-this will redirects to address in other tab and closes the popup.
+      * @returns {undefined}
+      */
+     function  funcEvalRegistrationClosePopup() {
+         var win = window.open("http://www.appensure.com/eval-registration/");
+         win.focus();
+         $(".overlay").hide();
+         $("#popup").hide("slow");
+         //checkIsDataPresent();
+     }
+     /**
+      * functoCloseall()- This will close the popup.
+      * @returns {undefined}
+      */
+     function  functoCloseall() {
+         $("#popup").hide("slow");
+         $(".overlay").hide();
+//        checkIsDataPresent();
+     }
+
+
+</script>
+
+
+{% endblock js %}
+

@@ -1,0 +1,146 @@
+<dashboard>
+  <label>Logger Intelligence</label>
+  <description>by A3SEC</description>
+  <row>
+    <chart>
+      <title>Last 7 Days Trend</title>
+      <searchString>| pivot AvLogger Logger count(Logger) AS "Count of Logger" SPLITROW _time AS "_time" PERIOD auto SPLITCOL plugin_id SORT 0 _time SHOWOTHER false NUMCOLS 100</searchString>
+      <earliestTime>rt-7d</earliestTime>
+      <latestTime>rtnow</latestTime>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisTitleY.text">Count of Logger</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+    </chart>
+    <chart>
+      <title>Number Logs Last 7 Days</title>
+      <searchString>| pivot AvLogger Logger count(Logger) AS "Count of Logger"</searchString>
+      <earliestTime>rt-7d</earliestTime>
+      <latestTime>rtnow</latestTime>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.rangeValues">["100000","170000","550000",1000000]</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.gaugeColors">[0xebe42d,0x7e9f44,0xd13b3b]</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.chart">radialGauge</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top 10 by PluginID &amp; SID</title>
+      <searchString>| pivot AvLogger Logger count(Logger) AS "Count of Logger" SPLITROW plugin_id AS "Plugin ID" SPLITCOL plugin_sid TOP 10 count(Logger) NUMCOLS 40</searchString>
+      <earliestTime>0</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisTitleY.text"># Events</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.chart.stackMode">stacked</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.axisTitleX.text">ID Plugins</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top 10 IPSources Last 7 Days</title>
+      <searchString>| pivot AvLogger Logger count(Logger) AS "Events" SPLITROW _time AS "_time" PERIOD auto SPLITCOL src_ip SORT 0 _time NUMCOLS 10</searchString>
+      <earliestTime>-7d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisTitleY.text">Events</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.axisTitleX.text">Date</option>
+    </chart>
+    <chart>
+      <title>Top 10 IPDestinations Last 7 Days</title>
+      <searchString>| pivot AvLogger Logger count(Logger) AS "Events" SPLITROW _time AS "_time" PERIOD auto SPLITCOL dst_ip SORT 0 _time NUMCOLS 10</searchString>
+      <earliestTime>-7d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Last Month Logs Comparative</title>
+      <searchString>sourcetype="avlogger" earliest=-4w@w latest=@w | timechart count span=1h | timewrap w</searchString>
+      <earliestTime>-7d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>Matrix of Users by DataSource Last 7 Days</title>
+      <searchString>| pivot AvLogger Logger count(Logger) AS "Count of Logger" SPLITROW username AS "User" SPLITCOL plugin_id TOP 500 count(Logger) COLSUMMARY true NUMCOLS 100</searchString>
+      <earliestTime>-7d@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</dashboard>

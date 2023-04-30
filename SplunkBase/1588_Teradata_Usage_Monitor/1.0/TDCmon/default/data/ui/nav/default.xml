@@ -1,0 +1,22 @@
+<nav>
+    <collection label="About">
+	<view name="about" label="About"/>
+        <divider />
+        <a href="mailto:splunkyoda@splunk.com">Send Feedback...</a>
+    </collection>
+    <view name="usage_overview" label="Usage Overview" default='true'  />
+    <collection label="Views">
+        <view source="unclassified" />
+        <divider />
+    </collection>
+    <collection label="Searches &amp; Reports">
+        <collection label="Reports">
+            <saved source="unclassified" match="report" />
+        </collection>
+        <divider />
+        <saved source="unclassified" />
+    </collection>
+    <view name="flashtimeline" />
+    <view name="setup" label="Setup" />    
+</nav>
+

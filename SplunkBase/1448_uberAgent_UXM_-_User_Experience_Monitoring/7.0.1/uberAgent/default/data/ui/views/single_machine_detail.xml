@@ -1,0 +1,719 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, single_machine_detail.js" stylesheet="main.css, single_machine_detail.css">
+
+   <label>Single Machine Detail</label>
+   <description>This dashboard displays detailed information about a specific machine.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>CommonWithUser</default>
+      </input>
+   </fieldset>
+   
+   <search id="Search_AllowedIndexesFilter">
+        <query>
+            | tstats count WHERE index=`uberAgent_index` by index | table index | mvcombine delim="," index | nomv index
+        </query>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="AllowedIndexesFilter">filter SourceIndex in ($result.index$)</set>
+        </progress>
+    </search>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            values(host) as Hosts
+            values(HwModel) as HwModel
+            values(HwManufacturer) as HwManufacturer
+            dc(SessionGUID) as SessionCount
+            dc(SessionFgAppName) as SessionFgAppCount
+            dc(SessionUserLower) as UserCount
+            $SearchFilter$
+         | eval Hosts = mvjoin(Hosts, ", ")
+         | eval HwModels = mvjoin(HwModel, ", ")
+         | eval HwManufacturers = mvjoin(HwManufacturer, ", ")
+         | appendcols
+         [
+         | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+            avg(CPUUsagePercent) as AvgCPUUsagePercent
+            avg(IOPercentDiskTime) as AvgIOPercentDiskTime
+            avg(RAMUsagePercent) as AvgRAMUsagePercent
+            avg(NetUtilizationPercent) as AvgNetUtilizationPercent
+            avg(CPURelativeFrequencyPercent) as AvgCPURelativeFrequencyPercent
+            avg(PagefileUsagePercent) as AvgPagefileUsagePercent
+            latest(CPUMaxMhz) as LatestCPUMaxMhz
+            latest(CPUCoresLogical) as LatestCPUCoresLogical
+            latest(RAMSizeGB) as LatestRAMSizeGB
+            $SearchFilter$
+         | eval AvgCPUUsagePercentRounded = round(AvgCPUUsagePercent,1)
+         | eval AvgIOPercentDiskTimeRounded = round(AvgIOPercentDiskTime,2)
+         | eval AvgRAMUsagePercentRounded = round(AvgRAMUsagePercent,1)
+         | eval AvgNetUtilizationPercentRounded = round(AvgNetUtilizationPercent,1)
+         | eval CPUBaseGHz = round (LatestCPUMaxMhz / 1000, 2)
+         | eval CPUActualGHz = round (LatestCPUMaxMhz / 1000 * AvgCPURelativeFrequencyPercent / 100, 2)
+         | eval AvgPagefileUsagePercentRounded = round(AvgPagefileUsagePercent, 1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+            sum(UIDelayMs) as SumUIDelayMs
+            $SearchFilter$
+         | eval SumUIDelayS = round(SumUIDelayMs/1000,1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+            dc(SessionGUID) as LogonCount
+            avg(TotalLogonTimeMs) as AvgTotalLogonTimeMs
+            $SearchFilter$
+         | eval AvgTotalLogonTimeSRounded = if(isnull(AvgTotalLogonTimeMs), "n/a", round(AvgTotalLogonTimeMs/1000,2))
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Application_Errors` Application_Errors
+            count(ErrorType) as ErrorCount
+            $SearchFilter$
+         ]
+      </query>
+   </search>
+
+   <search id="Search_Score_Base">
+      <query>
+         | pivot `uA_DM_Score_Machine` Score_Machine 
+            avg(machine_cpu) as machine_cpu
+            avg(machine_ram) as machine_ram
+            avg(machine_diskio) as machine_diskio
+            avg(machine_networkavailability) as machine_networkavailability
+            avg(machine_stoperrors) as machine_stoperrors
+            avg(machine_diskspace) as machine_diskspace
+            avg(machine_score) as machine_score
+         splitrow 
+            _time period minute
+         $SearchFilter$
+         $AllowedIndexesFilter$
+         | timechart span=30m
+            eval(round(avg(machine_cpu),1)) as CPU
+            eval(round(avg(machine_ram),1)) as RAM
+            eval(round(avg(machine_diskio),1)) as "Disk IO"
+            eval(round(avg(machine_networkavailability),1)) as "Network availability"
+            eval(round(avg(machine_stoperrors),1)) as "Stop errors"
+            eval(round(avg(machine_diskspace),1)) as "Disk space"
+            eval(round(avg(machine_score),1)) as Score
+      </query>
+   </search>
+
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">Hosts</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Machine:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">HwManufacturers</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Hw manufacturer:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">HwModels</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Hw model:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">CPUBaseGHz</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">CPU base speed:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">GHz</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">CPUActualGHz</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Avg. CPU actual speed:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">GHz</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">LatestCPUCoresLogical</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">CPU cores:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">LatestRAMSizeGB</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">RAM:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-afterLabel">GB</option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">SessionCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Sessions:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">UserCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Users:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">LogonCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Logons:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">SessionFgAppCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Apps in foreground:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">ErrorCount</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">#App errors:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel"></option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AvgCPUUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Avg. CPU:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">AvgRAMUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Avg. RAM:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgIOPercentDiskTimeRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Avg. disk:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgNetUtilizationPercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Avg. network:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">SumUIDelayS</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Total UI wait time:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">AvgTotalLogonTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">Avg. logon duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">AvgPagefileUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">Avg. page file usage:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-afterLabel">%</option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+    <panel id="panel_machine_score">
+      <title>Machine score</title>
+      <chart>
+        <search base="Search_Score_Base">
+          <query> 
+              | table _time Score
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">10.0</option>
+        <option name="charting.axisY.minimumNumber">0.0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.seriesColors">[0x77C4CF]</option>
+      </chart>
+    </panel>
+    <panel id="panel_machine_score_breakdown">
+    <title>Component scores</title>
+      <chart>
+        <search base="Search_Score_Base">
+          <query> 
+              | table _time CPU RAM "Disk IO" "Network availability" "Stop errors" "Disk space"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">10.0</option>
+        <option name="charting.axisY.minimumNumber">0.0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.seriesColors">["0x5A4575","0x43B5C6","0x6B6B6B","0x3D8A94","0x333333","0xC6DBDE","0xb98b73"]</option>
+      </chart>
+    </panel>
+  </row>
+   
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>Sessions</title>
+         <table id="Table_Panel21">
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     first(SessionUser) as User
+                     first(SessionID) as ID
+                     last(SessionProtocol) as "Protocol"
+                     last(SessionConnectionState) as "Last state"
+                     values(SessionClientName) as RemotingClients
+                     avg(SessionProcessCount) as AvgSessionProcessCount
+                     avg(SessionCPUUsagePercent) as AvgSessionCPUUsagePercent
+                     avg(SessionIOPS) as AvgSessionIOPS
+                     avg(SessionWorkingSetMB) as AvgSessionWorkingSetMB
+                     avg(SessionNetKBPS) as AvgSessionNetKBPS
+                     avg(SessionRpLatencyMs) as AvgSessionRpLatencyMs
+                     latest(_time) as LastSeen
+                     first(SessionLogonTime) as SessionLogonTime
+                     sum(SessionIODurationMs) as SumSessionIODurationMs
+                     sum(SessionIOCount) as SumSessionIOCount
+                     splitrow
+                        SessionGUID
+                     $SearchFilter$
+                  | join type=outer SessionGUID 
+                     [
+                        | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                           sum(TotalLogonTimeMs) as TotalLogonTimeMs
+                           splitrow
+                              SessionGUID
+                           $SearchFilter$
+                        | fields +
+                           SessionGUID
+                           TotalLogonTimeMs
+                     ]
+                  | eval "Remoting clients" = mvjoin(RemotingClients, ", ")
+                  | eval "Avg. #processes" = round(AvgSessionProcessCount,0)
+                  | eval "Avg. CPU (%)" = round(AvgSessionCPUUsagePercent,1)
+                  | eval "Avg. IOPS" = round(AvgSessionIOPS,1)
+                  | eval "Avg. RAM (MB)" = round(AvgSessionWorkingSetMB,0)
+                  | eval "Avg. network (KB/s)" = round(AvgSessionNetKBPS,1)
+                  | eval "Avg. ICA latency (ms)" = round(AvgSessionRpLatencyMs,1)
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Avg. IO latency (ms)"=round(SumSessionIODurationMs/SumSessionIOCount,1)
+                  | eval "Logon time"=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Logon duration (s)"=round(TotalLogonTimeMs/1000,2)
+                  | eval sortfield=lower('Logon time')
+                  | sort limit=0 -sortfield
+                  | table
+                     SessionGUID
+                     User
+                     ID
+                     "Logon time"
+                     "Logon duration (s)"
+                     "Last seen"
+                     "Last state"
+                     "Protocol"
+                     "Avg. #processes"
+                     "Avg. CPU (%)"
+                     "Avg. IOPS"
+                     "Avg. IO latency (ms)"
+                     "Avg. RAM (MB)"
+                     "Avg. network (KB/s)"
+                     "Avg. ICA latency (ms)"
+                     "Remoting clients"
+               </query>
+            </search>
+            <fields>User,ID,"Logon time","Logon duration (s)","Last seen","Last state","Protocol","Avg. #processes","Avg. CPU (%)","Avg. IOPS","Avg. IO latency (ms)","Avg. RAM (MB)","Avg. network (KB/s)","Avg. ICA latency (ms)","Remoting clients"</fields>
+            <option name="count">15</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_machine_detail_explanation.html">
+         </html>
+      </panel>
+   </row>
+
+   
+   <!-- Row 4 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Network data volume &amp; latency over time</title>
+         <chart id="Chart_Pane31">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     sum(NetTargetSendMB) as SumNetTargetSendMB
+                     sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                     sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                     sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum(SumNetTargetSendMB) as "Send volume (MB)"
+                     sum(SumNetTargetReceiveMB) as "Receive volume (MB)"
+                     eval(round(sum(SumNetTargetSendDurationMs)/sum(SumNetTargetSendLatencyCount),1)) as "Avg. send latency (ms)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"Avg. send latency (ms)"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Avg. send latency (ms)"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">Data volume (MB)</option>
+            <option name="charting.axisTitleY2.text">Latency (ms)</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      
+      <!-- Column 2 -->
+      <panel>
+         <title>CPU &amp; RAM over time</title>
+         <chart id="Chart_Panel32">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_SystemPerformanceSummary` System_SystemPerformanceSummary
+                     count(System_SystemPerformanceSummary) as EventCount
+                     sum(RAMUsageGB) as SumRAMUsageGB
+                     sum(CPUUsagePercent) as SumCPUUsagePercent
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     eval(round(sum(SumRAMUsageGB)/sum(EventCount),1)) as "Avg. RAM (GB)"
+                     eval(round(sum(SumCPUUsagePercent)/sum(EventCount),1)) as "Avg. CPU (%)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"Avg. CPU (%)"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Avg. CPU (%)"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">RAM (GB)</option>
+            <option name="charting.axisTitleY2.text">CPU (%)</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Applications</title>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     values(ProcUser) as ProcUser
+                     values(ProcName) as ProcName
+                     sum(ProcCPUPercent) as ProcCPUPercent
+                     sum(ProcIOPS) as ProcIOPS
+                     sum(ProcIOCount) as ProcIOCount
+                     sum(ProcIODurationMs) as ProcIODurationMs
+                     sum(ProcWorkingSetMB) as ProcWorkingSetMB
+                     sum(ProcNetKBPS) as ProcNetKBPS
+                     splitrow
+                        AppName as "App name"
+                     splitrow
+                        time as _time
+                     splitrow
+                        host as host
+                     $SearchFilter$
+                  | stats
+                     dc(ProcUser) as "#Users"
+                     values(ProcName) as "Process name(s)"
+                     avg(ProcCPUPercent) as AvgProcCPUPercent
+                     avg(ProcIOPS) as AvgProcIOPS
+                     sum(ProcIOCount) as SumProcIOCount
+                     sum(ProcIODurationMs) as SumProcIODurationMs
+                     avg(ProcWorkingSetMB) as AvgProcWorkingSetMB
+                     avg(ProcNetKBPS) AS AvgProcNetKBPS
+                     by
+                        "App name"
+                  | join
+                     type=outer "App name"
+                     [
+                        | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                              sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                              sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                           splitrow
+                              AppName as "App name"
+                           $SearchFilter$
+                        | fields +
+                           "App name"
+                           SumNetTargetSendLatencyCount
+                           SumNetTargetSendDurationMs
+                     ]
+                  | join
+                     type=outer "App name"
+                     [
+                        | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+                           sum(UIDelayMs) as SumUIDelayMs
+                           splitrow
+                              AppName as "App name"
+                           $SearchFilter$
+                        | fields +
+                           "App name"
+                           SumUIDelayMs
+                     ]
+                  | eval "Avg. CPU (%)" = round(AvgProcCPUPercent, 1)
+                  | eval "Avg. IOPS" = round (AvgProcIOPS,1)
+                  | eval "Avg. IO latency (ms)" = round (SumProcIODurationMs/SumProcIOCount,1)
+                  | eval "Avg. RAM (MB)" = round(AvgProcWorkingSetMB, 0)
+                  | eval "Avg. net thruput (KB/s)" = round (AvgProcNetKBPS,1)
+                  | eval "Avg. net latency (ms)" = round (SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+                  | eval "UI unresponsiveness (s)" = round(SumUIDelayMs/1000,1)
+                  | eval sortfield = lower("App name")
+                  | table
+                     "App name"
+                     "Process name(s)"
+                     "Avg. CPU (%)"
+                     "Avg. IOPS"
+                     "Avg. IO latency (ms)"
+                     "Avg. RAM (MB)"
+                     "Avg. net thruput (KB/s)"
+                     "Avg. net latency (ms)"
+                     "UI unresponsiveness (s)"
+                     "#Users"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields -
+                     sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_machine_detail_explanation_2.html">
+         </html>
+      </panel>
+   </row>
+   
+   <!-- Row 6 -->
+   <row>
+      <panel>
+         <title>Network connections</title>
+         <table id="Table_Panel51">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     first(NetTargetRemoteAddress) as "Target IP"
+                     sum(NetTargetSendCount) as SumNetTargetSendCount
+                     sum(NetTargetReceiveCount) as SumNetTargetReceiveCount
+                     sum(NetTargetConnectCount) as SumNetTargetConnectCount
+                     sum(NetTargetReconnectCount) as SumNetTargetReconnectCount
+                     sum(NetTargetRetransmitCount) as SumNetTargetRetransmitCount
+                     sum(NetTargetSendMB) as SumNetTargetSendMB
+                     sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                     sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                     sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                     dc(ProcName) as "Process count"
+                     dc(ProcUser) as "User count"
+                     splitrow
+                        NetTargetRemoteNameAddressPort AS "Target"
+                     splitrow
+                        NetTargetProtocols AS Protocols
+                     $SearchFilter$
+                  | eval "Send count"=round(SumNetTargetSendCount,0)
+                  | eval "Receive count"=round(SumNetTargetReceiveCount,0)
+                  | eval "Connect count"=round(SumNetTargetConnectCount,0)
+                  | eval "Reconnect count"=round(SumNetTargetReconnectCount,0)
+                  | eval "Retransmit count"=round(SumNetTargetRetransmitCount,0)
+                  | eval "Send volume (MB)"=round(SumNetTargetSendMB,1)
+                  | eval "Receive volume (MB)"=round(SumNetTargetReceiveMB,1)
+                  | eval "Avg. send latency (ms)"=round(SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+                  | eval sortfield=lower(Target)
+                  | table
+                     Target
+                     "Target IP"
+                     Protocols
+                     "Send count"
+                     "Receive count"
+                     "Connect count"
+                     "Reconnect count"
+                     "Retransmit count"
+                     "Send volume (MB)"
+                     "Receive volume (MB)"
+                     "Avg. send latency (ms)"
+                     "Process count"
+                     "User count"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_machine_detail_explanation_3.html">
+         </html>
+      </panel>
+   </row>
+   <!-- Row 7 -->
+    <row>
+        <panel>
+            <title>Stop errors</title>
+            <input type="time" token="time_range2" searchWhenChanged="true">
+                <label>Time range:</label>
+                <default>
+                    <earliest>-1d</earliest>
+                    <latest>now</latest>
+                </default>
+            </input>
+            <table>
+                <search>
+                    <query>
+                        | pivot `uA_DM_System_Bugcheck` System_Bugcheck
+                            latest(_time) as BugcheckTime
+                            latest(BugcheckCodeDisplayName) as "Stop error"
+                            latest(BugcheckCode) as "StopErrorCode"
+                            latest(BugcheckParameter1) as "Param 1"
+                            latest(BugcheckParameter2) as "Param 2"
+                            latest(BugcheckParameter3) as "Param 3"
+                            latest(BugcheckParameter4) as "Param 4"
+                            latest(PowerButtonTimestampEpoch) as PowerButtonTimestamp
+                            latest(SleepInProgress) as "Sleep in progress"
+                            latest(SystemSleepTransitionsToOn) as "System sleep transitions to on"
+                            latest(ConnectedStandbyInProgress) as "Conn. standby in progress"
+                            splitrow
+                                _time
+                                    period second
+                            splitrow
+                                host as Host
+                            $SearchFilter$
+                        | eval "Time" = strftime(strptime(BugcheckTime, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                        | eval PowerButtonTimestamp = PowerButtonTimestamp / 1000
+                        | eval "Power button timestamp" = strftime(PowerButtonTimestamp, "%Y-%m-%d %H:%M:%S")
+                        | eval "Stop error code" = tostring(StopErrorCode, "hex")
+                        | sort - _time
+                        | table
+                            Time
+                            Host
+                            "Stop error"
+                            "Stop error code"
+                            "Param 1"
+                            "Param 2"
+                            "Param 3"
+                            "Param 4"
+                            "Power button timestamp"
+                            "Sleep in progress"
+                            "System sleep transitions to on"
+                            "Conn. standby in progress"
+                    </query>
+                </search>
+                <option name="count">10</option>
+                <option name="drilldown">none</option>
+            </table>
+        </panel>
+    </row>
+    <!-- Row 8 -->
+    <row>
+        <panel>
+            <title>Disk space</title>
+            <input type="time" token="time_range3" searchWhenChanged="true">
+                <label>Time range:</label>
+                <default>
+                    <earliest>-1d</earliest>
+                    <latest>now</latest>
+                </default>
+            </input>
+            <table>
+                <search>
+                    <query>
+                        | pivot `uA_DM_System_VolumeInventory` System_VolumeInventory
+                            values(IsBootVolume) as "Is boot volume"
+                            values(IsDirty) as "Chkdsk req."
+                            values(FileSystem) as "File system"
+                            latest(UsedSpacePercent) as "Used Space (%)"
+                            latest(UsedSpacePercent) as latestUsedSpacePercent
+                            latest(FreeMB) as latestFreeMB
+                            values(CapacityMB) as CapacityMB
+                            values(PartitionStyle) as "Partition style"
+                            splitrow
+                                host as Host
+                            splitrow
+                                MountPoints as Path
+                            splitrow
+                                DiskNumbers
+                            FILTER MountPoints is *
+                            $SearchFilter$
+                        | eval "Free space (GB)" = round (latestFreeMB / 1024, 1)
+                        | eval "Free space (%)" = round (100 - avgUsedSpacePercent, 1)
+                        | eval "Used space (GB)" = round (CapacityMB * latestUsedSpacePercent / 100 / 1024, 1)
+                        | rename DiskNumbers AS DiskNumber
+                        | join type=outer Host, DiskNumber
+                            [
+                                | pivot `uA_DM_System_DiskInventory` System_DiskInventory
+                                    values(Name) as "Device name"
+                                    values(IsRemovable) as "Is removable"
+                                    values(IsWritable) as "Is writeable"
+                                    splitrow
+                                        host as Host
+                                    splitrow
+                                        DiskNumber
+                                    $SearchFilter$
+                                | fields
+                                    + Host DiskNumber "Device name" "Is removable" "Is writeable"
+                            ]
+                        | table
+                            Host
+                            "Path"
+                            "Free space (GB)"
+                            "Used space (GB)"
+                            "Free space (%)"
+                            "Device name"
+                            "File system"
+                            "Partition style"
+                            "Is boot volume"
+                            "Chkdsk req."
+                            "Is removable"
+                            "Is writeable"
+                    </query>
+                </search>
+                <option name="count">10</option>
+                <option name="drilldown">none</option>
+            </table>
+        </panel>
+    </row>
+</form>

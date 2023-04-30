@@ -1,0 +1,34 @@
+<form>
+<label>Success and Failures by Operation</label>
+
+
+<searchTemplate>index=esg_transaction AND WorkflowName!=NULL | soaekv | search WorkflowName = $wkfl$ | timechart count by "/logEntry/body/subEntry/body/wflSummary/completionStatus/status"</searchTemplate>
+<fieldset autoRun="true" >
+  <input type="time">
+  <label>Select Time Range</label>
+    <default>Last 7 days</default>
+  </input>
+
+ <input type="dropdown" token="wkfl">
+  <label>Select Operation</label>
+  <populatingSearch fieldForValue="WorkflowName" fieldForLabel="WorkflowName"><![CDATA[index=summary WorkflowName | top WorkflowName ]]></populatingSearch>
+   <default>*</default>
+   <choice value="*">Any</choice>
+   <seed>*</seed>
+ </input>
+  
+</fieldset>
+
+<row>
+  <chart>
+    <title>Success and Failures over the specified time and operation</title>
+    <option name="charting.chart">column</option>
+    <option name="charting.primaryAxisTitle">ktm</option>
+    <option name="charting.secondaryAxisTitle">time</option>
+    <option name="charting.legend.labels">[success,fail]</option>
+    <option name="charting.chart.stackMode">stacked</option>
+    <option name="charting.seriesColors">[0x00FF00,0xFF0000,0x0000FF]</option>
+  </chart>
+</row>
+
+</form>

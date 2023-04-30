@@ -1,0 +1,360 @@
+<view template="dashboard.html" stylesheet="traffic_overview.css">
+  <label>VPN SSL Tunnel Mode Dashboard</label>
+  <module name="AccountBar" layoutPanel="appHeader" />
+  <module name="AppBar" layoutPanel="navigationHeader" />
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+  <module name="GenericHeader" layoutPanel="panel_row1_col1">
+    <param name="label">VPN SSL Tunnel Mode Access Dashboard</param>
+  </module>
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">This dashboard provides visibility into the VPN SSL tunnel use events in your Fortinet firewalls environment.</param>
+  </module>
+  <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp1">
+    <param name="label">Source IP:</param>
+    <param name="field">source_ip</param>
+    <param name="replacementMap">
+      <param name="arg">
+        <param name="source_ip">
+          <param name="value"></param>
+        </param>
+      </param>
+    </param>
+    <param name="intention">
+      <param name="name">stringreplace</param>
+      <param name="arg">
+        <param name="source_ip">
+          <param name="default"></param>
+          <param name="prefix">source_ip="</param>
+          <param name="suffix">"</param>
+          <param name="fillOnEmpty">false</param>
+        </param>
+      </param>
+    </param>
+
+ 	<module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp1">
+            <param name="label">Device name:</param>
+            <param name="field">device_name</param>
+            <param name="replacementMap">
+              <param name="arg">
+                <param name="device_name">
+                  <param name="value"></param>
+                </param>
+              </param>
+            </param>
+            <param name="intention">
+              <param name="name">stringreplace</param>
+              <param name="arg">
+                <param name="device_name">
+                  <param name="default"></param>
+                  <param name="prefix">device_name="</param>
+                  <param name="suffix">"</param>
+                  <param name="fillOnEmpty">false</param>
+                </param>
+              </param>
+            </param>
+
+          <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp2">
+            <param name="label">VDom:</param>
+            <param name="field">vdom</param>
+            <param name="replacementMap">
+              <param name="arg">
+                <param name="vdom">
+                  <param name="value"></param>
+                </param>
+              </param>
+            </param>
+            <param name="intention">
+              <param name="name">stringreplace</param>
+              <param name="arg">
+                <param name="vdom">
+                  <param name="default"></param>
+                  <param name="prefix">vdom="</param>
+                  <param name="suffix">"</param>
+                  <param name="fillOnEmpty">false</param>
+                </param>
+              </param>
+            </param>
+
+ 	<module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp2">
+            <param name="label">Service:</param>
+            <param name="field">service</param>
+            <param name="replacementMap">
+              <param name="arg">
+                <param name="service">
+                  <param name="value"></param>
+                </param>
+              </param>
+            </param>
+            <param name="intention">
+              <param name="name">stringreplace</param>
+              <param name="arg">
+                <param name="service">
+                  <param name="default"></param>
+                  <param name="prefix">service="</param>
+                  <param name="suffix">"</param>
+                  <param name="fillOnEmpty">false</param>
+                </param>
+              </param>
+            </param>
+
+	<module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp3">
+      <param name="label">User:</param>
+      <param name="field">user</param>
+      <param name="replacementMap">
+        <param name="arg">
+          <param name="user">
+            <param name="value"></param>
+          </param>
+        </param>
+      </param>
+      <param name="intention">
+        <param name="name">stringreplace</param>
+        <param name="arg">
+          <param name="user">
+            <param name="default"></param>
+            <param name="prefix">user="</param>
+            <param name="suffix">"</param>
+            <param name="fillOnEmpty">false</param>
+          </param>
+        </param>
+      </param>
+
+      <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp3">
+        <param name="label">User group:</param>
+        <param name="field">group</param>
+        <param name="replacementMap">
+          <param name="arg">
+            <param name="group">
+              <param name="value"></param>
+            </param>
+          </param>
+        </param>
+        <param name="intention">
+          <param name="name">stringreplace</param>
+          <param name="arg">
+            <param name="group">
+              <param name="default"></param>
+              <param name="prefix">group="</param>
+              <param name="suffix">"</param>
+              <param name="fillOnEmpty">false</param>
+            </param>
+          </param>
+        </param>
+
+              <module name="TimeRangePicker" layoutPanel="panel_row2_col1_grp1" autoRun="True">
+                <param name="selected">Last 60 minutes</param>
+                <param name="searchWhenChanged">True</param>
+                <module name="HiddenSearch" layoutPanel="panel_row1_col1">
+                  <param name="search">$source_ip$ $user$ $group$ $vdom$ $device_name$ $service$ `Fortigate-Sslvpn-Portal-Tunnel-Traffic-DataCube`</param>
+                  <module name="JobProgressIndicator"></module>
+                  <module name="ViewRedirectorLink">
+                    <param name="viewTarget">flashtimeline</param>
+                    <param name="label">View Full Report</param>
+                  </module>
+
+                  <module name="HiddenPostProcess" layoutPanel="panel_row4_col1">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-DataCube-Device-by-Time`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">MBytes transfered by users over time</param>
+                      <param name="chart">column</param>
+                        <param name="charting.legend.nullValueMode">connect</param>
+                        <param name="charting.legend.showMarkers">true</param>
+                        <param name="chart.stackMode">unstacked</param>
+			<param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		<module name="HiddenPostProcess" layoutPanel="panel_row5_col1">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Service-Bytes`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top services usage by MBytes transfered</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		 <module name="HiddenPostProcess" layoutPanel="panel_row5_col2">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Service-Request`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top services usage by requests</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		<module name="HiddenPostProcess" layoutPanel="panel_row5_col3">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Top-Device`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top devices and vdoms usage by MBytes transfered</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+ 		<module name="HiddenPostProcess" layoutPanel="panel_row6_col1">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Top-Dst-IP-Bytes`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top destination IP by MBytes transfered</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+ 		<module name="HiddenPostProcess" layoutPanel="panel_row6_col2">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Top-Dst-IP`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top destination IP by requests</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		 <module name="HiddenPostProcess" layoutPanel="panel_row6_col3">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Top-Country-Bytes`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top destination countries by MBytes transfered</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+		 
+		 </module>
+
+                <module name="HiddenSearch" layoutPanel="panel_row1_col1">
+                  <param name="search">$source_ip$ $user$ $group$ $vdom$ $device_name$ $service$ `Fortigate-Sslvpn-DataCube`</param>
+	
+ 		<module name="HiddenPostProcess" layoutPanel="panel_row7_col1">
+                <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-IP-User`</param>
+                 <module name="HiddenChartFormatter">
+                <module name="Paginator">
+                  <param name="count">10</param>
+                  <param name="entityName">results</param>
+                  <module name="SimpleResultsTable">
+                    <param name="drilldown">row</param>
+                    <module name="ConvertToDrilldownSearch">
+                      <module name="ViewRedirector">
+                        <param name="viewTarget">flashtimeline</param>
+                      </module>
+                        </module>
+                    </module>
+                  </module>
+                </module>
+                </module>
+	
+		    <module name="HiddenPostProcess" layoutPanel="panel_row8_col1">
+                    <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Top-User-Bytes`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top users by MBytes transfered</param>
+                      <param name="chart">pie</param>
+                        <param name="charting.legend.nullValueMode">connect</param>
+                        <param name="charting.legend.showMarkers">true</param>
+                        <param name="chart.stackMode">unstacked</param>
+                        <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		<module name="HiddenPostProcess" layoutPanel="panel_row8_col2">
+                <param name="search">`Fortigate-Sslvpn-Tunnel-Traffic-DataCube-Top-User-Bytes-List`</param>
+                 <module name="HiddenChartFormatter">
+                <module name="Paginator">
+                  <param name="count">10</param>
+                  <param name="entityName">results</param>
+                  <module name="SimpleResultsTable">
+                    <param name="drilldown">row</param>
+                    <module name="ConvertToDrilldownSearch">
+                      <module name="ViewRedirector">
+                        <param name="viewTarget">flashtimeline</param>
+                      </module>
+                        </module>
+                    </module>
+                  </module>
+                </module>
+		</module>
+		</module>		 
+		 </module>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+</view>

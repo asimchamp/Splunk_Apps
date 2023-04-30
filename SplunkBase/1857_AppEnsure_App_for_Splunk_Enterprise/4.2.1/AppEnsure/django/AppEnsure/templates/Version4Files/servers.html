@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+{# Boilerplate for a Django Bindings template #}
+{% extends "splunkdj:base_with_app_bar.html" %}              
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}}{% endblock title %}
+{% block css %}
+<!-- Style sheets are loaded here -->
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/css/appensureStyle.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/css/serversStyle.css" />
+
+<style>
+
+</style>
+
+{% endblock css %}
+{% block content %}
+
+<div>
+
+     <div class="dashboard-cell" id="radioDiv"  style="width: 16%;">
+          <div class="dashboard-panel ">
+               <div class="dashboard-element">
+                    <div class="panel-head">
+                    </div>
+                    <div class="panel-body" id="Id_Radio" style="width: 100%;">
+                         {% radiogroup id="id_radio_group_Left" managerid="mID_leftListOfApps"  labelField="DisplayName" valueField="Servers" value="$app$"|token_safe default="*"%}
+                    </div>
+               </div>
+          </div>
+     </div>
+     <div class="dashboard-cell" style="width: 84%;" id="radioDiv3" >
+          <div class="dashboard-panel ">
+               <div class="dashboard-element">
+                    <div class="panel-body" id="RightDiv" >
+
+
+                         <!-- Tabs structure -->
+                         <div class="dashboard-row dashboard-row4" id="container" style="width: 99.2%;">
+                              <div class="tabs" id="dID_fourTabs" style="width: 100.2%">
+                                   <ul class="classID_ul_FourTab-links">
+                                        <!--<li id="appname" style="min-width:12%; font-size:15px; margin-top: 0.8%; font-weight: bold"></a></li>-->                                
+                                        <li class="active" id="overview"><a href="#tab1">Overview</a></li>
+                                        <!--<li><a href="#tab2" id="appd">App Details</a></li>-->
+                                        <li><a href="#tab4" id="alarm">Alarms</a></li>
+                                        <li><a href="#tab3" id="userd">Server Activity</a></li>
+                                        <!--<li><a href="#tab5" id="topologyd"</a></li>-->
+                                   </ul>
+                              </div>
+
+                              <div class="dashboard-row dashboard-row1" id="item">
+                                   <div class="dashboard-cell" style="width:100.8%;margin-top:-14px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" id="appbg">
+
+                                                       <table>
+                                                            <tr>
+                                                                 <th><h3 id="allapps">All Servers</h3></th>
+                                                            </tr>
+                                                            <tr style="width: 100%">
+                                                                 <th id="appname" style="width: 100%;position: static;margin-top:15px;padding-bottom: 23px"></th>
+                                                                 <th id="singledropdownvalue"></th>
+                                                                 <th style="width: 20%;position: static">
+                                                            <div  class="span2" id ="dID_selectHost"> 
+                                                                 <!--<h4 style="font-size: 14px;padding-left: 49px;padding-bottom: 15px;width: 35%;margin-left:-165px">Select Server/Process:  </h4>-->
+                                                                 <h4 style="font-size: 14px;width: 119%;font-size: 14px;margin-bottom: 15%;">Select Host:  </h4>
+                                                            </div>
+                                                            </th>
+                                                            <th id="dID_dropUser_HostName" style="width: 75%;position: static;display: none;margin-left: -15%;">
+                                                            <div>{% dropdown id="id_dropdown_selectServer"  value="$drop_HostName$"|token_safe showClearButton=False selectFirstChoice=True  managerid="mID_dropdown_selectServer" valueField="HostName" %} 
+                                                            </div></th>
+                                                            </tr>
+                                                       </table>
+                                                  </div>
+
+                                                  <div class="panel-body" id="time">
+
+                                                       <!--<div  class="span2" id ="txt"> </div> -->
+                                                       <!--{% timerange id="timerange" managerid="simplesearch1"  preset="All time"  earliest_time="0"|token_safe  latest_time="now"|token_safe %}-->
+                                                       
+                                                       {% timerange id="timerange" managerid="simplesearch1" preset="Last 24 hours"   earliest_time="-24h@h"|token_safe latest_time="now"|token_safe %}
+                                                  </div><!-- end of time -->
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div> <!-- end of item- -->                
+
+                              <!-- End of Tabs structure -->
+                              <!--Application Overview Info-->
+
+                              <!-- Chart and table  structure -->
+                              <div class="dashboard-row dashboard-row4" id="item55">
+                                   <div class="dashboard-cell" style="width: 100.8%;" id="tests2">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Server Details</h3>
+                                                  </div>
+                                                  <div class="panel-body" >
+
+                                                       <div> {% table id="id_table_allapps" managerid="mID_table_allapps" drilldownRedirect=False   %} </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                              </div>
+                              <!-- End of Chart and table  structure -->
+                              <div class="dashboard-row dashboard-row7" style="margin-top: 8px;padding-bottom: 10px;width: 100.9%" id="single_resTime_calls_users_alarm">
+                                   <div class="dashboard-cell" style="width: 33.3%;margin-top: -24px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" >
+                                                       <h3 id="head">Highest CPU Utilization</h3>
+                                                  </div>
+                                                  <div class="panel-body" >
+
+                                                       {% table id="id_single_respTime" managerid="mID_table_highestCPU"  fields=" \"Host Name\", \"CPU (%)\" "%}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 33.3%;margin-top: -24px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3  id="head">Highest Memory Utilization</h3>
+                                                  </div>
+                                                  <div class="panel-body" >                                       
+                                                       {% table id="id_table_highestMemoryUtilization" managerid="mID_table_highestMemoryUtilization" fields=" \"Host Name\", \"Memory (%)\"   " %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+
+                                   <div class="dashboard-cell" style="width: 33.3%;margin-top: -24px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Highest Alarm Count</h3>
+                                                  </div>
+                                                  <div class="panel-body" >
+                                                       {% table id="id_table_highestAlarmCount" managerid="mID_table_highestAlarmCount" fields=" \"Host Name\", Alarms   " %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <!--Start: All Alarms Overview-->
+                              <div class="dashboard-row dashboard-row13" style="width: 100%;float: right;" id="alram_all_overview">
+
+
+                                   <div class="dashboard-cell" style="width: 100%;margin-top:-14px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" id="cpuhead">
+                                                       <h3 id="head">Alarm Count</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_Alarms_AllApps" managerid="mID_chart_Alarms_AllApps"  type="area" %}
+                                                       <!--{% table id="sID_table_Alarms_AllApps" managerid="mID_table_Alarms_AllApps"  fields=" HN,NID,sCPU " %}-->
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                                   <div class="dashboard-cell" style="width: 100%;margin-top:-14px" >
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" id="cpuhead">
+                                                       <h3 id="head">Diagnostic Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/diagnostic_30.png" id="diagnostic_img"></h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       <!--{% chart id="alarm_table" managerid="user_ses_latency Alarm_search_chart"  type="area" %}-->
+                                                       {% table id="id_table_Alarms_AllApps" managerid="mID_table_Alarms_AllApps"  fields=" Applications , \"Diagnostic Details\" " %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                              </div>
+
+                              <!--start of All Users Overview-->
+                              <div class="dashboard-row dashboard-row13" style="width: 100%;float: right;" id="all_users_overview">
+
+                                   <div class="dashboard-cell" style="width: 100%;margin-top:-14px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" id="cpuhead">
+                                                       <h3 id="head"> User Count</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_Users_AllApps" managerid="mID_chart_Users_AllApps"  type="column" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                                   <div class="dashboard-cell" style="width: 100%;margin-top:-14px" >
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" id="cpuhead">
+                                                       <h3 id="head">User Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/people24_24.png" id="usercount_img"></h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% table id="id_table_Users_AllApps" managerid="mID_table_Users_AllApps"  fields=" Applications, UserIP , \"All Calls\",\"Response Time(ms)\",\"Open Calls\", \"Closed Calls\"   "%}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                              </div>
+                              <!--                    End of All Users Overview-->
+
+
+                              <!-- Table and table  structure -->
+                              <div class="dashboard-row dashboard-row4" >
+
+                                   <div class="dashboard-cell" style="width: 50%;" id="chart_id">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <center><h3>Users</h3></center>
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       <div>  {% timeline id="timeline1" managerid="search1" %} </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;" id="table_id">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+
+                                                  </div>
+                                                  <div class="panel-body" >
+
+                                                       <div>{% table id="eviewer1" managerid="search1" %} </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <!-- End of  structure -->
+
+                              <div class="dashboard-row dashboard-row4" >
+
+                                   <!-- Timeline and table of  structure -->
+                                   <div class="dashboard-cell" style="width: 50%;" id="chart1_id">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <!--<h3><center>App Details</center></h3>-->
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       <div> {% timeline id="timeline11" managerid="search1" %} </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;" id="table1_id">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+
+                                                  </div>
+                                                  <div class="panel-body" >
+
+                                                       <div>{% table id="chart_allapps111" managerid="mID_table_allapps" drilldownRedirect=False  %} </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+                              </div><!-- End of Timeline and table of  structure -->
+
+                              <!-- Start of chart structure -->
+                              <div class="dashboard-row dashboard-row51" id="item53">
+                                   <div class="dashboard-cell" style="width: 100%;">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <!--<h3><center>Your Selected App Details</center></h3>-->
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="chart_calls111" managerid="search_calls" type="column" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div><!-- End of chart structure -->
+
+
+                              <!--when we click alarm to display below chart and table-->
+
+                              <div class="dashboard-row dashboard-row51" id="item52">
+                                   <div class="dashboard-cell" style="width: 100.8%;margin-top: -14px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Application Alarm Count</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       <!--{% chart id="chart_calls11" managerid="search_calls" type="line" %}-->
+                                                       {% chart id="id_chart_AllAlarms" managerid="mID_chart_AllAlarms" type="area" %}
+
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <!-- End of chart structure -->
+                              <!-- Start of Table structure -->
+                              <div class="dashboard-row dashboard-row51" id="item51">
+                                   <div class="dashboard-cell" style="width: 100.8%;margin-top: -14px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Application Diagnostic Details<img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/diagnostic_30.png" id="diagnostic_img"></h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       <!--{% table id="table_searchresults51" managerid="mID_table_AllAlarms"  fields="\"Domain Name/IP\" Type Servers \"Response Time (ms)\" \"Availability (%)\" \"Throughput (KB/Min)\" Calls \"Slow Calls\"  \"Error Calls\" \"Very Slow Calls (%)\" "%}-->
+
+                                                       {% table id="id_table_AllAlarms" managerid="mID_table_AllAlarms" pageSize="10" fields=" \"Affected Servers\",\"Diagnostic Detail\" " %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div><!-- End of Table structure -->
+                              <!--End of Alatms -when we click alarm to display above chart and table-->
+
+                              <!-- user details -->
+                              <div class="dashboard-row dashboard-row4" id="item54">
+                                   <div class="dashboard-cell" style="width: 100%;">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <!--<h3><center>Your Application Users Details</center></h3>-->
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       {% chart id="chart_app" managerid="search_app_respTime" style="display:none; " type="column" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div> 
+                              <div class="dashboard-row dashboard-row4" id="item57">
+                                   <div class="dashboard-cell" style="width: 100%;">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <!--<h3><center>Your Selected Users Details</center></h3>-->
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       {% table id="table_app" managerid="search_app" pageSize="10" fields="\"User Name/IP\" \"Response Time (ms)\" \"All Calls\" \"Open Calls\" \"Closed Calls\" " %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div> 
+
+                              <!-- end of user details -->
+
+                              <!--SERVER ACTIVITY INFO-->                     
+
+                              <div class="dashboard-row dashboard-row5" id="dID_table_userIPS" style="width: 100.8%">
+
+
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -16px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Server Processes </h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% table id="id_table_ServerProcess" managerid="mID_table_ServerProcess"  fields=" \"Process Name\", \"CPU (%)\", \"Memory (MB)\", Port " pageSize="10"%}
+                                                       <!--{% table id="id_table_CPUUsage" managerid="mID_table_ListofIps"  fields=" IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" " pageSize="10"%}-->
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -16px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Servers Activity</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% table id="id_table_ServerActivity" managerid="mID_table_ServerActivity"  fields=" \"Server Name\", \"Response Time (ms)\", Calls,\"Slow Calls\",\"Error Calls\", Port " pageSize="10"%}
+                                                       <!--{% table id="id_table_CPUUsage" managerid="mID_table_ListofIps"  fields=" IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" " pageSize="10"%}-->
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+
+                                   <div class="dashboard-row dashboard-row6">
+                                        <div class="dashboard-cell" style="width: 100%;margin-top: -11px">
+                                             <div class="dashboard-panel ">
+                                                  <div class="dashboard-element">
+
+                                                       <div class="panel-body" style="margin-top: 19px">
+                                                            <div  class="span2" style="width: 15%"> <h4  id ="txtuser1" style="font-size: 14px">Select Server/Process&nbsp&nbsp&nbsp:</h4></div>
+                                                            <div>{% dropdown id="drop_process"  value="$server_process$"|token_safe showClearButton=False selectFirstChoice=True managerid="mID_table_ServerActivity" valueField="serverport" %} </div>
+
+                                                            <!--{% dropdown id="id_dropUser_HostName"  value="$hostValue$"|token_safe showClearButton=False selectFirstChoice=True  managerid="mID_dropUser_HostName" valueField="HN" %}-->                
+                                                       </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div> 
+
+
+                                   <div class="dashboard-cell" style="width:100%;margin-top: -15px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Average Response Time</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       <!--{% table id="id_table_userIPS" managerid="mID_table_userIPS" pageSize="10" fields=" UserIP,\"Response Time (ms)\", \"All Calls\",\"Open Calls\",\"Closed Calls\" " %}-->
+                                                       {% chart id="id_chart_ServerProcessAvgRespTime" managerid="mID_chart_ServerProcessAvgRespTime" style="display:none; " type="area" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+
+                              </div>
+
+                              <!--Start users Chart --> 
+                              <div class="dashboard-row dashboard-row4" id="dID_chart_ServerActivity" style="width: 100.8%">
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -16px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Throughput</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_ServerThrputhput" managerid="mID_chart_ServerThrputhput" style="display:none; " type="area" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -16px">
+                                        <div class="dashboard-panel" >
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Total Calls versus Total Error Calls</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_ServerCallsErrorCalls" managerid="mID_chart_ServerCallsErrorCalls" style="display:none; " type="line" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div><!--End users Chart --> 
+
+
+                              <div class="dashboard-row dashboard-row6" id="dropdown_user">
+                                   <div class="dashboard-cell" style="width: 100%;margin-top: -11px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+
+                                                  <div class="panel-body">
+                                                       <div  class="span2" id ="txtuser"> <h4>Select User :</h4></div>
+                                                       <div>{% dropdown id="drop_users"  value="$user$"|token_safe showClearButton=False default="*" managerid="mID_chart_user_AppRespTime" valueField="UserIPs" %} </div>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div> 
+
+
+                              <div class="dashboard-row dashboard-row4" id="all_users">
+                                   <div class="dashboard-cell" style="width: 100%;margin-top: -11px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">All User Calls</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       {% chart id="chart_user_calls" managerid="user_app_calls" type="column" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              <div class="dashboard-row dashboard-row7" id="parti_user">
+                                   <div class="dashboard-cell" style="width: 100%;">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">User Calls </h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="userchart" managerid="search_user" type="area" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                              <!--End of User Info-->
+
+
+
+
+                              <!-- Application- Table structure -->
+                              <div class="dashboard-row dashboard-row2" id="tab_overview" style="margin-top: -20px;width: 100.8%">
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -8px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">CPU Usage</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_CPUUsage" managerid="mID_chart_cpuUsage"  type="area" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -8px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Memory Usage</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_memUsage" managerid="mID_chart_memUsage"  type="area"%}
+                                                       <!--{% table id="id_table_CPUUsage" managerid="mID_table_ListofIps"  fields=" IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" " pageSize="10"%}-->
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -19px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Disk I/O </h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_diskUsage" managerid="mID_chart_IOUsage"   fields="_time,  \"IO Writes\",\"IO Reads\" "   type="line" %}
+                                                       <!--{% table id="id_table_CPUUsage" managerid="mID_table_ListofIps"  fields=" IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" " pageSize="10"%}-->
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -19px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Storage Usage</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% chart id="id_chart_storageUsage" managerid="mID_chart_storageUsage"  type="area" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+
+
+                              </div><!-- End of Application- Table structure -->
+
+                              <!-- Application- Select Server Within Topology -->
+                              <div class="dashboard-row dashboard-row8" id="dropdownips">
+                                   <div class="dashboard-cell" style="width: 100%;margin-top: -15px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+
+                                                  <div class="panel-body">
+                                                       <div  class="span2" id ="txt123"> <h4>Select Server Within Topology&nbsp&nbsp&nbsp:</h4></div>
+                                                       <div style="margin-top: 17px; margin-left: 17%;">
+                                                            {% dropdown id="id_dropDown_ListofIps"  value="$IP$"|token_safe showClearButton=False default="*" managerid="mID_table_ListofIps" valueField="IP" %} </div>
+
+                                                       <!-- <div  class="span_button" id ="tierText" style="display:block; "></div> -->
+
+
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div> <!-- End of Application- Select Server Within Topology -->
+
+                              <!-- Application- chart structure -->
+                              <div class="dashboard-row dashboard-row3" id="over_all_restime">
+                                   <div class="dashboard-cell" style="width: 100%;margin-top: -14px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head" id="head">
+                                                       <table>
+                                                            <th><h3 style="font-weight: 600">Response Time&nbsp :</h3></th><th><span id="tierText">All</span></th> 
+                                                            <th><img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/clusterIcon_26.png" id="web_img"></th>
+                                                            <th><img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/appIcon123_28.png" id="db_img"></th>
+                                                            <th><img src="/en-US/splunkd/__raw/servicesNS/admin/AppEnsure/static/appTier_28.png" id="app_img"></th>
+                                                       </table>
+
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       {% chart id="chart_Res" managerid="overview_ResTime" type="area" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div><!-- End of Application- chart structure -->
+
+                              <!-- Start of Application- charts- throughput and calls structure -->
+                              <div class="dashboard-row dashboard-row4" id="over_thrput_calls" style="">
+
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -15px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Throughput</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       {% chart id="chart_Throughput" managerid="over_throughput" type="line" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                                   <div class="dashboard-cell" style="width: 50%;margin-top: -15px">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <h3 id="head">Calls</h3>
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       {% chart id="chart_calls" managerid="over_calls" type="line" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div> <!-- End of Application- charts- throughput and calls structure -->
+
+                              <div class="dashboard-row dashboard-row3" id="topology_div">
+                                   <div class="dashboard-cell" style="width: 100%;">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+                                                       <!--<h3><center>Overview all Ip's Restime</center></h3>-->
+                                                  </div>
+                                                  <div class="panel-body">
+
+                                                       <h1></h1>
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div><!-- End of Application- chart structure -->
+
+                              <div class="dashboard-row dashboard-row789" id="item789" style="display: none">
+                                   <div class="dashboard-cell" style="width: 100%;">
+                                        <div class="dashboard-panel ">
+                                             <div class="dashboard-element">
+                                                  <div class="panel-head">
+
+                                                  </div>
+                                                  <div class="panel-body">
+                                                       {% table id="id_table_TopologyID" managerid="mID_table_TopologyID" fields="id,AN,host" %}
+                                                  </div>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+
+
+
+
+
+                         </div><!-- end of right side Div1 --> 
+                    </div><!-- end of right side Div2 --> 
+               </div><!-- end of right side Div3 --> 
+          </div><!-- end of right side Div4 --> 
+          <br style="clear:both;"/>
+     </div><!-- end of right side Div5 --> 
+
+     {% endblock content %}
+
+     {% block managers %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_chart_Alarms_AllApps"
+     search="index=aeserversalarms sourcetype=aeserversalarms|dedup RC,id, CAN|sort -count | stats count(RC) as AlarmsCount by CAN|rename CAN as \"Application Name\" |fields  \"Application Name\" , AlarmsCount "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_Users_AllApps"
+     search="index=aeusers |dedup CAN, UserIP |stats sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls,values(UserIP) as Users,AVG(URT) as ResponseTime values(CAN) as Applications by UserIP|rename OpenCalls as \"Open Calls\"|eval \"Response Time(ms)\" = round(ResponseTime,0) |rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" |rename Users as UserIP |fields Applications, UserIP , \"All Calls\",\"Response Time(ms)\",\"Open Calls\",\"Closed Calls\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_chart_Users_AllApps"
+     search="index=aeusers |dedup UserIP, CAN |stats count as Users by CAN|rename CAN as ApplicationName | rename Users as UsersCount"|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_Alarms_AllApps"
+     search="index=aeserversalarms sourcetype=aeserversalarms |dedup RC,id, CAN|sort -count | stats values(aDD) as \"Diagnostic Details\" by CAN|rename CAN as Applications |fields Applications,\"Diagnostic Details\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     <!-- left side list of applications search query -->
+     {% searchmanager
+     autostart=false
+     id="mID_leftListOfApps"
+     search="index=aeservermetrics | dedup HN|rename HN as Servers| fields Servers"
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %} 
+
+     {% searchmanager
+     autostart=false
+     id="mID_getappname"
+     search="index=aeservermetrics HN=\"$app$\"| dedup HN|rename HN as Servers| fields Servers"|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     <!--Charts - throughput when IP is selected-->
+     {% searchmanager
+     autostart=false
+     id="over_throughput"
+     search="index=aeapplist id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id] AT=0 OR AT=10 Ip=\"$IP$\"|timechart eval(avg(AC)) as \"Throughput(Calls/min)\" |eval \"Throughput(Calls/min)\"=round(('Throughput(Calls/min)'),0) "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="over_calls"
+     search="index=aeapplist  id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id] AT=0 OR AT=10 Ip=\"$IP$\" |timechart eval(sum(AC)) as Calls |eval \"Calls(calls/min)\"=round((Calls),0) |fields _time, \"Calls(calls/min)\"  "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="overview_ResTime"
+     search="index=aeapplist id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id]  Ip=\"$IP$\"|timechart eval(avg(RT)) as ResponseTime |eval ResponseTime=round((ResponseTime),0) |rename ResponseTime as \"Response Time (ms)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     <!--App- ResponseTime box-->
+     {% searchmanager
+     autostart=false
+     id="mID_table_highestCPU"
+     search="index= aeservermetrics |stats AVG(SCPU) as CPUUsage  by HN|eval \"CPU (%)\" = round(CPUUsage,0)|rename HN as \"Host Name\"|fields \"Host Name\", \"CPU (%)\"|sort -\"CPU (%)\" |head 10 "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     <!--App- Calls box-->
+     {% searchmanager
+     autostart=false
+     id="mID_table_highestMemoryUtilization"
+     search="index= aeservermetrics |stats AVG(SMEM) as MEMUsage  by HN|eval \"Memory (%)\"= round(MEMUsage,0)|rename HN as \"Host Name\"|fields \"Host Name\", \"Memory (%)\" |sort -\"Memory (%)\" |head 10  "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     <!-- App- Users box-->
+     {% searchmanager
+     autostart=false
+     id="mID_table_highestAlarmCount"
+     search="index=aeserversalarms sourcetype=aeserversalarms |stats count(sRC) as AlarmCount by HN |rename HN as \"Host Name\"| rename AlarmCount as Alarms| sort - Alarms |fields \"Host Name\", Alarms "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     <!-- App- Alerts box-->
+     {% searchmanager
+     autostart=false
+     id="mID_single_Alarms"
+     search="index =aealarms CAN=\"$app$\" id=*[search index=aeapplist CAN=\"$app$\" T=\"1\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]| stats count(RC) as AlarmsCount "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="search_user"
+     search="index=aeusers UserIP= \"$user$\" id=*[search index=aeapplist  CAN=\"$app$\" T=\"1\" | eval HostName=\"$hostValue$\" | eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id] | timechart sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls|rename OpenCalls as \"Open Calls\" |rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="user_app_calls"
+     search="index=aeusers id=*[search index=aeappmetrics CAN=\"$app$\" |dedup id |fields id] AT=0| stats  sum(AC) as AllCalls, sum(CC) as ClosedCalls, sum(OC) as OpenCalls by UserIP|eval \"Response Time(ms)\" = round(ResponseTime,0)|rename OpenCalls as \"Open Calls\" |rename ClosedCalls as \"Closed Calls\"|rename AllCalls as \"All Calls\" |sort -\"All Calls\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_userIPS"
+     search="index=aeusers id=*[search index=aeapplist CAN=\"$app$\"  T=\"1\" |  eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]| stats avg(URT) as ResponseTime, values(UserIP) as IP, sum(AC) as \"All Calls\", sum(CC) as \"Closed Calls\", sum(OC) as \"Open Calls\" by UserIP |eval \"Response Time (ms)\" = round(ResponseTime,0) |rename IP as UserIP |fields UserIP , \"Response Time (ms)\", \"All Calls\",\"Closed Calls\",\"Open Calls\" |sort -\"Response Time (ms)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+<!--     {% searchmanager
+     autostart=false
+     id="mID_chart_ServerProcessAvgRespTime"
+     search=" index= aeservermetrics | eval HostName=\"$server_process$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where SN=selectedHostName and P= selectedIP |timechart AVG(RT) as RspTime|eval \"Response Time (ms)\" = round(RspTime,2)|fields _time,\"Response Time (ms)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}-->
+     
+      {% searchmanager
+     autostart=false
+     id="mID_chart_ServerProcessAvgRespTime"
+     search=" index= aeservermetrics | eval HostName=\"$drop_HostName$\" |eval serport=\"$server_process$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|eval splitserport= split(serport,\"/\")|eval selectedser=mvindex(splitserport, 0)|eval selectedport=mvindex(splitserport, 1)|where HN=selectedHostName and AIP=selectedIP and SN=selectedser and P=selectedport|timechart AVG(RT) as RspTime|eval \"Response Time (ms)\" = round(RspTime,2)|fields _time,\"Response Time (ms)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     
+     
+     
+     
+     
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_ServerProcess"
+     search=" index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP|stats AVG(SCPU) as CPU, AVG(SMEM) as Memory, values(P) as Port,values(PN) as \"Process Name\" by PN, P |eval \"CPU (%)\"=round(CPU,0)|eval \"Memory (MB)\"=round(Memory,0)| fields \"Process Name\", \"CPU (%)\", \"Memory (MB)\", Port "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_ServerActivity"
+     search="  index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP |stats AVG(RT) as respTime, SUM(AC) as Calls, SUM(SC) as \"Slow Calls\", SUM(EC) as \"Error Calls\", values(P) as Port,values(SN) as \"Server Name\" by SN,P|eval \"Response Time (ms)\"=round(respTime,0)|eval \"Memory (MB)\"=round(Memory,0) |eval serverport='Server Name'+\"/\"+Port | fields \"Server Name\", \"Response Time (ms)\", Calls,\"Slow Calls\",\"Error Calls\", Port,serverport "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+<!--     {% searchmanager
+     autostart=false
+     id="mID_chart_ServerThrputhput"
+     search="  index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP |timechart eval(avg(AC)) as Thrpt|eval \"Throughput (Calls/min)\"=round((Thrpt),2)|fields _time, \"Throughput (Calls/min)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}-->
+     
+       {% searchmanager
+     autostart=false
+     id="mID_chart_ServerThrputhput"
+     search=" index= aeservermetrics | eval HostName=\"$drop_HostName$\" |eval serport=\"$server_process$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|eval splitserport= split(serport,\"/\")|eval selectedser=mvindex(splitserport, 0)|eval selectedport=mvindex(splitserport, 1)|where HN=selectedHostName and AIP=selectedIP and SN=selectedser and P=selectedport|timechart eval(avg(AC)) as Thrpt|eval \"Throughput (Calls/min)\"=round((Thrpt),2)|fields _time, \"Throughput (Calls/min)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     
+
+<!--     {% searchmanager
+     autostart=false
+     id="mID_chart_ServerCallsErrorCalls"
+     search="index= aeservermetrics | eval HostName=\"$server_process$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where SN=selectedHostName and P= selectedIP|timechart eval(SUM(AC)) as calls, eval(SUM(EC)) as errorCalls|eval \"Calls\"=round((calls),2) |eval \"Error Calls\"=round((errorCalls),2)|fields _time,\"Calls\", \"Error Calls\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}-->
+     
+     
+      {% searchmanager
+     autostart=false
+     id="mID_chart_ServerCallsErrorCalls"
+     search="index= aeservermetrics | eval HostName=\"$drop_HostName$\" |eval serport=\"$server_process$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|eval splitserport= split(serport,\"/\")|eval selectedser=mvindex(splitserport, 0)|eval selectedport=mvindex(splitserport, 1)|where HN=selectedHostName and AIP=selectedIP and SN=selectedser and P=selectedport | timechart eval(SUM(AC)) as calls, eval(SUM(EC)) as errorCalls|eval \"Calls\"=round((calls),2) |eval \"Error Calls\"=round((errorCalls),2)|fields _time,\"Calls\", \"Error Calls\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     
+     
+     
+     
+     
+
+     {% searchmanager
+     autostart=false
+     id="mID_chart_user_AppRespTime"
+     search="index=aeusers id=*[search index=aeapplist  CAN=\"$app$\" T=\"1\"| eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]| stats avg(URT) as ResponseTime, values(UserIP) as UserIPs by UserIP   |eval \"Response Time(ms)\" = round(ResponseTime,0)|fields UserIPs , \"Response Time(ms)\"|sort -\"Response Time (ms)\"| head 50"|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     <!---Chart and table - When Application is selected--->
+     {% searchmanager
+     autostart=false
+     id="search_app"
+     search="index=ae_appusers  AppName=*[search index=ae_disappname DisplayName = \"$app$\" earliest_time=\"0\" latest_time=\"now\" | fields AppName] Instance=*[search index=ae_disappname DisplayName = \"$app$\" earliest_time=\"0\" latest_time=\"now\" | fields Instance]  |where Customized=0 OR Customized=8 OR Customized=2 OR Customized=10 |stats sum(Calls) as AllCalls,sum(Open_Calls) as OpenCalls,avg(RespTime) as RespTime,sum(Closed_Calls) as ClosedCalls by AppName,UserIP |dedup UserIP |eval AllCalls=round(AllCalls,0)|eval OpenCalls=round(OpenCalls,0)|eval ClosedCalls=round(ClosedCalls,0)| eval \"Response Time (ms)\"=round(RespTime,0)|rename UserIP as \"User Name/IP\" |rename AllCalls as \"All Calls\"|rename OpenCalls as \"Open Calls\"|rename ClosedCalls as \"Closed Calls\" |fields \"User Name/IP\",\"Response Time (ms)\",\"All Calls\" ,\"Open Calls\",\"Closed Calls\" |sort -\"Response Time (ms)\""|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     {% searchmanager
+     autostart=false
+     id="search_app_respTime"
+     search="index=ae_appusers AppName=*[search index=ae_disappname DisplayName = \"$app$\" earliest_time=\"0\" latest_time=\"now\" | fields AppName] Instance=*[search index=ae_disappname DisplayName = \"$app$\" earliest_time=\"0\" latest_time=\"now\"| fields Instance]|where Customized=0 OR Customized=8 OR Customized=2 OR Customized=10 |stats sum(Calls) as AllCalls,sum(Open_Calls) as OpenCalls,avg(RespTime) as RespTime,sum(Closed_Calls) as ClosedCalls by AppName,UserIP |dedup UserIP |eval AllCalls=round(AllCalls,0)|eval OpenCalls=round(OpenCalls,0)|eval ClosedCalls=round(ClosedCalls,0)| eval \"Response Time (ms)\"=round(RespTime,0)|rename UserIP as \"User Name/IP\"  |fields \"User Name/IP\",\"Response Time (ms)\" |sort -\"Response Time (ms)\"| head 50 "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+
+
+<!--     {% searchmanager
+     autostart=false
+     id="mID_chart_AllAlarms"
+     search="index=aeserversalarms sourcetype=aeserversalarms |sort -count | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP|where HN=selectedHostName and AIP=selectedIP | stats count(sRC) as \"Alarm Count\" by CAN,HN|rename HN as Server|fields Server, \"Alarm Count\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}-->
+     
+     
+       {% searchmanager
+     autostart=false
+     id="mID_chart_AllAlarms"
+     search="index=aeserversalarms sourcetype=aeserversalarms |sort -count | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP|where HN=selectedHostName and AIP=selectedIP | timechart count(sRC) as Alarms "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     
+  
+     {% searchmanager
+     autostart=false
+     id="mID_table_AllAlarms"
+     search="index=aeserversalarms sourcetype=aeserversalarms |sort -count | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP|where HN=selectedHostName and AIP=selectedIP | stats values(aDD) as \"Diagnostic Detail\" by CAN,HN|rename HN as \"Affected Servers\" |fields \"Affected Servers\",\"Diagnostic Detail\"  "|token_safe 
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     
+     
+     
+     
+     
+     
+     
+
+     {% searchmanager
+     autostart=false
+     id="list_agents"
+     search="index=aeappmetrics |where AT=0 or AT=10 | dedup  id |fields AN,id"
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %} 
+
+
+     <!--Charts - All Apps- ResponseTime Query  -->
+     {% searchmanager
+     autostart=false
+     id="mID_chart_allapps"
+     search="index=aeappmetrics | stats values(CAN) as Applications, AVG(RT) as ResponseTime  by CAN |eval \"Response Time (ms)\"=round(ResponseTime,0)| fields Applications, \"Response Time (ms)\" |sort -\"Response Time (ms)\" "
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_allapps"
+     search="index= aeservermetrics | dedup HN|stats AVG(SCPU) as CPUUsage, AVG(SMEM) as MemoryUsage, AVG(Disk) as DiskUsage, values(OS) as \"Operating System\" by HN|eval \"CPU Usage (%)\" = round(CPUUsage,2) |eval \"Memory Usage (%)\" = round(MemoryUsage,2) |eval \"Disk Usage (%)\" = round(DiskUsage,2)|rename HN as Server | fields Server, \"Operating System\",\"CPU Usage (%)\",\"Memory Usage (%)\", \"Disk Usage (%)\"  "
+     cache=False 
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+
+     {% searchmanager id="search1"
+     search="index=_internal | head 1000 | stats count by sourcetype"
+     preview=True
+     required_field_list="*"
+     status_buckets=300 %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_chart_cpuUsage"
+     search="index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP |timechart eval(AVG(SCPU)) as \"CPU (%)\"|eval \"CPU (%)\"=round('CPU (%)',2) "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     {% searchmanager
+     autostart=false
+     id="mID_chart_memUsage"
+     search="index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP |timechart eval(AVG(SMEM)) as \"Memory (%)\"|eval \"Memory (%)\"=round('Memory (%)',2) "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+     {% searchmanager
+     autostart=false
+     id="mID_chart_storageUsage"
+     search="index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP |timechart eval(AVG(Disk)) as \"Storage (%)\"|eval \"Storage (%)\"=round('Storage (%)',2) "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_chart_IOUsage"
+     search="index= aeservermetrics | eval HostName=\"$drop_HostName$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1)|where HN=selectedHostName and AIP= selectedIP  |timechart eval(AVG(IOWrite)) as \"IOWrites\",eval(AVG(IORead)) as \"IOReads\" |eval \"IO Writes\"=round(IOWrites,2)|eval \"IO Reads\"=round(IOReads,2)|fields _time,  \"IO Writes\",\"IO Reads\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_table_ListofIps"
+     search="index= aeapplist CAN=\"$app$\"  id=*[search index=aeapplist CAN=\"$app$\" T=\"1\" | eval HostName=\"$hostValue$\"| eval splitedData= split(HostName,\"/\")|eval selectedHostName=mvindex(splitedData, 0)|eval selectedIP=mvindex(splitedData, 1) | dedup id |where HN= selectedHostName AND Ip=selectedIP |fields id]|stats  sum(RT) as ResponseTime, sum(AC) as Calls, avg(AC) as Throughput,sum(SC) as \"Slow Calls\", sum(EC) as \"Error Calls\", values(T) as Type, values(Ip) as IP, values(SN) as Servers by Ip|eval Type=if(Type==1,\"Server_WEB\",if(Type==2,\"Server_APP\",if(Type==3,\"Server_DB\",if(Type==4,\"Server\",if(Type==5,\"Server_WEB\",\"--\")))))|eval \"Response Time (ms)\"=round((ResponseTime),0)|eval Servers=if(Servers==\" \",\"--\",Servers) |eval \"Throughput (Calls/min)\"=round((Throughput),0)|fields IP, Type, Servers, \"Response Time (ms)\", \"Throughput (Calls/min)\", Calls, \"Slow Calls\", \"Error Calls\" | sort -\"Response Time (ms)\" "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     <!--for topology-->
+     {% searchmanager
+     autostart=false
+     id="mID_table_TopologyID"
+     search="index=aeappmetrics CAN=\"$app$\" AT=0|dedup id, AN|fields id,CAN,host "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_chart_user_AppRespTime_test"
+     search="index=aeusers AN=\"$app$\" | dedup UserIP  | fields UserIP  "|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+     {% searchmanager
+     autostart=false
+     id="mID_dropdown_selectServer"
+     search="index=aeservermetrics HN=\"$app$\"|dedup AIP|eval HostName = HN.\"/\".AIP |fields HostName"|token_safe
+     cache=False
+     earliest_time="-24h@h"
+     latest_time="now"
+     %}
+
+   
+     
+
+
+     {% endblock managers %}
+     {% block js %}
+
+     <script>
+
+          var part_app = 0;
+          var overview = 0;
+          var all_apps = 0;
+          var app_apps_booleanVal = 0;
+          var count = 0;
+          var collection_data;
+          var sID_chart_user_AppRespTime_test;
+          var newdropdowndata;
+          var clickedAppName;
+          var hostNameDropdown;
+          var getappname;
+          var listofprocess;
+          var serport;
+          var id_selecetedApp_Tab_overview =0;
+
+          require(["splunkjs/ready!", "splunkjs/mvc/chartview", "jquery", "splunkjs/mvc/radiogroupview"], function (mvc) {
+              all_apps = 1;
+              app_apps_booleanVal = 100;
+
+              //        ****************************************Start : Create Search Instances****************************************************
+              var sID_leftListOfApps = mvc.Components.getInstance("mID_leftListOfApps");
+              var sID_radio_group_Left = mvc.Components.getInstance("id_radio_group_Left");
+              var search_dropAgents = mvc.Components.getInstance("list_agents");
+              var sID_table_allapps = mvc.Components.getInstance("mID_table_allapps");
+              var sID_chart_allapps = mvc.Components.getInstance("mID_chart_allapps");
+              var event = mvc.Components.getInstance("search1");
+              var sID_table_AllAlarms = mvc.Components.getInstance("mID_table_AllAlarms");
+              var sID_chart_AllAlarms = mvc.Components.getInstance("mID_chart_AllAlarms");
+              var search_appresptime = mvc.Components.getInstance("search_app_respTime");
+              var searchuser = mvc.Components.getInstance("search_app");
+              var timerange1 = mvc.Components.getInstance("timerange");
+
+              //           start User instance
+              var sID_chart_ServerProcessAvgRespTime = mvc.Components.getInstance("mID_chart_ServerProcessAvgRespTime");
+              var sID_table_ServerProcess = mvc.Components.getInstance("mID_table_ServerProcess");
+              var sID_table_ServerActivity = mvc.Components.getInstance("mID_table_ServerActivity");
+              var sID_chart_ServerThrputhput = mvc.Components.getInstance("mID_chart_ServerThrputhput");
+              var sID_chart_ServerCallsErrorCalls = mvc.Components.getInstance("mID_chart_ServerCallsErrorCalls");
+              var sID_chart_user_AppRespTime = mvc.Components.getInstance("mID_chart_user_AppRespTime");
+              var sID_table_userIPS = mvc.Components.getInstance("mID_table_userIPS");
+              var listofUsers = mvc.Components.getInstance("drop_users");
+              listofprocess = mvc.Components.getInstance("drop_process");
+              var allusers = mvc.Components.getInstance("user_app_calls");
+              var partuser = mvc.Components.getInstance("search_user");
+              var sID_table_TopologyID = mvc.Components.getInstance("mID_table_TopologyID");
+              var sID_dropdown_selectServer = mvc.Components.getInstance("mID_dropdown_selectServer");
+              var DID_dropdown_selectServer = mvc.Components.getInstance("id_dropdown_selectServer");
+              var sID_getappname = mvc.Components.getInstance("mID_getappname");
+              getappname = sID_getappname.data("preview", {count: 0, offset: 0});
+              var sID_table_highestCPU = mvc.Components.getInstance("mID_table_highestCPU");
+              var sID_table_highestMemoryUtilization = mvc.Components.getInstance("mID_table_highestMemoryUtilization");
+              var sID_table_highestAlarmCount = mvc.Components.getInstance("mID_table_highestAlarmCount");
+              var sID_single_Alarms = mvc.Components.getInstance("mID_single_Alarms");
+              var sID_table_ListofIps = mvc.Components.getInstance("mID_table_ListofIps");
+              var sID_dropDown_ListofIps = mvc.Components.getInstance("id_dropDown_ListofIps");
+              var sID_chart_cpuUsage = mvc.Components.getInstance("mID_chart_cpuUsage");
+              var sID_chart_memUsage = mvc.Components.getInstance("mID_chart_memUsage");
+              var sID_chart_storageUsage = mvc.Components.getInstance("mID_chart_storageUsage");
+              var sID_chart_IOUsage = mvc.Components.getInstance("mID_chart_IOUsage");
+              var overrestime = mvc.Components.getInstance("overview_ResTime");
+              var overthrput = mvc.Components.getInstance("over_throughput");
+              var overcalls = mvc.Components.getInstance("over_calls");
+              var sID_table_Alarms_AllApps = mvc.Components.getInstance("mID_table_Alarms_AllApps");
+              var sID_chart_Alarms_AllApps = mvc.Components.getInstance("mID_chart_Alarms_AllApps");
+              var sID_table_Users_AllApps = mvc.Components.getInstance("mID_table_Users_AllApps");
+              var sID_chart_Users_AllApps = mvc.Components.getInstance("mID_chart_Users_AllApps");
+              newdropdowndata = sID_dropdown_selectServer.data("preview", {count: 0, offset: 0});
+
+              //        var sID_serverport = mvc.Components.getInstance("mID_table_ServerActivity");
+              serport = sID_table_ServerActivity.data("preview", {count: 0, offset: 0});
+
+
+
+              // ************************************************END : Create Search Instances****************************************************
+
+              // *******************************************************************************Start : Default Start Search ****************************************************
+              sID_chart_user_AppRespTime.search.set(timerange1.val());
+              sID_chart_user_AppRespTime.startSearch();
+              
+//              sID_table_ServerProcess.search.set(timerange1.val());
+//              sID_table_ServerProcess.startSearch();
+              
+              
+              //        sID_table_ServerActivity.search.set(timerange1.val());
+              //        sID_table_ServerActivity.startSearch();
+              sID_leftListOfApps.search.set(timerange1.val());
+              sID_leftListOfApps.startSearch();
+              sID_table_allapps.search.set(timerange1.val())
+              sID_table_allapps.startSearch();
+
+              sID_table_highestCPU.search.set(timerange1.val());
+              sID_table_highestCPU.startSearch();
+              sID_table_highestMemoryUtilization.search.set(timerange1.val());
+              sID_table_highestMemoryUtilization.startSearch();
+              sID_table_highestAlarmCount.search.set(timerange1.val());
+              sID_table_highestAlarmCount.startSearch();
+
+              // *******************************************************************************END : Default Start Search ****************************************************
+
+              // *******************************************************************************Start : tabs highlighed wen i click****************************************************
+              jQuery(document).ready(function () {
+
+
+                  jQuery('.tabs .classID_ul_FourTab-links a').on('click', function (e) {
+                      var currentAttrValue = jQuery(this).attr('href');
+
+                      if (currentAttrValue != "#tab5") {
+                          // Show/Hide Tabs
+                          jQuery('.tabs ' + currentAttrValue).show().siblings().hide();
+                          // Change/remove current tab to active
+                          jQuery(this).parent('li').addClass('active').siblings().removeClass('active');
+                          e.preventDefault();
+                      }
+
+                  });
+
+                  jQuery('.tabs1 .tab-links1 a').on('click', function (e) {
+                      var currentAttrValue = jQuery(this).attr('href');
+
+                      // Show/Hide Tabs
+                      jQuery('.tabs1 ' + currentAttrValue).show().siblings().hide();
+                      // Change/remove current tab to active
+                      jQuery(this).parent('li').addClass('active1').siblings().removeClass('active1');
+
+
+                      e.preventDefault();
+                  });
+
+              });
+              // *******************************************************************************END : tabs highlighed wen i click****************************************************
+
+
+              /** -----------------START : If We Select All Servers [OR] Particular Appln to displaying logic below we have written.--- **/
+
+              sID_radio_group_Left.settings.set("choices", [
+                  {value: "*", label: "All Servers"}
+              ]);
+
+
+              sID_radio_group_Left.on("change", function () {
+                  part_app = 0;
+                  all_apps = 1;
+                  app_apps_booleanVal = 100;
+                  console.log("standard Apps - clicked appname : " + $('input:radio:checked').next('label:first').html());
+                  sID_table_TopologyID.search.set(timerange1.val());
+                  sID_table_TopologyID.startSearch();
+                  jQuery('#overview').addClass('active').siblings().removeClass('active');
+                  jQuery('#overview1').addClass('active1').siblings().removeClass('active1');
+
+                  //                listofprocess.val("DDC/80");
+
+                  //                serport.on("data", function () {
+                  //
+                  //                    var mycount = serport.collection().length;
+                  //                    var serport_data = serport.data();
+                  //                    var finalval = serport_data.rows[0][6];
+                  //                    //                alert(finalval);'
+                  //                    listofprocess.val(finalval);
+                  //                });
+                  //
+                  //                sID_table_ServerActivity.search.set(timerange1.val());
+                  //                sID_table_ServerActivity.startSearch();
+
+
+                  //All Apps
+                  if (sID_radio_group_Left.val() == "*") {
+                      $('#radio_groupId0').removeAttr('disabled');
+                      sID_table_highestCPU.search.set(timerange1.val());
+                      sID_table_highestCPU.startSearch();
+                      sID_table_highestMemoryUtilization.search.set(timerange1.val());
+                      sID_table_highestMemoryUtilization.startSearch();
+                      sID_table_highestAlarmCount.search.set(timerange1.val());
+                      sID_table_highestAlarmCount.startSearch();
+                      search_dropAgents.search.set(timerange1.val());
+                      search_dropAgents.startSearch();
+                      sID_table_allapps.search.set(timerange1.val());
+                      sID_table_allapps.startSearch();
+
+                      document.getElementById("tests2").style.display = "block";
+                      document.getElementById("item55").style.display = "block";
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "block";
+                      document.getElementById("allapps").style.display = "block";
+                      document.getElementById("table_id").style.display = "none";
+                      document.getElementById("chart_id").style.display = "none";
+                      document.getElementById("table1_id").style.display = "none";
+                      document.getElementById("chart1_id").style.display = "none";
+                      document.getElementById("item51").style.display = "none";
+                      document.getElementById("item52").style.display = "none";
+                      document.getElementById("item53").style.display = "none";
+                      document.getElementById("item54").style.display = "none";
+                      document.getElementById("item57").style.display = "none";
+                      document.getElementById("dID_fourTabs").style.display = "none";
+                      //            user tab info
+                      document.getElementById("dID_chart_ServerActivity").style.display = "none";
+                      document.getElementById("dID_table_userIPS").style.display = "none";
+                      document.getElementById("dropdown_user").style.display = "none";
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "none";
+                      // App Over view
+                      document.getElementById("tab_overview").style.display = "none";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+                      document.getElementById("topology_div").style.display = "none";
+                      document.getElementById("appname").style.display = "none";
+                      document.getElementById("dID_selectHost").style.display = "none";
+                      document.getElementById("dID_dropUser_HostName").style.display = "none";
+                      document.getElementById("alram_all_overview").style.display = "none";
+                      document.getElementById("all_users_overview").style.display = "none";
+                      document.getElementById("tierText").style.display = "none";
+                      document.getElementById("singledropdownvalue").style.display = "none";
+
+                  } else {
+                        id_selecetedApp_Tab_overview = 1;
+//                         alert("else-serach");
+                         
+                      serport.on("data", function () {
+
+                          var mycount = serport.collection().length;
+                          var serport_data = serport.data();
+                          var finalval = serport_data.rows[0][6];
+                          //                alert(finalval);'
+                          listofprocess.val(finalval);
+                      });
+                      $(".choice:first-child").css("background", "white");
+                      DID_dropdown_selectServer.val($('#hostNameDropdown').html());
+                      part_app = 1;
+                      overview = 1;
+                      app_apps_booleanVal = 0;
+                      all_apps = 0;
+                      $("#singledropdownvalue").text("");
+                      sID_table_TopologyID.search.set(timerange1.val());
+                      sID_table_TopologyID.startSearch();
+                      sID_dropdown_selectServer.search.set(timerange1.val());
+                      sID_dropdown_selectServer.startSearch();
+                      sID_table_ListofIps.search.set(timerange1.val());
+                      sID_table_ListofIps.startSearch();
+                      
+                      overrestime.search.set(timerange1.val());
+                      overrestime.startSearch();
+                      overthrput.search.set(timerange1.val());
+                      overthrput.startSearch();
+                      overcalls.search.set(timerange1.val());
+                      overcalls.startSearch();
+
+                      setDropdownVal();
+                      setDefaultDropdownVal();
+                      sID_getappname.search.set(timerange1.val());
+                      sID_getappname.startSearch();
+
+                      $("#appname").text(sID_radio_group_Left.val());
+
+                      document.getElementById("dID_dropUser_HostName").style.display = "none";
+                      document.getElementById("dID_selectHost").style.display = "none";
+                      document.getElementById("singledropdownvalue").style.display = "block";
+                      document.getElementById("tests2").style.display = "none";
+                      document.getElementById("dID_fourTabs").style.display = "block";
+                      document.getElementById("item51").style.display = "none";
+                      document.getElementById("item52").style.display = "none";
+                      document.getElementById("item53").style.display = "none";
+                      document.getElementById("item54").style.display = "none";
+                      document.getElementById("item55").style.display = "none";
+                      document.getElementById("item57").style.display = "none";
+                      //            user tab info
+                      document.getElementById("dID_chart_ServerActivity").style.display = "none";
+                      document.getElementById("dID_table_userIPS").style.display = "none";
+                      document.getElementById("dropdown_user").style.display = "none";
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "none";
+
+                      // App Over view
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                      document.getElementById("tab_overview").style.display = "block";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+                      document.getElementById("allapps").style.display = "none";
+                      document.getElementById("appname").style.display = "block";
+                      document.getElementById("alram_all_overview").style.display = "none";
+                      document.getElementById("all_users_overview").style.display = "none";
+                      document.getElementById("tierText").style.display = "block";
+                  }
+                  $("#overview").click(function () {
+                       id_selecetedApp_Tab_overview = 1;
+                      overview = 1;
+                      app_apps_booleanVal = 0;
+                      all_apps = 0;
+                      sID_table_highestCPU.search.set(timerange1.val());
+                      sID_table_highestCPU.startSearch();
+                      sID_table_highestMemoryUtilization.search.set(timerange1.val());
+                      sID_table_highestMemoryUtilization.startSearch();
+                      sID_table_highestAlarmCount.search.set(timerange1.val());
+                      sID_table_highestAlarmCount.startSearch();
+                      sID_single_Alarms.search.set(timerange1.val());
+                      sID_single_Alarms.startSearch();
+                      sID_table_ListofIps.search.set(timerange1.val());
+                      sID_table_ListofIps.startSearch();
+                      overviewSearches();
+                      /**Alarms search**/
+                      overrestime.search.set(timerange1.val());
+                      overrestime.startSearch();
+                      overthrput.search.set(timerange1.val());
+                      overthrput.startSearch();
+                      overcalls.search.set(timerange1.val());
+                      overcalls.startSearch();
+                      document.getElementById("tests2").style.display = "none";
+                      document.getElementById("dID_fourTabs").style.display = "block";
+                      document.getElementById("item51").style.display = "none";
+                      document.getElementById("item52").style.display = "none";
+                      document.getElementById("item53").style.display = "none";
+                      document.getElementById("item54").style.display = "none";
+                      document.getElementById("item55").style.display = "none";
+                      document.getElementById("item57").style.display = "none";
+                      //            user tab info
+                      document.getElementById("dID_chart_ServerActivity").style.display = "none";
+                      document.getElementById("dID_table_userIPS").style.display = "none";
+                      document.getElementById("dropdown_user").style.display = "none";
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "none";
+                      document.getElementById("topology_div").style.display = "none";
+                      // App Over view
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                      document.getElementById("tab_overview").style.display = "block";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+                      document.getElementById("allapps").style.display = "none";
+                      document.getElementById("appname").style.display = "block";
+                      document.getElementById("alram_all_overview").style.display = "none";
+                      document.getElementById("all_users_overview").style.display = "none";
+                      document.getElementById("tierText").style.display = "block";
+                      $(document).ready(function () {
+                          //  $('#Id_Radio').css({height: 1091 - 15});
+                      });
+
+                  });
+
+                    //Server Activity Tab execution when we click Server Activity Tab
+                  $("#userd").click(function () {
+                       id_selecetedApp_Tab_overview = 3;
+                      sID_dropdown_selectServer.search.set(timerange1.val());
+                      sID_dropdown_selectServer.startSearch();
+                      overview = 3;
+                      app_apps_booleanVal = 0;
+                      all_apps = 0;
+                      users_offsetHeight = document.getElementById('radioDiv3').offsetHeight;
+                      listofUsers.val("*");
+                      console.log("right height" + "\t " + 1031 - 5);
+                       serverActivitySearches();
+                      document.getElementById("item57").style.display = "none";
+                      document.getElementById("tests2").style.display = "none";
+                      document.getElementById("table_id").style.display = "none";
+                      document.getElementById("chart_id").style.display = "none";
+                      document.getElementById("table1_id").style.display = "none";
+                      document.getElementById("chart1_id").style.display = "none";
+                      document.getElementById("item51").style.display = "none";
+                      document.getElementById("item52").style.display = "none";
+                      document.getElementById("item53").style.display = "none";
+                      document.getElementById("item54").style.display = "none";
+                      document.getElementById("item55").style.display = "none";
+                      document.getElementById("dID_fourTabs").style.display = "block";
+                      //            user tab info
+                      document.getElementById("dID_chart_ServerActivity").style.display = "block";
+                      document.getElementById("dID_table_userIPS").style.display = "block";
+                      document.getElementById("dropdown_user").style.display = "none";
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "none";
+
+                      // App Over view
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                      document.getElementById("tab_overview").style.display = "none";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+                      document.getElementById("topology_div").style.display = "none";
+                      document.getElementById("allapps").style.display = "none";
+                      document.getElementById("appname").style.display = "block";
+                      document.getElementById("alram_all_overview").style.display = "none";
+                      document.getElementById("all_users_overview").style.display = "none";
+                      document.getElementById("tierText").style.display = "block";
+
+                      document.getElementById("item55").style.display = "block";
+                      $(document).ready(function () {
+                          // $('#Id_Radio').css({height: 1031 - 20});
+                      });
+                  });
+                  $("#alarm").click(function () {
+                       id_selecetedApp_Tab_overview = 2;
+                      overview = 2;
+                      app_apps_booleanVal = 0;
+                      all_apps = 0;
+                      alarms_offsetHeight = document.getElementById('radioDiv3').offsetHeight;
+                      console.log("right height" + "\t leftHeight " + alarms_offsetHeight);
+
+                      alarmSearches();
+                      document.getElementById("tests2").style.display = "none";
+                      document.getElementById("dID_fourTabs").style.display = "block";
+                      document.getElementById("item51").style.display = "block";
+                      document.getElementById("item52").style.display = "block";
+                      document.getElementById("item53").style.display = "none";
+                      document.getElementById("item54").style.display = "none";
+                      document.getElementById("item55").style.display = "none";
+                      document.getElementById("item57").style.display = "none";
+                      //              user tab info
+                      document.getElementById("dID_chart_ServerActivity").style.display = "none";
+                      document.getElementById("dID_table_userIPS").style.display = "none";
+                      document.getElementById("dropdown_user").style.display = "none";
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "none";
+
+                      // App Over view
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                      document.getElementById("tab_overview").style.display = "none";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+                      document.getElementById("topology_div").style.display = "none";
+                      document.getElementById("allapps").style.display = "none";
+                      document.getElementById("appname").style.display = "block";
+                      document.getElementById("alram_all_overview").style.display = "none";
+                      document.getElementById("all_users_overview").style.display = "none";
+                      document.getElementById("tierText").style.display = "block";
+                  });
+                  $("#topologyd").click(function () {
+                      var idValue = $('#id_table_TopologyID tr td[data-cell-index="0"]').html();// 
+                      var appNameValue = $('#id_table_TopologyID tr td[data-cell-index="1"]').html();
+                      var hostName = $('#id_table_TopologyID tr td[data-cell-index="2"]').html();
+                      //                alert(idValue + "\t " + hostName);
+                      var radioidValue = $('#id_radio_group_Left').html();
+                      clickedAppName = $('input:radio:checked').next('label:first').html()
+                      console.log("standard Apps - clicked appname : " + $('input:radio:checked').next('label:first').html());
+                      var urlValue = "http://" + hostName.trim() + "/Apps/Topology/" + idValue.trim() + "/";
+                      //var urlValue = "https://demo.appensure.com:25000/aComm/SplunkAppEnsure.html?vale1=" + dataValue.trim() + "&vale2=" + dataValue1.trim() + "^val3=" + dataValue2.trim() + "";
+                      var win = window.open(urlValue, '_blank');
+                      win.focus();
+
+
+                  });
+
+              });
+
+              /** -----------------END : If We Select All Servers [OR] Particular Appln to displaying logic below we have written.--- **/
+
+              DID_dropdown_selectServer.settings.set("choices", [
+              ]);
+              
+               DID_dropdown_selectServer.on("change", function () {
+
+                  if (DID_dropdown_selectServer.val() == "*") {
+                  } else {
+                       
+                       if(id_selecetedApp_Tab_overview==1){
+                           overviewSearches();
+                       }
+                       if(id_selecetedApp_Tab_overview==2){
+                            alarmSearches();
+                       }
+                       if(id_selecetedApp_Tab_overview==3){
+                            serverActivitySearches();
+                       }
+                       
+                  }
+              
+            });
+              
+                  function overviewSearches(){
+                      sID_chart_cpuUsage.search.set(timerange1.val());
+                      sID_chart_cpuUsage.startSearch();
+                      sID_chart_memUsage.search.set(timerange1.val());
+                      sID_chart_memUsage.startSearch();
+                      sID_chart_storageUsage.search.set(timerange1.val());
+                      sID_chart_storageUsage.startSearch();
+                      sID_chart_IOUsage.search.set(timerange1.val());
+                      sID_chart_IOUsage.startSearch();
+                  }
+                  
+                  function alarmSearches(){
+                      sID_table_AllAlarms.search.set(timerange1.val());
+                      sID_table_AllAlarms.startSearch();
+                      sID_chart_AllAlarms.search.set(timerange1.val());
+                      sID_chart_AllAlarms.startSearch();
+                  }
+                  
+                  function serverActivitySearches(){
+                      sID_table_ServerProcess.search.set(timerange1.val());
+                      sID_table_ServerProcess.startSearch();
+                      sID_table_ServerActivity.search.set(timerange1.val());
+                      sID_table_ServerActivity.startSearch();
+                      sID_chart_ServerProcessAvgRespTime.search.set(timerange1.val());
+                      sID_chart_ServerProcessAvgRespTime.startSearch();
+                      sID_chart_ServerThrputhput.search.set(timerange1.val());
+                      sID_chart_ServerThrputhput.startSearch();
+                      sID_chart_ServerCallsErrorCalls.search.set(timerange1.val());
+                      sID_chart_ServerCallsErrorCalls.startSearch();
+                 }
+
+
+              listofUsers.settings.set("choices", [
+                  {value: "*", label: "(All Users)"}
+              ]);
+
+              sID_dropDown_ListofIps.settings.set("choices", [
+                  {value: "*", label: "(All)"}
+              ]);
+
+              sID_dropDown_ListofIps.on("change", function () {
+                  // start : get tier details
+                  var collectionLength = 0;
+                  var collection_data = null;
+                  var mainTableSearch = splunkjs.mvc.Components.getInstance("mID_table_ListofIps");
+                  var myResults_mainTableSearch = mainTableSearch.data("preview", {count: 0, offset: 0});
+
+                  myResults_mainTableSearch.on("data", function () {
+                      collectionLength = myResults_mainTableSearch.collection().length;
+                      collection_data = myResults_mainTableSearch.data();
+
+                      for (var i = 0; i < collectionLength; i++) {
+
+                          if (sID_dropDown_ListofIps.val() == "*") {
+                              document.getElementById("tierText").innerHTML = "All";
+                              document.getElementById("web_img").style.display = "none";
+                              document.getElementById("db_img").style.display = "none";
+                              document.getElementById("app_img").style.display = "none";
+
+                          } else if (sID_dropDown_ListofIps.val() == collection_data.rows[i][0]) {
+
+
+                              if (collection_data.rows[i][1] == "Server_WEB") {
+                                  //                            tierValue.value = "WebTier Details";
+                                  document.getElementById("tierText").innerHTML = "Web Tier";
+                                  document.getElementById("web_img").style.display = "block";
+                                  document.getElementById("db_img").style.display = "none";
+                                  document.getElementById("app_img").style.display = "none";
+
+                              } else if (collection_data.rows[i][1] == "Server_APP") {
+                                  //                            tierValue.value = "AppTier";
+                                  document.getElementById("tierText").innerHTML = "App Tier";
+                                  document.getElementById("web_img").style.display = "none";
+                                  document.getElementById("db_img").style.display = "none";
+                                  document.getElementById("app_img").style.display = "block";
+                              } else if (collection_data.rows[i][1] == "Server_DB") {
+                                  //                            tierValue.value = "DBTier";
+                                  document.getElementById("tierText").innerHTML = "DB Tier";
+                                  document.getElementById("web_img").style.display = "none";
+                                  document.getElementById("db_img").style.display = "block";
+                                  document.getElementById("app_img").style.display = "none";
+                              }
+
+                          }// end of list of Ips
+                      }
+                  });
+
+              });
+
+
+              listofprocess.on("change", function () {
+                  sID_chart_ServerProcessAvgRespTime.search.set(timerange1.val());
+                  sID_chart_ServerProcessAvgRespTime.startSearch();
+
+                  sID_chart_ServerThrputhput.search.set(timerange1.val());
+                  sID_chart_ServerThrputhput.startSearch();
+
+                  sID_chart_ServerCallsErrorCalls.search.set(timerange1.val());
+                  sID_chart_ServerCallsErrorCalls.startSearch();
+              });
+
+
+              listofUsers.on("change", function () {
+
+                  if (listofUsers.val() == "*") {
+
+                      allusers.search.set(timerange1.val());
+                      allusers.startSearch();
+
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "none";
+
+                      // App Over view
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                      document.getElementById("tab_overview").style.display = "none";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+
+                  }
+                  else {
+                      partuser.search.set(timerange1.val());
+                      partuser.startSearch();
+                      document.getElementById("all_users").style.display = "none";
+                      document.getElementById("parti_user").style.display = "block";
+                      // App Over view
+                      document.getElementById("single_resTime_calls_users_alarm").style.display = "none";
+                      document.getElementById("tab_overview").style.display = "none";
+                      document.getElementById("dropdownips").style.display = "none";
+                      document.getElementById("over_all_restime").style.display = "none";
+                      document.getElementById("over_thrput_calls").style.display = "none";
+                  }
+              });
+
+
+              //****************************************************** Start searches: TimeRange**************************************************************
+
+              timerange1.on("change", function () {
+
+                  if (part_app == 1) {
+                      sID_table_AllAlarms.search.set(timerange1.val());
+                      sID_table_AllAlarms.startSearch();
+                      sID_chart_AllAlarms.search.set(timerange1.val());
+                      sID_chart_AllAlarms.startSearch();
+                      sID_table_highestCPU.search.set(timerange1.val());
+                      sID_table_highestCPU.startSearch();
+                      sID_table_highestMemoryUtilization.search.set(timerange1.val());
+                      sID_table_highestMemoryUtilization.startSearch();
+                      sID_table_highestAlarmCount.search.set(timerange1.val());
+                      sID_table_highestAlarmCount.startSearch();
+                      sID_single_Alarms.search.set(timerange1.val());
+                      sID_single_Alarms.startSearch();
+                      sID_table_ListofIps.search.set(timerange1.val());
+                      sID_table_ListofIps.startSearch();
+                      sID_chart_cpuUsage.search.set(timerange1.val());
+                      sID_chart_cpuUsage.startSearch();
+                      sID_chart_memUsage.search.set(timerange1.val());
+                      sID_chart_memUsage.startSearch();
+                      sID_chart_storageUsage.search.set(timerange1.val());
+                      sID_chart_storageUsage.startSearch();
+                      sID_chart_IOUsage.search.set(timerange1.val());
+                      sID_chart_IOUsage.startSearch();
+                      /**Alarms search**/
+                      overrestime.search.set(timerange1.val());
+                      overrestime.startSearch();
+                      overthrput.search.set(timerange1.val());
+                      overthrput.startSearch();
+                      overcalls.search.set(timerange1.val());
+                      overcalls.startSearch();
+
+                      setDropdownVal();
+                      setDefaultDropdownVal();
+                      sID_dropdown_selectServer.search.set(timerange1.val());
+                      sID_dropdown_selectServer.startSearch();
+                      sID_leftListOfApps.search.set(timerange1.val());
+                      sID_leftListOfApps.startSearch();
+                      sID_getappname.search.set(timerange1.val());
+                      sID_getappname.startSearch();
+
+                      if (overview == 1) {
+                          sID_table_AllAlarms.search.set(timerange1.val());
+                          sID_table_AllAlarms.startSearch();
+                          sID_chart_AllAlarms.search.set(timerange1.val());
+                          sID_chart_AllAlarms.startSearch();
+                          sID_table_highestCPU.search.set(timerange1.val());
+                          sID_table_highestCPU.startSearch();
+                          sID_table_highestMemoryUtilization.search.set(timerange1.val());
+                          sID_table_highestMemoryUtilization.startSearch();
+                          sID_table_highestAlarmCount.search.set(timerange1.val());
+                          sID_table_highestAlarmCount.startSearch();
+                          sID_single_Alarms.search.set(timerange1.val());
+                          sID_single_Alarms.startSearch();
+                          sID_table_ListofIps.search.set(timerange1.val());
+                          sID_table_ListofIps.startSearch();
+                          sID_chart_cpuUsage.search.set(timerange1.val());
+                          sID_chart_cpuUsage.startSearch();
+                          sID_chart_memUsage.search.set(timerange1.val());
+                          sID_chart_memUsage.startSearch();
+                          sID_chart_storageUsage.search.set(timerange1.val());
+                          sID_chart_storageUsage.startSearch();
+                          sID_chart_IOUsage.search.set(timerange1.val());
+                          sID_chart_IOUsage.startSearch();
+                          overrestime.search.set(timerange1.val());
+                          overrestime.startSearch();
+                          overthrput.search.set(timerange1.val());
+                          overthrput.startSearch();
+                          overcalls.search.set(timerange1.val());
+                          overcalls.startSearch();
+
+                      }
+
+                      if (overview == 2) {
+                          sID_table_AllAlarms.search.set(timerange1.val());
+                          sID_table_AllAlarms.startSearch();
+                          sID_chart_AllAlarms.search.set(timerange1.val());
+                          sID_chart_AllAlarms.startSearch();
+                      }
+                      if (overview == 3) {
+                          sID_chart_user_AppRespTime.search.set(timerange1.val());
+                          sID_chart_user_AppRespTime.startSearch();
+                          sID_chart_ServerProcessAvgRespTime.search.set(timerange1.val());
+                          sID_chart_ServerProcessAvgRespTime.startSearch();
+                          sID_table_ServerProcess.search.set(timerange1.val());
+                          sID_table_ServerProcess.startSearch();
+                          sID_table_ServerActivity.search.set(timerange1.val());
+                          sID_table_ServerActivity.startSearch();
+                          sID_table_userIPS.search.set(timerange1.val());
+                          sID_table_userIPS.startSearch();
+                          allusers.search.set(timerange1.val());
+                          allusers.startSearch();
+                          sID_chart_ServerThrputhput.search.set(timerange1.val());
+                          sID_chart_ServerThrputhput.startSearch();
+                          sID_chart_ServerCallsErrorCalls.search.set(timerange1.val());
+                          sID_chart_ServerCallsErrorCalls.startSearch();
+                      }
+                  }
+
+                  //             All App Select: Start searches
+
+                  if (all_apps == 1) {
+                      search_dropAgents.search.set(timerange1.val());
+                      search_dropAgents.startSearch();
+                      sID_table_allapps.search.set(timerange1.val());
+                      sID_table_allapps.startSearch();
+                      sID_table_highestCPU.search.set(timerange1.val());
+                      sID_table_highestCPU.startSearch();
+                      sID_table_highestMemoryUtilization.search.set(timerange1.val());
+                      sID_table_highestMemoryUtilization.startSearch();
+                      sID_table_highestAlarmCount.search.set(timerange1.val());
+                      sID_table_highestAlarmCount.startSearch();
+                      sID_leftListOfApps.search.set(timerange1.val());
+                      sID_leftListOfApps.startSearch();
+                      if (app_apps_booleanVal == 100) {
+                          search_dropAgents.search.set(timerange1.val());
+                          search_dropAgents.startSearch();
+                          sID_table_allapps.search.set(timerange1.val());
+                          sID_table_allapps.startSearch();
+                      }
+                      if (app_apps_booleanVal == 2) {
+                          sID_table_Alarms_AllApps.search.set(timerange1.val());
+                          sID_table_Alarms_AllApps.startSearch();
+                          sID_chart_Alarms_AllApps.search.set(timerange1.val());
+                          sID_chart_Alarms_AllApps.startSearch();
+                      }
+                      if (app_apps_booleanVal == 3) {
+                          sID_chart_Users_AllApps.search.set(timerange1.val());
+                          sID_chart_Users_AllApps.startSearch();
+                          sID_table_Users_AllApps.search.set(timerange1.val());
+                          sID_table_Users_AllApps.startSearch();
+                      }
+                  }
+              });
+
+              //****************************************************** END searches: TimeRange************************************************************** 
+
+
+
+              splunkjs.mvc.Components.getInstance('id_chart_CPUUsage').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.seriesColors": "[0x6B8930]",
+                  "charting.legend.placement": "none"
+              });
+              splunkjs.mvc.Components.getInstance('id_chart_memUsage').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.seriesColors": "[0x6B8930]",
+                  "charting.legend.placement": "none"
+              });
+              splunkjs.mvc.Components.getInstance('id_chart_storageUsage').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.seriesColors": "[0x6CB8CA, 0x6CB8CA, 0x6CB8CA]",
+                  "charting.legend.placement": "none"
+              });
+              splunkjs.mvc.Components.getInstance('id_chart_diskUsage').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.axisTitleY.text": "Disk I/O (kb/sec)",
+                  "charting.seriesColors": "[0x6CB8CA, 0xB2E48A]",
+              });
+
+
+
+
+              splunkjs.mvc.Components.getInstance('id_chart_ServerProcessAvgRespTime').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.seriesColors": "[0x6CB8CA, 0xB2E48A]",
+                  "charting.legend.placement": "none"
+              });
+              splunkjs.mvc.Components.getInstance('id_chart_ServerCallsErrorCalls').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.axisTitleY.text": "Calls",
+                  "charting.seriesColors": "[0xB2E48A, 0xFC6A6A]",
+                  "charting.legend.placement": "bottom"
+              });
+              splunkjs.mvc.Components.getInstance('id_chart_ServerThrputhput').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.seriesColors": "[0x5479AF ]",
+                  "charting.legend.placement": "none"
+              });
+
+
+
+
+              splunkjs.mvc.Components.getInstance('chart_Res').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.axisTitleY.text": "Response Time (ms)",
+                  "charting.seriesColors": "[0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA,0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA]",
+                  "charting.legend.placement": "none"
+              });
+
+              splunkjs.mvc.Components.getInstance('chart_Throughput').settings.set({
+                  "charting.axisTitleY.text": "Throughput (Calls/min)",
+                  "charting.axisTitleX.text": "Time",
+                  "charting.seriesColors": "[0xF7912C]",
+                  "charting.legend.placement": "none"
+
+              });
+              splunkjs.mvc.Components.getInstance('chart_calls').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.axisTitleY.text": "Calls",
+                  // "charting.seriesColors": "[0x6CB8CA,0x6B8930]"
+                  "charting.seriesColors": "[0xB2E48A]",
+                  "charting.legend.placement": "none"
+              });
+
+
+              splunkjs.mvc.Components.getInstance('id_chart_AllAlarms').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.axisTitleY.text": "Alarms",
+                  "charting.seriesColors": "[0xFC6A6A]",
+                  "charting.legend.placement": "none"
+              });
+
+              splunkjs.mvc.Components.getInstance('chart_user_calls').settings.set({
+                  "charting.axisTitleX.text": "UserIP",
+                  "charting.axisTitleY.text": "Calls",
+                  "charting.seriesColors": "[0x6CB8CA,0xD85E3D,0x6B8930]", //green,blue,red,
+                  "charting.legend.placement": "none"
+
+              });
+
+              splunkjs.mvc.Components.getInstance('userchart').settings.set({
+                  "charting.axisTitleX.text": "Time",
+                  "charting.axisTitleY.text": "Calls",
+                  "charting.seriesColors": "[0x6CB8CA,0xD85E3D,0x6B8930]",
+                  "charting.legend.placement": "block"
+                          ////green,blue,red
+                          //"charting.seriesColors": "[0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA,0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA, 0x6CB8CA]"
+              });
+
+
+              splunkjs.mvc.Components.getInstance('id_chart_Alarms_AllApps').settings.set({
+                  "charting.axisTitleX.text": "Applications",
+                  "charting.axisTitleY.text": "Alarms",
+                  "charting.seriesColors": "[0xFC6A6A]",
+                  "charting.legend.placement": "none"
+              });
+
+
+              splunkjs.mvc.Components.getInstance('id_chart_Users_AllApps').settings.set({
+                  "charting.axisTitleX.text": "Applications",
+                  "charting.axisTitleY.text": "Users",
+                  "charting.seriesColors": "[0x956E96]",
+                  "charting.legend.placement": "none"
+              });
+
+
+
+
+              function setDefaultDropdownVal() {
+                  $("#appname").text("--");
+                  $("#singledropdownvalue").text("--");
+                  //            $("h1, h2, p").addClass("blue");
+                  document.getElementById("dID_selectHost").style.display = "none";
+                  document.getElementById("dID_dropUser_HostName").style.display = "none";
+                  document.getElementById("singledropdownvalue").style.display = "block";
+              }
+              //
+              /**
+               * setDropdownVal()
+               * @returns {undefined}
+               */
+              function setDropdownVal() {
+                  getappname.on("data", function () {
+                      app_data = getappname.data();
+                      $("#appname").text(app_data.rows[0][0]);
+                  });
+
+
+
+                  newdropdowndata.on("data", function () {
+
+                      count = newdropdowndata.collection().length;
+                      collection_data = newdropdowndata.data();
+                      hostNameDropdown = collection_data.rows[0][0];
+                      //                count=2;
+                      if (count == 1) {
+                          //                        alert("value is single  :"+collection_data.rows[0][0])
+                          $("#singledropdownvalue").text("Host: " + collection_data.rows[0][0]);
+                          document.getElementById("dID_selectHost").style.display = "none";
+                          document.getElementById("dID_dropUser_HostName").style.display = "none";
+                          document.getElementById("singledropdownvalue").style.display = "block";
+                      } else
+                      {
+                          //                alert("multiple values " + count)
+                          document.getElementById("dID_selectHost").style.display = "block";
+                          document.getElementById("dID_dropUser_HostName").style.display = "block";
+                          document.getElementById("singledropdownvalue").style.display = "none";
+                      }
+                  });
+              }// end of setDropdownVal()
+
+
+          });
+
+
+
+     </script>
+
+
+     {% endblock js %}
+

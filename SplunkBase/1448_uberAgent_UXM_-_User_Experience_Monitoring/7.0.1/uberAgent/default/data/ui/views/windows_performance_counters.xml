@@ -1,0 +1,597 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+<init>
+   <set token="show_overview">true</set>
+   <set token="show_notification">true</set>
+   <set token="Panel31AllHosts">TokenPlaceholder</set>
+   <set token="Hostfilter">filter host in ("$Panel31Field1$,$Panel31Field5$,$Panel31AllHosts$")</set>
+   <set token="CompareToAllMachinesTable_Join"></set>
+</init>
+
+   <label>Windows Performance Counters</label>
+   <description>This dashboard displays information about performance counters collected on Windows-based endpoints. Please note that performance counter metrics are not enabled by default.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_PerformanceCounter</default>
+      </input>
+   </fieldset>
+   
+   
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+           values(PerformanceCounterName) as PerformanceCounterName
+           values(PerformanceCounterObject) as PerformanceCounterObject
+           dc(host) as MachineSum
+           dc(PerformanceCounterName) as PerformanceCounterNameSum
+           dc(PerformanceCounterInstance) as PerformanceCounterInstanceSum
+           dc(PerformanceCounterObject) as PerformanceCounterObjectSum
+           $SearchFilter$
+      </query>
+   </search>
+
+   <search id="Searchbase_FilterFields">
+      <query>
+         | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter 
+            splitrow
+               host
+            splitrow
+               PerformanceCounterObject
+            splitrow
+               PerformanceCounterName
+            splitrow
+               PerformanceCounterInstance
+            $SearchFilter$
+      </query>
+   </search>   
+
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Overview for all machines</title>
+         <search>
+            <query> 
+            | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+               count(System_PerformanceCounter) as "Amount"
+            </query>
+            <earliest>-7d</earliest>
+            <latest>now</latest>
+            <progress>
+               <condition match="$result.Amount$ == 0">
+                  <set token="show_html">true</set>
+                  <unset token="show_overview" />
+               </condition>
+            </progress>
+         </search>
+
+         <html depends="$show_html$">
+            <h2><p><strong>Attention!</strong> No Performance Counter data was found! Is the Performance Counter metric enabled? Please consult the documentation on <a title="Performance Counter Metrics on uberagent.com." href="https://uberagent.com/docs/uberagent/latest/metrics/performance-counters/" target="_blank">how to enable the Performance Counter metrics</a>.</p></h2>
+         </html>
+         <viz type="uberAgent.uberagent-singlevalue" depends="$show_overview$">
+            <search base="Search_Single"/>
+            <option name="uberAgent.uberagent-singlevalue.1-field">MachineSum</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">PerformanceCounterNameSum</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Performance counters:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">PerformanceCounterInstanceSum</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Performance counter instances:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">PerformanceCounterObjectSum</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Performance counter objects:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+         </viz>
+      </panel>
+
+   </row>
+   <!-- Row 2 -->
+   <!-- Column 1 -->
+   <row>
+     <panel>
+      <title>Performance counters host count</title>
+         <input type="dropdown" token="Panel21Field1" id="Input_Panel21Field1" searchWhenChanged="true">
+         <search base="Searchbase_FilterFields">
+            <query>
+             | eval PerformancecounterLabel = PerformanceCounterObject."\\".PerformanceCounterName
+             | eval PerformancecounterValue = PerformanceCounterObject."\\\\".PerformanceCounterName
+             | dedup PerformancecounterLabel, PerformancecounterValue 
+             | table PerformancecounterLabel, PerformancecounterValue 
+            </query>
+         </search>
+         <change>
+            <unset token="Panel21Field2"/>
+            <unset token="form.Panel21Field2"/>
+         </change>
+         <fieldForLabel>PerformancecounterLabel</fieldForLabel>
+         <fieldForValue>PerformancecounterValue</fieldForValue>
+         <choice value="*">All</choice>
+         <default>*</default>
+         <initialValue>*</initialValue>
+         <allowCustomValues>true</allowCustomValues>
+         <label>Performance counter</label>
+        </input>
+
+      <chart id="Chart_Panel21">
+         <search>
+            <query>
+               | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+                  splitrow
+                     PerformanceCounterObject
+                  splitrow
+                     PerformanceCounterName
+                  splitrow
+                     host
+                  splitrow
+                     _time Period $PivotPeriodAutoTimechart$
+                  $SearchFilter$  
+               | eval Performancecounter = PerformanceCounterObject."\\".PerformanceCounterName
+               | search Performancecounter = "$Panel21Field1$"
+               | timechart `uberAgent_dynamic_span` distinct_count(host) as "#Hosts" partial=false
+            </query>
+          </search>
+         <option name="height">250</option>
+         <option name="charting.chart">line</option>
+         <option name="charting.chart.nullValueMode">connect</option>
+         <option name="charting.legend.placement">none</option>
+         <option name="charting.axisY.includeZero">true</option>
+         <option name="charting.axisTitleX.visibility">collapsed</option>
+         <option name="charting.axisTitleY.text"></option>
+         <option name="charting.drilldown">none</option>
+        </chart>
+     </panel>
+    </row>
+
+   <!-- Row 3 -->
+    <row>
+      <panel>
+         <title>Performance counter instance values over time</title>
+         <html depends="$show_notification$"><p>The chart will be displayed after all filter options are selected.</p></html>
+         <input type="dropdown" token="Panel31Function1" id="Input_Panel31Function1" searchWhenChanged="true">
+         <choice value="avg">average</choice>
+         <choice value="count">count</choice>
+         <choice value="max">maximum</choice>
+         <choice value="median">median</choice>
+         <choice value="min">minimum</choice>
+         <choice value="stdev">standard deviation</choice>
+         <choice value="sum">sum</choice>
+         <default>avg</default>
+         <label>Function:</label>
+         <change>
+            <condition value="avg">
+               <set token="Panel31Function1Display">Avg.</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1" />
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2" />
+               <unset token="Panel31Field5" />
+               <unset token="form.Panel31Field5" />
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+            <condition value="count">
+               <set token="Panel31Function1Display">Count</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1"/>
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2"/>
+               <unset token="Panel31Field5"/>
+               <unset token="form.Panel31Field5"/>
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+            <condition value="max">
+               <set token="Panel31Function1Display">Max.</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1"/>
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2"/>
+               <unset token="Panel31Field5"/>
+               <unset token="form.Panel31Field5"/>
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+            <condition value="median">
+               <set token="Panel31Function1Display">Med.</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1"/>
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2"/>
+               <unset token="Panel31Field5"/>
+               <unset token="form.Panel31Field5"/>
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+            <condition value="min">
+               <set token="Panel31Function1Display">Min.</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1"/>
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2"/>
+               <unset token="Panel31Field5"/>
+               <unset token="form.Panel31Field5"/>
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+            <condition value="stdev">
+               <set token="Panel31Function1Display">"Stdev"</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1"/>
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2"/>
+               <unset token="Panel31Field5"/>
+               <unset token="form.Panel31Field5"/>
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+            <condition value="sum">
+               <set token="Panel31Function1Display">Sum</set>
+               <set token="Panel31Radio1">No</set>
+               <unset token="form.Panel31Radio1"/>
+               <set token="Panel31Radio2">No</set>
+               <unset token="form.Panel31Radio2"/>
+               <unset token="Panel31Field5"/>
+               <unset token="form.Panel31Field5"/>
+               <set token="CompareToSpecMachine_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+               <unset token="CompareToSpecMachine_Filter"/>
+            </condition>
+         </change>
+      </input>
+
+      <input type="dropdown" token="Panel31Field1" id="Input_Panel31Field1" searchWhenChanged="true">
+         <search base="Searchbase_FilterFields">
+            <query>
+            | dedup host
+            | table host
+            </query>
+         </search> 
+         <label>Host:</label>
+         <fieldForLabel>host</fieldForLabel>
+         <fieldForValue>host</fieldForValue>
+         <allowCustomValues>true</allowCustomValues>
+         <choice value="*">All</choice>
+         <default>*</default>
+         <change>
+            <unset token="Panel31Field2"/>
+            <unset token="form.Panel31Field2"/>
+            <unset token="Panel31Field3"/>
+            <unset token="form.Panel31Field3"/>
+            <unset token="Panel31Field4"/>
+            <unset token="form.Panel31Field4"/> 
+            <unset token="CompareToSpecMachine_Filter"/>
+            <unset token="CompareToSpecMachine_Join"/>
+         </change>
+      </input>
+      
+      <input type="dropdown" token="Panel31Field2" id="Input_Panel31Field2" searchWhenChanged="true" depends="$Panel31Field1$">
+         <search base="Searchbase_FilterFields">
+            <query>
+            | search host="$Panel31Field1$"
+            | dedup PerformanceCounterObject
+            | table PerformanceCounterObject
+            </query>
+        </search>
+         <change>
+            <set token="Panel31Field2Cache">$Panel31Field2$</set>
+            <unset token="Panel31Field3"/>
+            <unset token="form.Panel31Field3"/>
+            <unset token="Panel31Field4"/>
+            <unset token="form.Panel31Field4"/>
+            <unset token="CompareToSpecMachine_Filter"/>
+            <unset token="CompareToSpecMachine_Join"/>
+         </change>
+         <fieldForLabel>PerformanceCounterObject</fieldForLabel>
+         <fieldForValue>PerformanceCounterObject</fieldForValue>
+         <choice value="*">All</choice>
+         <label>Performance counter object:</label>
+      </input>
+
+      <input type="dropdown" token="Panel31Field3" id="Input_Panel31Field3" searchWhenChanged="true" depends="$Panel31Field1$,$Panel31Field2$">
+         <search base="Searchbase_FilterFields">
+            <query>
+            | search host="$Panel31Field1$"
+            | search PerformanceCounterObject = "$Panel31Field2Cache$"
+            | dedup PerformanceCounterName
+            | table PerformanceCounterName 
+            </query>
+         </search>
+         <change>
+            <set token="Panel31Field3Cache">$Panel31Field3$</set>
+            <unset token="Panel31Field4"/>
+            <unset token="form.Panel31Field4"/>
+            <unset token="CompareToSpecMachine_Filter"/>
+            <unset token="CompareToSpecMachine_Join"/>
+         </change>
+         <fieldForLabel>PerformanceCounterName</fieldForLabel>
+         <fieldForValue>PerformanceCounterName</fieldForValue>
+         <choice value="*">All</choice>
+         <label>Performance counter name:</label>
+      </input>
+
+      <input type="dropdown" token="Panel31Field4" id="Input_Panel31Field4" searchWhenChanged="true" depends="$Panel31Field1$,$Panel31Field2$,$Panel31Field3$">
+         <search base="Searchbase_FilterFields">
+            <query>
+            | search host="$Panel31Field1$"
+            | search PerformanceCounterObject = "$Panel31Field2Cache$"
+            | search PerformanceCounterName = "$Panel31Field3Cache$"
+            | dedup PerformanceCounterInstance
+            | table PerformanceCounterInstance
+            </query>
+         </search>
+         <change>
+            <set token="Panel31Radio1">No</set>
+            <unset token="form.Panel31Radio1"/>
+            <set token="Panel31Radio2">No</set>
+            <unset token="form.Panel31Radio2"/>
+            <unset token="Panel31Field5"/>
+            <unset token="form.Panel31Field5"/>
+            <unset token="Panel31AllHosts"/>
+            <unset token="CompareToSpecMachine_Filter"/>
+            <set token="Panel31Field4Cache">$Panel31Field4$</set>
+         </change>
+         <fieldForLabel>PerformanceCounterInstance</fieldForLabel>
+         <fieldForValue>PerformanceCounterInstance</fieldForValue>
+         <choice value="*">All</choice>
+         <label>Performance counter instance:</label>
+      </input>
+      </panel>
+   </row>
+
+  <!-- Row 4 -->  
+  <!-- Column 1 -->  
+   <row depends="$Panel31Field4$">
+      <panel>
+         <input type="checkbox" token="Panel31Radio1" searchWhenChanged="true" id="Radio_CompareToSpecMachine" depends="$Panel31Field1$,$Panel31Field2$,$Panel31Field3$,$Panel31Field4$">
+            <initialValue>No</initialValue>
+            <default>No</default>
+            <choice value="Yes">Yes</choice>
+            <label>Compare with a specific host</label>
+            <change>
+               <condition value="No">
+                  <unset token="CompareToSpecMachine_Filter"/>
+                  <unset token="CompareToSpecMachine_Join"/>
+                  <unset token="Panel31Field5"/>
+                  <unset token="form.Panel31Field5"/>
+                  <set token="CompareToSpecMachine_Join"></set>
+               </condition>
+               <condition value="Yes">
+                  <set token="CompareToSpecMachine_Filter"></set>
+               </condition>
+            </change>
+         </input>
+
+      <input type="dropdown" token="Panel31Field5" id="Input_Panel31Field5" searchWhenChanged="true" depends="$CompareToSpecMachine_Filter$">
+         <search base="Searchbase_FilterFields">
+            <query>
+            | search PerformanceCounterObject = "$Panel31Field2Cache$"
+            | search PerformanceCounterName = "$Panel31Field3Cache$"
+            | search PerformanceCounterInstance = "$Panel31Field4Cache$"
+            | dedup host
+            | table host
+            </query>
+         </search> 
+         <label>Host:</label>
+         <fieldForLabel>host</fieldForLabel>
+         <fieldForValue>host</fieldForValue>
+         <choice value="SelectHost">Please select host...</choice>
+         <default>SelectHost</default>
+         <allowCustomValues>true</allowCustomValues>
+         <change>
+            <set token="CompareToSpecMachine_Join">
+            | append
+            [ | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+               $Panel31Function1$(PerformanceCounterValue) as PerformanceCounterValueSpec
+               splitrow
+                  PerformanceCounterInstance
+               splitrow
+                  _time
+               $SearchFilter$
+               filter host is "$Panel31Field5$"
+               filter PerformanceCounterObject is "$Panel31Field2$"
+               filter PerformanceCounterName is "$Panel31Field3$"
+               filter PerformanceCounterInstance is "$Panel31Field4$"
+              | eval "$Panel31Field3$ on $Panel31Field5$ for" = round(PerformanceCounterValueSpec, 2)
+             | fields + "$Panel31Field3$ on $Panel31Field5$ for" PerformanceCounterInstance
+            ]
+            </set>
+            <set token="Hostfilter">filter host in ("$Panel31Field1$,$Panel31Field5$,$Panel31AllHosts$")</set>
+         </change>
+      </input>
+
+      <input type="checkbox" token="Panel31Radio2" searchWhenChanged="true" id="Radio_CompareToAllMachines" depends="$Panel31Field1$,$Panel31Field2$,$Panel31Field3$,$Panel31Field4$">
+         <initialValue>No</initialValue>
+         <default>No</default>
+         <choice value="Yes">Yes</choice>
+         <label>Compare with all hosts</label>
+         <change>
+            <condition value="No">
+               <set token="CompareToAllMachines_Join"></set>
+               <set token="CompareToAllMachinesTable_Join"></set>
+            </condition>
+            <condition value="Yes">
+               <set token="CompareToAllMachines_Join"> 
+               | append
+               [ | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+                  $Panel31Function1$(PerformanceCounterValue) as PerformanceCounterValueAll
+                  splitrow
+                     host
+                  splitrow
+                     PerformanceCounterInstance
+                  splitrow
+                     _time Period $PivotPeriodAutoTimechart$
+                  $SearchFilter$
+                  filter PerformanceCounterObject is "$Panel31Field2$"
+                  filter PerformanceCounterName is "$Panel31Field3$"
+                  filter PerformanceCounterInstance is "$Panel31Field4$"
+                 | fields + PerformanceCounterValueAll PerformanceCounterInstance
+               ]
+               </set>
+               <set token="CompareToAllMachinesTable_Join">
+               |append 
+               [ | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+                  values(PerformanceCounterName) as PerformanceCounterName
+                  values(PerformanceCounterObject) as PerformanceCounterObject
+                  dc(host) as "TotalMachines"
+                  $Panel31Function1$(PerformanceCounterValue) as CalculatedPerformanceCounterValueTmp
+                  splitrow
+                     PerformanceCounterInstance as "Instance"
+                  splitrow
+                     PerformanceCounterObject
+                  splitrow
+                     PerformanceCounterName
+                  splitrow
+                     host
+                  $SearchFilter$
+                  filter PerformanceCounterObject is "$Panel31Field2$"
+                  filter PerformanceCounterName is "$Panel31Field3$"
+                  filter PerformanceCounterInstance is "$Panel31Field4$"
+                 | eval "Performance counter" = PerformanceCounterObject."\\".PerformanceCounterName
+                 | eventstats $Panel31Function1$(CalculatedPerformanceCounterValueTmp) as CalculatedPerformanceCounterValue
+                 | eval "$Panel31Function1Display$ value" = round(CalculatedPerformanceCounterValue, 2)
+                 | stats latest("Performance counter") as "Performance counter" latest("Instance") as "Instance" latest("$Panel31Function1Display$ value") as "$Panel31Function1Display$ value" latest("Host") as "Host" sum("TotalMachines") as "TotalMachines"
+                 | eval Host = "All machines" + " (" + TotalMachines + ")"
+                 | table "Performance counter", "Instance", Host, "$Panel31Function1Display$ value"
+               ]
+               </set>
+            </condition>
+         </change>
+      </input>
+
+      <chart id="Chart_Panel31" depends="$Panel31Field4$">
+         <search>
+            <query>
+            | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter
+               $Panel31Function1$(PerformanceCounterValue) as PerformanceCounterValue
+               splitrow
+                  host
+               splitrow
+                  PerformanceCounterInstance
+               splitrow
+                  _time Period $PivotPeriodAutoTimechart$
+               $SearchFilter$
+               filter host is "$Panel31Field1$"
+               filter PerformanceCounterObject is "$Panel31Field2$"
+               filter PerformanceCounterName is "$Panel31Field3$"
+               filter PerformanceCounterInstance is "$Panel31Field4$"
+            | eval "$Panel31Field3$ on $Panel31Field1$ for" = round(PerformanceCounterValue, 2)
+               $CompareToSpecMachine_Join$
+               $CompareToAllMachines_Join$
+            | timechart `uberAgent_dynamic_span` $Panel31Function1$("$Panel31Field3$ on $Panel31Field1$ for") as "$Panel31Function1Display$ $Panel31Field3$ on $Panel31Field1$ for" eval(round($Panel31Function1$(PerformanceCounterValueAll),2)) as "$Panel31Function1Display$ $Panel31Field3$ on all hosts for" $Panel31Function1$("$Panel31Field3$ on $Panel31Field5$ for") as "$Panel31Function1Display$ $Panel31Field3$ on $Panel31Field5$ for" by PerformanceCounterInstance partial=false
+            </query>
+         <done>
+            <condition match="(isnull($Panel31Field4$))">
+               <set token="show_notification">true</set>
+            </condition>
+            <condition>
+               <unset token="show_notification"></unset>
+            </condition>
+         </done>
+         </search>
+         <option name="height">400</option>
+         <option name="charting.chart">line</option>
+         <option name="charting.chart.nullValueMode">connect</option>
+         <option name="charting.legend.placement">bottom</option>
+         <option name="charting.axisY.includeZero">true</option>
+         <option name="charting.axisTitleX.visibility">collapsed</option>
+         <option name="charting.axisTitleY.text">Performance counter value</option>
+         <option name="charting.drilldown">none</option>
+      </chart>
+      </panel>
+   </row>
+   <!-- Row 5 -->
+   <!-- Column 1 -->
+   <row>
+     <panel depends="$Panel31Field1$,$Panel31Field2$,$Panel31Field3$,$Panel31Field4$">
+      <title>Data table</title>
+         <table>
+         <search>
+            <query>
+            | pivot `uA_DM_System_PerformanceCounter` System_PerformanceCounter 
+               $Panel31Function1$(PerformanceCounterValue) as CalculatedPerformanceCounterValue
+               splitrow
+                  PerformanceCounterInstance as "Instance"
+               splitrow
+                  host as Host
+               splitrow
+                  PerformanceCounterObject
+               splitrow
+                  PerformanceCounterName
+               $SearchFilter$
+               $Hostfilter$
+               filter PerformanceCounterObject is "$Panel31Field2$"
+               filter PerformanceCounterName is "$Panel31Field3$"
+               filter PerformanceCounterInstance is "$Panel31Field4$"
+            | eval "Performance counter" = PerformanceCounterObject."\\".PerformanceCounterName 
+            | eval "$Panel31Function1Display$ value" = round(CalculatedPerformanceCounterValue, 2)
+            | table "Performance counter", "Instance", Host, "$Panel31Function1Display$ value"
+            $CompareToAllMachinesTable_Join$
+           </query>
+         </search>
+         <option name="count">10</option>
+         <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+ </form>

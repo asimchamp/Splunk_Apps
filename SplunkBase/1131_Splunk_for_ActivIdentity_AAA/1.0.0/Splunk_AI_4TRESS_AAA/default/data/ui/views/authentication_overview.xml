@@ -1,0 +1,278 @@
+<view template="dashboard.html" stylesheet="traffic_overview.css">
+  <label>Authentication Dashboard</label>
+  <module name="AccountBar" layoutPanel="appHeader" />
+  <module name="AppBar" layoutPanel="navigationHeader" />
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+  <module name="GenericHeader" layoutPanel="panel_row1_col1">
+    <param name="label">Authentication Dashboard</param>
+  </module>
+  <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+    <param name="text">This dashboard provides visibility into the authentication data in your 4TRESS AAA environment.</param>
+  </module>
+  <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp1">
+    <param name="label">User ID:</param>
+    <param name="field">userID</param>
+    <param name="replacementMap">
+      <param name="arg">
+        <param name="userID">
+          <param name="value"></param>
+        </param>
+      </param>
+    </param>
+    <param name="intention">
+      <param name="name">stringreplace</param>
+      <param name="arg">
+        <param name="userID">
+          <param name="default"></param>
+          <param name="prefix">userID="</param>
+          <param name="suffix">"</param>
+          <param name="fillOnEmpty">false</param>
+        </param>
+      </param>
+    </param>
+    <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp2">
+      <param name="label">Source IP:</param>
+      <param name="field">nasIP</param>
+      <param name="replacementMap">
+        <param name="arg">
+          <param name="nasIP">
+            <param name="value"></param>
+          </param>
+        </param>
+      </param>
+      <param name="intention">
+        <param name="name">stringreplace</param>
+        <param name="arg">
+          <param name="nasIP">
+            <param name="default"></param>
+            <param name="prefix">nasIP="</param>
+            <param name="suffix">"</param>
+            <param name="fillOnEmpty">false</param>
+          </param>
+        </param>
+      </param>
+      <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp2">
+        <param name="label">Group:</param>
+        <param name="field">group</param>
+        <param name="replacementMap">
+          <param name="arg">
+            <param name="group">
+              <param name="value"></param>
+            </param>
+          </param>
+        </param>
+        <param name="intention">
+          <param name="name">stringreplace</param>
+          <param name="arg">
+            <param name="group">
+              <param name="default"></param>
+              <param name="prefix">group="</param>
+              <param name="suffix">"</param>
+              <param name="fillOnEmpty">false</param>
+            </param>
+          </param>
+        </param>
+        <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp3">
+          <param name="label">Radius IP:</param>
+          <param name="field">serverIP</param>
+          <param name="replacementMap">
+            <param name="arg">
+              <param name="serverIP">
+                <param name="value"></param>
+              </param>
+            </param>
+          </param>
+          <param name="intention">
+            <param name="name">stringreplace</param>
+            <param name="arg">
+              <param name="serverIP">
+                <param name="default"></param>
+                <param name="prefix">serverIP="</param>
+                <param name="suffix">"</param>
+                <param name="fillOnEmpty">false</param>
+              </param>
+            </param>
+          </param>
+          <module name="ExtendedFieldSearch" layoutPanel="panel_row2_col1_grp1">
+            <param name="label">Status:</param>
+            <param name="field">status</param>
+            <param name="replacementMap">
+              <param name="arg">
+                <param name="status">
+                  <param name="value"></param>
+                </param>
+              </param>
+            </param>
+            <param name="intention">
+              <param name="name">stringreplace</param>
+              <param name="arg">
+                <param name="status">
+                  <param name="default"></param>
+                  <param name="prefix">status="</param>
+                  <param name="suffix">"</param>
+                  <param name="fillOnEmpty">false</param>
+                </param>
+              </param>
+            </param>
+              
+		<module name="TimeRangePicker" layoutPanel="panel_row2_col1_grp1" autoRun="True">
+                <param name="selected">Last 60 minutes</param>
+                <param name="searchWhenChanged">True</param>
+                <module name="HiddenSearch" layoutPanel="panel_row1_col1">
+                  <param name="search">$serverIP$ $userID$ $group$ $nasIP$ $status$ `ActivIdentity-Authentication-DataCube`</param>
+                  <module name="JobProgressIndicator"></module>
+                  <module name="ViewRedirectorLink">
+                    <param name="viewTarget">flashtimeline</param>
+                    <param name="label">View Full Report</param>
+                  </module>
+
+                  <module name="HiddenPostProcess" layoutPanel="panel_row4_col1">
+                    <param name="search">`AI-Authentication-DataCube-Status-Count-by-Time`</param>
+		    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Authentication Status Over Time</param>
+                      <param name="chart">line</param>
+                      <param name="charting.legend.nullValueMode">connect</param>
+                      <param name="charting.legend.showMarkers">true</param>
+                      <param name="chart.stackMode">unstacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>                    
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		 <module name="HiddenPostProcess" layoutPanel="panel_row5_col1">
+                    <param name="search">`AI-Authentication-DataCube-Radius-Count-by-Time`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Per Radius Request Over Time</param>
+                      <param name="chart">line</param>
+                      <param name="charting.legend.nullValueMode">connect</param>
+                      <param name="charting.legend.showMarkers">true</param>
+                      <param name="chart.stackMode">unstacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		<module name="HiddenPostProcess" layoutPanel="panel_row6_col1">
+                    <param name="search">`AI-Authentication-DataCube-NASIP-Count-by-Time`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Per NAS IP Request Over Time</param>
+                      <param name="chart">line</param>
+                      <param name="charting.legend.nullValueMode">connect</param>
+                      <param name="charting.legend.showMarkers">true</param>
+                      <param name="chart.stackMode">unstacked</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+                  <module name="HiddenPostProcess" layoutPanel="panel_row7_col1">
+                    <param name="search">`AI-Authentication-DataCube-Top-UserID-Request`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top User ID by Request</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+                  <module name="HiddenPostProcess" layoutPanel="panel_row7_col2">
+                    <param name="search">`AI-Authentication-DataCube-Top-Group-Request`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top Groups by Requests</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		<module name="HiddenPostProcess" layoutPanel="panel_row8_col1">
+                    <param name="search">`AI-Authentication-DataCube-Top-Radius-Server-Request`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top Radius Server by Requests</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+		 <module name="HiddenPostProcess" layoutPanel="panel_row8_col2">
+                    <param name="search">`AI-Authentication-DataCube-Status-Request`</param>
+                    <module name="HiddenChartFormatter">
+                      <param name="chartTitle">Top Status Authentication by Requests</param>
+                      <param name="chart">pie</param>
+                      <param name="legend.placement">bottom</param>
+                      <module name="FlashChart">
+                        <param name="width">100%</param>
+                        <param name="height">250px</param>
+                        <module name="ConvertToDrilldownSearch">
+                          <module name="ViewRedirector">
+                            <param name="viewTarget">flashtimeline</param>
+                          </module>
+                        </module>
+                      </module>
+                    </module>
+                  </module>
+
+                </module>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+</view>

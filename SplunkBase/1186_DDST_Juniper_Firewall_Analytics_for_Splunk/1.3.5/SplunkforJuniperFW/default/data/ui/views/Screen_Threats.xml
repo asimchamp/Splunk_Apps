@@ -1,0 +1,102 @@
+<view template="dashboard.html">
+	<label>Screen Threat Summary</label>
+	<module name="AccountBar" layoutPanel="navigationHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="TitleBar" layoutPanel="navigationHeader">
+		<param name="showActionsMenu">False</param>
+	</module>  
+	<module name="TimeRangePicker" layoutPanel="panel_row1_col1" group="Top 10 Screen Events by Type">
+		<param name="searchWhenChanged">True</param>
+		<param name="selected">Last 60 minutes</param>
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="useHistory">false</param>
+			<param name="savedSearch">Screen Events</param>
+			<module name="JobProgressIndicator"/>
+			<module name="SimpleResultsTable">
+				<param name="drilldown">row</param>
+				<param name="entityName">results</param>
+				<module name="ConvertToDrilldownSearch">
+					<module name="ViewRedirector">
+						<param name="viewTarget">flashtimeline</param>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="panel_row1_col2" group="Top 10 Source IP Screen Events">
+		<param name="searchWhenChanged">True</param>
+		<param name="selected">Last 60 minutes</param>
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="useHistory">false</param>
+			<param name="savedSearch">Screen by Client</param>
+			<module name="JobProgressIndicator"/>
+			<module name="SimpleResultsTable">
+				<param name="drilldown">row</param>
+				<param name="entityName">results</param>
+				<module name="ConvertToDrilldownSearch">
+					<module name="ViewRedirector">
+						<param name="viewTarget">flashtimeline</param>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="panel_row2_col1" group="Top 10 Security Zone">
+		<param name="searchWhenChanged">True</param>
+		<param name="selected">Last 60 minutes</param>
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="useHistory">false</param>
+			<param name="savedSearch">Screen Security zone</param>
+			<module name="EnablePreview">
+				<param name="enable">true</param>
+				<param name="display">false</param>
+				<module name="HiddenChartFormatter">
+					<param name="chart">pie</param>
+					<module name="JSChart">
+						<param name="height">300px</param>
+						<module name="ViewRedirectorLink">
+							<param name="viewTarget">flashtimeline</param>
+							<param name="label">View full results</param>
+						</module>
+					</module>
+				</module>
+			</module>
+			<module name="SimpleResultsTable">
+				<param name="drilldown">row</param>
+				<param name="entityName">results</param>
+				<param name="displayRowNumbers">False</param>
+			</module>
+		</module>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="panel_row2_col2" group="Screen Events Trend by Device">
+		<param name="searchWhenChanged">True</param>
+		<param name="selected">Last 60 minutes</param>
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="useHistory">false</param>
+			<param name="savedSearch">Screen Events over time</param>
+			<module name="EnablePreview">
+				<param name="enable">true</param>
+				<param name="display">false</param>
+				<module name="HiddenChartFormatter">
+					<param name="chart">line</param>
+					<param name="primaryAxisTitle.text">Time</param>
+					<param name="secondaryAxisTitle.text">Detections</param>
+					<param name="legend.placement">right</param>
+					<module name="JSChart">
+						<param name="height">300px</param>
+						<module name="ViewRedirectorLink">
+							<param name="viewTarget">flashtimeline</param>
+							<param name="label">View full results</param>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module> 
+
+</view>

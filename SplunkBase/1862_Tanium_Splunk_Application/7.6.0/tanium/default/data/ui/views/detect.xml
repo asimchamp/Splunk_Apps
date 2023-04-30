@@ -1,0 +1,124 @@
+<form version="1.1">
+  <label>Tanium Detect Dashboard</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Time to Search</label>
+      <default>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Detect Alerts</title>
+      <chart>
+        <title>Signals and OpenIOC Alerts</title>
+        <search>
+          <query>`tanium_index` Question=Tanium-Detect Intel_Type!=Null | timechart count by Intel_Type  | bucket span=1d _time</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.text">Count</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Number of Alerts</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Signal Alerts</title>
+      <single>
+        <search>
+          <query>`tanium_index` Question=Tanium-Detect Intel_Type=tanium-signal | stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>OpenIOC Alerts</title>
+      <single>
+        <search>
+          <query>`tanium_index` Question=Tanium-Detect Intel_Type=openioc | stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,3]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Reputation Alerts</title>
+      <single>
+        <search>
+          <query>`tanium_index` reputation="Malicious" | stats dc(id)</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,2]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Tanium Signals Alerts</title>
+        <search>
+          <query>`tanium_index` Question=Tanium-Detect Intel_Type=tanium-signal | table Timestamp,Computer_Name, Computer_IP, Intel_Name, Intel_Labels | rename Computer_Name AS "Computer Name" | rename Computer_IP AS "Computer IP" | rename Intel_Name AS "Signal Name" | rename Intel_Labels AS "Signal Labels"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>OpenIOC Detections</title>
+        <search>
+          <query>`tanium_index` Question=Tanium-Detect Intel_Type=openioc | table Timestamp,Computer_Name, Computer_IP, Intel_Name, Intel_Labels</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Reputation Services</title>
+      <table>
+        <title>Malicious File Detections</title>
+        <search>
+          <query>`tanium_index` reputation=Malicious | table createdAt, reputation, value, service | rename createdAt AS "Detection Time" | rename reputation AS "File Disposition" | rename service AS "Reputation Source" | rename value AS "File Hash"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

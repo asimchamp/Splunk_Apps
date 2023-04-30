@@ -1,0 +1,29 @@
+<form>
+  <label>Helpdesk</label>
+  <fieldset>
+    <input type="time">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="text" token="Filtername">
+      <label>Login filter</label>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <searchString>
+        `smspasscode-index` sourcetype="WinEventLog:SmsCL" |
+        search LoginAccount="*$Filtername$*" |
+        iplocation End_user_IP |
+        table WhenLogin, LoginAccount, AuthResult, PasscodeType, DispatchType, DispatchTarget, Authentication_client_type, Authentication_policy_used, Reason, End_user_IP, Country, City |
+        rename WhenLogin AS "When", LoginAccount AS "Account", AuthResult AS "Result", PasscodeType AS "Passcode type", DispatchType AS "Dispatch type", DispatchTarget AS "Dispatch target", Authentication_client_type AS "Authentication client type", Authentication_policy_used AS "Authentication policy", End_user_IP as "User IP"
+      </searchString>
+      <title>Login attempts</title>
+      <option name="count">50</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+</form>

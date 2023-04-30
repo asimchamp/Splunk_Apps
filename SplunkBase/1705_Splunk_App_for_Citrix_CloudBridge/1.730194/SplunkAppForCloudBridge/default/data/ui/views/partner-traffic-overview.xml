@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Partner Traffic Overview</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 60 minutes</default>
+    </input>
+     <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+  </fieldset>
+ 
+  <row>
+    <chart>
+      <title>LAN Traffic By Top Partners</title>
+      <searchString>| savedsearch "Partner - LAN Traffic By Top Partner" observationPointId="$observerId$"</searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+      <drilldown><link>/app/SplunkAppForCloudBridge/partner-detail?form.partnerCbInstanceId=$click.value$</link></drilldown>   
+
+    </chart>
+    <chart>
+      <searchString>| savedsearch "Partner - WAN Traffic By Top Partner" observationPointId="$observerId$"</searchString>
+      <title>WAN Traffic By Partners</title>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+      <drilldown><link>/app/SplunkAppForCloudBridge/partner-detail?form.partnerCbInstanceId=$click.value$</link></drilldown>   
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+      <searchString>| savedsearch "Partner - WAN Traffic Received By Top Partner" observationPointId="$observerId$"</searchString>
+      <title>WAN Receive Throughput By Top Partners</title>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.stackMode">stacked</option> 
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Mbps</option> 
+      <drilldown><link>/app/SplunkAppForCloudBridge/partner-detail?form.partnerCbInstanceId=$click.name2$</link></drilldown>   
+    </chart>
+    <chart>
+      <searchString>| savedsearch "Partner - WAN Traffic Sent By Top Partner" observationPointId="$observerId$"</searchString>
+      <title>WAN Send Throughput By Top Partners</title>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.stackMode">stacked</option> 
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Mbps</option> 
+      <drilldown><link>/app/SplunkAppForCloudBridge/partner-detail?form.partnerCbInstanceId=$click.name2$</link></drilldown>   
+    </chart>
+  </row>
+
+</form>

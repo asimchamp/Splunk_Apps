@@ -1,0 +1,266 @@
+<form theme="light">
+  <label>Overview</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" searchWhenChanged="false">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Total Netflow Packets</title>
+      <single>
+        <search>
+          <query>|tstats `svalue` sum(Ixia_Flow.packets) as "Total Packets" from datamodel=Ixia</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">auto</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Total Netflow Octets</title>
+      <single>
+        <search>
+          <query>|tstats `svalue` sum(Ixia_Flow.octets) as "Total Bytes" from datamodel=Ixia</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">auto</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>NetFlow Records Packet Timeline</title>
+      <chart>
+        <search>
+          <query>|tstats `svalue` sum(Ixia_Flow.packets) as "Total Packets" from datamodel=Ixia by _time</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="charting.seriesColors">[0xe898a5]</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>NetFlow Records Octets Timeline</title>
+      <chart>
+        <search>
+          <query>|tstats `svalue` sum(Ixia_Flow.octets) as "Total Octets" from datamodel=Ixia by _time</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="charting.seriesColors">[0xe898a5]</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Source Countries</title>
+      <map>
+        <search>
+          <query>|tstats `svalue` count(Ixia_Flow.packets) As "Count" from datamodel=Ixia  by Ixia_Flow.source_ip_country_name| eval Count="# of Packets - " + 'Ixia_Flow.source_ip_country_name' + ": " + Count |rename Ixia_Flow.source_ip_country_name as Country|geom geo_countries featureIdField=Country</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="mapping.choroplethLayer.colorMode">categorical</option>
+        <option name="mapping.type">choropleth</option>
+        <drilldown>
+          <set token="country_source">$click.value$</set>
+          <link target="_blank">search?q=sourcetype=%22stream:netflow%22%20packets%21%3D%22%22%20%7Cwhere%20source_ip_country_name%20==%22$country_source$%22%20%7Crename%20source_ip_country_name%20as%20%22Source%20country%22,destination_ip_country_name%20as%20%22Destination%20country%22,%20src_ip%20as%20%22Source%20IP%22,dest_ip%20as%20%22Destination%20IP%22%20,%20,l7_application_name%20as%20%22Application%20name%22%20%20%7Ctable%20%20%20%22Source%20country%22,%22Destination%20country%22,%22Source%20IP%22,%22Destination%20IP%22,%22Application%20name%22&amp;earliest=$earliest$&amp;latest=$latest$</link>
+        </drilldown>
+      </map>
+    </panel>
+    <panel>
+      <title>Top Destination Countries</title>
+      <map>
+        <search>
+          <query>|tstats `svalue` count(Ixia_Flow.packets) As "Count" from datamodel=Ixia  by Ixia_Flow.destination_ip_country_name | eval Count="# of Packets - " + 'Ixia_Flow.destination_ip_country_name' + ": " + Count | rename Ixia_Flow.destination_ip_country_name as Country|geom geo_countries featureIdField=Country</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="mapping.choroplethLayer.colorMode">categorical</option>
+        <option name="mapping.type">choropleth</option>
+        <drilldown>
+          <set token="country_destination">$click.value$</set>
+          <link target="_blank">search?q=sourcetype=%22stream:netflow%22%20packets%21%3D%22%22%20%7Cwhere%20destination_ip_country_name%20==%22$country_destination$%22%20%7Crename%20source_ip_country_name%20as%20%22Source%20country%22%7Crename%20destination_ip_country_name%20as%20%22Destination%20country%22%7Crename%20src_ip%20as%20%22Source%20IP%22%7Crename%20dest_ip%20as%20%22Destination%20IP%22%20%7Crename%20l7_application_name%20as%20%22Application%20name%22%20%20%7Ctable%20%20%20%22Source%20country%22,%22Destination%20country%22,%22Source%20IP%22,%22Destination%20IP%22,%22Application%20name%22&amp;earliest=$earliest$&amp;latest=$latest$</link>
+        </drilldown>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Layer 7 Applications</title>
+      <input type="dropdown" token="top_applications" searchWhenChanged="true">
+        <label>Top</label>
+        <choice value="10">10</choice>
+        <choice value="25">25</choice>
+        <choice value="50">50</choice>
+        <default>10</default>
+        <initialValue>10</initialValue>
+      </input>
+      <viz type="ixflow_app.c3donut">
+        <search>
+          <query>|tstats `svalue` count(Ixia_Flow.l7_application_name) AS "Count of Application" from datamodel=Ixia by Ixia_Flow.l7_application_name  |sort-"Count of Application"|head limit=$top_applications$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="ixflow_app.c3donut.expand">true</option>
+        <option name="ixflow_app.c3donut.label_format">%</option>
+        <option name="ixflow_app.c3donut.label_show">0</option>
+        <option name="ixflow_app.c3donut.label_threshold">0.05</option>
+        <option name="ixflow_app.c3donut.label_value">ratio</option>
+        <option name="ixflow_app.c3donut.legend_position">bottom</option>
+        <option name="ixflow_app.c3donut.legend_show">1</option>
+        <option name="ixflow_app.c3donut.tooltip_format">%</option>
+        <option name="ixflow_app.c3donut.tooltip_show">1</option>
+        <option name="ixflow_app.c3donut.tooltip_value">default</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Network Talkers</title>
+      <input type="dropdown" token="top_talkers" searchWhenChanged="true">
+        <label>Top</label>
+        <choice value="10">10</choice>
+        <choice value="25">25</choice>
+        <choice value="50">50</choice>
+        <default>10</default>
+        <initialValue>10</initialValue>
+      </input>
+      <table>
+        <search>
+          <query>| tstats `svalue` sum(Ixia_Flow.octets) as "Total Bytes" from datamodel=Ixia by Ixia_Flow.src_ip, Ixia_Flow.dest_ip 
+| rename Ixia_Flow.src_ip as "Source IP Address", Ixia_Flow.dest_ip as "Destination IP Address" 
+| aggregatebyflow
+| sort 0 -"Total Bytes" 
+| head $top_talkers$</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link target="_blank">search?q=sourcetype="stream:netflow" ((src_ip="$row.Source IP Address$" AND dest_ip="$row.Destination IP Address$" ) OR (dest_ip="$row.Source IP Address$" AND src_ip="$row.Destination IP Address$" ))&amp;earliest=$earliest$&amp;latest=$latest$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

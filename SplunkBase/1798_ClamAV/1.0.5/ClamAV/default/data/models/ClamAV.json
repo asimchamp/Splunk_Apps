@@ -1,0 +1,1110 @@
+{
+    "modelName": "ClamAV",
+    "displayName": "ClamAV",
+    "description": "Data on ClamAV logs and virus'.",
+    "objectSummary": {
+        "Event-Based": 7,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "Detected_Virus",
+            "displayName": "Detected Virus",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "dest",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "eventtype",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "eventtype",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_count",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_count",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_file",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_file",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "product_version",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "product_version",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "category",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "category",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "clamav_action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "clamav_action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "scan_time_sec",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "scan_time_sec",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "signature",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "signature",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "`clamav_search`",
+                    "owner": "Detected_Virus"
+                }
+            ],
+            "lineage": "Detected_Virus"
+        },
+        {
+            "objectName": "Virus_Only",
+            "displayName": "Virus Only issues",
+            "parentName": "Detected_Virus",
+            "fields": [
+                {
+                    "fieldName": "dest",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "eventtype",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "eventtype",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_count",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_count",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_file",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_file",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "product_version",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "product_version",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "category",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "category",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "clamav_action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "clamav_action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "scan_time_sec",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "scan_time_sec",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "signature",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "signature",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "eventtype=Clamav_Virus",
+                    "owner": "Detected_Virus.Virus_Only"
+                }
+            ],
+            "lineage": "Detected_Virus.Virus_Only"
+        },
+        {
+            "objectName": "DLP_only",
+            "displayName": "DLP Only issues",
+            "parentName": "Detected_Virus",
+            "fields": [
+                {
+                    "fieldName": "dest",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "eventtype",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "eventtype",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_count",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_count",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_file",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_file",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "product_version",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "product_version",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "category",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "category",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "clamav_action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "clamav_action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "scan_time_sec",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "scan_time_sec",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "signature",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "signature",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "eventtype=Clamav_DLP",
+                    "owner": "Detected_Virus.DLP_only"
+                }
+            ],
+            "lineage": "Detected_Virus.DLP_only"
+        },
+        {
+            "objectName": "Quarantine_Only_issues",
+            "displayName": "Quarantine Only issues",
+            "parentName": "Detected_Virus",
+            "fields": [
+                {
+                    "fieldName": "dest",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "eventtype",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "eventtype",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_count",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_count",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "infected_file",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "infected_file",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "product_version",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "product_version",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "category",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "category",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "clamav_action",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "clamav_action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "scan_time_sec",
+                    "owner": "Detected_Virus",
+                    "type": "number",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "scan_time_sec",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "signature",
+                    "owner": "Detected_Virus",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "signature",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "eventtype=Clamav_Quarantine",
+                    "owner": "Detected_Virus.Quarantine_Only_issues"
+                }
+            ],
+            "lineage": "Detected_Virus.Quarantine_Only_issues"
+        },
+        {
+            "objectName": "ClamAV_Errors",
+            "displayName": "ClamAV Errors",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "dest",
+                    "owner": "ClamAV_Errors",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "eventtype",
+                    "owner": "ClamAV_Errors",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "eventtype",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "eventtype= Clamav_Errors",
+                    "owner": "ClamAV_Errors"
+                }
+            ],
+            "lineage": "ClamAV_Errors"
+        },
+        {
+            "objectName": "Malware",
+            "displayName": "Malware_Attacks",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "action",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "action",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "category",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "category",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "dest",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "dest",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "file_name",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "file_name",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "file_path",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "file_path",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "signature",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "signature",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "tag",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "vendor_product",
+                    "owner": "Malware",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "vendor_product",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "`clamav_search`",
+                    "owner": "Malware"
+                }
+            ],
+            "lineage": "Malware"
+        },
+        {
+            "objectName": "Malware_Operations",
+            "displayName": "Malware_Operations",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "dest",
+                    "owner": "Malware_Operations",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "dest",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "product_version",
+                    "owner": "Malware_Operations",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "product_version",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "tag",
+                    "owner": "Malware_Operations",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "tag",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "vendor_product",
+                    "owner": "Malware_Operations",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "vendor_product",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "fieldSearch": "",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "`clamav_search`",
+                    "owner": "Malware_Operations"
+                }
+            ],
+            "lineage": "Malware_Operations"
+        }
+    ],
+    "objectNameList": [
+        "Detected_Virus",
+        "Virus_Only",
+        "DLP_only",
+        "Quarantine_Only_issues",
+        "ClamAV_Errors",
+        "Malware",
+        "Malware_Operations"
+    ]
+}

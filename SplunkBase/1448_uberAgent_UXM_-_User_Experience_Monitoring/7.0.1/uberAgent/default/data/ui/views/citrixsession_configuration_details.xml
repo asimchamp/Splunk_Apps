@@ -1,0 +1,1123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css, citrixsession_configuration_details.css">
+
+  <label>Citrix Session Configuration Details</label>
+  <description>This dashboard displays detailed information about applied Citrix HDX policies and important active settings.</description>
+
+  <fieldset autoRun="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time range:</label>
+      <default>
+        <earliest>-1h</earliest>
+        <latest>now</latest>
+      </default>
+      <change>
+        <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+        <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+        <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+      </change>
+    </input>
+    <input type="dropdown" token="FilterField" id="Input_FilterField">
+      <label>Filter field:</label>
+    </input>
+    <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+      <label>Filter operator:</label>
+    </input>
+    <input type="text" token="FilterExpression" id="Input_FilterExpression">
+      <label>Filter expression:</label>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$"></input>
+    <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$"></input>
+    <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$"></input>
+    <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$"></input>
+    <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$"></input>
+    <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$"></input>
+    <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$"></input>
+    <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$"></input>
+    <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$"></input>
+    <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$"></input>
+    <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$"></input>
+    <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$"></input>
+    <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$"></input>
+    <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$"></input>
+    <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$"></input>
+    <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$"></input>
+    <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+      <default>CitrixSession_ConfigurationDetails</default>
+    </input>
+  </fieldset>
+
+  <search id="Search_Single">
+    <query>
+      | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+        dc(SessionGUID) as UniqueSessions
+        dc(host) as UniqueHosts
+        dc(SessionUser) as UniqueUsers
+        $SearchFilter$
+      | fields UniqueSessions UniqueUsers UniqueHosts
+    </query>
+  </search>
+
+  <search id="Search_Single2">
+    <query>
+      | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig          
+          latest(DisplayModeName) as "Display mode" 
+          latest(ThinwireVideoCodecType) as "Thinwire video codec type"
+          latest(ThinwireColorspace) as "Thinwire color space"
+          latest(ThinwireVideoCodecUse) as "Thinwire video codec usage"
+          splitrow
+            SessionGUID
+          $SearchFilter$
+    </query>
+  </search>  
+
+  <!-- Row 1 -->
+  <row>
+    <panel>
+        <title>Citrix session overview</title>
+        <viz type="uberAgent.uberagent-singlevalue">
+          <search base="Search_Single" />
+          <option name="uberAgent.uberagent-singlevalue.1-field">UniqueHosts</option>
+          <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts:</option>
+          <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+          <option name="uberAgent.uberagent-singlevalue.2-field">UniqueUsers</option>
+          <option name="uberAgent.uberagent-singlevalue.2-title">#Users:</option>
+          <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+          <option name="uberAgent.uberagent-singlevalue.3-field">UniqueSessions</option>
+          <option name="uberAgent.uberagent-singlevalue.3-title">#Sessions:</option>
+          <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+        </viz>
+    </panel>
+  </row>
+
+  <!-- Row 2 -->
+  <row>
+
+    <panel id="Section_Panel21">
+      <html>
+        <h1>
+          <b><center>Network</center></b>
+        </h1>
+      </html>
+    </panel>
+
+  </row>
+
+  <!-- Row 3 -->
+  <row>
+
+    <panel id="Table_Panel31">
+      <table>
+        <title>Network policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+              latest(NetworkPolicyAcceptSessionReliabilityConnections) as "Policy Session reliability connections"
+              latest(NetworkPolicySessionReliabilityPort) as "Policy Session reliability port"
+              latest(NetworkPolicySessionReliabilityTimeout) as "Policy Session reliability timeout (s)"
+              latest(NetworkPolicyICAListenerPortNumber) as "Policy ICA listener port"
+              splitrow
+                SessionGUID
+              $SearchFilter$
+            | fieldsummary Policy* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Policy
+            | replace "Policy *" with "*" in "Policy"
+            | replace "1:*" with "Allowed:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Prohibited:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions" 
+            | eval "Value(s): #sessions" = mvsort('Value(s): #sessions')
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    
+    <panel id="Chart_Panel32">
+      <chart>
+        <title>Transport protocols</title>
+          <search>
+            <query>
+              | pivot `uA_DM_Session_SessionDetail` Session_SessionDetail
+                  latest(SessionTransportProtocols) as "Transport protocols"
+                  splitrow
+                    SessionGUID
+                  $SearchFilter$
+              | stats count as "#sessions" by "Transport protocols"
+            </query>
+          </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+    <panel id="Chart_Panel33">
+      <chart>
+        <title>Sessions connected via</title>
+          <search>
+            <query>
+              | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                  latest(NetworkConnectedVia) as "Connected via"
+                  splitrow
+                    SessionGUID
+                  $SearchFilter$
+                | stats count as "#sessions" by "Connected via"
+              </query>
+          </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+    <panel id="Chart_Panel34">
+      <chart>
+        <title>Enlightened Data Transport MTU size</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(NetworkEdtMtu) as "EDT MTU"
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | stats count as "#sessions" by "EDT MTU"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+  </row>
+
+  <!-- Row 4 -->  
+  <row>
+
+    <panel id="Section_Panel41">
+      <html>
+        <h1><b><center>Session access</center></b></h1>
+      </html>
+    </panel>
+
+  </row>
+
+  <!-- Row 5 -->
+  <row>
+
+    <!-- Column 1 -->
+    <panel>
+
+      <input type="dropdown" token="Panel51GroupBy" searchWhenChanged="true">
+          <choice value="platform@version">Platform@version</choice>
+          <choice value="platform">Platform</choice>
+          <choice value="version">Version</choice>
+          <default>Platform@version</default>
+          <label>Group by:</label>
+        </input>
+
+        <chart>
+        <title>Client component $Panel51GroupBy$ (top 10)</title>
+          <search>
+            <query>
+              | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                  splitrow
+                    SessionClientPlatform as "platform"
+                  splitrow
+                    SessionClientVersion as "version"
+                  splitrow
+                    SessionClientName as "Clientname"
+                  filter SessionBrokerType is "Citrix"
+                  $SearchFilter$
+              | eval "platform@version" = 'platform'+"@"+'version' 
+              | stats count as "#Clients" by $Panel51GroupBy$ 
+              | sort limit=10 - $Panel51GroupBy$ 
+            </query>
+          </search>
+          <option name="height">250</option>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+          <option name="charting.axisTitleX.visibility">collapsed</option>
+          <option name="charting.drilldown">none</option>
+        </chart>
+    </panel>
+    
+    <!-- Column 2 -->
+    <panel>
+      
+      <input type="dropdown" token="Panel52SortBy" searchWhenChanged="true">
+        <choice value="+ ">Ascending</choice>
+        <choice value="- ">Descending</choice>
+        <default>Descending</default>
+        <label>Sort order:</label>
+      </input>
+      
+      <chart>
+        <title>Published names used to launch sessions (top 10)</title>
+        <search>
+            <query>
+              | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                  latest(SessionPublishedName) as "Published name"
+                  splitrow
+                    SessionGUID
+                  filter SessionBrokerType is "Citrix"
+                  $SearchFilter$
+              | top "Published name" showcount=false percentfield="Published name percentage"
+              | sort limit=10 $Panel52SortBy$ "Published name percentage"
+            </query>
+        </search>
+        <option name="height">250</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+  </row>
+
+  <!-- Row 6 -->
+  <row>
+
+    <!-- Column 1 -->
+    <panel>
+
+      <input type="dropdown" token="Panel61GroupBy" searchWhenChanged="true">
+        <choice value="&quot;Session connection state&quot;">Sessions</choice>
+        <choice value="&quot;Published app connection state&quot;">Published apps</choice>
+        <default>Sessions</default>
+        <label>Group by:</label>
+        <change>
+          <condition value="&quot;Session connection state&quot;">
+            <set token="GroupBySession">true</set>
+            <unset token="GroupByApp"></unset>
+          </condition>
+         <condition value="&quot;Published app connection state&quot;">
+            <set token="GroupByApp">true</set>
+            <unset token="GroupBySession"></unset>
+          </condition>
+        </change>
+      </input>
+
+      <chart depends="$GroupBySession$">
+        <title>Connection state distribution</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | join type=left SessionGUID
+              [
+                | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                  latest(SessionConnectionState) as "Session connection state"
+                  splitrow
+                    SessionGUID
+                  $SearchFilter$
+                | fields + SessionGUID "Session connection state"
+              ]
+            | stats count(SessionGUID) as "#Sessions" by $Panel61GroupBy$
+          </query>
+        </search>
+        <option name="height">250</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+
+      <chart depends="$GroupByApp$">
+        <title>Connection state distribution</title>
+        <search>
+          <query>
+            | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                latest(SessionAppStateCtx) as "Published app connection state"
+                splitrow
+                  SessionGUID
+                splitrow
+                  SessionPublishedAppsCtxSplitLower
+                filter SessionBrokerType is "Citrix"
+                $SearchFilter$ 
+            | rename SessionPublishedAppsCtxSplitLower as "#Published apps" 
+            | stats count("#Published apps") as "#Published apps" by $Panel61GroupBy$
+          </query>
+        </search>
+        <option name="height">250</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+
+    </panel>
+
+    <!-- Column 2 -->
+    <panel>
+
+      <input type="dropdown" token="Panel62SortBy" searchWhenChanged="true">
+        <choice value="+ ">Ascending</choice>
+        <choice value="- ">Descending</choice>
+        <default>Descending</default>
+        <label>Sort order:</label>
+      </input>
+
+      <chart>
+        <title>Published application usage (top 10)</title>
+        <search>
+            <query>
+              | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                  splitrow
+                    SessionPublishedAppsCtxSplit as "Published app"
+                  splitrow
+                    SessionGUID
+                  filter SessionBrokerType is "Citrix"
+                  $SearchFilter$
+              | stats dc(SessionGUID) as "#Sessions" by "Published app"
+              | sort limit=10 $Panel62SortBy$ "#Sessions"
+            </query>
+        </search>
+        <option name="height">250</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+
+    </panel>
+
+  </row>
+
+  <!-- Row 7 -->  
+  <row>
+
+    <panel id="Section_Panel71">
+      <html>
+        <h1><b><center>Display mode</center></b></h1>
+      </html>
+    </panel>
+
+  </row>
+
+  <!-- Row 8 -->
+  <row>
+
+    <panel id="Table_Panel81">
+      <table>
+        <title>Display mode policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(ThinwirePolicyFps) as "Policy Thinwire FPS"
+                latest(ThinwirePolicyPriority) as "Policy Thinwire channel priority"
+                latest(ThinwirePolicyUseHardwareEncoding) as "Policy Thinwire hardware encoding"
+                latest(ThinwirePolicyUseVideoCodec) as "Policy Thinwire video codec"
+                latest(ThinwirePolicyVisualQuality) as "Policy Thinwire visual quality"
+                latest(FramehawkPolicyPriority) as "Policy framehawk channel priority"
+                latest(D3DPolicyAeroRedirection) as "Policy DCR aero redirection"
+                latest(D3DPolicyGraphicsQuality) as "Policy DCR graphics quality"
+                latest(D3DPolicyPriority) as "Policy DCR channel priority"
+                latest(GraphicsPolicyDisplayDegradeNotifyUser) as "Policy Legacy graphics display degrade notify user"
+                latest(GraphicsPolicyDisplayDegradePolicy) as "Policy Legacy graphics display degrade policy"
+                latest(GraphicsPolicyPriority) as "Policy Legacy graphics channel priority"
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | fieldsummary Policy* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Policy
+            | replace "Policy *" with "*" in "Policy"
+            | replace "1:*" with "Allowed:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Prohobited:*" in "Value(s): #sessions"
+            | mvcombine delim=";" "Value(s): #sessions" 
+            | eval "Value(s): #sessions" = mvsort('Value(s): #sessions')
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+
+    <panel id="Chart_Panel82">
+      <chart>
+        <title>Display modes</title>
+        <search base="Search_Single2">
+          <query>
+            | stats count as "#sessions" by "Display mode"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+    <panel id="Chart_Panel83">
+      <chart>
+        <title>Thinwire video codec usage</title>
+        <search base="Search_Single2">
+          <query>
+            | stats count as "#sessions" by "Thinwire video codec usage"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+  </row>
+
+  <!-- Row 9 -->
+  <row>
+
+    <panel id="Table_Panel91">
+      <table>
+        <title>Display mode settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(ThinwireHardwareEncodeInUse) as "Setting Thinwire hardware encode"
+                latest(ThinwireColorDepth) as "Setting Thinwire color depth (bit)"
+                latest(ThinwireComponentEncoder) as "Setting Thinwire component encoder"    
+                latest(ThinwireActualPriority) as "Setting Thinwire actual channel priority"
+                latest(FramehawkActualPriority) as "Setting Framehawk actual channel priority"
+                latest(D3DActualPriority) as "Setting DCR actual channel priority"
+                latest(GraphicsActualPriority) as "Setting Legacy graphics actual channel priority"  
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | fieldsummary Setting* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Setting
+            | replace "Setting *" with "*" in "Setting"
+            | replace "1:*" with "Active:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Inactive:*" in "Value(s): #sessions"
+            | mvcombine delim=";" "Value(s): #sessions"
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+
+    <panel id="Chart_Panel92">
+      <chart>
+        <title>Thinwire color space</title>
+        <search base="Search_Single2">
+          <query>
+            | stats count as "#sessions" by "Thinwire color space"
+          </query>
+        </search>
+
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+    <panel id="Chart_Panel93">
+      <chart>
+        <title>Thinwire video codec type</title>
+        <search base="Search_Single2">
+          <query>
+            | stats count as "#sessions" by "Thinwire video codec type"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+  </row>
+  
+  <!-- Row 10 --> 
+  <row>
+
+    <panel id="Section_Panel101">
+      <html>
+        <h1><b><center>Client drive mapping</center></b></h1>
+      </html>
+    </panel>
+
+  </row>
+
+  <!-- Row 11 -->
+  <row>
+
+    <panel id="Table_Panel111">
+      
+      <table>
+        <title>Client drive mapping policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(CdmPolicyAllowDriveRedirection) as "Policy Client drive mapping"
+                latest(CdmPolicyReadOnly) as "Policy Read-only client drive access"
+                latest(CdmPolicyPriority) as "Policy Channel priority"
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | fieldsummary Policy* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Policy 
+            | replace "Policy *" with "*" in "Policy" 
+            | replace "1:*" with "Allowed:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Prohibited:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions" 
+            | eval "Value(s): #sessions" = mvsort('Value(s): #sessions')
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+      <table>
+        <title>Client drive mapping settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(CdmActualPriority) as "Setting Actual channel priority"
+                splitrow
+                  SessionGUID 
+                $SearchFilter$
+            | fieldsummary Setting* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Setting 
+            | replace "Setting *" with "*" in "Setting" 
+            | replace "1:*" with "Active:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Inactive:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions"
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+    </panel>
+
+    <panel>
+
+      <chart>
+        <title>Mapped client drive types</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+              latest(CdmVolumes) as "Setting CDM Volumes"
+              splitrow
+              SessionGUID
+              $SearchFilter$
+            | fieldsummary Setting* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\").*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval value = split(value,";") 
+            | mvexpand value 
+            | fields value count 
+            | rex field=value "(?&lt;value&gt;(.+?(?= \()))" 
+            | mvcombine delim=";" count 
+            | streamstats sum(count) as "# types in sessions" window=1 
+            | rename value as "Mapped drive type" 
+            | fields "Mapped drive type" "# types in sessions"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+
+    </panel>
+
+  </row>
+
+  <!-- Row 12 --> 
+  <row>
+
+    <panel id="Section_Panel121">
+      <html>
+        <h1><b><center>Printer</center></b></h1>
+      </html>
+    </panel>
+
+  </row>
+
+  <!-- Row 13 -->
+  <row>
+
+    <panel id="Table_Panel131">
+
+      <table>
+        <title>Printer policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+              latest(PrinterPolicyAllowRedirection) as "Policy Allow printer redirection"
+              latest(PrinterPolicyAutoCreateClientPrintersDisplayName) as "Policy Auto-create client printers"
+              latest(PrinterPolicyPriority) as "Policy Channel Priority"
+              splitrow
+                SessionGUID
+              $SearchFilter$
+            | fieldsummary Policy* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\").*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Policy 
+            | replace "Policy *" with "*" in "Policy" 
+            | replace "1:*" with "Allowed:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Prohibited:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions" 
+            | eval "Value(s): #sessions" = mvsort('Value(s): #sessions')
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+      <table>
+        <title>Printer settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(PrinterActualPriority) as "Setting Actual channel priority"
+                splitrow
+                  SessionGUID 
+                $SearchFilter$
+            | fieldsummary Setting* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Setting 
+            | replace "Setting *" with "*" in "Setting" 
+            | replace "1:*" with "Active:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Inactive:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions"
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+    </panel>
+
+    <panel id="Table_Panel132">
+      <chart>
+        <title>Printers connected most often (top 10)</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(PrinterSessionPrinter) as LatestPrinterSessionPrinter
+                splitrow
+                  SessionGUID
+                $SearchFilter$ 
+            | eval LatestPrinterSessionPrinterSplit = split(LatestPrinterSessionPrinter, ";")
+            | foreach LatestPrinterSessionPrinterSplit 
+                [ eval LatestPrinterSessionPrinterSplit = trim(mvmap(LatestPrinterSessionPrinterSplit,substr(&lt;&lt;FIELD&gt;&gt;,0,(len(mvindex(split(LatestPrinterSessionPrinterSplit,"("),0)))))) ] 
+            | mvexpand LatestPrinterSessionPrinterSplit 
+            | rename LatestPrinterSessionPrinterSplit as "Printer names" 
+            | stats count("Printer names") as "#sessions" by "Printer names"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+
+  </row>
+
+  <!-- Row 14 -->
+  <row>
+    
+    <panel id="Section_Panel141">
+      <html>
+        <h1><b><center>Audio</center></b></h1>
+      </html>
+    </panel>
+
+    <panel id="Section_Panel142">
+      <html>
+        <h1><b><center>USB</center></b></h1>
+      </html>
+    </panel>
+  
+  </row>
+
+  <!-- Row 15 -->
+  <row>
+
+    <panel>
+
+      <table id="Table_Panel151">
+        <title>Audio policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(AudioPolicyAllowMicrophoneRedirection) as "Policy Microphone redirection"
+                latest(AudioPolicyAllowRedirection) as "Policy Audio redirection"
+                latest(AudioPolicyPriority) as "Policy Channel priority"
+                latest(AudioPolicySoundQuality) as "Policy Sound quality"
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | fieldsummary Policy* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\").*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Policy 
+            | replace "Policy *" with "*" in "Policy" 
+            | replace "1:*" with "Allowed:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Prohibited:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions" 
+            | eval "Value(s): #sessions" = mvsort('Value(s): #sessions')
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+    </panel>
+
+    <panel>
+
+      <table id="Table_Panel152">
+        <title>USB policies</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(USBPolicyAllowPNPRedirection) as "Policy PNP redirection"
+                latest(USBPolicyAllowUSBSupport) as "Policy USB support"
+                latest(USBPolicyPriority) as "Policy Channel priority"
+                splitrow
+                  SessionGUID
+                $SearchFilter$
+            | fieldsummary Policy* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\").*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Policy 
+            | replace "Policy *" with "*" in "Policy" 
+            | replace "1:*" with "Allowed:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Prohibited:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions" 
+            | eval "Value(s): #sessions" = mvsort('Value(s): #sessions')</query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+    </panel>
+
+  </row>
+
+  <!-- Row 16 -->
+  <row>
+
+    <panel>
+
+      <table id="Table_Panel161">
+        <title>Audio settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(AudioActualPriority) as "Setting Actual channel priority"
+                splitrow
+                  SessionGUID 
+                $SearchFilter$
+            | fieldsummary Setting* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Setting 
+            | replace "Setting *" with "*" in "Setting" 
+            | replace "1:*" with "Active:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Inactive:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions"
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+    </panel>
+
+    <panel>
+
+      <table id="Table_Panel162">
+        <title>USB settings</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                latest(USBActualPriority) as "Setting Actual channel priority"
+                splitrow
+                  SessionGUID 
+                $SearchFilter$
+            | fieldsummary Setting* 
+            | eval values = split(values,"},{") 
+            | mvexpand values 
+            | rex field=values "(?&lt;value&gt;(?&lt;=\"value\":\")[\\w\\.]*(?=\",\"count\"))" 
+            | rex field=values "(?&lt;count&gt;(?&lt;=\"count\":)\d+)" 
+            | eval "Value(s): #sessions" = 'value'+": "+'count' 
+            | fields field "Value(s): #sessions" 
+            | rename field as Setting 
+            | replace "Setting *" with "*" in "Setting" 
+            | replace "1:*" with "Active:*" in "Value(s): #sessions" 
+            | replace "0:*" with "Inactive:*" in "Value(s): #sessions" 
+            | mvcombine delim=";" "Value(s): #sessions"
+          </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+
+    </panel>
+  
+  </row>
+  
+  <!-- Row 17 -->
+  <row>
+    
+    <panel id="Section_Panel171">
+      <html>
+        <h1><b><center>Data table</center></b></h1>
+      </html>
+    </panel>
+  
+  </row>
+
+  <!-- Row 18 -->
+  <row>
+
+    <panel>
+
+      <input type="multiselect" token="Panel181Filter" id="Input_Panel181" searchWhenChanged="true">
+        <choice value="&quot;User&quot;">User</choice>
+        <choice value="&quot;Host&quot;">Host</choice>
+        <choice value="&quot;Logon time&quot;">Logon time</choice>
+        <choice value="&quot;Last seen&quot;">Last seen</choice>
+        <choice value="&quot;Last state&quot;">Last state</choice>
+        <choice value="&quot;Client name(s)&quot;">Client name(s)</choice>
+        <choice value="&quot;Client IP(s)&quot;">Client IP(s)</choice>
+        <choice value="&quot;Client platform(s)&quot;">Client platform(s)</choice>
+        <choice value="&quot;Client version(s)&quot;">Client version(s)</choice>
+        <choice value="&quot;Pub. name&quot;">Pub. name</choice>
+        <choice value="&quot;Pub. app(s)&quot;">Pub. app(s)</choice>
+        <choice value="&quot;Encryption&quot;">Encryption</choice>
+
+        <choice value="&quot;Policy microphone redirection&quot;">Policy microphone redirection</choice>
+        <choice value="&quot;Policy audio redirection&quot;">Policy audio redirection</choice>
+        <choice value="&quot;Policy audio channel priority&quot;">Policy audio channel priority</choice>
+        <choice value="&quot;Policy sound qualityer&quot;">Policy sound quality</choice>
+        <choice value="&quot;Audio actual channel priority&quot;">Audio actual channel priority</choice>
+
+        <choice value="&quot;Policy client drive mapping&quot;">Policy client drive mapping</choice>
+        <choice value="&quot;Policy read-only client drive access&quot;">Policy read-only client drive access</choice>
+        <choice value="&quot;Policy channel priority&quot;">Policy cdm channel priority</choice>
+        <choice value="&quot;Mapped volumes&quot;">Mapped volumes</choice>
+        <choice value="&quot;CDM actual channel priority&quot;">CDM actual channel priority</choice>
+        
+        <choice value="&quot;Display mode&quot;">Display mode</choice>
+        
+        <choice value="&quot;Policy thinwire FPS&quot;">Policy thinwire FPS</choice>
+        <choice value="&quot;Policy thinwire channel priority&quot;">Policy thinwire channel priority</choice>
+        <choice value="&quot;Policy thinwire hardware encoding&quot;">Policy thinwire hardware encoding</choice>
+        <choice value="&quot;Policy thinwire video codec&quot;">Policy thinwire video codec</choice>
+        <choice value="&quot;Policy thinwire visual quality&quot;">Policy thinwire visual quality</choice>
+        <choice value="&quot;Thinwire actual channel priority&quot;">Thinwire actual channel priority</choice>
+        <choice value="&quot;Thinwire color depth (bit)&quot;">Thinwire color depth (bit)</choice>
+        <choice value="&quot;Thinwire component encoder&quot;">Thinwire component encoder</choice>
+        <choice value="&quot;Thinwire hardware encode&quot;">Thinwire hardware encode</choice>
+        <choice value="&quot;Thinwire video codec type&quot;">Thinwire video codec type</choice>
+        <choice value="&quot;Thinwire color space&quot;">Thinwire color space</choice>
+        <choice value="&quot;Thinwire video codec usage&quot;">Thinwire video codec usage</choice>
+        
+        <choice value="&quot;Policy framehawk priority&quot;">Policy framehawk priority</choice>
+        <choice value="&quot;Framehawk actual channel priorityy&quot;">Framehawk actual channel priority</choice>
+       
+        <choice value="&quot;Policy DCR aero redirection&quot;">Policy DCR aero redirection</choice>
+        <choice value="&quot;Policy DCR graphics quality&quot;">Policy DCR graphics quality</choice>
+        <choice value="&quot;Policy DCR channel priority&quot;">Policy DCR channel priority</choice>
+        <choice value="&quot;DCR actual channel priority&quot;">DCR actual channel priority</choice>
+        
+        <choice value="&quot;Policy legacy graphics display degrade notify user&quot;">Policy legacy graphics display degrade notify user</choice>
+        <choice value="&quot;Policy legacy graphics display degrade policy&quot;">Policy legacy graphics display degrade policy</choice>
+        <choice value="&quot;Policy legacy graphics channel priority&quot;">Policy legacy graphics channel priority</choice>
+        <choice value="&quot;Legacy graphics actual channel priority&quot;">Legacy graphics actual channel priority</choice>
+
+        <choice value="&quot;Policy session reliability connections&quot;">Policy session reliability connections</choice>
+        <choice value="&quot;Policy session reliability port&quot;">Policy session reliability port</choice>
+        <choice value="&quot;Policy session reliability timeout (s)&quot;">Policy session reliability timeout (s)</choice>
+        <choice value="&quot;Policy ICA listener port&quot;">Policy ICA listener port</choice>
+        <choice value="&quot;EDT MTU&quot;">EDT MTU</choice>
+        <choice value="&quot;Connected via&quot;">Connected via</choice>
+        <choice value="&quot;Transport protocols&quot;">Transport protocols</choice>
+        
+        <choice value="&quot;Policy allow printer redirection&quot;">Policy allow printer redirection</choice>
+        <choice value="&quot;Policy auto-create client printers&quot;">Policy auto-create client printers</choice>
+        <choice value="&quot;Policy printer channel priority&quot;">Policy printer channel priority</choice>
+        <choice value="&quot;Mapped printers&quot;">Mapped printers</choice>
+        <choice value="&quot;Printer actual channel priority&quot;">Printer actual channel priority</choice>
+        
+        <choice value="&quot;Policy USB PNP redirection&quot;">Policy USB PNP redirection</choice>
+        <choice value="&quot;Policy USB support&quot;">Policy USB support</choice>
+        <choice value="&quot;Policy USB channel priority&quot;">Policy USB channel priority</choice>
+        <choice value="&quot;USB actual channel priority&quot;">USB actual channel priority</choice>
+        
+        <label>Fields to display:</label>
+        <default>
+          "User",
+          "Host",
+          "Logon time",
+          "Last seen",
+          "Last state",
+          "Display mode",
+          "Transport protocols"
+          "EDT MTU",
+          "Connected via"
+        </default>
+      </input>
+
+      <table id="Table_Panel181">
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+              latest(AudioActualPriority) as "Audio actual channel priority"   
+              latest(AudioPolicyAllowMicrophoneRedirection) as "Policy microphone redirection"
+              latest(AudioPolicyAllowRedirection) as "Policy audio redirection"
+              latest(AudioPolicyPriority) as "Policy audio channel priority"
+              latest(AudioPolicySoundQuality) as "Policy sound quality"
+              
+              latest(CdmActualPriority) as "CDM actual channel priority"
+              latest(CdmPolicyAllowDriveRedirection) as "Policy client drive mapping"
+              latest(CdmPolicyReadOnly) as "Policy read-only client drive access"
+              latest(CdmPolicyPriority) as "Policy cdm channel priority"
+              latest(CdmVolumes) as "Mapped volumes"
+              
+              latest(DisplayModeName) as "Display mode" 
+              
+              latest(ThinwirePolicyFps) as "Policy thinwire FPS"
+              latest(ThinwirePolicyPriority) as "Policy thinwire channel priority"
+              latest(ThinwirePolicyUseHardwareEncoding) as "Policy thinwire hardware encoding"
+              latest(ThinwirePolicyUseVideoCodec) as "Policy thinwire video codec"
+              latest(ThinwirePolicyVisualQuality) as "Policy thinwire visual quality"
+              latest(ThinwireActualPriority) as "Thinwire actual channel priority"
+              latest(ThinwireColorDepth) as "Thinwire color depth (bit)"
+              latest(ThinwireComponentEncoder) as "Thinwire component encoder"
+              latest(ThinwireHardwareEncodeInUse) as "Thinwire hardware encode"
+              latest(ThinwireVideoCodecType) as "Thinwire video codec type"
+              latest(ThinwireColorspace) as "Thinwire color space"
+              latest(ThinwireVideoCodecUse) as "Thinwire video codec usage"
+              
+              latest(FramehawkActualPriority) as "Framehawk actual channel priority"
+              latest(FramehawkPolicyPriority) as "Policy framehawk channel priority"
+              
+              latest(D3DActualPriority) as "DCR actual channel priority"
+              latest(D3DPolicyAeroRedirection) as "Policy DCR aero redirection"
+              latest(D3DPolicyGraphicsQuality) as "Policy DCR graphics quality"
+              latest(D3DPolicyPriority) as "Policy DCR channel priority"
+              
+              latest(GraphicsActualPriority) as "Legacy graphics actual channel priority" 
+              latest(GraphicsPolicyDisplayDegradeNotifyUser) as "Policy legacy graphics display degrade notify user"
+              latest(GraphicsPolicyDisplayDegradePolicy) as "Policy legacy graphics display degrade policy"
+              latest(GraphicsPolicyPriority) as "Policy legacy graphics channel priority"
+              
+              latest(NetworkPolicyAcceptSessionReliabilityConnections) as "Policy session reliability connections"
+              latest(NetworkPolicySessionReliabilityPort) as "Policy session reliability port"
+              latest(NetworkPolicySessionReliabilityTimeout) as "Policy session reliability timeout (s)"
+              latest(NetworkPolicyICAListenerPortNumber) as "Policy ICA listener port"
+              latest(NetworkEdtMtu) as "EDT MTU"
+              latest(NetworkConnectedVia) as "Connected via"
+              
+              latest(PrinterActualPriority) as "Printer actual channel priority"
+              latest(PrinterPolicyAllowRedirection) as "Policy allow printer redirection"
+              latest(PrinterPolicyAutoCreateClientPrintersDisplayName) as "Policy auto-create client printers"
+              latest(PrinterPolicyPriority) as "Policy printer channel priority"
+              latest(PrinterSessionPrinter) as "Mapped prninters"
+              
+              latest(USBActualPriority) as "USB actual channel priority"
+              latest(USBPolicyAllowPNPRedirection) as "Policy USB PNP redirection"
+              latest(USBPolicyAllowUSBSupport) as "Policy USB support"
+              latest(USBPolicyPriority) as "Policy USB channel priority"
+              
+              latest(SessionUser) as User
+              latest(host) as Host
+              
+              splitrow
+                SessionGUID
+              $SearchFilter$
+            | join type=left SessionGUID 
+              [
+                | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                    latest(_time) as LastSeen
+                    latest(SessionConnectionState) as "Last state"
+                    latest(SessionTransportProtocols) as "Transport protocols"
+                    latest(SessionLogonTime) as SessionLogonTime    
+                    values(SessionClientName) as "Client name(s)"
+                    values(SessionClientIp) as "Client IP(s)"
+                    values(SessionClientPlatform) as "Client platform(s)"
+                    values(SessionClientVersion) as "Client version(s)"
+                    values(SessionPublishedName) as "Pub. name"
+                    values(SessionPublishedAppsCtxSplitLower) as "Pub. app(s)"
+                    values(SessionEncryptionCtx) as "Encryption"
+                    splitrow
+                      SessionGUID
+                    $SearchFilter$  
+                | eval "Last seen" = strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                | eval "Logon time" = strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")  
+                | fields + SessionGUID "Transport protocols" "Last seen" "Last state" "Logon time" "Client name(s)" "Client IP(s)" "Client platform(s)" "Client version(s)" "Pub. name" "Pub. app(s)" "Encryption"
+              ]
+            | sort limit=0 -"Logon time" 
+            | table $Panel181Filter$ SessionGUID
+          </query>
+        </search>
+        <option name="count">25</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                single_user_detail?earliest=$earliest$&latest=$latest$&form.FilterField=sUser&form.FilterOperator=in&form.FilterExpression=$row.User$
+            ]]>
+          </link>
+        </drilldown>
+      </table>
+
+      <html src="citrixsession_configuration_details_explanation.html">
+      </html>
+    </panel>
+
+  </row>
+
+</form>

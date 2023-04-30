@@ -1,0 +1,107 @@
+<form>
+  <label>File Investigation</label>
+
+  <fieldset>
+      <input type="text" token="hashToken">
+          <label>Hash Or File Name:</label>
+          <default></default>
+      </input>
+	  <input type="dropdown" token="hashTerm" searchWhenChanged="false">
+		<label>Match type</label>
+		<default>HashSearch</default>
+		<choice value="HashSearch">Exact match</choice>
+		<choice value="HashSearchWildcard">Wildcard match</choice>
+		<change>
+			<condition value="HashSearch">
+				<set token="hashTermOut">HashSearch</set>
+				<set token="hashTestOut">HashTest</set>
+				<set token="notHashTestOut">NotHashTest</set>
+			</condition>
+			<condition value="HashSearchWildcard">
+				<set token="hashTermOut">HashSearchWildcard</set>
+				<set token="hashTestOut">HashTestWildcard</set>
+				<set token="notHashTestOut">NotHashTestWildcard</set>
+			</condition>
+		</change>
+	  </input>
+	  <input type="time" searchWhenChanged="false">
+			<default>Last 7 days</default>
+	  </input>
+  </fieldset>
+  
+  <row>
+		<table>
+			<title>Number of computers on which this file has been created:</title>
+			<searchTemplate>
+				eventtype=bit9_filesOnComputers `FileCreatedOps` [search `$hashTermOut$($hashToken$)` | table FileHash] | top 0 FileName showperc=false | rename FileName as "File Name", count as Computers
+			</searchTemplate>
+		</table>
+		<table>
+			<title>File Hashes</title>
+			<searchTemplate>
+				`$hashTermOut$($hashToken$)` | dedup FileHash | table Md5, Sha1, FileHash | rename Md5 AS MD5, Sha1 AS "SHA-1", FileHash AS "SHA-256"
+			</searchTemplate>
+		</table>
+  </row>
+  <row>
+		<table>
+			<title>File Information: First Seen On Network</title>
+			<searchTemplate>
+				`$hashTermOut$($hashToken$)` | convert timeformat="%m/%d/%Y %I:%M:%S %p" mktime(ModifiedDate) AS ModifiedCTime | sort ModifiedCTime | table FileName, Timestamp, PathName, Publisher, HostName, TrustValue, FileSize | stats first(FileName) as "File Name" first(Timestamp) as "Date Created" first(PathName) as "First Path" first(Publisher) as Publisher first(HostName) as "First Computer" last(TrustValue) as "Trust" first(FileSize) as "File Size"
+			</searchTemplate>
+			<option name="charting.data.preview">false</option>
+		</table>
+  </row>
+  <row>
+      <chart>
+          <title>Hash Activity</title>
+          <searchTemplate>
+              eventtype=bit9_filesOnComputers `FileActivityOps` [search `$hashTermOut$($hashToken$)` | table FileHash] | append [search eventtype=bit9_filesOnComputers `FileActivityOps` [search `$hashTermOut$($hashToken$)` | eval ProcessHash=FileHash | table ProcessHash]] | timechart bins=50 count(eval(`$hashTestOut$($hashToken$)` AND OpType=0)) as "Got created", count(eval(`$notHashTestOut$($hashToken$)` AND OpType=0)) as "Created another file", count(eval(`$hashTestOut$($hashToken$)` AND OpType!=0)) as "Got modified", count(eval(`$notHashTestOut$($hashToken$)` AND OpType!=0)) as "Modified another file"
+          </searchTemplate>
+          <option name="charting.chart">column</option>
+          <option name="charting.chart.stackMode">stacked</option>
+          <option name="charting.primaryAxisTitle.text">Date</option>
+		  <option name="charting.axisTitleX.text">Date</option>
+          <option name="charting.legend.placement">right</option>
+		  <option name="charting.data.count">50000</option>
+      </chart>
+	  <table>
+		<title>Other Hashes With First-Seen Name</title>
+		<searchTemplate>
+			eventtype=bit9_filesOnComputers [search `$hashTermOut$($hashToken$)` latest=now earliest=1 | convert timeformat="%m/%d/%Y %I:%M:%S %p" mktime(ModifiedDate) AS ModifiedCTime | sort ModifiedCTime | head 1 | table FileName] | dedup FileHash, HostName | table FileHash, HostName | rename FileHash as Hash, HostName as Computer
+		</searchTemplate>
+	  </table>
+  </row>
+  <row>
+      <table>
+          <title>Files Modified By This File</title>
+          <searchTemplate>
+              eventtype=bit9_filesOnComputers `FilesModifiedOps` [search `$hashTermOut$($hashToken$)` | eval ProcessHash=FileHash | table ProcessHash] | table Timestamp, HostName, FileName, OpDescription | sort Timestamp | rename HostName as Computer, FileName as Name, OpDescription as Operation
+          </searchTemplate>
+      </table>
+  </row>
+  <row>
+      <table>
+          <title>Top Hashes Modified By This File</title>
+          <searchTemplate>
+              eventtype=bit9_filesOnComputers `FilesModifiedOps` [search `$hashTermOut$($hashToken$)` | eval ProcessHash=FileHash | table ProcessHash] | top showperc=false 0 FileHash, FileName | sort -count | rename FileHash as Hash, FileName as Name, count as Count
+          </searchTemplate>
+      </table>
+  </row>
+  <row>
+      <table>
+          <title>Top Event Subtypes Containing This File</title>
+          <searchTemplate>
+              eventtype=bit9_event [search `$hashTermOut$($hashToken$)` | table FileHash] | append maxtime=180 [search eventtype=bit9_event [search `HashSearch($hashToken$)` | eval ProcessHash=FileHash | table ProcessHash]] | top 0 EventSubType showperc=false | rename EventSubType as "Event Subtype", count as Count
+          </searchTemplate>
+      </table>
+	<chart>
+          <title>Top Rules Containing This File</title>
+          <searchTemplate>
+              eventtype=bit9_event RuleName!="" [search `$hashTermOut$($hashToken$)` | table FileHash] | append maxtime=180 [search eventtype=bit9_event RuleName!="" [search `$hashTermOut$($hashToken$)` | eval ProcessHash=FileHash | table ProcessHash]] | append maxtime=180 [search eventtype=bit9_event RuleName!="" [search `$hashTermOut$($hashToken$)` | eval InstallerHash=FileHash | table InstallerHash]] | top 0 RuleName
+          </searchTemplate>
+          <option name="charting.chart">pie</option>
+		  <option name="charting.chart.sliceCollapsingThreshold">0</option>
+	</chart>
+  </row>
+</form>

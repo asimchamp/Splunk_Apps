@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>AlaxalA L2 Auth dashboad</label>
+  <row>
+    <html><h2>
+      ようこそAlaxalA L2認証ログ分析ツールへ。
+      </h2>
+      <ul>
+          <li>ログ検索を表示する場合には<a hlef="./seach">検索</a>を参照ください。</li>
+          <li>ログ統計を表示する場合には<a hlef="./statistics">統計</a>を参照ください。</li>
+      </ul></html>
+    <!-- Static content, remove upon editing-->
+    <!-- End of static content -->
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*Login succeeded*"
+| RENAME host AS SWITCH_NAME | RENAME ala_auth_type AS AUTH_TYPE
+| RENAME ala_auth_port AS PORT | RENAME ala_auth_vlan AS VLAN
+| table _time, AUTH_TYPE, SWITCH_NAME,  USER, IP, VLAN, MAC, PORT </searchString>
+      <title>最新ログイン端末</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*Logout*"
+| RENAME host AS SWITCH_NAME | RENAME ala_auth_type AS AUTH_TYPE
+| RENAME ala_auth_port AS PORT | RENAME ala_auth_vlan AS VLAN
+| table _time, AUTH_TYPE, SWITCH_NAME,  USER, IP, VLAN, MAC, PORT 
+</searchString>
+      <title>最新ログアウト端末</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*failed*"
+| RENAME host AS SWITCH_NAME | RENAME ala_auth_type AS AUTH_TYPE | RENAME ala_auth_msg AS REASON 
+| RENAME ala_auth_port AS PORT | RENAME ala_auth_vlan AS VLAN
+| table _time, AUTH_TYPE, SWITCH_NAME,  USER, IP, VLAN, MAC, PORT, REASON</searchString>
+      <title>最新認証失敗端末</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*Login succeeded*" | convert timeformat="%y/%m/%d %H:%M:%S" ctime(_time) AS LOGIN_TIME  
+| RENAME _time AS LIT | RENAME ala_auth_ip AS IP | RENAME ala_auth_user AS USER | dedup MAC | TABLE MAC, IP, USER,  LOGIN_TIME, LIT |
+JOIN MAC
+[ SEARCH sourcetype="alaxala_auth_log" ala_auth_msg="*Logout*" | convert timeformat="%y/%m/%d %H:%M:%S" ctime(_time) AS LOGOUT_TIME | RENAME _time AS LOT | TABLE MAC, LOGOUT_TIME, LOT ] |
+eval DT_sec = (LOT - LIT) | WHERE DT_sec &gt; 0 | eval DT_min = (DT_sec / 60) |
+TABLE MAC, IP, USER, LOGIN_TIME, LOGOUT_TIME, DT_sec, DT_min | sort -LOGOUT_TIME</searchString>
+      <title>端末毎認証時間</title>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*Login succeeded*" | RENAME ala_auth_MAC AS MAC | chart count by MAC | sort -count </searchString>
+      <title>本日の端末毎認証回数</title>
+      <earliestTime>@d</earliestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*Login succeeded*" | RENAME host AS SWITCH_NAME | chart count by SWITCH_NAME | sort -count </searchString>
+      <title>本日のスイッチ毎認証数</title>
+      <earliestTime>@d</earliestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*Login succeeded*" | RENAME host AS SWITCH_NAME | chart count by SWITCH_NAME | sort -count</searchString>
+      <title>本日のVLAN毎認証数</title>
+      <earliestTime>@d</earliestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*failed*" | RENAME ala_auth_MAC AS MAC | chart count by MAC | sort -count </searchString>
+      <title>本日の端末毎認証失敗数</title>
+      <earliestTime>@d</earliestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*failed*" | RENAME host AS SWITCH_NAME | chart count by SWITCH_NAME | sort -count </searchString>
+      <title>本日のスイッチ毎認証失敗数</title>
+      <earliestTime>@d</earliestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <table>
+      <searchString>sourcetype="alaxala_auth_log" ala_auth_msg="*failed*" | RENAME ala_auth_vlan AS VLAN | chart count by VLAN | sort -count </searchString>
+      <title>本日のVLAN毎認証失敗数</title>
+      <earliestTime>@d</earliestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <!-- First row of a single comment -->
+  <!-- Second row of 2 panels -->
+</dashboard>

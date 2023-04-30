@@ -1,0 +1,19 @@
+<form version="1.1" stylesheet="faker_chart.css" script="CodeFlower.js,d3.js,d3.geom.js,d3.layout.js,dataConverter.js,faker_chart.js">
+	<label>Configuration - Parent Child Controller</label>
+    <fieldset>
+	    <input id="arrayDropDown" type="dropdown" token="arrayId" searchWhenChanged="true">
+			<label>Array</label>
+			<search fieldForLabel="arrayName" fieldForValue="arrayId">| inputlookup nesa_volume_groups | stats count by arrayId, arrayName</search>
+		</input>
+	</fieldset>
+	<panel grouping="2">
+      	<html>
+			<div id="pcShowChart"></div>
+		</html>
+      	<table id="tblfakerChart">
+			<search id="sFakerChart">`get_nesa_index` sourcetype=eseries:graph host="$arrayId$" | head 1 | spath volumeGroup{} output=volumeGroup | spath volume{} output=volume | spath drive{} output=drive | spath controller{} output=controller | STATS count(volume) by controller, volumeGroup | Fields controller, volumeGroup, count(volume)
+  </search>
+                <earliest>-24h</earliest>
+          </table>
+	</panel>
+</form>

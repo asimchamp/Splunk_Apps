@@ -1,0 +1,18 @@
+<dashboard>
+	<label>Airports by Destination (Simple View)</label>
+	<description/>
+	<row>
+		<table id="element1">
+			<title>Airports by Destination</title>
+			<searchString>search index=faa
+| stats count by DestState DestAirport
+| sort - count</searchString>
+			<earliestTime>1357027200</earliestTime>
+			<latestTime>1359705600</latestTime>
+			<option name="wrap">true</option>
+			<option name="displayRowNumbers">true</option>
+			<option name="dataOverlayMode">none</option>
+			<option name="drilldown">row</option>
+		</table>
+	</row>
+</dashboard>

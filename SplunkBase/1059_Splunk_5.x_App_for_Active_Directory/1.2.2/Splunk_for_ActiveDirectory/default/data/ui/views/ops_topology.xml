@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view onUnloadCancelJob="True" template="dashboard.html">
+	<label>Topology Report</label>
+	<module name="AccountBar" layoutPanel="appHeader" />
+	<module name="AppBar" layoutPanel="appHeader" />
+	<module name="SideviewUtils" layoutPanel="appHeader" />
+
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+
+	<module name="TitleBar" layoutPanel="viewHeader"/>
+
+	<module name="HTML" layoutPanel="panel_row1_col1_grp1">
+		<param name="html"><![CDATA[
+		<h2>Active Directory Topology Report</h2>
+		<p>This dashboard gives you a topology report for the entire Active Directory infrastructure being monitored.</p>
+		]]></param>
+	</module>
+		
+	<!-- The Time Range Picker feeds the picker for the Column Selector -->
+	<module name="TimeRangePicker" layoutPanel="panel_row1_col1_grp2" autoRun="True">
+		<param name="default">Last 60 minutes</param>
+		<param name="searchWhenChanged">True</param>
+		
+		<!-- Search for the MSAD Topology so we can render it in the Column Selector -->
+		<module name="Search">
+			<param name="search">|`domain-selector`</param>
+	
+			<module name="JobProgressIndicator" layoutPanel="panel_row2_col1"></module>
+
+			<module name="ColumnSelector" layoutPanel="panel_row2_col1">
+				<param name="drilldownPrefix">domainselection</param>
+				<param name="defaultState">true</param>
+				<param name="autoSelector">both</param>
+				<param name="loadFromCookie">true</param>
+				<param name="cookieName">domainselection</param>
+				<param name="columns">
+					<param name="ForestName">
+						<param name="title">Forest</param>
+						<param name="weight">0</param>
+					</param>
+					<param name="Site">
+						<param name="title">Site</param>
+						<param name="weight">1</param>
+					</param>
+					<param name="DomainDNSName">
+						<param name="title">Domain</param>
+						<param name="weight">2</param>
+					</param>
+					<param name="host">
+						<param name="title">Server</param>
+						<param name="weight">3</param>
+					</param>
+				</param>
+						
+				<!-- Now do the search for the hosts in question -->
+				<module name="Search" layoutPanel="panel_row3_col1">
+					<param name="search">eventtype=msad-dc-health $domainselection.host$|dedup host,DomainDNSName|sort ForestName,Site,DomainDNSName,host|eval DomainTitle="Forest: ".ForestName." (".ForestLevel."), Domain: ".DomainNetBIOSName."\\".DomainDNSName." (".DomainLevel.")"|fields *</param>
+					
+					<!-- Place the results into the MSADTopologyReport module -->
+					<module name="MSADTopologyReport">
+						<param name="titleField">DomainTitle</param>
+						<param name="firebug">true</param>
+						
+						<module name="Redirector">
+							<param name="url">ops_dc_status</param>
+							<param name="arg.host">$click.host$</param>
+							<param name="arg.earliest">$search.timeRange.earliest$</param>
+							<param name="arg.latest">$search.timeRange.latest$</param>
+							<param name="arg.autoRun">True</param>
+						</module>
+					</module>
+					
+				</module> <!-- Inner Search -->
+			</module> <!-- ColumnSelector -->
+		</module> <!-- Outer Search -->
+	</module> <!-- TimeRangePicker -->
+</view>

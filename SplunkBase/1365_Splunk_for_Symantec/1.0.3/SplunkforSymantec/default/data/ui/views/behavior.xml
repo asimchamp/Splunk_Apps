@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+    <label>Process Blocking</label>
+    <fieldset autoRun="true">
+        <input type="time" searchWhenChanged="true">
+            <default>Today</default>
+        </input>
+    </fieldset>
+    <row>
+        <single>
+            <searchString>`process_blocking_count`</searchString>
+            <option name="beforeLabel">Processes Blocked: </option>
+        </single>
+        <chart>
+            <searchString>`process_blocking_api_actions`</searchString>
+            <title>API Actions Blocked</title>
+            <option name="charting.chart">pie</option>
+        </chart>
+    </row>
+    <row>
+        <table>
+            <searchString>`process_blocking_table`</searchString>
+            <title>Behavior Blocking</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <option name="maxLines">10</option>
+            <option name="segmentation">outer</option>
+            <option name="softWrap">true</option>
+        </table>
+    </row>
+</form>

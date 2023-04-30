@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?><dashboard refresh="900">
+  <label>RSA Security Analytics (Query) App Status</label>
+  <row>
+    <panel>
+      <single>
+        <title>Error count (Last 24 Hours)</title>
+        <search>
+          <query>index=_internal nwsdk_query.py  "[ERROR]" | stats count | rangemap field=count low=0-10 elevated=11-100 default=severe</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Latest Event Time</title>
+        <search>
+          <query>| metadata type=sourcetypes | where sourcetype="netwitness"  | convert ctime(*Time) | fields lastTime</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total RSA Security Analytics Events</title>
+        <search>
+          <query>| metadata type=sourcetypes | search sourcetype="netwitness" | fields + totalCount</query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Remaining Meta per Config (Last day)</title>
+        <search>
+          <query>index=_* nwsdk_query.py sourcetype="splunkd" NOT Metrics NOT "[INFO] No new data to process" NOT LicenseUsage remaining | rex field=_raw "nwsdk_query.py (?&lt;config&gt;[^\"]+)\"" | timechart span=15 max(Remaining) by config</query>
+          <earliest>-1d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Meta</option>
+        <option name="charting.chart">line</option>
+        <option name="refresh.display">preview</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Sessions per Run Stats (Last day)</title>
+        <search>
+          <query>index=_internal nwsdk_query.py "[INFO] Processing Stats" | timechart span=30m avg(session_count) as Avg max(session_count) as Max min(session_count) as Min</query>
+          <earliest>-1d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Sessions</option>
+        <option name="charting.chart">line</option>
+        <option name="drilldown">all</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Meta per Run Stats (Last day)</title>
+        <search>
+          <query>index=_internal nwsdk_query.py "[INFO] Processing Stats" | timechart span=30m avg(meta_count) as Avg max(meta_count) as Max min(meta_count) as Min</query>
+          <earliest>-1d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Meta</option>
+        <option name="charting.chart">line</option>
+        <option name="drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Sessions per Second Stats (Last day)</title>
+        <search>
+          <query>index=_internal nwsdk_query.py "[INFO] Processing Stats" | timechart span=15m avg(sessions_per_second) as Avg max(sessions_per_second) as Max min(sessions_per_second) as Min</query>
+          <earliest>-1d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Sessions</option>
+        <option name="charting.chart">line</option>
+        <option name="drilldown">all</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Meta per Second Stats (Last day)</title>
+        <search>
+          <query>index=_internal nwsdk_query.py "[INFO] Processing Stats" | timechart span=15m avg(meta_per_second) as Avg max(meta_per_second) as Max min(meta_per_second) as Min</query>
+          <earliest>-1d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Meta</option>
+        <option name="charting.chart">line</option>
+        <option name="drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>MBytes Indexed per Query per day (Last 15 days)</title>
+        <search>
+          <query>sourcetype=netwitness config="*" | fields _raw, _time, config | eval evt_bytes = len(_raw) | timechart span=1d limit=15 sum(eval(evt_bytes/1024/1024)) AS TotalMB by config useother=false</query>
+          <earliest>-15d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">MBytes</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <title>nwsdk_query.py Error and Warning messages (Last 7 days)</title>
+        <search>
+          <query>index=_internal nwsdk_query.py ( "[ERROR]" OR "[WARNING]" ) </query>
+          <earliest>-7d</earliest>
+          <latest>now</latest>
+        </search>
+      </event>
+    </panel>
+  </row>
+</dashboard>

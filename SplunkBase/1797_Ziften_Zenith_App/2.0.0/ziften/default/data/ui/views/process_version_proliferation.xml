@@ -1,0 +1,48 @@
+<form>
+  <label>Process Version Proliferation</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Top Process Version Proliferation</title>
+      <search><query>sourcetype=ziften:*  message_type=processinventory|eval basename = replace(imagefilepath, ".*\\\\", "")|eval uid = basename."-".companyname|stats dc(fileversion) as "Total File Versions" dc(productversion) as "Total Product Versions" max(basename) as "File Name" max(companyname) as "Vendor" values(fileversion) as "File Versions" values(productversion) as "Product Versions" dc(agentguid) as "Enterpririse Prev" by uid |sort -"Total File Versions" -"Total Product Versions" |fields "File Name" "Enterpririse Prev" "Total File Versions" "Total Product Versions"|head 15</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.chart">bar</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>Process Version Proliferation</title>
+      <search><query>sourcetype=ziften:*  message_type=processinventory|eval basename = replace(imagefilepath, ".*\\\\", "")|eval uid = basename."-".companyname|stats dc(fileversion) as "Total File Versions" dc(productversion) as "Total Product Versions" max(basename) as "File Name" max(companyname) as "Vendor" values(fileversion) as "File Versions" values(productversion) as "Product Versions" dc(agentguid) as "Enterpririse Prev" by uid |sort -"Total File Versions" -"Total Product Versions" |fields "File Name" "Vendor" "Enterpririse Prev" "Total File Versions" "Total Product Versions" "File Versions" "Product Versions"|head 1000</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="count">5</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">true</option>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+</form>

@@ -1,0 +1,33 @@
+<form script="autodiscover.js">
+  <label>Player Relationships</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="killtime" searchWhenChanged="true">
+      <label/>
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+      <h2>Sankey kills</h2>
+      <div id="killSankeySearch" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options="{               &quot;search&quot;: &quot;tag=tf2 player_action=\&quot;killed\&quot; | stats count by player_name, victim_name&quot;,                                  &quot;earliest_time&quot;: {                  &quot;type&quot;: &quot;token_safe&quot;,                  &quot;value&quot;: &quot;$$killtime.earliest$$&quot;              },              &quot;latest_time&quot;: {                  &quot;type&quot;: &quot;token_safe&quot;,                  &quot;value&quot;: &quot;$$killtime.latest$$&quot;              },                                      &quot;status_buckets&quot;: 0,                                &quot;cancelOnUnload&quot;: true,                                &quot;auto_cancel&quot;: 90,                             &quot;preview&quot;: true                        }"/>
+      <div id="sankeyChart" class="splunk-view" data-require="app/tf2/components/sankeydiagram/sankeydiagram" data-options="{                             &quot;managerid&quot;: &quot;killSankeySearch&quot;,                             &quot;sourceField&quot;: &quot;player_name&quot;,                             &quot;destinationField&quot;: &quot;victim_name&quot;,                             &quot;valueField&quot;: &quot;count&quot;,           &quot;drilldownn&quot;: &quot;http://localhost/&quot;,    &quot;height&quot;: 800       }"/>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h2>Kill Chord Chart</h2>
+      <div id="chordchart_search" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options="{         &quot;search&quot;: &quot;tag=tf2 victim_position player_action=\&quot;killed\&quot; | stats count by player_name, victim_name&quot;,          &quot;preview&quot;: true,         &quot;earliest_time&quot;: {                  &quot;type&quot;: &quot;token_safe&quot;,                  &quot;value&quot;: &quot;$$killtime.earliest$$&quot;              },              &quot;latest_time&quot;: {                  &quot;type&quot;: &quot;token_safe&quot;,                  &quot;value&quot;: &quot;$$killtime.latest$$&quot;              }      }">
+      </div>
+      <div id="chordchart" class="splunk-view" data-require="app/tf2/components/chordchart/chordchart" data-options="{         &quot;managerid&quot;: &quot;chordchart_search&quot;,         &quot;src_field&quot;: &quot;player_name&quot;,         &quot;dst_field&quot;: &quot;victim_name&quot;,         &quot;count_field&quot;: &quot;count&quot;,         &quot;width&quot;: 720,         &quot;height&quot;: 720,    &quot;src_colors&quot;: {&quot;Belgium&quot;: &quot;#ff0000&quot;}       }">
+      </div>
+      </html>
+    </panel>
+  </row>
+
+</form>

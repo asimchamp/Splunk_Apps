@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Analysis</label>
+  <searchTemplate> host=$host$ | fields eps, kb, kbps</searchTemplate>
+    <fieldset>
+           <input type="dropdown" token="host">
+            <label>Select Host</label>
+            <populatingSearch fieldForValue="host" fieldForLabel="host">
+                | metadata type=hosts sourcetype="syslog"  
+               </populatingSearch>
+
+        </input>
+        <input type="time" />
+    </fieldset>
+  <row>
+    <table>
+      <searchString>host="$host$"| TOP rhost |rename rhost AS "IP"</searchString>
+      <title>Most Attacking IPs</title>
+    </table>
+    <chart>
+      <searchString>host="$host$"| TOP rhost limit=10 </searchString>
+      <title> Percentages of Attacking IPs</title>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      
+      <option name="charting.chart.sliceCollapsingThreshold">0</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <searchString>host="$host$" status="authentication failure" | lookup geoip clientip AS rhost
+     | top client_country
+     | rename client_country as "Country" 
+     |rename count as "Numbr of Attacks"</searchString>
+      <title> Country of Attacks Originate</title>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  
+    <table>
+      <searchString>host="$host$" status="authentication failure"| lookup geoip clientip AS rhost
+     | top client_city
+     | rename client_city as "City" 
+     |rename count as "Numbr of Attacks"</searchString>
+      <title>City of Attacks Originate</title>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>host="$host$" status="authentication failure"| lookup geoip clientip AS rhost
+     | TOP client_country by rhost
+     | sort -count | table client_country, count, rhost 
+     | rename client_country as "Country" 
+     |rename count as "Number of Attacks"
+     |rename rhost as "IP" </searchString>
+      <title>Geolocation of Attacking IP</title>
+      
+    </table>
+  
+    <chart>
+      <searchString>host="$host$" status="authentication failure"| stats count by date_hour
+|rename date_hour AS Hour</searchString>
+      <title>Most Frequent Hour Attack</title>
+      
+      <option name="charting.chart">column</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>host="$host$" status="authentication failure"| stats count by date_wday
+|rename date_wday AS Day</searchString>
+      <title>Most Frequent Day Attack</title>
+    <option name="charting.seriesColors">[0x0000FF,0x0000FF,0x0000FF]</option>  
+      <option name="charting.chart">column</option>
+    </chart>
+  
+    <chart>
+      <searchString>host="$host$" NOT "oneadmin" status="authentication failure"| chart count over user
+|rename user AS Username</searchString>
+      <title>Most Frequently Usernames Attacked</title>
+      <option name="charting.seriesColors">[0xFF0000,0xF87217,0x0000FF]</option>
+      
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.secondaryAxis.scale">log</option>
+    </chart>
+  </row>
+    
+   
+  <row>
+    <chart>
+      <searchString>host="$host$" status="authentication failure" | chart count over date_mday by rhost useother=f</searchString>
+      <title>Trend of Attacked per IP</title>
+      <option name="charting.chart">line</option>
+    </chart>
+  
+  
+    <table>
+      <searchString>host="$host$" status="authentication failure"| ctable rhost user| rename rhost AS "IP"</searchString>
+      <title>Usernames Used per IP Attack</title>
+    </table>
+  </row>
+
+ <row>
+    <table>
+      <searchString>host="$host$" status="authentication failure"  |stats count by date_mday | eventstats avg(count) as avg1 | eval Description=case(count&lt;avg1, "Normal", count&gt;avg1, "Alert")| table date_mday, Description | rename date_mday AS "Day of the Month" </searchString>
+      <title>Daily Attack Situation</title>
+    </table>
+  </row>
+    
+
+    
+</form>

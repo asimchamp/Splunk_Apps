@@ -1,0 +1,181 @@
+<form version="1.1">
+  <label>Tanium User Endpoint Management</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field16">
+      <label></label>
+      <default>
+        <earliest>-90d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Threat Response Alerts by User</title>
+        <search>
+          <query>`tanium_index` sourcetype=tanium:detect:signals | chart count over "Match Details.match.properties.user" by "Intel Name" | rename "Match Details.match.properties.user" as User | head 20</query>
+          <earliest>$field16.earliest$</earliest>
+          <latest>$field16.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20sourcetype=tanium:detect:signals%20%7C%20stats%20dc(Alert%20Id)%20as%20Alerts%20by%20%22Match%20Details.match.properties.user%22%20%22Intel%20Name%22%20%7C%20sort%20-Alerts&amp;earliest=$field16.earliest$&amp;latest=$field16.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <single>
+        <title>Reboot Required by User</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Last-Reboot" Reboot_Required=Yes | timechart span=1d count by "Last_Logged_In_User"</query>
+          <earliest>$field16.earliest$</earliest>
+          <latest>$field16.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=`tanium_index` Question="Splunk-High-Uptime-Over-30-Days" | dedup Computer_Name | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table Computer_Name,High_Uptime,Last_Logged_In_User,Operating_System,Chassis_Type,Computer_Serial_Number&amp;earliest=$field16.earliest$&amp;latest=$field16.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>Highest System Performance Issue by User</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-High-CPU-Utilization" OR Question="Splunk-High-Memory-Utilization" OR Question="Splunk-Packet-Loss" NOT "*GB" NOT "*MB" 
+|  top limit=20 Last_Logged_In_User</query>
+          <earliest>$field16.earliest$</earliest>
+          <latest>$field16.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20Question=%22Splunk-High-CPU-Utilization%22%20OR%20Question=%22Splunk-High-Memory-Utilization%22%20OR%20Question=%22Splunk-Packet-Loss%22%20NOT%20%22*GB%22%20NOT%20%22*MB%22%20%0A%7C%20table%20Computer_Name,Last_Logged_In_User,CPU_Consumption,RAM,Memory_Consumption&amp;earliest=$field16.earliest$&amp;latest=$field16.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Accounts Added to Local Admin Group</title>
+        <search>
+          <query>`tanium_index` sourcetype=tanium:detect:signals "Intel Name"="User Added to Local Administrators"  | timechart dc(Alert Id)</query>
+          <earliest>$field16.earliest$</earliest>
+          <latest>$field16.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[0,5]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20sourcetype=tanium:detect:signals%20%22Intel%20Name%22=%22User%20Added%20to%20Local%20Administrators%22%20%20%7C%20table%20%22Computer%20Name%22%20%22Intel%20Name%22%20Timestamp&amp;earliest=$field16.earliest$&amp;latest=$field16.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Administrator Enumeration and Addition</title>
+        <search>
+          <query>`tanium_index` sourcetype=tanium:detect:signals "Intel Name"="Administrator Account Enumeration" AND "Intel Name"="Administrator Account Enumeration"  | timechart dc(Computer Name)</query>
+          <earliest>$field16.earliest$</earliest>
+          <latest>$field16.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendInterval">-7d</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">search?q=%60index_tanium%60%20sourcetype=tanium:detect:signals%20%22Intel%20Name%22=%22Administrator%20Account%20Enumeration%22%20AND%20%22Intel%20Name%22=%22Administrator%20Account%20Enumeration%22%20%20%7C%20table%20%22Computer%20Name%22%20%22Intel%20Name%22%20Timestamp&amp;earliest=$field16.earliest$&amp;latest=$field16.latest$</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field2">
+        <label></label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="text" token="field4">
+        <label>Computer Name</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="field1">
+        <label>IP Address</label>
+        <default>*</default>
+      </input>
+      <input type="text" token="field5">
+        <label>Last Logged In User</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <table>
+        <title>Search IP Address for Logged In Users</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Machine-User"  Computer_Name="*$field4$*" IP_Address="*$field1$*" Last_Logged_In_User="*$field5$*" |dedup _time,Computer_Name | eval date_time = strftime(_time,"%m/%d/%y %H:%M:%S") | join Computer_Name type=left [search `tanium_index` Question="Splunk-Basic-Asset"] | table date_time,Computer_Name,IP_Address,Last_Logged_In_User,Chassis_Type,Operating_System,Computer_Serial_Number</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Admin Access</title>
+      <event>
+        <search>
+          <query>`tanium_index` Question="Splunk-Machine-User" (Last_Logged_In_User="*Administrator*" OR Last_Logged_In_User="*root*")</query>
+          <earliest>-7d@d</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="list.drilldown">none</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>

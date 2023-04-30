@@ -1,0 +1,26 @@
+<form>
+  <label>Windows Event Log Filtering</label>
+  <fieldset submitButton="false"/>
+  <row>
+    <panel>
+      <html>
+        <h2>Windows Event Log Filtering</h2>
+        <p>Provide capability for customers to filter event log channels based on standard fields in the event payload like Event Code, Task Category, Level , etc. This allows customers to target specific event entries that are of highest value to them while filtering out lower value events; thereby taking full advantage of their indexing volume.</p>
+        <br/>
+        <p>Below is a sample stanza showing configuration in inputs.conf with two whitelist regexes highlighted -</p>
+        <pre><code>[WinEventLog://Security]
+disabled=0
+whitelist1= EventCode=/^[4|5].*$/ Type=/Error|Warning/
+whitelist2= TaskCategory=%^Log.*$%</code></pre>
+        <br/>
+        <p>The above configuration will result in the ingestion of Windows security event logs that match the following criteria:</p>
+        <ul>
+          <li>Events with EventCode that starts with the numbers 4 or 5 AND have type set to Error or Warning</li>
+          <li>Events with TaskCategory that begin with “Log”.</li>
+        </ul>
+        <br/>
+        <p>Additional notes: Upto to 10 whitelist and 10 blacklist configuration can be specified for a given stanza. Blacklist override whitelist when conflicts occur. The regex terms for multiple criteria within a given whitelist/blacklist are treated as logical AND. The set of whitelists / blacklists are then logically OR to come up with the effective set that will apply to the stanza.</p>
+      </html>
+    </panel>
+  </row>
+</form>

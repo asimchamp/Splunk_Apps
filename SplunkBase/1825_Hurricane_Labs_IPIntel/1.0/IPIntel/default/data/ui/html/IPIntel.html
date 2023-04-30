@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>IPIntel HTML | Splunk</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/pages/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/IPIntel/application.css" />
+    <!--[if IE 7]><link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/sprites-ie7.css" /><![endif]-->
+</head>
+<body class="simplexml preload">
+
+<!-- 
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system. 
+-->
+
+<div class="header">
+    <div id="placeholder-splunk-bar">
+        <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+    </div>
+    <div id="placeholder-app-bar"></div>
+</div>
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+    <div class="dashboard-header clearfix">
+        <h2>IPIntel</h2>
+        <p class="description"></p>
+    </div>
+    <div class="fieldset">
+        <div class="input input-text" id="field1">
+            <label>Enter an IP Address or Domain Name</label>
+        </div>
+    </div>
+    <div id="exportWrapper" class="fieldset">
+      <div class="actionButtons">
+        <a class="btn" href="#" id="downloadLink"><span>Export Data</span></a>
+      </div>
+    </div>
+  <div id="dataWrapper">
+    <div class="dashboard-row dashboard-row1">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element1" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row2">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element2" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row3">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element3" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row4">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element4" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row5">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element5" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row6">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element6" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row7">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element table" id="element7" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>IPIntel Data</h3>
+                        </div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  </div>  
+<div class="footer"></div>
+
+<!-- 
+END LAYOUT
+-->
+
+<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/build/simplexml.min/config.js"></script>
+<script type="text/javascript">
+require.config({
+    baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+    waitSeconds: 0 // Disable require.js load timeout
+});
+
+//
+// LIBRARY REQUIREMENTS
+//
+// In the require function, we include the necessary libraries and modules for
+// the HTML dashboard. Then, we pass variable names for these libraries and
+// modules as function parameters, in order.
+// 
+// When you add libraries or modules, remember to retain this mapping order
+// between the library or module and its function parameter. You can do this by
+// adding to the end of these lists, as shown in the commented examples below.
+
+require([
+    "splunkjs/mvc",
+    "splunkjs/mvc/utils",
+    "splunkjs/mvc/tokenutils",
+    "underscore",
+    "jquery",
+    "splunkjs/mvc/simplexml",
+    "splunkjs/mvc/headerview",
+    "splunkjs/mvc/footerview",
+    "splunkjs/mvc/simplexml/dashboard",
+    "splunkjs/mvc/simplexml/element/chart",
+    "splunkjs/mvc/simplexml/element/event",
+    "splunkjs/mvc/simplexml/element/html",
+    "splunkjs/mvc/simplexml/element/list",
+    "splunkjs/mvc/simplexml/element/map",
+    "splunkjs/mvc/simplexml/element/single",
+    "splunkjs/mvc/simplexml/element/table",
+    "splunkjs/mvc/simpleform/input/dropdown",
+    "splunkjs/mvc/simpleform/input/radiogroup",
+    "splunkjs/mvc/simpleform/input/text",
+    "splunkjs/mvc/simpleform/input/timerange",
+    "splunkjs/mvc/simpleform/input/submit",
+    "splunkjs/mvc/searchmanager",
+    "splunkjs/mvc/savedsearchmanager",
+    "splunkjs/mvc/postprocessmanager",
+    "splunkjs/mvc/simplexml/urltokenmodel"
+    // Add comma-separated libraries and modules manually here, for example:
+    // ..."splunkjs/mvc/simplexml/urltokenmodel",
+    // "splunkjs/mvc/checkboxview"
+    ],
+    function(
+        mvc,
+        utils,
+        TokenUtils,
+        _,
+        $,
+        DashboardController,
+        HeaderView,
+        FooterView,
+        Dashboard,
+        ChartElement,
+        EventElement,
+        HtmlElement,
+        ListElement,
+        MapElement,
+        SingleElement,
+        TableElement,
+        DropdownInput,
+        RadioGroupInput,
+        TextInput,
+        TimeRangeInput,
+        SubmitButton,
+        SearchManager,
+        SavedSearchManager,
+        PostProcessManager,
+        UrlTokenModel
+
+        // Add comma-separated parameter names here, for example: 
+        // ...UrlTokenModel, 
+        // CheckboxView
+        ) {
+
+
+
+        var pageLoading = true;
+
+
+        // 
+        // TOKENS
+        //
+        
+        // Create token namespaces
+        var urlTokenModel = new UrlTokenModel();
+        mvc.Components.registerInstance('url', urlTokenModel);
+        var defaultTokenModel = mvc.Components.getInstance('default', {create: true});
+        var submittedTokenModel = mvc.Components.getInstance('submitted', {create: true});
+
+        urlTokenModel.on('url:navigate', function() {
+            defaultTokenModel.set(urlTokenModel.toJSON());
+            if (!_.isEmpty(urlTokenModel.toJSON()) && !_.all(urlTokenModel.toJSON(), _.isUndefined)) {
+                submitTokens();
+            } else {
+                submittedTokenModel.clear();
+            }
+        });
+
+        // Initialize tokens
+        defaultTokenModel.set(urlTokenModel.toJSON());
+
+        var defaultUpdate = {};
+
+        var submitTokens = function() {
+            submitTokensSoon(pageLoading);
+        };
+
+        var submitTokensSoon = _.debounce(function(replaceState) {
+            submittedTokenModel.set(defaultTokenModel.toJSON());
+            urlTokenModel.saveOnlyWithPrefix('form\\.', defaultTokenModel.toJSON(), {
+                replaceState: replaceState
+            });
+        });
+
+
+        //
+        // SEARCH MANAGERS
+        //
+
+        var search1 = new SearchManager({
+            "id": "search1",
+            "search": "| ipintel $_ip_domain$",
+            "cancelOnUnload": true,
+            "latest_time": "$latest$",
+            "status_buckets": 300,
+            "earliest_time": "$earliest$",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| multikv fields country_name, region_name, city_name, time_zone | table country_name, region_name, city_name, time_zone | fillnull value=\"None\" | rename country_name AS Country, region_name AS Region, city_name AS City, time_zone AS \"Time Zone\" | transpose | rename \"row 1\" AS row1 | eval Location=column . \": \" . row1 | fields Location | rename Location AS \"Geographic Location\"",
+            "managerid": "search1",
+            "id": "search2"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| multikv fields isp_name, as_name, bgp_prefix | table isp_name, as_name, bgp_prefix | fillnull value=\"None\" | rename isp_name AS \"ISP\", as_name AS \"AS\", bgp_prefix AS \"BGP\"  | transpose | rename \"row 1\" AS row1, \"row 2\" as row2 | eval val=case(isnotnull(row1), row1, isnotnull(row2), row2) | eval NetworkLocation=column . \": \" . val | makemv delim=\";\" NetworkLocation | fields + NetworkLocation | rename NetworkLocation as \"Network Location\"",
+            "managerid": "search1",
+            "id": "search3"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| search sourcetype=virustotal_resolutions | multikv fields address, last_resolved | table hostname, last_resolved | fillnull value=\" Not Available\" last_resolved | eval DNSNames = hostname . \" (Last Resolved: \" . last_resolved . \")\" | appendpipe [|stats count | where count==0 | eval DNSNames=\"No hostnames found.\"] | fields DNSNames | rename DNSNames AS \"Known DNS Names\"",
+            "managerid": "search1",
+            "id": "search4"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| search sourcetype=shodan | multikv fields port, last_update | table port, last_update | fillnull value=\" Not Available\" last_update | eval Ports = port . \" (Last Resolved: \" . last_update . \")\" | dedup port | appendpipe [|stats count | where count==0 | eval Ports=\"No ports found.\"] | fields Ports | rename Ports as \"Open Ports\"",
+            "managerid": "search1",
+            "id": "search5"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| search sourcetype=iprep | multikv fields category, score | table category, score | rename category AS Category, score AS Score | transpose | rename \"row 1\" AS row1 | fillnull value=\"None\" row1 | eval Combined=column . \": \" . row1 | fields Combined | rename Combined AS \"Emerging Threats IP Reputation\" | fields \"Emerging Threats IP Reputation\"",
+            "managerid": "search1",
+            "id": "search6"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| search sourcetype=blacklist | multikv fields listed, dnsbl | table listed, dnsbl | eval state=if(listed==\"True\", \"Listed on: \", \"Not Listed.\") | eval Combined = state . dnsbl | appendpipe [|stats count | where count==0 | eval Combined=\"Does not appear on any blacklists.\"] | fields Combined | rename Combined AS Blacklists",
+            "managerid": "search1",
+            "id": "search7"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        new PostProcessManager({
+            "search": "| search sourcetype=cins | multikv fields cins_listed | table cins_listed | fillnull value=\"Not Listed\" cins_listed | eval Combined=\"Listed: \" . cins_listed | fields Combined  | rename Combined AS \"Collective Intelligence Network Security\"",
+            "managerid": "search1",
+            "id": "search8"
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+
+
+        //
+        // SPLUNK HEADER AND FOOTER
+        //
+
+        new HeaderView({
+            id: 'header',
+            section: 'dashboards',
+            el: $('.header'),
+            acceleratedAppNav: true
+        }, {tokens: true}).render();
+
+        new FooterView({
+            id: 'footer',
+            el: $('.footer')
+        }, {tokens: true}).render();
+
+
+        //
+        // DASHBOARD EDITOR
+        //
+
+        new Dashboard({
+            id: 'dashboard',
+            el: $('.dashboard-body')
+        }, {tokens: true}).render();
+
+
+        //
+        // VIEWS: VISUALIZATION ELEMENTS
+        //
+
+        var element1 = new TableElement({
+            "id": "element1",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search2",
+            "el": $('#element1')
+        }, {tokens: true}).render();
+
+        element1.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+        var element2 = new TableElement({
+            "id": "element2",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search3",
+            "el": $('#element2')
+        }, {tokens: true}).render();
+
+        element2.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+        var element3 = new TableElement({
+            "id": "element3",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search4",
+            "el": $('#element3')
+        }, {tokens: true}).render();
+
+        element3.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+        var element4 = new TableElement({
+            "id": "element4",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search5",
+            "el": $('#element4')
+        }, {tokens: true}).render();
+
+        element4.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+        var element5 = new TableElement({
+            "id": "element5",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search6",
+            "el": $('#element5')
+        }, {tokens: true}).render();
+
+        element5.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+        var element6 = new TableElement({
+            "id": "element6",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search7",
+            "el": $('#element6')
+        }, {tokens: true}).render();
+
+        element6.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+        var element7 = new TableElement({
+            "id": "element7",
+            "drilldown": "none",
+            "showPager": true,
+            "managerid": "search8",
+            "el": $('#element7')
+        }, {tokens: true}).render();
+
+        element7.on("click", function(e) {
+            e.preventDefault();
+        });
+        
+
+
+        //
+        // VIEWS: FORM INPUTS
+        //
+
+        var field1 = new TextInput({
+            "id": "field1",
+            "value": "$form._ip_domain$",
+            "el": $('#field1')
+        }, {tokens: true}).render();
+
+
+
+        field1.on("change", function(value, input, options) {
+            if (!field1.hasValue()) {
+                defaultUpdate['field1'] = true;
+                this.val(field1.settings.get("default"));
+                return;
+            }
+            
+            var newValue = field1.val() || field1.settings.get("default");
+            var newComputedValue = newValue;
+
+            // Update computed value
+            defaultTokenModel.set("_ip_domain", newComputedValue);
+            
+            // Submit the token only if it wasn't from setting the default
+            if (defaultUpdate['field1']) {
+                defaultUpdate['field1'] = false;
+            } else {
+                submitTokens();
+            }
+        });
+        defaultUpdate['field1'] = true;
+        field1.trigger("change", field1.val(), field1);
+
+
+        submitTokens();
+
+
+        //
+        // DASHBOARD READY
+        //
+
+        DashboardController.ready();
+        pageLoading = false;
+
+    }
+);
+</script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/app/IPIntel/critical.js" type="text/javascript"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/app/IPIntel/export.js" type="text/javascript"></script>
+</body>
+</html>

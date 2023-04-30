@@ -1,0 +1,545 @@
+/* Application logo sizing and naming  */
+.appLogo {
+    height: 55px; 
+    width: 168px;
+    background-image: url(appLogo.png);
+    background-repeat: no-repeat;
+}
+
+tr.downClass td {
+    background-color:#A80700 !important;
+    color: #FFFFFF !important;
+}
+
+.simpleResultsTable.splTable a {
+  color:#000000 !important;
+  font-weight: bold;
+}
+
+tr.warnClass td {
+    background-color:#F9AF13 !important;
+    color: #000000 !important;
+}
+
+tr.alarmClass td {
+    background-color:#F2791F !important;
+    color: #000000 !important;
+}
+tr.criticalClass td {
+    background-color:#F2000A !important;
+    color: #FFFFFF !important;
+}
+
+th.idClass {
+	display:none !important;
+}
+
+td.idClass {
+	display:none !important;
+}
+
+a.downClass {
+    color: #FFFFFF !important;
+}
+/* the name of your app. line height can be adjusted to fix alignment issues w/ the logo. color is the color of the text. if your logo has the name in it, then you can set this to "display:none;  */
+.appHeaderWrapper h1 {
+    display:none;
+    color:#001E41;
+    line-height: 43px;
+}
+/* 07688B; #3A79C0*/
+.appHeaderWrapper {
+    color: #000000;
+    background-color: #1C68A4;
+    background-image: none;
+    border-bottom-style: ;
+    border-bottom-width: ;
+    border-bottom-color: ;
+    margin: 10px 10px 10px 10px;
+}
+
+h1 {
+    font-size: 18px;
+    font-weight: normal;
+    color:#FFFFFF;
+}
+
+* {
+    border-color: #1C68A4;
+}
+
+.SearchBar .assistantActivator {
+    background-color:#FF7E38;
+
+}
+.SearchBar .assTab span.splIcon-triangle {
+    background-position: -67px -367px; 
+}
+
+input.searchButton {
+    background-color: #FF7E38;
+    background-image: url(/static/img/skins/default/search_button.png);
+    background-position: -40px 0px;
+    
+    /* corner rounding for good browsers */
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;   
+    
+    _background-image: url('/static/img/skins/default/green_search_button.png');
+    _background-repeat: no-repeat;
+    _background-position: 0px -74px; 
+}
+/* color of top-right links */
+/*.appHeaderWrapper a {
+    color: #FFFFFF;
+}*/
+
+.innerMenuWrapper a {
+    color: #000000;
+}
+
+.innerMenuWrapper ul {
+  padding-bottom: 0px !important;
+}
+
+.SimpleResultsTable table.simpleResultsTable td.pos, .SimpleResultsTable table.simpleResultsTable th.pos {
+  width: 40px !important;
+  text-align: center;
+}
+
+/* Add scroll bars to maps and devices menus */
+/* Maps menu is always in position 0 */
+div.outerMenuWrapper.splShadow.splMenu.splMenu-primary.navmenu_0 div.innerMenuWrapper {
+  overflow: auto !important;
+  max-height: 350px !important;
+  width: 180px !important;
+}
+
+/* Devices menu is in position 6 in Splunk 4.3.x */
+div.outerMenuWrapper.splShadow.splMenu.splMenu-primary.navmenu_6 div.innerMenuWrapper {
+  overflow: auto !important;
+  max-height: 350px !important;
+  width: 180px !important;
+}
+div.outerMenuWrapper.splShadow.splMenu.splMenu-primary.navmenu_6 div.innerMenuWrapper div.outerMenuWrapper.splShadow .innerMenuWrapper {
+  overflow: auto !important;
+  max-height: 350px !important;
+  width: 180px !important;
+}
+
+/* Devices menu is in position 5 in Splunk 5.0 */
+div.outerMenuWrapper.splShadow.splMenu.splMenu-primary.navmenu_5 div.innerMenuWrapper {
+  overflow: auto !important;
+  max-height: 350px !important;
+  width: 180px !important;
+}
+div.outerMenuWrapper.splShadow.splMenu.splMenu-primary.navmenu_5 div.innerMenuWrapper div.outerMenuWrapper.splShadow .innerMenuWrapper {
+  overflow: auto !important;
+  max-height: 350px !important;
+  width: 180px !important;
+}
+
+.splMenu-primary {
+    color: #000000;
+}
+
+body.splTemplate-dashboard {
+    background-color: #1C68A4;
+}
+.splHeader-dashboard {
+    background-image: none;
+}
+.splHeader-dashboard {
+    background-color: transparent;
+}
+.splHeader-dashboard h2, 
+.dashboardContent .ServerSideInclude h2,
+.dashboardContent .GenericHeader h3 {
+    font-size:12px;
+    color: #1C68A4;
+    font-weight:bold;
+    background-color: transparent;
+    padding-top:15px;
+    margin-bottom:-5px;
+}
+.splHeader h2 {
+padding-top:0px !important;
+padding-bottom:10px !important;
+}
+
+.viewHeader {
+    background-color: #1C68A4;
+}
+
+.navigationHeader { 
+    color: #000000;
+}
+
+.TitleBar .splHeader, .FieldPickerPopup .splHeader-primary {
+    color: #000000;
+    margin: 0px 10px 10px 10px;
+    background-color: #7AA0CB;
+    border-style: solid;
+    border-width: 1px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 1);
+    -webkit-box-shadow: #1C68A4 0 0 5px;
+    _background-image: none;
+    background-image: none;
+    border-top-color: #FFFFFF;
+}
+.splHeader-primary {
+  border-top-color: #FFFFFF !important;
+}
+.TitleBar .splHeader-primary {
+  border-top-color: #1C68A4 !important;
+}
+.mainSearchControls, .splSearchControls-inline, .SearchBar{
+  background-color:#1C68A4;
+}
+
+.splTemplate-search {
+    background-color:#1C68A4;
+}
+
+.dashboardCell {
+    background: #fff;
+    border-style: solid;
+    border-width: 1px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: #ccc 0 0 5px;
+    _background-image: none;
+}
+
+.mapInclude {
+    overflow: auto !important;
+}
+
+.dashboardContent .SimpleResultsTableResults, .dashboardContent .EventsViewer {
+    background-image: none;
+    background: transparent;
+}
+
+
+.splHeader-dashboard h2, .dashboardContent .ServerSideInclude h2, .dashboardContent .GenericHeader h3, .SearchBar .saRow h4  {
+    color: #000000;
+}
+
+.mainSearchControls, .mainSearchControlsTable {
+    background-color: #1C68A4;
+}
+
+.splMenu-secondary ul {
+    background-color: #FF7E38;
+    color: #000000;
+}
+
+.splMenu-primary ul {
+    background-color: #FF7E38;
+    color: #000000;
+}
+.splMenu-primary li.disabled a {
+    color:#E1E1E1;
+}   
+
+.splMenu-secondary {
+    color: #000000;
+}
+
+.menuItemLink {
+    color: #000000;
+}
+
+.splHeader-secondary {
+    background-color: #7AA0CB;
+    _background-position: 0px -111px;
+    background-image: url(overlay_togradient_large.png);
+    background-repeat: repeat-x;
+    background-position: top;
+}
+
+
+.singleLabel {
+    font-size: 16px;
+    display: block;
+    color: #111;
+    float:left;
+}
+
+.SingleValue .SingleValueHolder { 
+    background-image:none;
+    background-color:transparent;
+    width:auto;
+    font-size:15px;
+    font-weight:normal;
+    color:#111;
+    font-weight: 300;
+    -moz-border-radius: 0; 
+    -moz-box-shadow:none;
+    -webkit-border-radius: 0;
+}
+
+.SingleValue .ack .singleResult {
+    font-size:16px;
+    font-weight:300;
+    margin-right:5px;
+    float:left;
+}
+
+.SingleValue .ack {
+    background-image:url(images/ack.png);
+    background-repeat:no-repeat;
+    background-position:0px 8px;
+    padding:6px 5px 10px 20px;
+    border-color: #FFFFFF;
+    -moz-border-radius: 0 !important;
+    -moz-box-shadow:none !important;
+    -webkit-border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+
+.SingleValue .critical .singleResult {
+    font-size:16px;
+    font-weight:300;
+    margin-right:5px;
+    float:left;
+}
+
+.SingleValue .critical {
+    background-image:url(images/critical.png);
+    background-repeat:no-repeat;
+    background-position:0px 8px;
+    padding:6px 5px 10px 20px;
+    border-color: #FFFFFF;
+    -moz-border-radius: 0 !important;
+    -moz-box-shadow:none !important;
+    -webkit-border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+
+.SingleValue .warning .singleResult {
+    font-size:16px;
+    font-weight:300;
+    margin-right:5px;
+    float:left;
+}
+
+.SingleValue .warning {
+    background-image:url(images/warning.png);
+    background-repeat:no-repeat;
+    background-position:0px 8px;
+    padding:6px 5px 10px 20px;
+    -moz-border-radius: 0 !important;
+    -moz-box-shadow:none !important;
+    -webkit-border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+
+.SingleValue .ok .singleResult {
+    font-size:16px;
+    font-weight:300;
+    margin-right:5px;
+    float:left;
+}
+
+.SingleValue .ok {
+    background-image:url(images/ok.png);
+    background-repeat:no-repeat;
+    background-position:1px 8px;
+    padding:6px 5px 10px 20px;
+    -moz-border-radius: 0 !important;
+    -moz-box-shadow:none !important;
+    -webkit-border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+
+.SingleValue .alarm .singleResult {
+    font-size:16px;
+    font-weight:300;
+    margin-right:5px;
+    float:left;
+}
+
+.SingleValue .alarm {
+    background-image:url(images/alarm.png);
+    background-repeat:no-repeat;
+    background-position:1px 8px;
+    padding:6px 5px 10px 20px;
+    -moz-border-radius: 0 !important;
+    -moz-box-shadow:none !important;
+    -webkit-border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+
+.SingleValue .down .singleResult {
+    font-size:16px;
+    font-weight:300;
+    margin-right:5px;
+    float:left;
+}
+
+
+.SingleValue .down {
+    background-image:url(images/down.png);
+    background-repeat:no-repeat;
+    background-position:1px 8px;
+    padding:6px 5px 10px 20px;
+    -moz-border-radius: 0 !important;
+    -moz-box-shadow:none !important;
+    -webkit-border-radius: 0 !important;
+    -webkit-box-shadow: none !important;
+    box-shadow:none !important;
+}
+
+.SingleValue .high {
+       background-color: #e67918;
+       color: #fff;
+}
+.SingleValue .elevated {
+       background-color: #e9da34;
+       color: #000;
+}
+.SingleValue .guarded {
+       background-color: #4da6df;
+       color: #fff;
+}
+
+/* default singleResult style */
+.SingleValue .singleResult {
+       font-size: 16px;
+       font-weight: bold;
+}
+
+.SingleValueHolder.statusup {
+       background-color: #72c72d;
+       color: #fff;
+       -moz-border-radius: 4px;
+       -webkit-border-radius: 4px;
+       font-size: 16px;
+       font-weight: bold;
+       -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+       background-image:url(/static/img/skins/default/overlay_gradient_50.png);
+       background-repeat: repeat-x;
+       _background-image: none;
+}
+.SingleValue .statusdown {
+       background-color: #9B0000;
+       color: #fff;
+       -moz-border-radius: 4px;
+       -webkit-border-radius: 4px;
+       font-size: 16px;
+       font-weight: bold;
+       -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+       background-image:url(/static/img/skins/default/overlay_gradient_50.png);
+       background-repeat: repeat-x;
+       _background-image: none;
+}
+
+.SingleValueHolder. {
+       background-color: #6B6B6B;
+       color: #000000;
+       -moz-border-radius: 4px;
+       -webkit-border-radius: 4px;
+       font-size: 16px;
+       font-weight: bold;
+       -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+       background-image:url(/static/img/skins/default/overlay_gradient_50.png);
+       background-repeat: repeat-x;
+       _background-image: none;
+}
+
+.SingleValue .blue {
+       background-color: #006090;
+       color: #fff;
+       text-align:center;
+       -moz-border-radius: 4px;
+       -webkit-border-radius: 4px;
+       font-size: 16px;
+       font-weight: bold;
+       -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+       background-image:url(/static/img/skins/default/overlay_gradient_50.png);
+       background-repeat: repeat-x;
+       _background-image: none;
+}
+
+.SingleValue .grey {
+       background-color: #7F7F7F;
+       color: #fff;
+       text-align:center;
+       -moz-border-radius: 4px;
+       -webkit-border-radius: 4px;
+       font-size: 16px;
+       font-weight: bold;
+       -moz-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+       background-image:url(/static/img/skins/default/overlay_gradient_50.png);
+       background-repeat: repeat-x;
+       _background-image: none;
+}
+
+.SingleValue .none {
+       background-color: #999;
+       color: #fff;
+}
+
+/* Dashboard customisations
+Apply to:
+- Device List
+- Notifications
+- Alert View
+- Device Dashboards */
+.splTemplate-dashboard .Count {
+        float: right;
+        height: 10px;
+        padding-top: 5px;
+        padding-right: 30px;
+        padding-bottom: 5px;
+}
+
+.splTemplate-dashboard .Paginator {
+		height: 22px;
+        float: right;
+        padding-top: 1px;
+        padding-right: 10px;
+}
+
+/* Device List header customisations */
+.splView-devices .StaticSelect {
+        float: left;
+}
+
+/* Notifications header customisations */
+.splView-notifications .TimeRangePicker {
+        padding-top: 5px;
+}
+.splView-notifications .StaticSelect {
+        float: left;
+}
+
+/* fix truncation in the events list */
+
+.EventsViewerSoftWrap .default .event {
+	word-break: break-word;
+}
+
+/* fixes for printing tables */
+
+@media print {
+	.Paginator .active a, .Paginator .active a:hover {
+		text-decoration:underline;
+	}
+	
+	.EventsViewer, .SimpleResultsTable .simpleResultsTableWrapper table.simpleResultsTable {
+		word-break: break-word!important;
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+}

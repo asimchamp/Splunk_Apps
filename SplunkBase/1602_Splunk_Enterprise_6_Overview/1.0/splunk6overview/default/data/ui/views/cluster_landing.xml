@@ -1,0 +1,54 @@
+<dashboard isVisible="false">
+	<label>Simplified Cluster Management</label>
+	<row>
+        <html>
+		<div>
+			<a href="/app/splunk6overview/forwarder_landing"><h2 align="left">Previous: Forwarder Management</h2></a>
+		</div>
+	</html>
+	<html>
+		<div>
+			<a href="/app/splunk6overview/overview"><h2 align="right">Next: Welcome</h2></a>
+		</div>
+	</html>
+	</row>
+        <row>
+        <html>
+		<div>
+		<p>Simplified Cluster Management provides faster recovery from failures through new performance optimizations and easier management
+		of Splunk Apps in a distributed clustered environment. Splunk admins do not need to visit every cluster node to deploy an app. </p>
+                <ul>
+                    <li>Enhanced Cluster Monitoring UI: Ability to monitor the health of the cluster through a centralized dashboard </li>
+                    <li>Auto Rebalancing of Peers: Ability to distribute the loads evenly among the cluster peers </li>
+                    <li>Faster Recovery: Ability to recover from peer failures through copying of TSIDX files instead of regeneration </li>
+                    <li>Apps Management: Ability to manage and distribute all apps to peers through cluster master </li>
+		</ul>
+		</div>
+            <h1>Using the feature</h1>
+            <div STYLE="margin-left: 20px;">
+		<p>To uset this feature you need to have a Splunk Cluster set up.  Once you have your cluster <a href="/manager/system/clustering">set up</a>
+		you can use the cluster management feature to manage and monitor your clusters.
+		There are a couple of key activities that use Cluster management:</p>
+		<ul>
+			<li>Cluster rebalancing</li>
+			<li>Change node type and configuration</li>
+			<li>Cluster monitoring</li>
+			<li>Distribute Configuration Bundles</li>
+		</ul>
+	    </div>
+	</html>
+	<html>
+		<div>
+			<img src="/static/app/splunk6overview/images/simplified_cluster_management.png" />
+		</div>
+        </html>
+    </row>
+	<row>
+		<html>
+			<h1>Resources</h1>
+			<a href="/help?location=whatsnew.simplifiedclustermanagement" target="_blank"><h2>Learn More</h2></a>
+			<a href="http://docs.splunk.com/Documentation/Splunk/6.0beta/ReleaseNotes/MeetSplunk" target="_blank"><h2>Intro to Splunk 6 documentation</h2></a>
+		</html>
+	</row>
+</dashboard>
+	

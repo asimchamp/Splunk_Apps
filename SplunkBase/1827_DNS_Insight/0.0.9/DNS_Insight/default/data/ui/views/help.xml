@@ -1,0 +1,79 @@
+<form version="1.1">
+<label>Help</label>
+<row>
+<panel>
+<html>
+<h3>About</h3>
+<p>This App visualizes DNS traffic and helps to pinpoint errors and anomalies like DNS-Tunneling</p>
+
+<p>DNS Insight takes an output of tcpdump/tshark as input, parses it and displays results as following charts and tables:</p>
+<ul>
+  <li>Overview</li>
+  <ul>
+    <li>     Total Events</li>
+    <li>     Parsing Errors</li>
+    <li>     Query Type Distribution</li>
+    <li>     Return Code Distribution</li>
+    <li>     Protocol (UDP/TCP) Distribution</li>
+  </ul>
+  <li>Top Queries</li>
+   <ul>
+    <li>     Top Queries</li>
+    <li>     Top Level Domains</li>
+    <li>     Top Domains</li>
+    <li>     Top Reverse Resolution Entries (PTR) IPv4</li>
+    <li>     Top Reverse Resolution Entries (PTR) IPv6</li>
+    <li>     Top Destinations</li>
+    <li>     Top Sources</li>
+   </ul>
+  <li>Anomalies</li>
+   <ul>
+    <li>     Top DNS Errors</li>
+    <li>     DNS Packet Length</li>
+    <li>     Number of Labels in the query</li>
+   </ul>
+  <li>Performance</li>
+   <ul>
+    <li>     Slowest Transactions</li>
+    <li>     Duration</li>
+   </ul>
+  <li>DNS Tunneling</li>
+   <ul>
+    <li>     Possible DNS Tunnelling</li> 
+   </ul>
+  <li>Search</li>
+  <li>Help</li>
+</ul>
+
+<p>The DNS Traffic can be collected simultaneously from many different devices:
+<ul>
+<li>windows (using TA-tshark or by capturing with dumpcap/tshark/Wireshark)</li>
+<li>linux (capturing with tcpdump, a tcpdump script, or using TA-tcpdump or TA-tshark) </li>
+<li>switch mirror port (SPAN)</li>
+<li>TAP device</li>
+<li>manual import from a saved network dump (pcap file)</li>
+</ul>
+</p>
+
+<h3>Installation</h3>
+<p>
+<ul>
+  <li>For a single desployment (to collect DNS traffic from one system only) you need to install Splunk Enterprise + DNS_Insight App + TA-tcpdump (Linux) or TA-tshark (Windows).</li>
+  <li>For a distributed desploymeint (to collect DNS traffic from many systems):
+   <ul>
+     <li>Windows: Splunk Universal Forwarder + TA-tshark</li>
+     <li>Linux: Splunk Universal Forwarder + TA-tcpdump</li>
+     <li>Indexer: Splunk Enterprise + DNS_Insight App + TA-tshark + TA-tcpdump</li>
+     <li>Search Head: Splunk Enterprise + DNS_Insight App + TA-tshark + TA-tcpdump</li>
+   </ul>
+  </li>
+</ul>
+</p>
+
+<p>Discuss the DNS Insight on Splunk Answers at http://answers.splunk.com/answers/app/1827</p>
+
+<p>Contact: splunk@compek.net</p>
+</html>
+</panel>
+</row>
+</form>

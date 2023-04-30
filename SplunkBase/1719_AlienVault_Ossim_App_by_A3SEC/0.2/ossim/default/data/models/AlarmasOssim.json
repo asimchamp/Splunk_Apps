@@ -1,0 +1,122 @@
+{
+    "objectNameList": [
+        "AlarmasOssim", 
+        "ossimevent"
+    ], 
+    "objectSummary": {
+        "Search-Based": 0, 
+        "Transaction-Based": 0, 
+        "Event-Based": 2, 
+        "Interfaces": 0, 
+        "Interface Implementations": 0
+    }, 
+    "displayName": "AlarmasOssim", 
+    "description": "From Syslog (sourcetype=ossim_syslog)", 
+    "modelName": "AlarmasOssim", 
+    "objects": [
+        {
+            "calculations": [], 
+            "constraints": [
+                {
+                    "search": "sourcetype=ossim_syslog"
+                }
+            ], 
+            "comment": "", 
+            "fields": [
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "alarm", 
+                    "multivalue": false, 
+                    "fieldName": "alarm", 
+                    "type": "string", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "dst_ip", 
+                    "multivalue": false, 
+                    "fieldName": "dst_ip", 
+                    "type": "ipv4", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "equipo", 
+                    "multivalue": false, 
+                    "fieldName": "equipo", 
+                    "type": "string", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "eventtype", 
+                    "multivalue": false, 
+                    "fieldName": "eventtype", 
+                    "type": "string", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "pluginid", 
+                    "multivalue": false, 
+                    "fieldName": "pluginid", 
+                    "type": "number", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "pluginsid", 
+                    "multivalue": false, 
+                    "fieldName": "pluginsid", 
+                    "type": "number", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "priority", 
+                    "multivalue": false, 
+                    "fieldName": "priority", 
+                    "type": "number", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "src_ip", 
+                    "multivalue": false, 
+                    "fieldName": "src_ip", 
+                    "type": "ipv4", 
+                    "required": false
+                }, 
+                {
+                    "hidden": false, 
+                    "comment": "", 
+                    "displayName": "subalarm", 
+                    "multivalue": false, 
+                    "fieldName": "subalarm", 
+                    "type": "string", 
+                    "required": false
+                }
+            ], 
+            "objectName": "AlarmasOssim", 
+            "displayName": "AlarmasOssim", 
+            "parentName": "BaseEvent"
+        }, 
+        {
+            "calculations": [], 
+            "constraints": [], 
+            "comment": "", 
+            "fields": [], 
+            "objectName": "ossimevent", 
+            "displayName": "ossimevent", 
+            "parentName": "AlarmasOssim"
+        }
+    ]
+}

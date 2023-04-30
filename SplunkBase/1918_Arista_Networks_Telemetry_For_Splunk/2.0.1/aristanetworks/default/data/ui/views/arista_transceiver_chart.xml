@@ -1,0 +1,35 @@
+<form version="1.1">
+  <label>Transceiver Inventory Chart</label>
+  <fieldset autoRun="true" submitButton="false">
+    <html>
+         <p>Filter using any field [ switchname=* make=* interface=* model=* serialnum=* ]</p>
+      </html>
+    <input type="text" token="filter">
+      <default>switchname=* model!="NotPresent"</default>
+      <suffix/>
+    </input>
+    <input type="time" token="timerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Matching Events</title>
+        <search>
+          <query>
+                  sourcetype="arista_switch_inventory" AristaXcvrInventory $filter$ | table switchname, interface, model, serialnum | dedup switchname interface | stats count by model
+          </query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+  </row>
+</form>

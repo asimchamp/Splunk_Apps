@@ -1,0 +1,38 @@
+<dashboard isVisible="false">
+	<label>Install the Splunk Universal Forwarder on your SQL Server</label>
+	<row>
+		<html>
+<p>The Splunk Universal Forwarder may be installed as either the local system user or as a domain
+user.   Follow the appropriate instructions in the <a href="http://docs.splunk.com/Documentation/Splunk/latest/Deploy/Introducingtheuniversalforwarder">Splunk Documentation</a>
+for information on this topic.</p>
+
+<p>Once the Splunk Universal Forwarder has been installed, you must allow the user that is running
+the Splunk Universal Forwarder access to the SQL Server.</p>
+
+<ol>
+	<li>Start the SQL Server Management Studio</li>
+	<li>Connect to the SQL Server being configured</li>
+	<li>Log in as a user in the sysadmin role</li>
+	<li>In the left-hand navigation, open Security -&gt; Logins</li>
+	<li>Right-click on Logins and select New Login...</li>
+	<li>In the Login Name box, enter the user that is running the Splunk Universal Forwarder</li>
+	<li>Click on OK to add the user</li>
+	<li>Double-click on the user you have just selected</li>
+	<li>Select Server Roles</li>
+	<li>Check the box next to "sysadmin"</li>
+	<li>Click on OK to update the server roles</li>
+</ol>
+
+<p>If you installed the Splunk Universal Forwarder as the local system user, this is represented on
+the SQL Server as "NT AUTHORITY\SYSTEM" and already exists.  Ensure you perform the last 4 steps to
+enable the user as a sysadmin user.</p>
+
+<p>You may also want to restrict the permissions granted to the Splunk process.   This is outside the
+scope of these instructions.  However, be aware that the splunk process needs system read access to all
+databases.  It does not need to change any data.  The sysadmin role already has these permissions.</p>
+
+<p>We recommend linking the Splunk Universal Forwarder to a Splunk Deployment Server so that you may
+easily deploy the required add-ons from a central location.</p>
+		</html>
+	</row>
+</dashboard>

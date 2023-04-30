@@ -1,0 +1,102 @@
+<form>
+  <label>HTTPS v2</label>
+  <description>deep dive into HTTPS with URLs</description>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="dest_ip" searchWhenChanged="true">
+      <label>Remove Destination IP</label>
+      <search>
+        <query>index=sonicwall tid=262 | lookup sonicwall_sessions session_id as session_id OUTPUT | search  dest_ip=* | top dest_ip</query>
+      </search>
+      <fieldForLabel>dest_ip</fieldForLabel>
+      <fieldForValue>dest_ip</fieldForValue>
+      <valuePrefix>dest_ip!="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> </delimiter>
+      <default>NONE</default>
+      <choice value="NONE">None</choice>
+    </input>
+    <input type="multiselect" token="firewall" searchWhenChanged="true">
+      <label>Firewalls</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>index=sonicwall template_type=dynamic | eval firewall_hostname=coalesce(firewall_hostname, host) | top firewall_hostname</query>
+      </search>
+      <fieldForLabel>firewall_hostname</fieldForLabel>
+      <fieldForValue>firewall_hostname</fieldForValue>
+      <default>*</default>
+      <valuePrefix>firewall_hostname="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Activity by Firewall</title>
+        <search>
+          <query>index=sonicwall tid=257 dest_port=80 OR dest_port=8080 OR dest_port=443 | chart count by firewall_hostname, dest_port</query>
+          <earliest>@d</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>URLs by Destination IP</title>
+        <search>
+          <query>index=sonicwall tid=262 $firewall$  | lookup sonicwall_sessions session_id as session_id OUTPUT | search *  $dest_ip$  | chart values(url), values(dest_port), values(session_id) count by dest_ip</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>HTTPS Connections by destination IP</title>
+        <search>
+          <query>index=sonicwall tid=257 app_id=49177 $firewall$  | chart values(app_name), values(dest_port), values(session_id) by dest_ip</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>real time correlated session_id</title>
+        <search>
+          <query>index=sonicwall $firewall$ tid=257 OR tid=262 OR tid=278 OR dest_port=80 OR dest_port=8080 OR dest_port=443 OR app_name="HTTP"  OR $dest_ip$  | transaction session_id | chart values(url), values(app_name), values(session_id) by dest_port</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

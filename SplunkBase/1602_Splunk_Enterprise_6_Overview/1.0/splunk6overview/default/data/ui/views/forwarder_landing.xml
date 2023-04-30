@@ -1,0 +1,51 @@
+<dashboard isVisible="false">
+	<label>Forwarder Management</label>
+	<row>
+        <html>
+		<div>
+			<a href="/app/splunk6overview/framework_landing"><h2 align="left">Previous: Web Development</h2></a>
+		</div>
+	</html>
+	<html>
+		<div>
+			<a href="/app/splunk6overview/cluster_landing"><h2 align="right">Next: Cluster Management</h2></a>
+		</div>
+	</html>
+	</row>
+        <row>
+        <html>
+		<p>The Forwarder Management interface allows users to easily create and edit server classes. A simplified dashboard allows you to monitor your deployments:</p>
+		<li>Track the status of your system</li>
+		<li>Monitor deployment activity</li>
+		<li>View the assocations between apps, clients, and server classes</li>
+		<li>Configure app behavior</li>
+		<li>Uninstall apps from clients</li>
+            <h1>Using the feature</h1>
+            <div STYLE="margin-left: 20px;">
+		<p>You access the forwarder management <a href="/manager/system/deploymentserver">interface </a>through Splunk Web on the deployment server. To open the interface:
+		<ln>Click the System menu at the top of Splunk Web. A window pops up with links to the set of system interfaces.</ln>
+		<ln>Select "Forwarder Management" in the Distributed Environment section. This takes you to the main page of the interface:</ln>		
+		<p>The page contains these features (going from top to bottom):</p>
+		<p>The Repository Location. The repository location is where deployment apps reside on the deployment server.</p>
+		<p>A status section, with information on deployment clients and recent downloads.</p>
+		Three tabs:
+		<li>Apps. This tab lists the set of deployment apps in the repository location, along with their status. You can edit some app properties from here.</li>
+		<li>Server Classes. This tab lists the set of server classes, along with their status. From here, you can create new server classes and edit existing ones. You can also drill down on existing server classes for information on their associated apps and clients. For a new, unconfigured deployment server, the list will be empty.</li>
+		<li>Clients. This tab lists all of the deployment server's clients, along with status information. You can filter this list in various ways to limit the current view.</li></p>
+	    </div>
+	</html>
+	<html>
+		<div>
+			<img src="/static/app/splunk6overview/images/forwarder_management.png" />
+		</div>
+        </html>
+    </row>
+	<row>
+		<html>
+			<h1>Resources</h1>
+			<a href="/help?location=whatsnew.forwardermanagement" target="_blank"><h2>Learn More</h2></a>
+			<a href="http://docs.splunk.com/Documentation/Splunk/6.0beta/ReleaseNotes/MeetSplunk" target="_blank"><h2>Intro to Splunk 6 documentation</h2></a>
+		</html>
+	</row>
+</dashboard>
+	

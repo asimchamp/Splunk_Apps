@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 
+Static URL : {{STATIC_URL}}
+App Name: {{app_name}} {{APP_NAME}}
+SPLUNKWEB_URL_PREFIX: {{SPLUNKWEB_URL_PREFIX}}
+-->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Current Status | Splunk</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/pages/dashboard-simple-bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/application.css"/>
+    <!--[if IE 7]><link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/sprites-ie7.css" /><![endif]-->
+</head>
+<body class="simplexml preload">
+
+<!-- 
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system. 
+-->
+
+<div class="header">
+    <div id="placeholder-splunk-bar">
+        <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+    </div>
+    <div id="placeholder-app-bar"></div>
+</div>
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+    <div class="dashboard-header clearfix">
+        <h2>Current Status</h2>
+        <p class="description"></p>
+    </div>
+  <div class="dashboard-row dashboard-row1">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="element3" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>Current Status</h3>                                                  
+                        </div>                     
+                        <div class="panel-body" style="margin-bottom:10px" id="base_accordion">
+                          
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   <div class="dashboard-row dashboard-row2">
+        <div class="dashboard-cell" style="width: 50%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="element1" style="width: 100%">
+                        <div class="panel-head">
+                          <h3>Energy Consumption by Day and Hour - Last <span id="sizeRangeMonths">12</span> Weeks - All Devices Combined</h3>
+                          
+                        </div>
+                      <center>
+                        <svg width="600" height="600">
+          <g id="status">
+            <g class="first">
+              <text class="time" x="300" y="237"></text>
+              <text class="value" x="300" y="276"></text>
+              <text class="units" x="300" y="290"></text>
+            </g>
+            <g class="second">
+              <text class="time" x="255" y="320"></text>
+              <text class="value" x="255" y="347"></text>
+              <text class="units" x="255" y="360"></text>
+            </g>
+            <g class="third">
+              <text class="time" x="345" y="320">Year</text>
+              <text class="value" x="345" y="347"></text>
+              <text class="units" x="345" y="360"></text>
+            </g>
+          </g>
+          <text class="week_step" id="downweek" x="70" y="570">-</text>
+          <text class="week_step" id="upweek" x="500" y="570">+</text>
+        </svg>
+                        
+                      </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cell" style="width: 50%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="element2" style="width: 100%">
+                        <div class="panel-head">
+                            <h2>Nest Structures and Devices</h2>
+                        </div>                      
+                      <div id="multi_nest_accordion">
+                      </div>
+                      <br/><br/><br/><br/>
+                      <div id="nest_home_img"><img src="{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/home_night.png"/></div>
+                      <div id="nest_home_txt"><blockquote>Welcome to your Roost! <br/><b>Note:</b>When setting up the modular input (under data inputs) for your Nest thermostat, make sure you set the Interval to "60" seconds (it's located under More Settings)!</blockquote></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer"></div>
+
+<!-- 
+END LAYOUT
+-->
+  
+  
+
+>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+  <script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/build/simplexml.min/config.js"></script>
+  <script type="text/javascript" src="{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/d3.v3.min.js"></script>
+  <script src="{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/energy.js"></script>
+  <script src="{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/application.js"></script>
+  
+  
+<script type="text/javascript">
+require.config({
+    baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+    waitSeconds: 0 // Disable require.js load timeout
+});
+
+//
+// LIBRARY REQUIREMENTS
+//
+// In the require function, we include the necessary libraries and modules for
+// the HTML dashboard. Then, we pass variable names for these libraries and
+// modules as function parameters, in order.
+// 
+// When you add libraries or modules, remember to retain this mapping order
+// between the library or module and its function parameter. You can do this by
+// adding to the end of these lists, as shown in the commented examples below.
+
+require([
+    "splunkjs/mvc",
+    "splunkjs/mvc/utils",
+    "splunkjs/mvc/tokenutils",
+    "underscore",
+    "jquery",
+    "splunkjs/mvc/simplexml",
+    "splunkjs/mvc/headerview",
+    "splunkjs/mvc/footerview",
+    "splunkjs/mvc/simplexml/dashboard",
+    "splunkjs/mvc/simplexml/element/chart",
+    "splunkjs/mvc/simplexml/element/event",
+    "splunkjs/mvc/simplexml/element/html",
+    "splunkjs/mvc/simplexml/element/list",
+    "splunkjs/mvc/simplexml/element/map",
+    "splunkjs/mvc/simplexml/element/single",
+    "splunkjs/mvc/simplexml/element/table",
+    "splunkjs/mvc/simpleform/input/dropdown",
+    "splunkjs/mvc/simpleform/input/radiogroup",
+    "splunkjs/mvc/simpleform/input/text",
+    "splunkjs/mvc/simpleform/input/timerange",
+    "splunkjs/mvc/simpleform/input/submit",
+    "splunkjs/mvc/searchmanager",
+    "splunkjs/mvc/savedsearchmanager",
+    "splunkjs/mvc/postprocessmanager",
+    "splunkjs/mvc/simplexml/urltokenmodel",
+  	"splunkjs/mvc/tableview"
+    // Add comma-separated libraries and modules manually here, for example:
+    // ..."splunkjs/mvc/simplexml/urltokenmodel",
+    // "splunkjs/mvc/checkboxview"
+    ],
+    function(
+        mvc,
+        utils,
+        TokenUtils,
+        _,
+        $,
+        DashboardController,
+        HeaderView,
+        FooterView,
+        Dashboard,
+        ChartElement,
+        EventElement,
+        HtmlElement,
+        ListElement,
+        MapElement,
+        SingleElement,
+        TableElement,
+        DropdownInput,
+        RadioGroupInput,
+        TextInput,
+        TimeRangeInput,
+        SubmitButton,
+        SearchManager,
+        SavedSearchManager,
+        PostProcessManager,
+        UrlTokenModel,
+  		TableView
+
+        // Add comma-separated parameter names here, for example: 
+        // ...UrlTokenModel, 
+        // CheckboxView
+        ) {
+
+
+
+        var pageLoading = true;
+
+
+        // 
+        // TOKENS
+        //
+        
+        // Create token namespaces
+        var urlTokenModel = new UrlTokenModel();
+        mvc.Components.registerInstance('url', urlTokenModel);
+        var defaultTokenModel = mvc.Components.getInstance('default', {create: true});
+        var submittedTokenModel = mvc.Components.getInstance('submitted', {create: true});
+
+        urlTokenModel.on('url:navigate', function() {
+            defaultTokenModel.set(urlTokenModel.toJSON());
+            if (!_.isEmpty(urlTokenModel.toJSON()) && !_.all(urlTokenModel.toJSON(), _.isUndefined)) {
+                submitTokens();
+            } else {
+                submittedTokenModel.clear();
+            }
+        });
+
+        // Initialize tokens
+        defaultTokenModel.set(urlTokenModel.toJSON());
+
+        var defaultUpdate = {};
+
+        var submitTokens = function() {
+            submitTokensSoon(pageLoading);
+        };
+
+        var submitTokensSoon = _.debounce(function(replaceState) {
+            submittedTokenModel.set(defaultTokenModel.toJSON());
+            urlTokenModel.saveOnlyWithPrefix('form\\.', defaultTokenModel.toJSON(), {
+                replaceState: replaceState
+            });
+        });
+
+
+        //
+        // SEARCH MANAGERS
+        //
+
+		var currentSearchManager = new SearchManager({
+  			"id": "current_status",
+            "cancelOnUnload": true,
+            "status_buckets": 0,
+            "search": "`current_state`",
+            "latest_time": "now",
+            "earliest_time": "-1m@m",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+  	
+  		var multi_nests = new SearchManager({
+  			"id": "multi_nest",
+  			"search": "|`multi_structures_table`",
+  			"cancelOnUnload": true,
+            "status_buckets": 0,
+            "latest_time": "now",
+            "earliest_time": "-1m@m",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+  
+  		var energy_data = new SearchManager({
+  			"id": "energy_data",
+            "cancelOnUnload": true,
+            "status_buckets": 0,
+            "search": "`energy_data_graph`",
+            "latest_time": "@d",
+            "earliest_time": "-12w@w",
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+
+        //
+        // SPLUNK HEADER AND FOOTER
+        //
+
+        new HeaderView({
+            id: 'header',
+            section: 'dashboards',
+            el: $('.header'),
+            acceleratedAppNav: true
+        }, {tokens: true}).render();
+
+        new FooterView({
+            id: 'footer',
+            el: $('.footer')
+        }, {tokens: true}).render();
+
+
+        //
+        // DASHBOARD EDITOR
+        //
+
+        new Dashboard({
+            id: 'dashboard',
+            el: $('.dashboard-body')
+        }, {tokens: true}).render();
+
+
+        //
+        // VIEWS: VISUALIZATION ELEMENTS
+        //
+
+		var mainSearch = splunkjs.mvc.Components.getInstance("current_status");
+  		var current_statusResults = mainSearch.data("results"); 		
+    	// When data changes...
+    	current_statusResults.on("data", function() {
+  		   _.each(current_statusResults.data().rows, function (row, rowCount) 
+              {
+                  $('#base_accordion').append("<h1 style='font-size: 1.3em; font-weight:bold;' class='accordion_toggle' >"+current_statusResults.data().rows[rowCount][1]+"</h1><div class='accordion_content'>Serial Number: <span id='serial_number_"+rowCount+"'></span><center><table style='width:95%'><tr><td><h3>Outside Temp</h3></td><td><h3>Inside Temp</h3></td><td><h3>Target Temp</h3></td><td><h3>Inside Humidity</h3></td><td><h3>Outside Humidity</h3></td><td><h3>System State</h3></td><td><h3>Energy Friendly?</h3></td></tr><tr><td id='out_temp_"+rowCount+"' class='singleResult'></td><td id='in_temp_"+rowCount+"' class='singleResult'></td><td id='target_temp_"+rowCount+"' class='singleResult'></td><td id='in_rh_"+rowCount+"' class='singleResult'></td><td id='out_rh_"+rowCount+"' class='singleResult'></td><td id='system_state_"+rowCount+"' class='singleResult'></td><td id='leaf_state_"+rowCount+"' class='singleResult'></td></tr></table></center></div>");
+                  // This is the data object (a wrapper) that contains the results
+                  _.each(current_statusResults.data().fields, function(column,i) 
+                  {
+                      var docID = "#" + column + "_" + rowCount;
+                      var value = String(current_statusResults.data().rows[rowCount][i]);
+                      $(docID).html(value);
+                      addClassValue(docID, value);
+                  });  
+       
+              });
+  			  
+  			console.log("creating accordion");
+  //var jqueryui = require(["https://code.jquery.com/ui/1.10.0/jquery-ui.js"], function() {
+  			var jqueryui = require(["{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/jquery-ui.js"], function() {
+  				$('#base_accordion').accordion();
+  			});
+  			console.log("ending accordion");
+  			
+        });
+  
+  		var multiSearch = splunkjs.mvc.Components.getInstance("multi_nest");
+  		var multi_nestResults = multiSearch.data("results"); 		
+    	// When data changes...
+    	multi_nestResults.on("data", function() {
+  		   var structures = {};
+  		   _.each(multi_nestResults.data().rows, function (row, rowCount) 
+              {
+  				  var record = multi_nestResults.data().rows[rowCount];
+  				  var sn = String(record[10]);
+  				  structures[record[0]] = { "key": record[0], "zip": record[8], "name": record[1], "type": record[2], "size": record[11], "built":record[9] };
+  				  structures[record[0]][sn] = { "data": row, "type":"device"} ;
+                         
+              });
+  			 
+  			_.each(structures, function ( home, homeCount ) {
+  				var table_key = home.name +"_"+home.zip;
+  $('#multi_nest_accordion').append("<h1 style='font-size: 1.3em; font-weight:bold;' class='accordion_toggle' >"+capitaliseFirstLetter(home.type)+" "+home.name+" located in "+home.zip+". Built: "+home.built+" Size: "+home.size+"</h1><div class='accordion_content'><table id='"+table_key+"' width='100%'><tr><td>Name</td><td>Serial Number</td><td>IP Address</td><td>MAC Address</td></tr></table></div>")
+  				_.each(home, function (deviceObj, devCount) {
+  					if (deviceObj.type == "device") {
+  						device = deviceObj.data;
+  						$('#' + table_key+' tr:last').after("<tr><td>"+device[6]+"</td><td>"+device[10]+"</td><td>"+device[3]+"</td><td>"+device[4]+"</td></tr>");
+  					}
+  				});
+  			});
+  
+  			console.log("structures: ",structures);
+  			console.log("creating accordion");
+  			var jqueryui_multi = require(["{{SPLUNKWEB_URL_PREFIX}}/static/app/Roost/jquery-ui.js"], function() {
+  				$('#multi_nest_accordion').accordion();
+  			});
+  			console.log("ending accordion");
+  			
+        });
+    
+        submitTokens();
+
+  
+  		var energySearch = splunkjs.mvc.Components.getInstance("energy_data");
+  		var energy_results = energySearch.data("results",{ count: "10000" });
+  		energy_results.on("data", function() {
+  			var min_ts = 2145916800;
+  			var maxWeeks = 12;
+  			var data = []; var all_data = []; 
+  		_.each(energy_results.data().rows, function (column, i)
+  		{
+  				if (column[0] < min_ts) { min_ts = column[0]; }
+  				data.push((column[1]/60));
+  				all_data.push((column[1]/(60*maxWeeks)));
+  		});
+  			console.log("Ts: " + min_ts + " Data Length: " + data.length);	
+  			drawEnergyChart(min_ts, data, all_data, maxWeeks);
+  		});
+
+        //
+        // DASHBOARD READY
+        //
+
+        DashboardController.ready();
+        pageLoading = false;
+
+    }
+);
+</script>
+</body>
+</html>

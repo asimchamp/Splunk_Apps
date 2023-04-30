@@ -1,0 +1,80 @@
+<form version="1.1">
+  <label>LANZ</label>
+  <search id="baseSearch">
+    <query>source="arista_switch_lanz" | convert timeformat="%I:%M:%S.%6N %p" ctime(t_end) AS t_end | convert timeformat="%I:%M:%S.%6N %p" ctime(max_q_time) AS max_q_time| convert timeformat="%I:%M:%S.%6N %p" ctime(start_time) AS start_time</query>
+    <earliest>-1h@h</earliest>
+    <latest>@h</latest>
+  </search>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" token="lanz_time" searchWhenChanged="true">
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="Switchname" searchWhenChanged="true">
+      <label>Switch:</label>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_lanz" | stats count by switchname | sort switchname</query>
+        <earliest>$lanz_time.earliest$</earliest>
+        <latest>$lanz_time.latest$</latest>
+      </search>
+    </input>
+    <input type="dropdown" token="lanz_interface" searchWhenChanged="true">
+      <label>Interface</label>
+      <fieldForLabel>interface</fieldForLabel>
+      <fieldForValue>interface</fieldForValue>
+      <search>
+        <query>source="arista_switch_lanz" switchname | stats count by interface | sort interface</query>
+        <earliest>$lanz_time.earliest$</earliest>
+        <latest>$lanz_time.latest$</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>source="arista_switch_lanz" $Switchname$ $lanz_interface$ | convert timeformat="%I:%M:%S.%6N %p" ctime(t_end) AS t_end | convert timeformat="%I:%M:%S.%6N %p" ctime(max_q_time) AS max_q_time | convert timeformat="%I:%M:%S.%6N %p" ctime(start_time) AS start_time |table _time, tc</query>
+          <earliest>$lanz_time.earliest$</earliest>
+          <latest>$lanz_time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Events</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Interface statistics on $Switchname$ interface $lanz_interface$ over time</title>
+      <table>
+        <title>Matching events</title>
+        <search>
+          <query>source="arista_switch_lanz" $Switchname$ $lanz_interface$  | convert timeformat="%I:%M:%S.%6N %p" ctime(t_end) AS t_end | convert timeformat="%I:%M:%S.%6N %p" ctime(max_q_time) AS max_q_time | convert timeformat="%I:%M:%S.%6N %p" ctime(start_time) AS start_time |table switchname, _time, tc, duration, max_q_length, max_q_time, start_time, max_latency, drops</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <search>
+          <query>source="arista_switch_lanz" $Switchname$ $lanz_interface$ | convert timeformat="%I:%M:%S.%6N %p" ctime(t_end) AS t_end | convert timeformat="%I:%M:%S.%6N %p" ctime(max_q_time) AS max_q_time | convert timeformat="%I:%M:%S.%6N %p" ctime(start_time) AS start_time |table _time, max_q_length</query>
+          <earliest>$lanz_time.earliest$</earliest>
+          <latest>$lanz_time.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.axisTitleY.text">Maximum Queue Size (bytes)</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+</form>

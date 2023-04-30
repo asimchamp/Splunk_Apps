@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Load Balancing</label>
+
+  <fieldset>
+    <input type="time">
+    <default>Last 24 hours</default> 
+    </input>
+    <input type="text" token="Name">
+      <label>Name</label>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <searchString>
+	`smspasscode-index` source="WinEventLog:SmsLB" EventCode="4031" (LBUsername="*$Name$*" OR LBSAMUsername="*$Name$*") |
+	eval Time=_time |
+	convert ctime(Time) |
+	table Time LBUsername LBSAMUsername ComputerName LBRequestFrom LBPolicy LBRuleApplied LBDispatchTarget LBForwardedTo |
+	rename LBUsername AS "Name", LBSAMUsername AS "Login account", ComputerName AS "Load Balancing host", LBRequestFrom AS "Authentication client", LBPolicy AS "Load Balancing policy", LBRuleApplied AS "Rule", LBDispatchTarget AS "Dispatch target", LBForwardedTo AS "Transmitter host"
+      </searchString>
+      <title>Load Balancing</title>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+	`smspasscode-index` source="WinEventLog:SmsLB" EventCode="4099" (LBUsername="*$Name$*" OR LBSAMUsername="*$Name$*") |
+	table _time LBUsername LBSAMUsername LBRequestFrom LBPolicy LBRuleApplied LBPersonalPasscode |
+	rename LBUsername AS "Name", LBSAMUsername AS "Login account", LBRequestFrom AS "Authentication client", LBPolicy AS "Load Balancing policy", LBRuleApplied AS "Rule", LBPersonalPasscode AS "Note"
+      </searchString>
+      <title>Personal passcode use</title>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+	`smspasscode-index` source="WinEventLog:SmsLB" EventCode="4031" (LBUsername="*$Name$*" OR LBSAMUsername="*$Name$*") |
+	chart count by LBRequestFrom |
+	rename LBRequestFrom AS "Authentication client" |
+	sort -count
+      </searchString>
+      <title>Requests from authentication clients</title>
+    </table>
+  </row>
+
+</form>

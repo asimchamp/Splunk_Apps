@@ -1,0 +1,421 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, machine_gpuusage.js" stylesheet="main.css">
+
+   <label>Machine GPU</label>
+   <description>This dashboard displays detailed information about GPU usage per machine.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>System_GpuUsage</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Charts">
+      <query>
+         | pivot `uA_DM_System_GpuUsage` System_GpuUsage
+            $Panel21Function1$(ComputeUsagePercentAllEngines) as ComputeUsagePercentRawValue
+            $Panel22Function1$(MemoryDedicatedMB) as MemoryDedicatedMBRawValue
+            $Panel22Function1$(MemorySharedMB) as MemorySharedMBRawValue
+            latest(DisplayAdapterIndex) as "DisplayAdapterIndexRaw"
+            latest(DisplayAdapterName) as "DisplayAdapterName"
+            splitrow
+               host as Host
+            splitrow
+               DisplayAdapterName as DisplayAdapterName
+            $SearchFilter$
+            filter ComputeUsagePercentAllEngines is "*"
+         | eval "DisplayAdapterIndex" = coalesce(DisplayAdapterIndexRaw, 0)
+         | eval "GPU@Host" = DisplayAdapterName . "@" . Host
+         | eval "$Panel21Function1$(ComputeUsagePercentAllEngines)" = round(ComputeUsagePercentRawValue, 1)
+         | eval "$Panel22Function1$(MemoryDedicatedMB)" = round(MemoryDedicatedMBRawValue, 1)
+         | eval "$Panel22Function1$(MemorySharedMB)" = round(MemorySharedMBRawValue, 1)
+      </query>
+   </search>
+            
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>GPU compute usage per engine over time</title>
+         <chart id="Chart_Panel11">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_GpuUsageEngine` System_GpuUsageEngine
+                       avg(GpuEngineComputeUsagePercent) as "GpuEngineComputeUsagePercent"
+                    splitrow
+                       _time
+                       period $PivotPeriodAutoSolo$
+                    splitcol 
+                       GpuEngineCombined
+                    $SearchFilter$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+      <panel>
+         <title>GPU compute usage per machine (top 10)</title>
+         <input type="dropdown" token="Panel21Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel21">
+            <search base="Search_Charts">
+               <query>
+                  sort limit=10 - "$Panel21Function1$(ComputeUsagePercentAllEngines)"
+                  | fields 
+                     "GPU@Host"
+                     "$Panel21Function1$(ComputeUsagePercentAllEngines)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <panel>
+         <title>GPU memory usage per machine (top 10)</title>
+         <input type="dropdown" token="Panel22Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel22">
+            <search base="Search_Charts">
+               <query>
+                  eval TotalMB = '$Panel22Function1$(MemoryDedicatedMB)' + '$Panel22Function1$(MemorySharedMB)'
+                  | sort limit=10 - TotalMB
+                  | fields
+                     "GPU@Host"
+                     "$Panel22Function1$(MemoryDedicatedMB)"
+                     "$Panel22Function1$(MemorySharedMB)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 3 -->
+   <row>
+      <panel>
+         <title>GPU compute usage per display adapter (top 10)</title>
+         <input type="dropdown" token="Panel31Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_GpuUsage` System_GpuUsage
+                     $Panel31Function1$(ComputeUsagePercentAllEngines) as ComputeUsagePercentRawValue
+                     latest(DisplayAdapterName) as "DisplayAdapterName"
+                     splitrow
+                        DisplayAdapterName as DisplayAdapterName
+                     $SearchFilter$
+                     filter ComputeUsagePercentAllEngines is "*"
+                  | eval "$Panel31Function1$(DisplayAdapterComputeUsagePercent)" = round(ComputeUsagePercentRawValue, 1)
+                  | sort limit=10 - "$Panel31Function1$(DisplayAdapterComputeUsagePercent)"
+                  | fields 
+                     DisplayAdapterName
+                     "$Panel31Function1$(DisplayAdapterComputeUsagePercent)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>      
+      </panel>
+      <panel>
+         <title>GPU compute usage per GPU engine (top 10)</title>
+         <input type="dropdown" token="Panel32Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart id="Chart_Panel32">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_GpuUsageEngine` System_GpuUsageEngine
+                     values(GpuEngineTypeDisplayName) as GpuEngineTypeDisplayName
+                     $Panel32Function1$(GpuEngineComputeUsagePercent) as ComputeUsagePercentRawValue
+                     splitrow 
+                        GpuEngineTypeDisplayName
+                     $SearchFilter$
+                  | eval "$Panel32Function1$(GpuEngineComputeUsagePercent)" = round(ComputeUsagePercentRawValue, 2)
+                  | sort limit=10 - "$Panel32Function1$(GpuEngineComputeUsagePercent)"
+                  | fields 
+                     GpuEngineTypeDisplayName
+                     "$Panel32Function1$(GpuEngineComputeUsagePercent)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>      
+   </row>
+   
+   <!-- Row 4 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <input type="dropdown" token="Panel41Function1" id="Input_Panel41Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel41Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel41Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel41Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel41Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel41Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel41Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel41Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_GpuUsage` System_GpuUsage
+                     $Panel41Function1$(ComputeUsagePercentAllEngines) as FuncComputeUsagePercentAllEngines
+                     $Panel41Function1$(MemoryDedicatedMB) as FuncMemoryDedicatedMB
+                     $Panel41Function1$(MemorySharedMB) as FuncMemorySharedMB
+                     $Panel41Function1$(MemoryDedicatedPercent) as FuncMemoryDedicatedPercent
+                     $Panel41Function1$(MemorySharedPercent) as FuncMemorySharedPercent
+                     splitrow
+                        host as Host
+                     splitrow
+                        DisplayAdapterName as "GPU name"
+                     splitrow
+                        DisplayAdapterIndexEval as "GPU index"
+                     $SearchFilter$
+                     filter ComputeUsagePercentAllEngines is "*"
+                  | eval "$Panel41Function1Display$ GPU compute (%)"=round(FuncComputeUsagePercentAllEngines,1)
+                  | eval "$Panel41Function1Display$ GPU dedicated memory (MB)"=round(FuncMemoryDedicatedMB,1)
+                  | eval "$Panel41Function1Display$ GPU shared memory (MB)"=round(FuncMemorySharedMB,1)
+                  | eval "$Panel41Function1Display$ GPU dedicated memory (%)"=round(FuncMemoryDedicatedPercent,1)
+                  | eval "$Panel41Function1Display$ GPU shared memory (%)"=round(FuncMemorySharedPercent,1)
+                  | eval sortfield=lower(Host)
+                  | table
+                     Host
+                     "GPU name"
+                     "GPU index"
+                     "$Panel41Function1Display$ GPU compute (%)"
+                     "$Panel41Function1Display$ GPU dedicated memory (MB)"
+                     "$Panel41Function1Display$ GPU shared memory (MB)"
+                     "$Panel41Function1Display$ GPU dedicated memory (%)"
+                     "$Panel41Function1Display$ GPU shared memory (%)"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+                <set token="DrilldownFilterBy1Host">$row.Host$</set>
+                <set token="DrilldownFilterBy2GPUName">$row.GPU name$</set>
+                <set token="DrilldownFilterBy3GPUIndex">$row.GPU index$</set>
+            </drilldown>
+         </table>
+
+      <html src="machine_gpuusage_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+   <!-- Row 5 -->
+   <row depends="$DrilldownFilterBy1Host$">
+      <!-- Column 1 -->
+      <panel>
+         <title>Detailed GPU engine information over time for: $DrilldownFilterBy1Host$, Adapter: $DrilldownFilterBy2GPUName$, GPU index: $DrilldownFilterBy3GPUIndex$</title>
+         <chart id="Chart_Panel52">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_GpuUsageEngine` System_GpuUsageEngine
+                       avg(GpuEngineComputeUsagePercent) as "GpuEngineComputeUsagePercent"
+                    splitrow
+                       _time
+                       period $PivotPeriodAutoSolo$
+                    splitcol
+                       GpuEngineCombined
+                    filter host is $DrilldownFilterBy1Host|s$
+                    filter DisplayAdapterIndex is $DrilldownFilterBy3GPUIndex|s$
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">%</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>      
+
+      <!-- Column 2 -->
+      <panel>
+         <title>GPU memory usage over time for: $DrilldownFilterBy1Host$, Adapter: $DrilldownFilterBy2GPUName$, GPU index: $DrilldownFilterBy3GPUIndex$</title>
+         <chart id="Chart_Panel51">
+            <search>
+               <query>
+                  | pivot `uA_DM_System_GpuUsage` System_GpuUsage
+                     $Panel41Function1$(MemoryDedicatedMB) as MemoryDedicatedMBRawValue
+                     $Panel41Function1$(MemorySharedMB) as MemorySharedMBRawValue
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     filter host is $DrilldownFilterBy1Host$
+                     filter DisplayAdapterIndex is $DrilldownFilterBy3GPUIndex|s$
+                  | eval "$Panel41Function1$(MemoryDedicatedMB)" = round(MemoryDedicatedMBRawValue, 1)
+                  | eval "$Panel41Function1$(MemorySharedMB)" = round(MemorySharedMBRawValue, 1)
+                  | fields - MemoryDedicatedMBRawValue MemorySharedMBRawValue
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">MB</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+</form>

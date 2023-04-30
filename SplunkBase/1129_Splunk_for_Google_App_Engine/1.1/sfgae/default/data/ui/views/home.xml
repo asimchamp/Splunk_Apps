@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Home</label>
+  <row>
+    <chart>
+      <searchString>source="app_engine" | timechart count(status)</searchString>
+      <title>Total Requests</title>
+      <earliestTime>-1mon</earliestTime>
+      <option name="charting.axisTitleX.text">30 Days</option>
+      <option name="charting.axisTitleY.text">Requests</option>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.scale">log</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>source="app_engine" | timechart count(status)</searchString>
+      <title>Real Time Requests</title>
+      <earliestTime>rt-15m</earliestTime>
+      <latestTime>rt</latestTime>
+      <option name="charting.axisTitleX.text">15 Minutes</option>
+      <option name="charting.axisTitleY.text">Requests</option>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.scale">log</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">all</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>source="app_engine" | timechart count by status</searchString>
+      <title>Top Response Codes</title>
+      <earliestTime>-7d</earliestTime>
+      <option name="charting.axisTitleX.text">7 Days</option>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.showMarkers">false</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.maximumNumber"/>
+      <option name="charting.secondaryAxis.minimumNumber"/>
+      <option name="charting.secondaryAxis.scale">log</option>
+      <option name="charting.secondaryAxisTitle.text">Frequency</option>
+    </chart>
+    <chart>
+      <searchString>source="app_engine" | timechart count by uri limit=10 useother=false</searchString>
+      <title>Top URIs</title>
+      <earliestTime>-7d</earliestTime>
+      <option name="charting.axisTitleX.text">7 Days</option>
+      <option name="charting.axisTitleY.text">Requests</option>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.scale">log</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>source="app_engine" | top limit=10 useragent</searchString>
+      <title>Top Browsers</title>
+      <earliestTime>-30mon</earliestTime>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.secondaryAxis.scale">log</option>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+    <chart>
+      <searchString>source="app_engine" status="404" | top limit=10 uri</searchString>
+      <title>Top 404 Requests by URI</title>
+      <earliestTime>-1mon</earliestTime>
+      <option name="charting.axisTitleX.text">URI</option>
+      <option name="charting.axisTitleY.text"/>
+      <option name="charting.axisY.scale">log</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.scale">log</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="drilldown">all</option>
+    </chart>
+  </row>
+</dashboard>

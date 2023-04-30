@@ -1,0 +1,116 @@
+<form isVisible="false">
+	<label>SQL Instance Information</label>
+
+	<fieldset autoRun="true" submitButton="true">
+		<input type="dropdown" token="ServerInstance">
+			<label>Server Instance</label>
+			<prefix>ServerInstance="</prefix>
+			<suffix>"</suffix>
+			<populatingSearch fieldForValue="SIVal" fieldForLabel="ServerInstance" earliest="-10m" latest="now">
+| inputlookup SQLInstanceInformation 
+| eval SIVal=replace(ServerInstance,"\\\\","\\\\")
+| stats count by ServerInstance,SIVal
+			</populatingSearch>
+		</input>
+	</fieldset>
+
+	<row>
+		<table>
+			<title>Instance Information</title>
+			<searchTemplate>
+| inputlookup SQLInstanceInformation 
+| search $ServerInstance$
+| eval ProductVersion = Product + " " + Release + " " + ProductLevel + " " + Edition
+| eval VersionBuild = Version + " (" + Build + ")"
+| lookup SQLBuilds Version OUTPUT Patch,Recommended
+| stats last(ProductVersion) as "Product Version", values(VersionBuild) as "Version", values(Patch) as Patch, values(Recommended) as Recommended, values(Port) as "TCP Port", values(AuditLevel) as AuditLevel, values(Clustered) as Clustered, values(LoginMode) as LoginMode by Name
+| transpose 10
+			</searchTemplate>
+			<earliestTime>-10m</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="showPager">false</option>
+		</table>
+		<table>
+			<title>Database Information</title>
+			<searchTemplate>
+| inputlookup SQLDatabaseInformation
+| search $ServerInstance$
+| join DatabaseGuid [ search eventtype=mssql-databasehealth Status="Normal"| stats latest(ActiveConnections) as ActiveConnections,latest(Size) as Size,latest(Status) as DBStatus by DatabaseGuid ]
+| sort -Size
+| table ServerInstance,Name,Size,ActiveConnections
+			</searchTemplate>
+			<fields>Name,Size,ActiveConnections</fields>
+			<earliestTime>-10m</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="showPager">true</option>
+			<drilldown>
+				<link><![CDATA[/app/Splunk_for_SQLServer/ops_database?form.DatabaseName=$row.Name$&form.ServerInstance=$row.ServerInstance$]]></link>
+			</drilldown>
+		</table>
+	</row>
+	
+	<row>
+		<chart>
+			<title>SQL Server Database Transactions</title>
+			<searchString><![CDATA[eventtype=perfmon (collection="MSSQL:Transactions" OR collection="SQLServer:Transactions") counter="Transactions" | rex field=object "MSSQL\$(?<ServerInstance>[^:]+):" | eval ServerInstance=if(isnull(ServerInstance),host,host+"\\"+ServerInstance) | search $ServerInstance$ | timechart avg(Value) by instance]]></searchString>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">column</option>
+			<option name="charting.chart.nullValueMode">gaps</option>
+			<option name="charting.chart.stackMode">stacked</option>
+			<option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+		</chart>
+		<chart>
+			<title>SQL Server User Connections</title>
+			<searchString><![CDATA[eventtype=perfmon (collection="MSSQL:General Statistics" OR collection="SQLServer:General Statistics") counter="User Connections" | rex field=object "MSSQL\$(?<ServerInstance>[^:]+):" | eval ServerInstance=if(isnull(ServerInstance),host,host+"\\"+ServerInstance) | search $ServerInstance$ | timechart avg(Value)]]></searchString>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">area</option>
+			<option name="charting.chart.nullValueMode">connect</option>
+			<option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+		</chart>
+		<chart>
+			<title>SQL Agent Job Status Counts</title>
+			<searchString><![CDATA[eventtype=perfmon (collection="SQLAgentV:Jobs" OR collection="SQLAgent:Jobs") | rex field=object "(SQLAGENT|SQLAgent)\$(?<ServerInstance>[^:]+):" | eval ServerInstance=if(isnull(ServerInstance),host,host+"\\"+ServerInstance) | search $ServerInstance$ | timechart avg(Value) by counter]]></searchString>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">column</option>
+			<option name="charting.chart.nullValueMode">gaps</option>
+			<option name="charting.chart.stackMode">stacked</option>
+			<option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+		</chart>
+	</row>
+
+	<row>
+		<chart>
+			<title>Per-User CPU Load (CPU Seconds over Last 24 hours)</title>
+			<searchTemplate><![CDATA[eventtype=mssql-audit $ServerInstance$ action_id=LGO
+| rex field=_raw "(?ms)<total_cpu>(?<total_cpu>\d+)" 
+| where total_cpu>0 
+| rename session_server_principal_name as user
+| timechart sum(total_cpu) as total_cpu by user]]>
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">area</option>
+			<option name="charting.chart.nullValueMode">zero</option>
+			<option name="charting.chart.stackMode">stack</option>
+		</chart>
+		<chart>
+			<title>Per-Host CPU Load (CPU Seconds over Last 24 hours)</title>
+			<searchTemplate><![CDATA[eventtype=mssql-audit $ServerInstance$ (action_id=LGIS OR action_id=LGO) 
+| transaction host,session_id startswith=action_id:LGIS endswith=action_id:LGO 
+| rex field=_raw "(?ms)<total_cpu>(?<total_cpu>\d+)" 
+| where total_cpu>0 
+| rename session_server_principal_name as user
+| timechart sum(total_cpu) as total_cpu by src_ip]]>
+			</searchTemplate>
+			<earliestTime>-24h</earliestTime>
+			<latestTime>now</latestTime>
+			<option name="charting.chart">area</option>
+			<option name="charting.chart.nullValueMode">zero</option>
+			<option name="charting.chart.stackMode">stack</option>
+		</chart>
+			
+	</row>
+</form>

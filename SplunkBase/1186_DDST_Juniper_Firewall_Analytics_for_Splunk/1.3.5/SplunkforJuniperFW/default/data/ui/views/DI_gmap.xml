@@ -1,0 +1,33 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+  <label>DI Signature Map Location</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+
+  <module name="HiddenSearch" layoutPanel="panel_row1_col1" group="DNS Location Google mapped" autoRun="True">
+    <param name="search">sourcetype="JuniperFW" | search msg_id="*-00601" AND policy!=NULL |stats count(dst_ip) AS TotalReports by dst_ip |eval clientip=dst_ip  | geoip clientip | stats sum(TotalReports) as _geo_count by _geo</param>
+
+    <module name="TimeRangePicker">
+        <param name="default">Last 24 hours</param>
+        <param name="searchWhenChanged">True</param>
+
+    <module name="GoogleMaps">
+    	<param name="height">500px</param>
+    	<param name="mapType">roadmap</param>
+    </module>
+    </module>
+  </module>
+
+</view>

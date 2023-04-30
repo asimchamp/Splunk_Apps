@@ -1,0 +1,73 @@
+<form script="inpage_drilldown_form.js" stylesheet="custom.css" version="1.1">
+  <label>FX - Analysis</label>
+  <description>Analysis Dashboard for FireEye FX Events</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Search</label>
+      <default>*</default>
+      <suffix/>
+    </input>
+    <!-- Used for dropdown - Input field hidden using javascript. <div id = #field3 -->
+    <input type="text" token="ID" searchWhenChanged="true"/>
+    <input type="dropdown" token="ackstatus" searchWhenChanged="true">
+      <label>Acknowledge Status</label>
+      <choice value="Y">Yes</choice>
+      <choice value="N">No</choice>
+      <choice value="*">All</choice>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <table id="master">
+      <title>Alerts</title>
+      <search><query>eventtype=fe product="File MPS" $wild$ | lookup acknotes id as id | eval Ack=if(isnull(Ack), "N", Ack) | search Ack=$ackstatus$ | table Ack, dvc_host, id, file_type, signature, severity, file_hash, occurred | sort -occurred | rename dvc_host AS Appliance, id AS ID, file_type AS FT, signature AS Malware, severity AS Severity, file_hash AS "Md5sum", occurred AS "Complete (UTC)", locations as "Location"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+  <row>
+    <table id="detail">
+      <title>Alert Detail: $ID$</title>
+      <search><query>eventtype=fe product="File MPS" id=$ID$ $wild$ | lookup acknotes id as id | eval Notes=if(isnull(Notes), "Empty", Notes) | table Notes, file_hash, ext_ref | rename Notes as "Event Notes", file_hash as UrlHash, ext_ref AS "Event Link"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+        <drilldown target="_blank">
+          <condition field="Event Notes">
+            <link target="_blank">/app/$app$/acknotes?earliest=$earliest$&amp;latest=$latest$&amp;form.product=FX&amp;form.id=$ID$</link>
+          </condition>
+          <condition field="UrlHash"><link target="_blank">/app/$app$/vtlookup?UrlHash=$row.UrlHash$</link></condition>
+          <condition field="Event Link">$row.ext_ref$</condition>
+        </drilldown>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

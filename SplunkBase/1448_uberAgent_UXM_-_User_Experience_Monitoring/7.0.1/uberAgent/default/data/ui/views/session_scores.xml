@@ -1,0 +1,718 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css, session_scores.css">
+
+   <label>Session Scores</label>
+   <description>This dashboard displays detailed information about session scores. The lowest score is 0.0. The highest score is 10.0. The higher, the better. The data is updated every full and half hour. Click on a value of interest, to get a drilldown. If there are two or more sessions for a user per machine, the login time is added in parenthesis to the session to identify it more easily.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>@d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Session_SessionDetail_Users</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_AllowedIndexesFilter">
+        <query>
+            | tstats count WHERE index=`uberAgent_index` by index | table index | mvcombine delim="," index | nomv index
+        </query>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="AllowedIndexesFilter">filter SourceIndex in ($result.index$)</set>
+        </progress>
+    </search>
+
+   <search id="Search_Base_Good_Medium_Bad">
+      <query>
+         | pivot `uA_DM_Score_Session` Score_Session 
+            avg(session_score) as session_score
+            splitrow SessionGUID
+            $SearchFilter$
+            $AllowedIndexesFilter$
+         | eval IsBad = if(session_score &lt; 4,1,0)
+         | eval IsMedium = if(session_score &gt;= 4 AND session_score &lt; 7,1,0)
+         | eval IsGood = if(session_score &gt;= 7,1,0)
+         | stats 
+            sum(IsBad) as IsBad
+            sum(IsMedium) as IsMedium
+            sum(IsGood) as IsGood
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+    <row>
+      <panel>
+         <title>Session score distribution</title>
+         <single>
+            <title>Bad scores</title>
+                <search base="Search_Base_Good_Medium_Bad">
+                    <query>
+                        | table IsBad
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xdc4e41","0xdc4e41"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Sessions</option>
+                <option name="useColors">1</option>
+                <option name="drilldown">none</option>
+         </single>
+         <single>
+            <title>Medium scores</title>
+                <search base="Search_Base_Good_Medium_Bad">
+                    <query>
+                        | table IsMedium
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0xf8be34","0xf8be34"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Sessions</option>
+                <option name="useColors">1</option>
+         </single>
+         <single>
+            <title>Good scores</title>
+                <search base="Search_Base_Good_Medium_Bad">
+                    <query>
+                        | table IsGood
+                    </query>
+                </search>
+                <option name="colorMode">block</option>
+                <option name="drilldown">none</option>
+                <option name="numberPrecision">0</option>
+                <option name="rangeColors">["0x53a051","0x53a051"]</option>
+                <option name="rangeValues">[1]</option>
+                <option name="underLabel"># Sessions</option>
+                <option name="useColors">1</option>
+         </single>
+      </panel>
+   </row>
+   
+   <search id="Search_Lowest_10_Charts">
+      <query>
+         | pivot `uA_DM_Score_Session` Score_Session
+            $Panel41Function1$(session_cpu) as session_cpu
+            $Panel42Function1$(session_diskio) as session_diskio
+            $Panel51Function1$(session_ram) as session_ram
+            $Panel52Function1$($Panel52Field1$) as Panel52Raw
+            latest(Session) as Session
+            splitrow
+               SessionGUID
+            $SearchFilter$
+            $AllowedIndexesFilter$
+         | eval "$Panel41Function1$(session_cpu)" = round(session_cpu, 1)
+         | eval "$Panel42Function1$(session_diskio)" = round(session_diskio, 1)
+         | eval "$Panel51Function1$(session_ram)" = round(session_ram, 1)
+         | eval "$Panel52Function1$($Panel52Field1$)" = round(Panel52Raw, 1)
+      </query>
+   </search>
+
+   <search id="Search_ScoresOverTime">
+      <query>
+         | pivot `uA_DM_Score_Session` Score_Session
+            avg(session_cpu) as session_cpu
+            avg(session_ram) as session_ram
+            avg(session_diskio) as session_diskio
+            avg(session_logonduration) as session_logonduration
+            avg(session_protocollatency) as session_protocollatency
+            avg(session_score) as session_score
+            splitrow 
+               _time 
+                  period minute
+            $SearchFilter$
+            $AllowedIndexesFilter$
+         | timechart span=30m
+            eval(round(avg(session_cpu),1)) as CPU
+            eval(round(avg(session_ram),1)) as RAM
+            eval(round(avg(session_diskio),1)) as "Disk IO"
+            eval(round(avg(session_logonduration),1)) as "Logon duration"
+            eval(round(avg(session_protocollatency),1)) as "Protocol latency"
+            eval(round(avg(session_score),1)) as "Session score"
+      </query>
+   </search>
+   
+   <!-- Row 2 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Session score over time</title>
+         <chart id="Chart_Pane21">
+            <search base="Search_ScoresOverTime">
+               <query>
+                  | fields _time "Session score"
+               </query>
+            </search>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.maximumNumber">10.0</option>
+            <option name="charting.axisY.minimumNumber">0.0</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.chart.nullValueMode">connect</option>
+            <option name="charting.chart.showDataLabels">none</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.layout.splitSeries">0</option>
+            <option name="charting.legend.mode">standard</option>
+            <option name="charting.seriesColors">["0x5A4575","0x43B5C6","0x6B6B6B","0x3D8A94","0x333333","0xC6DBDE","0xb98b73"]</option>
+            <option name="charting.chart.nullValueMode">connect</option>
+         </chart>
+      </panel>
+
+   </row>
+
+   <!-- Row 3 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Component scores over time</title>
+         <chart id="Chart_Pane31">
+            <search base="Search_ScoresOverTime">
+               <query>
+                  | fields _time CPU RAM "Disk IO" "Logon duration" "Protocol latency"
+               </query>
+            </search>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisY.maximumNumber">10.0</option>
+            <option name="charting.axisY.minimumNumber">0.0</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.chart.nullValueMode">connect</option>
+            <option name="charting.chart.showDataLabels">none</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.layout.splitSeries">0</option>
+            <option name="charting.legend.mode">standard</option>
+            <option name="charting.seriesColors">["0x5A4575","0x43B5C6","0x6B6B6B","0x3D8A94","0x333333","0xC6DBDE","0xb98b73"]</option>
+            <option name="charting.chart.nullValueMode">connect</option>
+         </chart>
+      </panel>
+
+   </row>
+   
+   <!-- Row 4 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>CPU scores (worst 10 sessions)</title>
+         <input type="dropdown" token="Panel41Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Lowest_10_Charts">
+               <query>
+                  | sort limit=10 "$Panel41Function1$(session_cpu)"
+                  | fields
+                     Session
+                     "$Panel41Function1$(session_cpu)"
+                     SessionGUID
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">$Panel41Function1$(session_cpu)</option>
+            <option name="charting.axisTitleY.visibility">visible</option>
+            <option name="charting.seriesColors">["0x5A4575"]</option>
+            <option name="charting.chart.overlayFields">SessionGUID</option>
+            <option name="charting.axisY.maximumNumber">10</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterExpression=$row.SessionGUID|s$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Disk IO scores (worst 10 sessions)</title>
+         <input type="dropdown" token="Panel42Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Lowest_10_Charts">
+               <query>
+                  | sort limit=10 "$Panel42Function1$(session_diskio)"
+                  | fields
+                     Session
+                     "$Panel42Function1$(session_diskio)"
+                     SessionGUID
+               </query>
+            </search>
+            <fields>["Session","$Panel42Function1$(session_diskio)"]</fields>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">$Panel42Function1$(session_diskio)</option>
+            <option name="charting.axisTitleY.visibility">visible</option>
+            <option name="charting.seriesColors">["0x43B5C6"]</option>
+            <option name="charting.chart.overlayFields">SessionGUID</option>
+            <option name="charting.axisY.maximumNumber">10</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterExpression=$row.SessionGUID|s$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 5 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>RAM scores (worst 10 sessions)</title>
+         <input type="dropdown" token="Panel51Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Lowest_10_Charts">
+               <query>
+                  | sort limit=10 "$Panel51Function1$(session_ram)"
+                  | fields
+                     Session
+                     "$Panel51Function1$(session_ram)"
+                     SessionGUID
+               </query>
+            </search>
+            <fields>["Session","$Panel51Function1$(session_ram)"]</fields>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">$Panel51Function1$(session_ram)</option>
+            <option name="charting.axisTitleY.visibility">visible</option>
+            <option name="charting.seriesColors">["0x6B6B6B"]</option>
+            <option name="charting.chart.overlayFields">SessionGUID</option>
+            <option name="charting.axisY.maximumNumber">10</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterExpression=$row.SessionGUID|s$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Other scores per session (worst 10 sessions)</title>
+         <input type="dropdown" token="Panel52Function1" id="Input_Panel52Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <input type="dropdown" token="Panel52Field1" id="Input_Panel52Field1" searchWhenChanged="true">
+            <choice value="session_logonduration">Logon duration</choice>
+            <choice value="session_protocollatency">Protocol latency</choice>
+            <default>session_logonduration</default>
+            <label>Field:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+         </input>
+         <chart>
+            <search base="Search_Lowest_10_Charts">
+               <query>
+                  | sort limit=10 "$Panel52Function1$($Panel52Field1$)"
+                  | fields
+                     Session
+                     "$Panel52Function1$($Panel52Field1$)"
+                     SessionGUID
+               </query>
+            </search>
+            <fields>["Session","$Panel52Function1$($Panel52Field1$)"]</fields>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">$Panel52Function1$($Panel52Field1$)</option>
+            <option name="charting.axisTitleY.visibility">visible</option>
+            <option name="charting.seriesColors">["0x3D8A94"]</option>
+            <option name="charting.chart.overlayFields">SessionGUID</option>
+            <option name="charting.axisY.maximumNumber">10</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterExpression=$row.SessionGUID|s$
+                  ]]>
+               </link>
+            </drilldown>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 6 -->
+   <row>
+      <panel>
+         <title>Session scores grouped</title>
+         <input type="dropdown" token="Panel61GroupBy" searchWhenChanged="true">
+            <choice value="AdDomainDns">AD domain DNS</choice>
+            <choice value="AdOu">AD OU</choice>
+            <choice value="AdSite">AD site</choice>
+            <choice value="SessionBrokerType">Broker type</choice>
+            <choice value="CtxDeliveryGroupName">Citrix delivery group</choice>
+            <choice value="CtxFarmName">Citrix site</choice>
+            <choice value="CtxMachineCatalogName">Citrix machine catalog</choice>
+            <choice value="SessionClientDomain">Client domain</choice>
+            <choice value="SessionClientOsLanguage">Client OS language</choice>
+            <choice value="SessionClientPlatform">Client platform</choice>
+            <choice value="SessionClientUserDomain">Client user domain</choice>
+            <choice value="SessionClientVersion">Client version</choice>
+            <choice value="SessionConnectionState">Connection state</choice>
+            <choice value="CPUCoresLogical">CPU cores (logical)</choice>
+            <choice value="CPUCoresPhysical">CPU cores (physical)</choice>
+            <choice value="CPUName">CPU name</choice>
+            <choice value="CPUSockets">CPU sockets</choice>
+            <choice value="CPUMaxMhz">CPU speed (MHz)</choice>
+            <choice value="HwIsVirtualMachine">Hardware: is VM?</choice>
+            <choice value="HwHypervisorVendor">Hardware: hypervisor</choice>
+            <choice value="IsBatteryPresent">Hardware: has battery?</choice>
+            <choice value="HwManufacturer">Hardware manufacturer</choice>
+            <choice value="HwModel">Hardware model</choice>
+            <choice value="SessionProtocol">Protocol</choice>
+            <choice value="OsBuild">OS build number</choice>
+            <choice value="OsPlatform">OS platform [Windows|macOS]</choice>
+            <choice value="OsType">OS type</choice>
+            <choice value="OsUpdateBuildRevision">OS UBR (Update Build Revision)</choice>
+            <choice value="OsVersion">OS version number</choice>
+            <choice value="RAMSizeGB">RAM size (GB)</choice>
+            <choice value="SessionBrokerDnsVmw">VMware broker DNS name</choice>
+            <choice value="SessionBrokerRemoteIpVmw">VMware broker remote IP</choice>
+            <choice value="SessionBrokerTunnelUrlVmw">VMware broker tunnel URL</choice>
+            <choice value="SessionBrokerUrlVmw">VMware broker URL</choice>
+            <default>SessionProtocol</default>
+            <label>Group by:</label>
+            <change>
+               <condition value="*">
+                  <set token="Panel61GroupByDisplay">$label$</set>
+                  <unset token="DrilldownFilterBy61"></unset>
+               </condition>
+            </change>
+         </input>
+         <input type="dropdown" token="Panel61Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel61Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel61Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel61Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel61Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel61Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel61Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel61Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Score_Session` Score_Session
+                     $Panel61Function1$(session_cpu) as session_cpu
+                     $Panel61Function1$(session_ram) as session_ram
+                     $Panel61Function1$(session_diskio) as session_diskio
+                     $Panel61Function1$(session_logonduration) as session_logonduration
+                     $Panel61Function1$(session_protocollatency) as session_protocollatency
+                     $Panel61Function1$(session_score) as session_score
+                     latest(SessionGUID) as SessionGUID
+                     dc(SessionGUID) as "# Sessions"
+                     splitrow
+                        $Panel61GroupBy$ as "$Panel61GroupByDisplay$"
+                     $SearchFilter$
+                     $AllowedIndexesFilter$
+                  | eval "$Panel61Function1Display$ Session score" = round(session_score,1)
+                  | eval "$Panel61Function1Display$ CPU score" = round(session_cpu,1)
+                  | eval "$Panel61Function1Display$ RAM score" = round(session_ram,1)
+                  | eval "$Panel61Function1Display$ Disk IO score" = round(session_diskio,1)
+                  | eval "$Panel61Function1Display$ Logon duration score" = round(session_logonduration,1)
+                  | eval "$Panel61Function1Display$ Protocol latency score" = round(session_protocollatency,1)
+                  | eval sortfield=lower(Session)
+                  | table
+                     "$Panel61GroupByDisplay$"
+                     "# Sessions"
+                     "$Panel61Function1Display$ Session score"
+                     "$Panel61Function1Display$ CPU score"
+                     "$Panel61Function1Display$ RAM score"
+                     "$Panel61Function1Display$ Disk IO score"
+                     "$Panel61Function1Display$ Logon duration score"
+                     "$Panel61Function1Display$ Protocol latency score"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <option name="count">20</option>
+            <option name="drilldown">row</option>
+            <format type="color" field="$Panel61Function1Display$ Session score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel61Function1Display$ CPU score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel61Function1Display$ RAM score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel61Function1Display$ Disk IO score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel61Function1Display$ Logon duration score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel61Function1Display$ Protocol latency score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <drilldown>
+                <set token="DrilldownFilterBy61">$click.value$</set>
+            </drilldown>
+         </table>
+      </panel>
+   </row>
+   
+   <!-- Row 7 -->
+   <row depends="$DrilldownFilterBy61$">
+      <panel>
+         <title>Sessions in selected group: $Panel61GroupByDisplay$ = $DrilldownFilterBy61$</title>
+         <input type="dropdown" token="Panel71Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function:</label>
+            <prefix></prefix>
+            <suffix></suffix>
+            <change>
+               <condition value="avg">
+                  <set token="Panel71Function1Display">Avg.</set>
+               </condition>
+               <condition value="count">
+                  <set token="Panel71Function1Display">Count</set>
+               </condition>
+               <condition value="max">
+                  <set token="Panel71Function1Display">Max.</set>
+               </condition>
+               <condition value="median">
+                  <set token="Panel71Function1Display">Med.</set>
+               </condition>
+               <condition value="min">
+                  <set token="Panel71Function1Display">Min.</set>
+               </condition>
+               <condition value="stdev">
+                  <set token="Panel71Function1Display">Stdev</set>
+               </condition>
+               <condition value="sum">
+                  <set token="Panel71Function1Display">Sum</set>
+               </condition>
+            </change>
+         </input>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Score_Session` Score_Session
+                     $Panel71Function1$(session_cpu) as session_cpu
+                     $Panel71Function1$(session_ram) as session_ram
+                     $Panel71Function1$(session_diskio) as session_diskio
+                     $Panel71Function1$(session_logonduration) as session_logonduration
+                     $Panel71Function1$(session_protocollatency) as session_protocollatency
+                     $Panel71Function1$(session_score) as session_score
+                     latest(Session) as Session
+                     latest(SessionLogonTime) as SessionLogonTime
+                     splitrow
+                        SessionGUID
+                     filter $Panel61GroupBy$ is $DrilldownFilterBy61|s$
+                     $SearchFilter$
+                     $AllowedIndexesFilter$
+                  | eventstats count(Session) as SessionCount by Session
+                  | eval SessionLogonTimeHourMinute=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%H:%M")
+                  | eval SessionWithLogontime = Session." (".SessionLogonTimeHourMinute.")"
+                  | eval Session = if(SessionCount = 1,Session, SessionWithLogontime)
+                  | eval "$Panel71Function1Display$ Session score" = round(session_score,1)
+                  | eval "$Panel71Function1Display$ CPU score" = round(session_cpu,1)
+                  | eval "$Panel71Function1Display$ RAM score" = round(session_ram,1)
+                  | eval "$Panel71Function1Display$ Disk IO score" = round(session_diskio,1)
+                  | eval "$Panel71Function1Display$ Logon duration score" = round(session_logonduration,1)
+                  | eval "$Panel71Function1Display$ Protocol latency score" = round(session_protocollatency,1)
+                  | eval sortfield=lower(Session)
+                  | table
+                     Session
+                     "$Panel71Function1Display$ Session score"
+                     "$Panel71Function1Display$ CPU score"
+                     "$Panel71Function1Display$ RAM score"
+                     "$Panel71Function1Display$ Disk IO score"
+                     "$Panel71Function1Display$ Logon duration score"
+                     "$Panel71Function1Display$ Protocol latency score"
+                     SessionGUID
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields - sortfield
+               </query>
+            </search>
+            <fields>["Session","$Panel71Function1Display$ Session score","$Panel71Function1Display$ CPU score","$Panel71Function1Display$ RAM score","$Panel71Function1Display$ Disk IO score","$Panel71Function1Display$ Logon duration score","$Panel71Function1Display$ Protocol latency score"]</fields>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <format type="color" field="$Panel71Function1Display$ Session score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel71Function1Display$ CPU score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel71Function1Display$ RAM score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel71Function1Display$ Disk IO score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel71Function1Display$ Logon duration score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <format type="color" field="$Panel71Function1Display$ Protocol latency score">
+               <colorPalette type="list">[#DC4E41,#F8BE34,#53A051]</colorPalette>
+               <scale type="threshold">4,7</scale>
+            </format>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterExpression=$row.SessionGUID|s$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+      </panel>
+   </row>
+
+</form>

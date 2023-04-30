@@ -1,0 +1,73 @@
+<form stylesheet="nav_hutch.css" version="1.1">
+  <label>Top Sources, Sourcetypes, and Hosts</label>
+  <search id="baseSearch">
+    <query>
+      index=$indexes$ "$keyword_field$"
+    </query>
+  </search>
+  <fieldset>
+    <input type="multiselect" token="indexes" searchWhenChanged="true">
+      <label>Choose index(s)</label>
+      <choice value="*">All</choice>
+      <search>
+        <query> |eventcount summarize=false index=* | dedup index | fields index|rename index as title| search NOT title=splunklogger NOT title=history NOT title=summary | table title </query>
+      </search>
+      <fieldForLabel>Index</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <delimiter> OR index= </delimiter>
+    </input>
+      <input type="text" token="keyword_field">
+          <label>Enter keyword (e.g. error) to find</label>
+      </input>
+      <input type="time" />
+  </fieldset>
+ <row>
+      <table>
+          <title>Top Sources</title>
+	  <search base="baseSearch">
+            <query>|top source limit=10</query>
+	  </search>
+      </table>
+      <chart>
+	<title>Top Sources by time</title>
+	<search base="baseSearch">
+	  <query>|timechart count by source</query>
+	</search>
+	<option name="charting.chart">line</option>
+      </chart>
+ </row>
+
+ <row>
+      <table>
+          <title>Top SourceTypes</title>
+	  <search base="baseSearch">
+            <query>|top sourcetype limit=10</query>
+	  </search>
+      </table>
+      <chart>
+	<title>Top SourceTypes by time</title>
+	<search base="baseSearch">
+	  <query>|timechart count by sourcetype</query>
+	</search>
+	<option name="charting.chart">line</option>
+      </chart>
+ </row>
+
+ <row>
+      <table>
+          <title>Top Hosts</title>
+	  <search base="baseSearch">
+            <query>|top host limit=10</query>
+	  </search>
+      </table>
+      <chart>
+	<title>Top Hosts by time</title>
+	<search base="baseSearch">
+	  <query>|timechart count by host</query>
+	</search>
+	<option name="charting.chart">line</option>
+      </chart>
+ </row>
+
+</form>
+

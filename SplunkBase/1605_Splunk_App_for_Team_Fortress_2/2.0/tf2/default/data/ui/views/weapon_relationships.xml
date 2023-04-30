@@ -1,0 +1,57 @@
+<form script="autodiscover.js">
+  <label>Weapon Relationships</label>
+  <row>
+    <panel>
+      <html>
+            <h2>Interactive Parallel Chords - Last 60 Minutes (Click and drag across column values)</h2>
+
+            <div id="custom_search" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options="{                         &quot;search&quot;: &quot;tag=tf2 player_action=killed | join player_name type=outer [search tag=tf2 player_action=killed | stats count as total_kills by player_name] | join victim_name type=outer [search tag=tf2 player_action=killed | stats count as total_deaths by victim_name] | table player_name total_kills player_weapon player_team victim_team total_deaths victim_name&quot;,                         &quot;earliest_time&quot;: &quot;-1h&quot;                     }">
+            </div>
+
+            <div id="custom" class="splunk-view" data-require="app/tf2/components/parallelcoords/parallelcoords" data-options="{                         &quot;managerid&quot;: &quot;custom_search&quot;,                         &quot;height&quot;: 400                     }">
+            </div>
+
+        </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <input type="dropdown" token="player_tok" searchWhenChanged="true">
+        <label>Select a Player</label>
+        <choice value="*">All</choice>
+        <populatingSearch earliest="-60m@m" latest="now" fieldForLabel="player_name" fieldForValue="player_name">tag=tf2 | stats count by player_name</populatingSearch>
+        <default>*</default>
+      </input>
+      <chart>
+        <title>Weapon Statistics - Last 60 Minutes</title>
+        <searchString>tag=tf2 player_action=killed player_name=$player_tok$ | timechart count by player_weapon</searchString>
+        <earliestTime>-1h@m</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisLabelsY.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsY.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">1</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

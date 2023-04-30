@@ -1,0 +1,17 @@
+<dashboard script="table_icons_rangemap.js" stylesheet="table_decorations.css">
+    <label>SQL Hosts</label>
+    
+    <row>
+        <table id="table1">
+            <title>SQL Hosts</title>
+            <searchName>SQL Host List</searchName>
+            <option name="count">25</option>
+            <option name="displayRowNumbers">false</option>
+            <option name="showPager">true</option>
+            <drilldown>
+                <link>/app/Splunk_for_SQLServer/ops_host?form.SQLHost=$row.host$</link>
+            </drilldown>
+        </table>
+    </row>
+    
+</dashboard>

@@ -1,0 +1,46 @@
+<dashboard>
+  <label>Full Object ID Support</label>
+  <description></description>
+  <row>
+    <panel>
+      <html>
+        <h2>Full Object ID Support</h2>
+        <p>Assign unique IDs to rows, panels, elements, and form inputs for easier custom js/css handling.</p>
+        <h3>Example Syntax</h3>
+        <pre>
+<![CDATA[
+<form>
+  <label>sample id example</label>
+  <description></description>
+  <fieldset submitButton="false">
+    <input type="time" token="time" id="time_picker">
+      <label></label>
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row id="row_1">
+    <panel id="panel_1">
+      <title>Top Sourcetype</title>
+      <table id="table_1">
+        <search>
+          <query>index=_internal | top sourcetype</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>]]>
+        </pre>
+      </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Pivot | Splunk</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon_enterprise.ico" />
+    <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/pages/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/splunk6overview/dashboard.css" />
+    <!--[if IE 7]><link rel="stylesheet" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/sprites-ie7.css" /><![endif]-->
+</head>
+<body class="simplexml preload">
+
+<!-- 
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system. 
+-->
+
+<div class="header">
+    <div id="placeholder-splunk-bar">
+        <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+    </div>
+    <div id="placeholder-app-bar"></div>
+</div>
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+    <div class="dashboard-header clearfix">
+        <h2>Pivot</h2>
+    </div>
+        <div class="dashboard-row dashboard-row3">
+        <div class="dashboard-cell" style="width: 50%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element html" id="element4" style="width: 100%">
+                        <div class="panel-body html">
+                                <div><p></p><div><a href="/app/splunk6overview/datamodel_landing"><h2 align="left">Previous: Data Model</h2></a></div></div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-cell" style="width: 50%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element html" id="element5" style="width: 100%">
+                        <div class="panel-body html">
+                                <div><p></p><div><a href="/app/splunk6overview/predictive_landing"><h2 align="right">Next: Predictive Analytics</h2></a></div></div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row1">
+        <div class="dashboard-cell" style="width: 25%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element html" id="element1" style="width: 100%">
+                        <div class="panel-body html">
+                                <div><p>Pivot enables Business Analysts and System Admins alike to quickly generate sophisticated visualizations and reports without using
+				the Search Processing Language (SPL). Users can access different chart types from the side bar to visualize their data in many ways. </p>
+				<p>Queries using the Pivot interface are powered by underlying data models, which are usually designed and implemented by Knowledge Managers familiar with SPL.</p>
+		<h1>Creating a Pivot</h1><div style="margin-left: 20px;">
+                After the data model has been created, complete the following steps to create a pivot: 
+		<li>Select a data model</li> 
+		<li>Select an object to create the pivot</li>
+		<li>Choose a time range filter</li> 
+		<li>Select the field(s) to populate the rows - Click the <img src="/static/app/splunk6overview/images/plus_in_box.png"> icon in the "Split Row" functionality to select what you want to populate the rows with</li>
+		<li>Select the field(s) to sort the columns by - Use the <img src="/static/app/splunk6overview/images/plus_in_box.png"> icon in the "Split Column" functionality to select what you want to populate the rows with</li>
+		<li>Select visualization format</li>
+		<li>Save as a report or dashboard</li><br>
+		<h2>Examples</h2>
+		<a href="/app/splunk6overview/pivot?">Sample data model to build a pivot report or dash board</a>
+            </div></div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>        
+          <div class="dashboard-cell" style="width: 75%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element html" id="element2" style="width: 100%">
+                        <div class="panel-body html">
+                          <div><p></p><div><iframe height="800" width="1000" frameborder="0" src_doc="/app/splunk6overview/pivot?earliest=0&q=| pivot FAA flights count(flights)" src="/app/splunk6overview/pivot?earliest=0&q=| pivot FAA flights count(flights)"></iframe></div></div>
+                      </div>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-row dashboard-row2">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">                
+                <div class="panel-element-row">
+                    <div class="dashboard-element html" id="element3" style="width: 100%">
+                        <div class="panel-body html">
+                                <div><p></p><h1>Resources</h1><a href="/help?location=whatsnew.pivot" target="_blank"><h2>Learn More about pivot</h2></a><a href="http://docs.splunk.com/Documentation/Splunk/6.0beta/ReleaseNotes/MeetSplunk" target="_blank"><h2>Documentation</h2></a></div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer"></div>
+
+<!-- 
+END LAYOUT
+-->
+
+<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/build/simplexml.min/config.js"></script>
+<script type="text/javascript">
+require.config({
+    baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+    waitSeconds: 0 // Disable require.js load timeout
+});
+
+//
+// LIBRARY REQUIREMENTS
+//
+// In the require function, we include the necessary libraries and modules for
+// the HTML dashboard. Then, we pass variable names for these libraries and
+// modules as function parameters, in order.
+// 
+// When you add libraries or modules, remember to retain this mapping order
+// between the library or module and its function parameter. You can do this by
+// adding to the end of these lists, as shown in the commented examples below.
+
+require([
+    "splunkjs/mvc",
+    "splunkjs/mvc/utils",
+    "splunkjs/mvc/tokenutils",
+    "underscore",
+    "jquery",
+    "splunkjs/mvc/simplexml",
+    "splunkjs/mvc/headerview",
+    "splunkjs/mvc/footerview",
+    "splunkjs/mvc/simplexml/dashboard",
+    "splunkjs/mvc/simplexml/element/chart",
+    "splunkjs/mvc/simplexml/element/event",
+    "splunkjs/mvc/simplexml/element/html",
+    "splunkjs/mvc/simplexml/element/list",
+    "splunkjs/mvc/simplexml/element/map",
+    "splunkjs/mvc/simplexml/element/single",
+    "splunkjs/mvc/simplexml/element/table",
+    "splunkjs/mvc/simpleform/input/dropdown",
+    "splunkjs/mvc/simpleform/input/radiogroup",
+    "splunkjs/mvc/simpleform/input/text",
+    "splunkjs/mvc/simpleform/input/timerange",
+    "splunkjs/mvc/simpleform/input/submit",
+    "splunkjs/mvc/searchmanager",
+    "splunkjs/mvc/savedsearchmanager",
+    "splunkjs/mvc/postprocessmanager",
+    "splunkjs/mvc/simplexml/urltokenmodel"
+    // Add comma-separated libraries and modules manually here, for example:
+    // ..."splunkjs/mvc/simplexml/urltokenmodel",
+    // "splunkjs/mvc/checkboxview"
+    ],
+    function(
+        mvc,
+        utils,
+        TokenUtils,
+        _,
+        $,
+        DashboardController,
+        HeaderView,
+        FooterView,
+        Dashboard,
+        ChartElement,
+        EventElement,
+        HtmlElement,
+        ListElement,
+        MapElement,
+        SingleElement,
+        TableElement,
+        DropdownInput,
+        RadioGroupInput,
+        TextInput,
+        TimeRangeInput,
+        SubmitButton,
+        SearchManager,
+        SavedSearchManager,
+        PostProcessManager,
+        UrlTokenModel
+
+        // Add comma-separated parameter names here, for example: 
+        // ...UrlTokenModel, 
+        // CheckboxView
+        ) {
+
+
+
+        var pageLoading = true;
+
+
+        // 
+        // TOKENS
+        //
+        
+        // Create token namespaces
+        var urlTokenModel = new UrlTokenModel();
+        mvc.Components.registerInstance('url', urlTokenModel);
+        var defaultTokenModel = mvc.Components.getInstance('default', {create: true});
+        var submittedTokenModel = mvc.Components.getInstance('submitted', {create: true});
+
+        urlTokenModel.on('url:navigate', function() {
+            defaultTokenModel.set(urlTokenModel.toJSON());
+            if (!_.isEmpty(urlTokenModel.toJSON()) && !_.all(urlTokenModel.toJSON(), _.isUndefined)) {
+                submitTokens();
+            } else {
+                submittedTokenModel.clear();
+            }
+        });
+
+        // Initialize tokens
+        defaultTokenModel.set(urlTokenModel.toJSON());
+
+        var defaultUpdate = {};
+
+        var submitTokens = function() {
+            submitTokensSoon(pageLoading);
+        };
+
+        var submitTokensSoon = _.debounce(function(replaceState) {
+            submittedTokenModel.set(defaultTokenModel.toJSON());
+            urlTokenModel.saveOnlyWithPrefix('form\\.', defaultTokenModel.toJSON(), {
+                replaceState: replaceState
+            });
+        });
+
+
+        //
+        // SEARCH MANAGERS
+        //
+
+
+
+        //
+        // SPLUNK HEADER AND FOOTER
+        //
+
+        new HeaderView({
+            id: 'header',
+            section: 'dashboards',
+            el: $('.header'),
+            acceleratedAppNav: true
+        }, {tokens: true}).render();
+
+        new FooterView({
+            id: 'footer',
+            el: $('.footer')
+        }, {tokens: true}).render();
+
+
+        //
+        // DASHBOARD EDITOR
+        //
+
+        new Dashboard({
+            id: 'dashboard',
+            el: $('.dashboard-body')
+        }, {tokens: true}).render();
+
+
+        //
+        // VIEWS: VISUALIZATION ELEMENTS
+        //
+
+        var element1 = new HtmlElement({
+            "id": "element1",
+            "el": $('#element1')
+        }, {tokens: true}).render();
+        
+        var element2 = new HtmlElement({
+            "id": "element2",
+            "el": $('#element2')
+        }, {tokens: true}).render();
+        
+        var element3 = new HtmlElement({
+            "id": "element3",
+            "el": $('#element3')
+        }, {tokens: true}).render();
+        
+        var element4 = new HtmlElement({
+            "id": "element4",
+            "el": $('#element4')
+        }, {tokens: true}).render();
+        
+        var element5 = new HtmlElement({
+            "id": "element5",
+            "el": $('#element5')
+        }, {tokens: true}).render();
+        
+
+        submitTokens();
+
+
+        //
+        // DASHBOARD READY
+        //
+
+        DashboardController.ready();
+        pageLoading = false;
+
+    }
+);
+</script>
+</body>
+</html>

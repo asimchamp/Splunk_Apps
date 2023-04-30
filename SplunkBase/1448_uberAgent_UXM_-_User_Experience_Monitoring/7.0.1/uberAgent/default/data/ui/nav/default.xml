@@ -1,0 +1,113 @@
+<nav> 
+
+   <collection label="Splunk">
+      <view name="alerts" />
+      <view name="dashboards" />
+      <view name="datasets" />
+      <view name="pivot" />
+      <view name="reports" />
+      <view name="search" />
+   </collection>
+   
+   <collection label="Experience Score">
+    <view name="experience_score_overview" default="true"/>
+    <view name="machine_scores" />
+    <view name="session_scores" />
+    <view name="application_scores" />
+   </collection>
+   
+   <collection label="Machines">
+      <view name="machine_detail" />
+      <view name="machine_gpuusage" />
+	  <view name="windows_performance_counters" />
+      <divider />      
+      <a href="process_netcomm?Tokenlink_Panel11=host&amp;Tokenlink_Panel12=host&amp;Tokenlink_Panel31=host">Machine Network Communication</a>
+      <view name="machine_networkconfig" />
+      <a href="application_netissues?Tokenlink_Panel21=host&amp;Tokenlink_Panel31=host">Machine Network Issues</a>
+      <view name="machine_smbclient" />
+      <divider />	  
+      <view name="machine_uptime" />
+	  <view name="machine_bugcheck" />
+      <divider />
+      <view name="machine_inventory" />
+      <view name="machine_storage" />
+   </collection>
+
+   <collection label="Sessions">
+      <view name="session_overview" />
+      <view name="session_user_detail"/>
+      <view name="session_0_detail" />
+      <view name="session_logon_time" />
+      <view name="session_logon_time_policy" />
+      <view name="session_logoff_time" />
+   </collection>
+
+   <collection label="Applications">
+      <a href="process_detail?mode=app">Application Performance</a>
+      <view name="application_errors" />
+      <view name="application_ui_delays" />
+      <a href="process_startup_duration?Tokenlink_Panel21=Application&amp;Tokenlink_Panel22=Application&amp;Tokenlink_Panel31=Application&amp;mode=app">Application Startup</a>
+      <a href="process_netcomm?Tokenlink_Panel11=Application&amp;Tokenlink_Panel12=Application&amp;Tokenlink_Panel31=Application&amp;mode=app">Application Network Communication</a>
+      <a href="application_netissues?Tokenlink_Panel21=Application&amp;Tokenlink_Panel31=Application&amp;mode=app">Application Network Issues</a>
+      <a href="process_gpu_detail?Tokenlink_Panel11=Application&amp;Tokenlink_Panel21=Application&amp;Tokenlink_Panel22=Application&amp;Tokenlink_Panel41=AppName&amp;mode=app">Application GPU</a>
+      <divider />
+      <view name="browser_webappperf" />
+      <view name="browser_usage" />
+      <divider />
+      <view name="browser_chrome" />
+      <view name="browser_ie" />
+      <view name="outlook_plugin_load" />
+      <divider />
+      <view name="application_inventory" />
+      <view name="application_usage" />
+      <view name="update_inventory" />
+   </collection>
+
+   <collection label="Processes">
+      <view name="process_detail" />
+      <a href="application_ui_delays?mode=process">Process UI Unresponsiveness</a>
+      <a href="process_startup_duration?Tokenlink_Panel21=Process&amp;Tokenlink_Panel22=Process&amp;Tokenlink_Panel31=Process">Process Startup</a>
+      <a href="process_netcomm?Tokenlink_Panel11=Process&amp;Tokenlink_Panel12=Process&amp;Tokenlink_Panel31=Process&amp;mode=proc">Process Network Communication</a>
+      <a href="application_netissues?Tokenlink_Panel21=Process&amp;Tokenlink_Panel31=Process&amp;mode=proc">Process Network Issues</a>
+      <a href="process_gpu_detail?Tokenlink_Panel11=Process&amp;Tokenlink_Panel21=Process&amp;Tokenlink_Panel22=Process&amp;Tokenlink_Panel41=ProcName&amp;mode=proc">Process GPU</a>
+   </collection>
+
+   <collection label="On/Off Transitions">
+      <view name="boot_duration" />
+      <view name="boot_delays" />
+      <view name="standby_duration" />
+      <view name="standby_delays" />
+      <view name="shutdown_duration" />
+      <view name="shutdown_delays" />
+   </collection>
+
+   <collection label="SBC/VDI">
+      <view name="citrix_published_apps" />
+      <view name="citrix_databases" />
+      <view name="citrix_licensing" />
+      <view name="citrix_machines" />
+      <divider />
+      <view name="citrixadc_performance" />
+      <view name="citrixadc_virtual_server_performance" />
+      <view name="citrixadc_gateway" />
+      <view name="citrixadc_inventory" />
+      <divider />
+      <view name="citrixsession_protocol_insights" />
+      <view name="citrixsession_configuration_details" />
+      <divider />
+      <view name="session_info_vmw" />
+      <divider />
+      <view name="sbc_sizing" />
+   </collection>
+
+   <collection label="Licensing">
+      <view name="data_volume" />
+      <view name="licensing_status" />
+      <view name="uberagent_versions" />
+   </collection>
+
+   <collection label="Help">
+      <a href="https://uberagent.com/docs/" target="_blank">Documentation</a>
+      <a href="https://support.uberagent.com/" target="_blank">Support</a>
+   </collection>
+</nav>

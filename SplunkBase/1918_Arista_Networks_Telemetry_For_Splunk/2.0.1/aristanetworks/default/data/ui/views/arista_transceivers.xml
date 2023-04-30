@@ -1,0 +1,34 @@
+<form version="1.1">
+  <label>Transceivers Inventory Table</label>
+  <fieldset autoRun="true" submitButton="false">
+    <html>
+         <p>Filter using any field [ switchname=* interface=* mfgname=* model=* serialnum=* ]</p>
+      </html>
+    <input type="text" token="filter">
+      <default>switchname=* model!="NotPresent"</default>
+      <suffix/>
+    </input>
+    <input type="time" token="timerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Matching Events</title>
+      <table>
+        <search>
+          <query>
+                 sourcetype="arista_switch_inventory" AristaXcvrInventory $filter$ | table switchname, interface, mfgname, model, serialnum | dedup switchname interface | sort switchname,interface
+          </query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

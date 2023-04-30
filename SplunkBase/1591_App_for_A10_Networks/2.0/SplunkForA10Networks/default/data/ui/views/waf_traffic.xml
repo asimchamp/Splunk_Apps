@@ -1,0 +1,246 @@
+<form script="link_switcher.js, autodiscover.js">
+  <label>Traffic</label>
+  <searchTemplate>search index="a10networks" sourcetype="a10_waf" $cs1$ $policy$ $src$ $dst$  | stats count by act src dst dpt hostname spt _time</searchTemplate>
+  <earliestTime>$earliest$</earliestTime>
+  <latestTime>$latest$</latestTime>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time Picker</label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="text" token="dst">
+      <label>Destination IP:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="policy">
+      <label>Policy Name:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="src">
+      <label>Source IP:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="cs1">
+      <label>Template:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h2>WAF Traffic Summary</h2>This report provides details about the Web Application Firewall Traffic. This dashboard reports the WAF module events.</html>
+  </row>
+  <row grouping="2">
+    <single>
+      <title>Session Stats</title>
+      <searchPostProcess>| stats dc(src) as count</searchPostProcess>
+      <option name="beforeLabel">Source IPs:</option>
+      <option name="field">count</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>| stats dc(dst) as count</searchPostProcess>
+      <option name="beforeLabel">Destination IPs:</option>
+      <option name="field">count</option>
+      <option name="linkView">search</option>
+    </single>
+  </row>
+  <row grouping="3">
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Traffic Over Time</b>
+      <div class="link-switcher" data-items="link1,link2"/>
+    </html>
+    <chart id="link1">
+      <title>By Action</title>
+      <searchPostProcess>timechart sum(count) as count by act</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Traffic by action Over Time</option>
+      <option name="charting.axisTitleY.text">Events</option>
+    </chart>
+    <chart id="link2">
+      <title>By Device</title>
+      <searchPostProcess>timechart sum(count) as count by hostname</searchPostProcess>
+    </chart>
+  </row>
+  <row grouping="3,3">
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Allowed by Source IP</b>
+      <div class="link-switcher" data-items="link3,link4"/>
+    </html>
+    <chart id="link3">
+      <title>Chart</title>
+      <searchPostProcess>search ((act="allow" OR act="learn") NOT src="") | sort - count |stats sum(count) as count by src | head 15</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Source IP</option>
+    </chart>
+    <table id="link4">
+      <title>Table</title>
+      <searchPostProcess>search ((act="allow" OR act="learn") NOT src="") | sort - count | stats sum(count) as count by src | rename src as "Source IP"| head 15</searchPostProcess>
+    </table>
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Allowed by Destination</b>
+      <div class="link-switcher" data-items="link5,link6"/>
+    </html>
+    <chart id="link5">
+      <title>Chart</title>
+      <searchPostProcess>search ((act="allow" OR act="learn") NOT dst="") | sort - count |stats sum(count) as count by dst | rename dst as "Destination IP"| head 10</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Destination IP</option>
+    </chart>
+    <table id="link6">
+      <title>Table</title>
+      <searchPostProcess>search ((act="allow" OR act="learn") NOT dst="") | sort - count |stats sum(count) as count by dst | rename dst as "Destination IP"| head 10</searchPostProcess>
+    </table>
+    <chart>
+      <title>Allowed by Destination Port</title>
+      <searchPostProcess>search ((act="allow" OR act="learn") NOT (ddst="" OR dpt="" OR dpt="0"))| sort - count|stats sum(count) as count by dpt | rename dpt as "Destination Port" | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Destination IP</option>
+    </chart>
+  </row>
+  <row grouping="3,3">
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Denied by Source IP</b>
+      <div class="link-switcher" data-items="link7,link8"/>
+    </html>
+    <chart id="link7">
+      <title>Chart</title>
+      <searchPostProcess>search  ((act=deny) NOT src="") | sort - count |stats sum(count) as count by src | head 15</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Source IP</option>
+    </chart>
+    <table id="link8">
+      <title>Table</title>
+      <searchPostProcess>search  ((act=deny) NOT src_ip="") | sort - count |stats sum(count) as count by src | rename src as "Source IP"| head 15</searchPostProcess>
+    </table>
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Denied by Destination</b>
+      <div class="link-switcher" data-items="link9,link10"/>
+    </html>
+    <chart id="link9">
+      <title>Chart</title>
+      <searchPostProcess>search  ((act=deny) NOT dst="")| sort - count |stats sum(count) as count by dst | head 10</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Destination IP</option>
+    </chart>
+    <table id="link10">
+      <title>Table</title>
+      <searchPostProcess>search  ((act=deny) NOT dst="")| sort - count |stats sum(count) as count by dst | head 10</searchPostProcess>
+    </table>
+    <chart>
+      <title>Denied by Destination Port</title>
+      <searchPostProcess>search  ((act=deny) NOT (dpt="" OR dpt="0"))| sort - count |stats sum(count) as count by dpt | head 10</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Destination IP</option>
+    </chart>
+  </row>
+  <row>
+    <event>
+      <title>WAF Events</title>
+      <option name="list.drilldown">full</option>
+      <option name="list.wrap">1</option>
+      <option name="maxLines">5</option>
+      <option name="raw.drilldown">full</option>
+      <option name="rowNumbers">0</option>
+      <option name="table.drilldown">1</option>
+      <option name="table.wrap">1</option>
+      <option name="type">list</option>
+      <fields>["host","source","sourcetype"]</fields>
+    </event>
+  </row>
+</form>

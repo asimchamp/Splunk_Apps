@@ -1,0 +1,68 @@
+<form version="1.1" script="timerange.js">
+  <label>Events by Component</label>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" searchWhenChanged="true" id="timerange">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="arrayId" searchWhenChanged="true">
+      <label>Array</label>
+      <search>
+        <query>
+          | inputlookup nesa_volume_groups | stats count by arrayId, arrayName
+        </query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+      <choice value="*">ALL</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="componentType" searchWhenChanged="true">
+      <label>Component Type</label>
+      <search>
+        <query>
+          | inputlookup nesa_volume_groups_component | search host="$arrayId$" | table componentType | dedup componentType | eval componentTypeVal="(componentType=\"".componentType."\")" | table componentType, componentTypeVal
+        </query>
+      </search>
+      <choice value="(eventType=&quot;*&quot;)">ALL</choice>
+      <choice value="(NOT eventType=&quot;*&quot;)">NONE</choice>
+      <selectFirstChoice>true</selectFirstChoice>
+      <fieldForLabel>componentType</fieldForLabel>
+      <fieldForValue>componentTypeVal</fieldForValue>
+    </input>
+    <input type="dropdown" token="event" searchWhenChanged="true">
+      <label>Event</label>
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <search>
+        <query>
+          | inputlookup nesa_volume_groups_component | search host="$arrayId$" $componentType$ | eval event=eventType." - ".description | table event,eventType | dedup event,eventType
+        </query>
+      </search>
+      <fieldForLabel>event</fieldForLabel>
+      <fieldForValue>eventType</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>MEL Event Table</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:mel-events host="$arrayId$" $componentType$ | rename comment AS "Deduplicate this, based on the sequenceNumber field" | stats min(_time) AS _time, min(_indextime) AS first_seen, max(_indextime) AS last_seen, first(_raw) AS _raw by host, sequenceNumber | fields - sequenceNumber | spath | `ctime(timeStamp)` AS stamp | `ctime(*seen)` | eval priority=replace(priority, "priority", "") | eval eventType=tostring(eventType, "hex") | search eventType="$event$" | JOIN type=LEFT host [inputlookup array_controller_label.csv | rename arrayId as host | table host, arrayName] | eval Time=_time | convert timeformat="%Y-%m-%d %H:%M:%S" ctime(Time) | table Time, first_seen, last_seen, arrayName, stamp, priority, critical, description, sequenceNumber, eventType, category, componentType, componentLocation.label, eventSourceController | rename first_seen AS "First seen"           last_seen AS "Last seen"           priority AS Priority   arrayName AS Array   stamp AS Stamp   critical AS Critical   description AS Description   sequenceNumber AS "Sequence #"   eventType AS "Event Type"   category AS Category   componentType AS "Component Type"   componentLocation.label AS "Component Location"   eventSourceController AS "Source Controller"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

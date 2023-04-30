@@ -1,0 +1,113 @@
+<dashboard>
+ <label>Installation</label>
+ <row>
+   <html>
+<h2>Step 1: Install the Splunk App for SQL Server on all Content SQL Servers</h2>
+
+<p>The backend storage for SharePoint is SQL Server. Install the Splunk App for 
+SQL Server, which is available on Splunkbase, prior to commencing work on SharePoint. 
+Ensure that audit data for database operations and perfmon data are flowing into 
+Splunk and that all SQL Server health and performance data is being recorded and 
+showing in the dashboards for that app prior to commencing the Splunk App for 
+SharePoint installation. You do not need to provide the query audit for the 
+database. Installation Documentation for the Splunk App for SQL Server is 
+available with that app. At least Splunk App for SQL Server v0.1.8 is required.</p>
+
+<h2>Step 2: Prepare the Splunk Indexers</h2>
+
+<p>Install the appropriate TA-Sharepoint20XX on the indexers and restart them. These
+add-ons are available on <a href="http://apps.splunk.com">apps.splunk.com</a> and must
+be configured separately.</p>
+
+<p>The TA-Sharepoint20XX add-on handles augmented line breaking and data fixing of the 
+ULS logs so that each transaction is available as a single event instead of 
+multiple events.  This is required for exception reporting within the dashboards.
+In addition, the TA-Sharepoint20XX add-on installs the required indices.</p>
+
+<h2>Step 3: Prepare your Sharepoint servers</h2>
+
+<p>The documentation provided with the TA-Sharepoint20XX add-on specifies the required
+configuration changes on your Sharepoint servers.</p>
+
+<h2>Step 4: Install the Splunk Universal Forwarder on the SharePoint servers</h2>
+
+<p>Refer to the documentation within the TA-Sharepoint20XX regarding the permissions
+required, taking special note of the Audit and Inventory Reader system.</p>
+
+<h2>Step 6: Deploy Add-ons to the SharePoint servers</h2>
+
+<p>The following add-ons need to be deployed to each server:</p>
+
+<ul>
+<li>Splunk_TA_windows v4.6.6 or later</li>
+<li>SA-ModularInput-PowerShell</li>
+<li>TA-Sharepoint20XX v0.2.0 or later</li>
+</ul>
+
+<p>Note that Technology Addons are distributed with data inputs disabled.  Ensure
+you enable the data inputs appropriate to the function.  Only enable the sp1Xaudit
+and sp1Xinventory on your Inventory and Audit Reader.  Enable all other inputs
+on all machines.</p>
+
+<h2>Step 7: Add cs-host to the SharePoint site logging</h2>
+
+<p>Normally, the full URL that the user types in is not available in the logs.  
+You need to adjust the logging specification for each web site in IIS as follows:</p>
+
+<ol>
+<li>Open up the IIS Manager</li>
+<li>Select the SharePoint Site</li>
+<li>Select Logging</li>
+<li>Click on Select Fields</li>
+<li>Check the box next to cs-host</li>
+<li>Click on OK</li>
+<li>Under Actions, click on Apply</li>
+<li>Repeat steps 2-7 for each additional SharePoint site and host</li>
+</ol>
+
+<p>This needs to be completed on each SharePoint host that answers IIS queries 
+(which is generally all of them).</p>
+
+<h2>Step 8: Add Users to the SharePoint role</h2>
+
+<p>Part of the app install will also enable a sharepoint role.  Add users that will 
+view the SharePoint data to the sharepoint role.  Without this step, they may not 
+be able to see the relevant data.  As an alternative to this process, you can also 
+edit the eventtypes supplied with the app to indicate which index the data resides 
+in.</p>
+
+<h2>Step 8: Wait 1 hour</h2>
+
+<p>We need some data from the inventory and this is gathered on a regular basis.  
+In general, this data is collected within the first hour of operation.</p>
+
+<h2>Step 9: Regenerate Lookup Files</h2>
+
+<p>There is a dashboard under Searches and Reports -> Lookup Generators called 
+the Lookup Table Builder. Use it to generate all the lookup tables.</p>
+
+<h2>Step 10: Check Errors</h2>
+
+<p>Log into Splunk and open the Splunk App for SharePoint.  Select 
+Health -> Farm Errors.  All errors in this report are significant.</p>
+
+<h2>Errors</h2>
+
+<p>If the modular inputs show errors, they will show up in the splunkd.log file.  The most common will be something to the 
+effect "SPFarm.Local == null", which would indicate a permissions problem.  Specifically, the user that is being used to run 
+the Splunk Universal Forwarder on the Audit and Inventory reader has not been added to the SPShellAdmin list with 
+Add-SPShellAdmin.</p>
+
+<p>If you get Farm Errors showing an SqlException 80131904, then it is likely that you have not provided access to all the
+databases.  Log on to the Central Administration host as a farm administrator with shell admin rights on SharePoint_Config;
+bring up a PowerShell host using "Run as Administrator", and type the following:</p>
+
+<pre>Add-PsSnapIn Microsoft.SharePoint.PowerShell
+Get-SPDatabase | Add-SPShellAdmin -UserName 'DOMAIN\user'</pre>
+
+<p>Replace the DOMAIN\user with the username of the user running the Splunk Universal Forwarder on the Inventory and Audit
+Reader.</p>
+
+   </html>
+  </row>
+</dashboard>

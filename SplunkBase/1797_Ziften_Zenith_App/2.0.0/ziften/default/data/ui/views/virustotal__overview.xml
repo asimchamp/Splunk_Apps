@@ -1,0 +1,130 @@
+<form>
+  <label>VT | Overview</label>
+  <row>
+    <panel>
+      <input type="text" token="md5">
+        <label>Enter MD5 to Lookup:</label>
+        <default/>
+      </input>
+      <table>
+        <title>VT results for $md5$</title>
+        <search>
+            <query>index=_internal|head 1|rename host as md5|eval md5="$md5$"|table md5|lookup vtlookup md5|makemv delim="," details|convert ctime(lookup_time)|fields md5 details score</query>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Unique Enterprise MD5s</title>
+        <search>
+            <query>|inputlookup image.csv|stats dc(imagefilemd5)</query>
+        </search>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="drilldown">all</option>
+        <option name="unit">distinct MD5s</option>
+        <option name="unitPosition">after</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search><query>|inputlookup vthistory.csv|fields md5|stats count(md5)</query></search>
+        <earliestTime>0</earliestTime>
+        <option name="drilldown">all</option>
+        <option name="unit">Total MD5s Searched</option>
+        <option name="unitPosition">after</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search><query>|inputlookup vthistory.csv|fields md5|stats dc(md5)</query></search>
+        <earliestTime>0</earliestTime>
+        <option name="drilldown">all</option>
+        <option name="unit">Distinct MD5s Searched</option>
+        <option name="unitPosition">after</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search><query>|inputlookup vthistory.csv|search hits &gt; 0|stats dc(md5)</query></search>
+        <earliestTime>0</earliestTime>
+        <option name="drilldown">all</option>
+        <option name="unit">Distinct MD5s with VT Hits</option>
+        <option name="unitPosition">after</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>VT Lookup History</title>
+        <search><query>|inputlookup vthistory.csv|rename lookup_time as _time|timechart span=1d count|tail 30|sort _time</query></search>
+        <earliestTime>0</earliestTime>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>VT Top Vendor Hit History</title>
+        <search><query>|inputlookup vthistory.csv|convert ctime(lookup_time)|makemv delim="," details|sort -lookup_time|fields lookup_time md5 details score|dedup md5|mvexpand details|eval vendor = replace(details, "\[(.*)\].*", "\1")|stats count by vendor|sort -count|head 12</query></search>
+        <earliestTime>0</earliestTime>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>VT All Vendor Hit History</title>
+        <search><query>|inputlookup vthistory.csv|convert ctime(lookup_time)|makemv delim="," details|sort -lookup_time|fields lookup_time md5 details score|dedup md5|mvexpand details|eval vendor = replace(details, "\[(.*)\].*", "\1")|stats count by vendor|sort -count</query></search>
+        <earliestTime>0</earliestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>VT Lookup History</title>
+        <search><query>|inputlookup vthistory.csv|convert ctime(lookup_time)|makemv delim="," details|sort -lookup_time|fields lookup_time md5 details score|rename md5 as imagefilemd5|lookup image_info imagefilemd5</query></search>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

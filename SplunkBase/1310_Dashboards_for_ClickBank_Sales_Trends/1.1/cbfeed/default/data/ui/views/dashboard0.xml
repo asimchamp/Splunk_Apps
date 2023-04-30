@@ -1,0 +1,87 @@
+<dashboard>
+  
+  <label>CBFeed App Overview</label>
+
+
+  <!-- First row of panels -->
+  <row>
+
+    <html>
+      <div class="content_width">
+      <h1>CBFeed App Overview</h1>
+
+      <h2 style="padding-top: 6px">About this app</h2>
+      <p>
+        This app provides trending analysis for digital products available for sale in the ClickBank marketplace. The purpose is to provide intelligence to internet marketers to help with decisions regarding which products to promote.
+     </p>
+     <p>
+        Note: The author of this app is not affiliated with ClickBank and does not represent the company in any capacity.  Questions regarding this app should be directed to the author, not ClickBank. 
+      </p>
+      <blockquote>
+        <p>
+          <b>How Product Data is Collected</b>
+          <br />Once per day a python script retrieves the daily marketplace xml feed via a scripted input. The script parses the xml and converts to a csv file that is then splunked and added to the cbfeed index.  
+        </p>
+        <p>
+         The marketplace feed is a one day snapshot of product sales statistics. Over the course of several days the index will grow and trending data will become more complete.  It is possible to backfill the index with older marketplace feed files. If interested, you can find<a href="http://www.winningbusinesssystem.com/"> historical feed files</a> at my blog. Look at the comments section of the input script to learn how to add older files.
+        </p> 
+        <p>
+          <b>Data Fields Explained</b>
+          <br />The feed provides a number of stats for each product in the marketplace. Since these stats are unique to ClickBank, it's important to know what they mean and how they can help you decide which products to promote.   
+        </p>
+<blockquote>
+
+
+        <p>
+<b>Initial $/sale:</b> This is the average amount that an affiliate earns for each sale of this product. One-time upsell purchases are also considered initial sales. This number takes into account refunds, chargebacks, and sales tax. Since vendors may offer products with different prices and commissions, the amount you earn on any given sale may not match this number exactly.
+<br /><b>Avg Rebill Total:</b> This number is only shown if the vendor offers recurring billing products (e.g., products like memberships and subscriptions that regularly bill customers over time). This number shows the average amount an affiliate makes on all of the rebilled sales. Note that this number doesn.t include the initial sale amount.
+<br /><b>Avg $/sale:</b> For one-time purchases, this number is the same as Initial $/sale. If the vendor offers recurring billing products, it equals the average total of the initial sale plus all rebills, divided by the number of initial sales. To put it simply, for every new purchase of this product, this amount is the average you.d make in total over the life of a new customer. However, this is just an average; this amount is not guaranteed.
+<br /><b>Avg %/sale:</b> This number shows the average commission rate earned for all sales of a vendor.s products, including one-time purchases, rebills, and upsell purchases. Since vendors can offer different commission rates for different types of products, this number may not exactly match the commission rate you earn on any given sale.
+<br /><b>Avg %/rebill:</b > This number is only shown if the vendor offers recurring billing products, and shows the average commission rate earned only on rebills.
+<br /><b>Grav:</b> Short for GRAVITY. performance statistic, this number represents a unique calculation by ClickBank that takes into account the number of different affiliates who earned a commission by promoting this product over the past 12 weeks. Since more recent transactions are given a higher value, this number can give you an idea of what products are .hot. at the moment, in terms of being promoted by many affiliates and making a good number of sales. However, high gravity can also indicate that there will be a lot of competition in promoting this product.
+<br /><b>Referred:</b> The fraction of a vendor's total sales that are referred by affiliates. Combining it with gravity, you can understand the behavior of affiliates. High referred generally means that there is a high amount of competition between affiliates who promote the product. A high Gravity score and low Referred score generally means that sales are being made without affiliates.
+<br /><b>Cat:</b> The Marketplace category and sub-category of the site.
+</p>
+      </blockquote>
+      </blockquote>
+
+ 
+      <h2 style="padding-top: 6px">Contents</h2>
+      <table cellpadding="12" bgcolor="#efefef">
+       
+ <tr valign="top">
+          <td width="20%">
+	  <p>
+          <b><u>Views</u></b>
+          <br /><b><a href="/app/cbfeed/overview">Marketplace Overview</a></b>
+<br />
+ An aggregate view of the index. Number of products and how many feed files indexed to date.
+<br />
+          <br /><b><a href="/app/cbfeed/product_gravity_sparklines">Product Gravity Trend Sparklines</a></b><br /> Sparkline visualization depicting gravity trends for each product ID.
+<br />
+          <br /><b><a href="/app/cbfeed/product_popularity_sparklines">Product Popularity Trend Sparklines</a></b><br /> Sparkline visualization depicting popularity rank trends for each product ID.
+<br />
+          <br /><b><a href="/app/cbfeed/category_analysis">Category Analysis</a></b><br /> Data visualizations for Marketplace product categories. For example -  "Top 10 Categories with Highest Avg Earnings Per Sale".
+<br />
+          <br /><b><a href="/app/cbfeed/product_analysis">Product Analysis</a></b><br /> Data visualizations for products in the Marketplace. For example - "Top 10 Products by Gravity".
+<br />
+          <br /><b><a href="/app/cbfeed/single_product_trend">Single Product Drilldown</a></b><br /> Detailed statistics and trends over time for specific products.
+<br />
+          <br /><b><a href="/app/cbfeed/cbfeed_flashtimeline">Custom Search</a></b><br /> Create your own custom searches to explore the indexed marketplace feeds. Make sure to preface your search with "index=cbfeed"
+<br /> 
+          </p>
+          </td>
+ <!--         <td bgcolor="white" width="1%"> </td> -->
+
+      </tr>
+      </table>      
+      
+<!--      <h2 style="padding-top: 6px">About the examples</h2> -->
+
+      </div>      
+    </html>
+  
+
+  </row>
+
+</dashboard>

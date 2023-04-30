@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Overview</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+    <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+  </fieldset>
+  
+  <row>
+    
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Bandwidth Savings: </option>
+      <searchString>|savedsearch "Overview - Total Bandwidth Savings Percent" observationPointId="$observerId$"</searchString>
+      </single>
+    
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Avg LAN Rate: </option>
+      <searchString> |savedsearch "Overview - LAN Throughput" observationPointId="$observerId$"</searchString>
+    </single>
+    
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Avg WAN Rate</option>
+      <searchString> |savedsearch "Overview - WAN Throughput" observationPointId="$observerId$"</searchString>
+    </single>
+    
+  </row>
+  <row>
+    
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Total Connections: </option>
+      <searchString> |savedsearch "Overview - Total Connections" observationPointId="$observerId$"</searchString>
+    </single>
+    
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Total Clients: </option>
+      <searchString> |savedsearch "Overview - Total Clients" observationPointId="$observerId$"</searchString>
+    </single>
+    
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Total Partners: </option>
+      <searchString> |savedsearch "Overview - Total Partners" observationPointId="$observerId$"</searchString>
+    </single>
+    
+  </row>
+  
+  <row>
+    <chart>
+      <searchString> |savedsearch "Overview - Total Bandwidth Savings by Top Applications" observationPointId="$observerId$"</searchString>
+      <title>Bandwidth Savings By Top Applications</title>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.axisY.minimumNumber">0</option>
+      <option name="charting.axisY.maximumNumber">100</option>
+      <option name="charting.axisTitleX.text">Applications</option> 
+      <option name="charting.axisTitleY.text">% BW Savings</option> 
+      <drilldown><link>/app/SplunkAppForCloudBridge/app-detail?form.appName=$click.value$</link></drilldown>   
+    </chart>
+     
+    <chart>
+      <searchString> |savedsearch "Overview - WAN Traffic by Top Applications" observationPointId="$observerId$"</searchString>
+      <title>WAN Traffic By Top Applications</title>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+      <drilldown><link>/app/SplunkAppForCloudBridge/app-detail?form.appName=$click.value$</link></drilldown>   
+    </chart>
+  </row>
+  
+  <row>
+    <chart>
+      <searchString> |savedsearch "Overview - WAN Throughput Over Time" observationPointId="$observerId$"</searchString>
+      <title>WAN Throughput</title>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">connect</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text">Mbps</option> 
+
+    </chart>
+  </row>
+  
+</form>

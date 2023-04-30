@@ -1,0 +1,268 @@
+<form>
+  <label>Performance Globale</label>
+  <fieldset submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <input type="time" token="field1">
+        <label>Période</label>
+        <default>
+          <earliest>@mon</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="TimeWindow">
+        <label>Fenêtre Temps Spécifique</label>
+        <choice value="&quot;&quot;">Tout le Temps</choice>
+        <choice value="`TimeWindow_WorkingDays`">Jours Ouvrés</choice>
+        <choice value="`TimeWindow_DayClosed`">Jours Fermés</choice>
+        <choice value="`TimeWindow_Weekend`">Weekend</choice>
+        <choice value="`TimeWindow_NightTime`">Nuits</choice>
+        <choice value="`TimeWindow_Lunch`">Déjeuner</choice>
+        <default>""</default>
+        <initialValue>""</initialValue>
+      </input>
+      <chart>
+        <title>Total des Appels Emis et Reçus dans le Mois</title>
+        <search>
+          <query>`sourcelog`
+(AVAYA_Is_Internal=0 OR AVAYA_Is_Internal=1)(AVAYA_Direction=O OR AVAYA_Direction=I)
+$TimeWindow$
+| timechart count
+| rename count AS " Nombre d'Appels"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Jours du Mois</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Appels Externes Reçus dans le Mois</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Is_Internal=0  AVAYA_Direction=I
+| timechart count
+| rename count AS "Nombre d'Appels"</query>
+          <earliest>@mon</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Jours du Mois</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Appels Emis vers l'Extérieur dans le Mois</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Is_Internal=0  AVAYA_Direction=O
+| timechart count
+| rename count AS "Nombre d'Appels"</query>
+          <earliest>@mon</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Jours du Mois</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Saturation des Lignes - Nombre Maximum d'Appels Simultanés dans la Journée</title>
+        <search>
+          <query>`sourcelog`
+(AVAYA_Is_Internal=0  AVAYA_Direction=I) OR (AVAYA_Is_Internal=0  AVAYA_Direction=O) |  convert dur2sec(AVAYA_Call_Duration)  AS Call_Duration | eval Total_Call_Time=Call_Duration+AVAYA_Ring_Duration+AVAYA_Hold_Time+AVAYA_Park_Time  | concurrency duration=Total_Call_Time  start=_time | timechart max(concurrency)   | rename  max(concurrency) AS "Appels Simultanés"</query>
+          <earliest>@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Heures de la Journée</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Saturation des Lignes - Nombre Maximum d'Appels Simultanés dans la Semaine</title>
+        <search>
+          <query>`sourcelog`
+(AVAYA_Is_Internal=0  AVAYA_Direction=I) OR (AVAYA_Is_Internal=0  AVAYA_Direction=O) |  convert dur2sec(AVAYA_Call_Duration)  AS Call_Duration | eval Total_Call_Time=Call_Duration+AVAYA_Ring_Duration+AVAYA_Hold_Time+AVAYA_Park_Time  | concurrency duration=Total_Call_Time  start=_time | timechart max(concurrency)   | rename  max(concurrency) AS "Appels Simultanés"</query>
+          <earliest>@w1</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Jours de la Semaine</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="field2">
+        <label>Période</label>
+        <default>
+          <earliest>@mon</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <title>Saturation des Lignes - Nombre Maximum d'Appels Simultanés dans le Mois</title>
+        <search>
+          <query>`sourcelog` (AVAYA_Is_Internal=0  AVAYA_Direction=I) OR (AVAYA_Is_Internal=0  AVAYA_Direction=O) |  convert dur2sec(AVAYA_Call_Duration)  AS Call_Duration | eval Total_Call_Time=Call_Duration+AVAYA_Ring_Duration+AVAYA_Hold_Time+AVAYA_Park_Time  | concurrency duration=Total_Call_Time  start=_time | timechart max(concurrency)   | rename  max(concurrency) AS " Appels Simultanés"</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-90</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Jours du Mois</option>
+        <option name="charting.axisTitleY.text">Nombre d'Appels</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Saturation des Canaux Voice Mail Pro</title>
+        <search>
+          <query>`sourcelog` (AVAYA_Party2Name="VM*" OR AVAYA_Party1Name="VM*")| convert dur2sec(AVAYA_Call_Duration)  AS Call_Duration | eval Total_Call_Time=Call_Duration+AVAYA_Ring_Duration+AVAYA_Hold_Time+AVAYA_Park_Time  | concurrency duration=Total_Call_Time  start=_time  | timechart max(concurrency)  | rename  max(concurrency) AS "Canaux VM Simultanés"</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Période</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

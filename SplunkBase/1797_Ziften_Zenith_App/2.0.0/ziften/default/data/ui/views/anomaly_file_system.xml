@@ -1,0 +1,121 @@
+<form>
+  <label>File System Anomaly</label>
+  <fieldset submitButton="false">
+    <input type="time">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>File Path Suspect Directory</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:zenith:processinventory  | stats latest(imagefilemd5) as md5, latest(fileversion) as fileversion by agentguid, imagefilepath | eval filepath=lower(replace(imagefilepath,".*:","")) | rex field=filepath mode=sed "s/^\\\\users\\\\[A-Za-z0-9\-\. ]*\\\\/\\\\users\\\\...\\\\/"  | eventstats dc(agentguid) as fp_systems by filepath | eventstats dc(agentguid) as md5_systems by md5 | where NOT like(filepath,"%\\trend micro\\%") AND fp_systems &lt;= 10 AND md5_systems &lt;= 10 AND (like(filepath,"%\\appdata%") OR like(filepath,"%\\users%") OR like(filepath,"%\\temp%") OR like(filepath,"%\\tmp%")) | sort 0 filepath</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>High Prev FIlename Low Prev MD5</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:zenith:processinventory  | eval filename=lower(replace(imagefilepath,".*\\\\","")) | eventstats dc(agentguid) as fn_systems by filename | stats dc(agentguid) as md5_systems values(agentguid) as systems max(fn_systems) as fn_systems  latest(fileversion) as fileversion by filename, imagefilemd5 | eventstats max(md5_systems) as max_md5_sys by filename | eval rarity = md5_systems/fn_systems | where rarity &lt; 0.005 and 5*max_md5_sys &gt; fn_systems | sort 0 rarity, filename | head 100</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>High Prev Filepath Low Prev MD%</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:* message_type=processinventory | eval filepath=lower(replace(imagefilepath,".*:","")) | rex field=filepath mode=sed "s/^\\\\users\\\\[A-Za-z0-9\-\. ]*\\\\/\\\\users\\\\...\\\\/"  | eventstats dc(agentguid) as fp_systems by filepath | stats dc(agentguid) as md5_systems values(agentguid) as systems max(fp_systems) as fp_systems  latest(fileversion) as fileversion by filepath, imagefilemd5 | eventstats max(md5_systems) as max_md5_sys by filepath | eval rarity = md5_systems/fp_systems | where rarity &lt; 0.005 and 5*max_md5_sys &gt; fp_systems | sort 0 rarity, filepath | head 100</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>High Prev FIlename Low Prev Filepath</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:* message_type=processinventory  | eval filepath=lower(replace(imagefilepath,".*:","")) | rex field=filepath mode=sed "s/^\\\\users\\\\[A-Za-z0-9\-\. ]*\\\\/\\\\users\\\\...\\\\/"  | stats dc(agentguid) as fp_systems values(agentguid) as systems values(fileversion) as fileversions values(imagefilemd5) as md5s by filepath | eval filename = lower(replace(filepath,".*\\\\","")) | eventstats sum(fp_systems) as fn_systems max(fp_systems) as max_fp_sys by filename | regex filepath!=".*(tmp|temp)\\\\.*" | eval rarity = fp_systems/fn_systems | where rarity &lt; 0.005 and 3*max_fp_sys &gt; fn_systems and md5s!="" | sort 0 rarity, filename | head 100</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Low Prev Office Plugin</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:* message_type=officeplugins earliest = -90d | stats latest(friendlyname) as friendlyname, latest(description) as description, latest(imagefilemd5) as md5 by agentguid, imagefilepath | eval filepath=lower(replace(imagefilepath,".*:","")) | rex field=filepath mode=sed "s/^\\\\users\\\\[A-Za-z0-9\-\. ]*\\\\/\\\\users\\\\...\\\\/"  | eventstats dc(agentguid) as fp_systems by filepath | eventstats dc(agentguid) as md5_systems by md5 | where fp_systems &lt;= 10 AND md5_systems &lt;= 10 | sort 0 friendlyname</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Low Prev ActiveX</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:zenith:activex | stats latest(description) as description, latest(registrylocation) as registrylocation, latest(imagefilemd5) as md5 by agentguid, imagefilepath | eval filepath=lower(replace(imagefilepath,".*:","")) | rex field=filepath mode=sed "s/^\\\\users\\\\[A-Za-z0-9\-\. ]*\\\\/\\\\users\\\\...\\\\/"  | eventstats dc(agentguid) as fp_systems by filepath | eventstats dc(agentguid) as md5_systems by md5 | where fp_systems &lt;= 10 AND md5_systems &lt;= 10 | sort 0 description</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,67 @@
+<view template="dashboard.html">
+    <label>Current Utililization</label>
+    <module name="AccountBar" layoutPanel="appHeader"/>
+    <module name="AppBar" layoutPanel="navigationHeader"/>
+    <module name="Message" layoutPanel="messaging">
+        <param name="filter">*</param>
+        <param name="clearOnJobDispatch">False</param>
+        <param name="maxSize">1</param>
+    </module>
+
+    <module name="ChassisSelector" layoutPanel="panel_row1_col1" group="Tool Port Current Utilization Statistics">
+		<param name="statisticsTarget">TOOL</param>
+		<module name="IdSelector">
+		    <param name="tokenChassis">theChassis</param>
+			<param name="tokenId">theId</param>			
+			<param name="intentionChassis">
+				<param name="name">stringreplace</param>
+				<param name="arg">
+					<param name="theChassis">
+						<param name="default">*</param>
+						<param name="fillOnEmpty">true</param>
+					</param>
+				</param>
+			</param>
+		    <param name="intentionId">
+				<param name="name">stringreplace</param>
+				<param name="arg">
+					<param name="theId">
+						<param name="default">*</param>
+						<param name="fillOnEmpty">true</param>
+					</param>
+				</param>
+			</param>
+		
+		
+			<module name="HiddenSearch" autoRun="True">
+				<param name="search">source="anue" AND chassis=$theChassis$ AND id=$theId$ | timechart span=$theSpan$ avg(tp_current_tx_utilization) as tp_current_tx_utilization avg(tp_current_pass_percent_packets) as tp_current_pass_percent_packets</param>
+				<module name="TimeRangePickerWithCustomIntent">
+					<param name="default">1 hour window</param>
+					<param name="searchWhenChanged">True</param>
+					<param name="intentionTimeSpanToken">theSpan</param>
+					<param name="intentionTimeSpan">
+						<param name="name">stringreplace</param>
+						<param name="arg">
+							<param name="theSpan">
+								<param name="default">*</param>
+								<param name="fillOnEmpty">true</param>
+							</param>
+						</param>
+					</param>
+					<module name="HiddenChartFormatter">
+						<param name="chart">line</param>
+						<param name="primaryAxisTitle.text">Time</param>
+						<param name="secondaryAxisTitle.text">%</param>
+						<param name="charting.secondaryAxis.minimumNumber">0</param>
+						<param name="charting.secondaryAxis.maximumNumber">100</param>
+						<module name="FlashChart">
+							<param name="width">100%</param>
+							<param name="height">350px</param>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>			
+	</module>
+	
+</view>

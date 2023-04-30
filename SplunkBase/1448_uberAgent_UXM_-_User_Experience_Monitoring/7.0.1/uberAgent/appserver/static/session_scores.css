@@ -1,0 +1,11 @@
+/* Scores in red have a white font that disappears on mouse-over. Hence always use a black font in colored tables.*/
+
+td.numeric.color-formatted {
+  color: rgb(0, 0, 0) !important;
+}
+
+/* Reduce width of count fields */
+
+div[id^="vlInputText_"] [data-view="splunkjs/mvc/textinputview"] {
+  width: 100px !important;
+}

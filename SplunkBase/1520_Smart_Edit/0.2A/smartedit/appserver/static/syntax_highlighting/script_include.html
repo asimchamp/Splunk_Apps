@@ -1,0 +1,193 @@
+<%namespace name="lib" file="//lib.html" import="*"/>
+
+<%call expr="lib.add_script_block()">
+            
+    /*
+     * by Petko D. Petkov; pdp (architect)
+     * http://www.gnucitizen.org
+     * http://www.gnucitizen.org/projects/jquery-include/
+     */
+    jQuery.extend({
+        /*
+         * included scripts
+         */
+        includedScripts: {},
+
+        /*
+         * include timer
+         */
+        includeTimer: null,
+
+        /*
+         * include
+         */
+        include: function (url, onload) {
+            if (jQuery.includedScripts[url] != undefined) {
+                return;
+            }
+
+            jQuery.isReady = false;
+
+            if (jQuery.readyList == null) {
+                jQuery.readyList = [];
+            }
+
+            var script = document.createElement('script');
+
+            script.type = 'text/javascript';
+            script.onload = function () {
+                jQuery.includedScripts[url] = true;
+
+                if (typeof onload == 'function') {
+                    onload.apply(jQuery(script), arguments);
+                }
+            };
+            script.onreadystatechange = function () {
+                if (script.readyState == 'complete') {
+                    jQuery.includedScripts[url] = true;
+
+                    if (typeof onload == 'function') {
+                        onload.apply(jQuery(script), arguments);
+                    }
+                }
+            };
+            script.src = url;
+
+            jQuery.includedScripts[url] = false;
+            document.getElementsByTagName('head')[0].appendChild(script);
+
+            if (!jQuery.includeTimer) {
+                jQuery.includeTimer = window.setInterval(function () {
+                    jQuery.ready();
+                }, 10);
+            }
+        }
+    });
+
+    /*
+     * replacement of jQuery.ready
+     */
+    jQuery.extend({
+        /*
+         * hijack jQuery.ready
+         */
+        _ready: jQuery.ready,
+
+        /*
+         * jQuery.ready replacement
+         */
+        ready: function () {
+            isReady = true;
+
+            for (var script in jQuery.includedScripts) {
+                if (jQuery.includedScripts[script] == false) {
+                    isReady = false;
+                    break;
+                }
+            }
+
+            if (isReady) {
+                window.clearInterval(jQuery.includeTimer);
+                jQuery._ready.apply(jQuery, arguments);
+            }
+        }
+    });
+
+    //addEventHandler = function(element, name, handler) {
+    //    $(element).bind(name, handler);
+    //}
+
+
+    //var baseFiles = ["codemirror.js", "util.js", "stringstream.js", "select.js", "undo.js", "editor.js", "tokenize.js", "parse_david.js"];
+    var baseFiles = ["codemirror.js"];
+    for (var i=0,len=baseFiles.length; i<len; i++) {
+        $.include(Splunk.util.make_url('static', 'app', Splunk.util.getCurrentApp(), "syntax_highlighting", baseFiles[i]));
+    }
+    //if (Splunk.Module.TextareaResize) {
+    //    Splunk.Module.TextareaResize = $.klass(Splunk.Module.TextareaResize, {
+    //        _resizeSearchBar: function($super) {
+    //            var retVal = $super();            
+    //            return retVal;
+    //        }
+    //    });
+    //}
+
+
+    // integration of this code with search-assistant and multiline-searchfield 
+    // stuff will be most of the work to make this really happen. .
+    // THIS IS JUST A PROTOTYPE.
+    if (Splunk.Module.SearchBar) {
+        Splunk.Module.SearchBar = $.klass(Splunk.Module.SearchBar, {
+            initSyntaxHighlighting: function(id) {
+                
+                this.editor = CodeMirror.fromTextArea(id, {    
+                    height: "60px",
+                    parserfile: "parse_david.js",
+                    stylesheet: Splunk.util.make_url('static', 'app', Splunk.util.getCurrentApp(), "syntax_highlighting", "colors.css"),
+                    path: Splunk.util.make_url('static', 'app', Splunk.util.getCurrentApp(), "syntax_highlighting"),
+                    continuousScanning: 500,
+                    lineNumbers: false
+                });
+                
+                
+                
+                $(this.editor.frame).load(function() {
+                    this.editor.grabKeys(
+                    function(evt) {
+                        this.pushContextToChildren();
+                    }.bind(this),
+                    function(keyCode) {
+                        this.logger.debug("grabKeys callback #2 keyCode=" + keyCode);
+                        this.setChildContextFreshness(false);
+                        return (keyCode==13);
+                    }.bind(this))
+                }.bind(this))
+                    
+                
+                
+            },
+            initialize: function($super, container) {
+                
+                var retVal = $super(container);
+                // turn off the assistant in the config.
+                this.setParam(this.ASSISTANT_PARAM_KEY, false);
+                this.setParam(this.AUTO_ASSIST_PARAM_KEY, false);
+                var search = "*"; // index=_internal source=*metrics.log group=per_sourcetype_thruput | timechart sum(kb) by series
+                this.setParam("search",  search);
+	        this.input.val(search);
+
+                
+                
+                
+                var id = "elvis";
+                this.input.attr("id", id);
+                this.initSyntaxHighlighting(id);
+                return retVal;
+            },
+            _getUserEnteredSearch: function() {
+                var q;
+                try {
+                    q = this.editor.getCode() || "*";
+                } catch (e){
+                    this.logger.warn("the editor isnt loaded yet. Not to worry - the page is probably just loading still");
+                    q = this.input.attr('value') || '*';
+                }
+                q = Splunk.util.addLeadingSearchCommand(q, true);
+                return q;
+            },
+            setInputField: function($super, search) {
+                var retVal = $super(search);
+                foo = function() {
+                    this.editor.setCode(search.toString());
+                }.bind(this)
+                try {
+                    foo();
+                } catch (e){
+                    this.logger.warn("the editor isnt loaded yet. trying again in 5 seconds");
+                    setTimeout(foo, 5000);
+                }
+                return retVal;
+            }
+        });
+    }
+</%call>

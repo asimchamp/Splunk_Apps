@@ -1,0 +1,212 @@
+<form version="1.1">
+  <label>Tanium Integrity Monitor</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="fieldIM_changetype" searchWhenChanged="true">
+      <label>Change Type</label>
+      <fieldForLabel>Change_Type</fieldForLabel>
+      <fieldForValue>Change_Type</fieldForValue>
+      <search>
+        <query>`tanium_index` Question=Splunk-Integrity-Monitor NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | stats dc(Change_Type) by Change_Type</query>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </search>
+      <choice value="*">All Changes</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="time" token="fieldIMtime">
+      <label>Time Picker</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="fieldIM_watchlists" searchWhenChanged="true">
+      <label>Watchlist</label>
+      <fieldForLabel>Watchlists</fieldForLabel>
+      <fieldForValue>Watchlists</fieldForValue>
+      <search>
+        <query>`tanium_index` Question=Splunk-Integrity-Monitor NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | stats dc(Watchlists) by Watchlists</query>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </search>
+      <choice value="*">All Watchlists</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="field_IMComputer_Name">
+      <label>Computer Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="dropdown" token="fieldIM_user" searchWhenChanged="true">
+      <label>User</label>
+      <choice value="*">All Users</choice>
+      <fieldForLabel>User</fieldForLabel>
+      <fieldForValue>User</fieldForValue>
+      <search>
+        <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Watchlists="$fieldIM_watchlists$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | stats dc(User) by User</query>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </search>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Change Type Overview</title>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Watchlists="$fieldIM_watchlists$" User="$fieldIM_user$" Computer_Name="$field_IMComputer_Name$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | stats count by Change_Type</query>
+          <earliest>$fieldIMtime.earliest$</earliest>
+          <latest>$fieldIMtime.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Change Type by User</title>
+        <search>
+          <query>`tanium_index` Question=Splunk-Integrity-Monitor Watchlists="$fieldIM_watchlists$" Change_Type="$fieldIM_changetype$" User="$fieldIM_user$" Computer_Name="$field_IMComputer_Name$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | chart count over User by Change_Type</query>
+          <earliest>$fieldIMtime.earliest$</earliest>
+          <latest>$fieldIMtime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Change Type over Time</title>
+      <chart>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Watchlists="$fieldIM_watchlists$" Change_Type="$fieldIM_changetype$" User="$fieldIM_user$" Computer_Name="$field_IMComputer_Name$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | timechart span=1h Count by Change_Type</query>
+          <earliest>$fieldIMtime.earliest$</earliest>
+          <latest>$fieldIMtime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Change Type by Watchlist over Time</title>
+      <chart>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Watchlists="$fieldIM_watchlists$" Change_Type="$fieldIM_changetype$" User="$fieldIM_user$" Computer_Name="$field_IMComputer_Name$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" | timechart span=1h Count by Watchlists</query>
+          <earliest>$fieldIMtime.earliest$</earliest>
+          <latest>$fieldIMtime.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Destination Files</title>
+      <table>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Watchlists="$fieldIM_watchlists$" Change_Type="$fieldIM_changetype$" User="$fieldIM_user$" Computer_Name="$field_IMComputer_Name$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" |  stats count sparkline AS Trend by object | rename object as File | sort -count | head 10 | fields File, Trend, count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format field="Trend" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="maxSpotColor">#EC2222</option>
+          <option name="spotRadius">3</option>
+          <option name="fillColor">#f989d7</option>
+          <option name="height">16</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top 10 Source Processes</title>
+      <table>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Watchlists="$fieldIM_watchlists$" Change_Type="$fieldIM_changetype$" User="$fieldIM_user$" Computer_Name="$field_IMComputer_Name$" NOT Warning:
+ NOT N/A Timestamp!="No integrity violations found" Timestamp!="Integrity Monitor Endpoint Tools not installed" Timestamp!="Tools out of date" Timestamp!="False" |  stats count sparkline AS Trend by command  | rename command as Process | sort -count | head 10 | fields Process, Trend, count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format field="Trend" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="maxSpotColor">#EC2222</option>
+          <option name="spotRadius">3</option>
+          <option name="fillColor">#f989d7</option>
+          <option name="height">16</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Health -  Integrity Monitor Client</title>
+      <chart>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Computer_Name="$field_IMComputer_Name$" | regex Timestamp!="[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])" | stats count by Timestamp | sort -count</query>
+          <earliest>$fieldIMtime.earliest$</earliest>
+          <latest>$fieldIMtime.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="height">454</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Computer Name by Message</title>
+        <search>
+          <query>`tanium_index`  Question="Splunk-Integrity-Monitor" Computer_Name="$field_IMComputer_Name$" | regex Timestamp!="[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])" | stats count by Timestamp Computer_Name | sort -count | rename Timestamp AS Message | head 10</query>
+          <earliest>$fieldIMtime.earliest$</earliest>
+          <latest>$fieldIMtime.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,172 @@
+<form script="link_switcher.js, autodiscover.js">
+  <label>Policy</label>
+  <searchTemplate>index="a10networks" sourcetype="a10_waf" * * * | stats count by act policy cs1 msg src hostname _time</searchTemplate>
+  <earliestTime>$earliest$</earliestTime>
+  <latestTime>$latest$</latestTime>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time Picker</label>
+      <default>Last 24 hours</default>
+    </input>
+    <input type="text" token="act">
+      <label>Action:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="policy">
+      <label>Policy:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="cs1">
+      <label>Template:</label>
+      <default/>
+      <suffix>*</suffix>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h2>WAF Policy Summary</h2>This report provides details about the Web Application Firewall module. This dashboard reports on the WAF Policy activity.</html>
+  </row>
+  <row/>
+  <row grouping="2">
+    <single>
+      <title>Session Stats</title>
+      <searchPostProcess>| stats dc(policy) as count</searchPostProcess>
+      <option name="beforeLabel">Security Policies:</option>
+      <option name="field">count</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>stats dc(cs1) as count</searchPostProcess>
+      <option name="beforeLabel">Templates:</option>
+      <option name="field">count</option>
+      <option name="linkView">search</option>
+    </single>
+  </row>
+  <row grouping="1">
+    <chart>
+      <searchPostProcess>search policy!="" AND policy!=0   |timechart count by policy useother=f | head 15</searchPostProcess>
+      <Title>Top Template</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Security Policy Activity Over Time</option>
+      <option name="charting.axisTitleY.text">Security Policy Activity</option>
+    </chart>
+    <chart>
+      <searchPostProcess>search cs1!=""  | timechart count by cs1 useother=f | head 15</searchPostProcess>
+      <Title>Templates Over Time</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Templates Over Time</option>
+      <option name="charting.axisTitleY.text">Templates</option>
+    </chart>
+  </row>
+  <row grouping="3,3">
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Top Template</b>
+      <div class="link-switcher" data-items="link3,link4"/>
+    </html>
+    <chart id="link3">
+      <title>Chart</title>
+      <searchPostProcess>search cs1!="" | stats sum(count) as count by cs1 | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Template</option>
+    </chart>
+    <table id="link4">
+      <title>Table</title>
+      <searchPostProcess>search cs1!="" | stats sum(count) as count by cs1 | rename cs1 as "Template"| head 10 | sort - count</searchPostProcess>
+    </table>
+    <html>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <b>Top Security Policies</b>
+      <div class="link-switcher" data-items="link5,link6"/>
+    </html>
+    <chart id="link5">
+      <title>Chart</title>
+      <searchPostProcess>search policy!="" AND policy!=0  |stats sum(count) as count by policy | head 10 | sort - count</searchPostProcess>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">bar</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Security Policy Name</option>
+    </chart>
+    <table id="link6">
+      <title>Table</title>
+      <searchPostProcess>search policy!="" | eval i_deny=if(act=="deny",1,0) | eval i_allow=if(act=="allow",1,0) | eval i_sanitize=if(act=="sanitize",1,0) | eval i_learn=if(act=="learn",1,0) | stats sum(i_allow) as Accepted sum(i_learn) as "Learn" sum(i_sanitize) as Sanitize sum(i_deny) as Deny by policy | rename policy as "Security Policy"| head 20</searchPostProcess>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Action by Template</title>
+      <searchPostProcess>search cs1!="" | eval i_deny=if(act=="deny",1,0) | eval i_allow=if(act=="allow",1,0) | eval i_sanitize=if(act=="sanitize",1,0) | eval i_learn=if(act=="learn",1,0) | stats sum(i_allow) as Accepted sum(i_learn) as Learn sum(i_sanitize) as Sanitize sum(i_deny) as Deny  by cs1 | rename cs1 as "Template"|  head 20</searchPostProcess>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Action by Security Policy</title>
+      <searchPostProcess>search policy!="" | eval i_deny=if(act=="deny",1,0) | eval i_allow=if(act=="allow",1,0) | eval i_sanitize=if(act=="sanitize",1,0) | eval i_learn=if(act=="learn",1,0) | stats sum(i_allow) as Accepted sum(i_learn) as "Learn" sum(i_sanitize) as Sanitize sum(i_deny) as Deny by policy | rename policy as "Security Policy"| head 20</searchPostProcess>
+    </table>
+  </row>
+  <row>
+    <event>
+      <title>WAF Security Policy Events</title>
+      <Title>WAF Security Policy Events</Title>
+      <search>index="a10networks" sourcetype="a10_waf" | stats count by src hostname spt _time</search>
+      <option name="list.drilldown">full</option>
+      <option name="list.wrap">1</option>
+      <option name="maxLines">5</option>
+      <option name="raw.drilldown">full</option>
+      <option name="rowNumbers">0</option>
+      <option name="table.drilldown">1</option>
+      <option name="table.wrap">1</option>
+      <option name="type">list</option>
+      <option name="count">10</option>
+      <fields>["host","source","sourcetype"]</fields>
+    </event>
+  </row>
+</form>

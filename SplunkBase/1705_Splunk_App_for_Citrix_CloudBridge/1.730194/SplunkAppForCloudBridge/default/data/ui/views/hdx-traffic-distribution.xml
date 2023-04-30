@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>HDX Traffic Distribution</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+    <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+  </fieldset>
+  
+<row>
+    <chart>
+      <title>HDX WAN Traffic By Application</title>
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") (flowId=1 OR flowId=4)  
+        | join type=inner `CONNECTION` [ search index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` ]
+        | stats sum(octetDeltaCount) as bytesConn values(appName) as appName by `CONNECTION`          
+        | `ICA_APP_NAME_FIX(appName)`
+        | stats sum(bytesConn) as bytes by appName                
+      </searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+    </chart>
+    <chart>
+      <title>HDX WAN Traffic By Client OS</title>
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") (flowId=1 OR flowId=4)  
+        | fillnull value="unknown" clientTypeString
+        | join type=inner `CONNECTION` [ search index=cloudbridge observationPointId="$observerId$" `ALL_TIME` TemplateName="271_ICA_SESSION_SETUP" | fields  `CONNECTION` clientTypeString]
+        | stats sum(octetDeltaCount) as bytes by clientTypeString          
+      </searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+    </chart>
+</row>
+<row>
+    <chart>
+      <title>HDX LAN Traffic By ICA Channel</title>
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" Template=273
+        | eval c0=0|eval c1=0|eval c2=0|eval c3=0|eval c4=0|eval c5=0|eval c6=0|eval c7=0|eval c8=0|eval c9=0|eval c10=0|eval c11=0|eval c12=0|eval c13=0|eval c14=0|eval c15=0|eval c16=0|eval c17=0|eval c18=0|eval c19=0|eval c20=0|eval c21=0|eval c22=0|eval c23=0|eval c24=0|eval c25=0|eval c26=0|eval c27=0|eval c28=0|eval c29=0|eval c30=0
+        |`EVAL_ICA_CHANNEL(0)`|`EVAL_ICA_CHANNEL(1)`|`EVAL_ICA_CHANNEL(2)`|`EVAL_ICA_CHANNEL(3)`|`EVAL_ICA_CHANNEL(4)`|`EVAL_ICA_CHANNEL(5)`|`EVAL_ICA_CHANNEL(6)`|`EVAL_ICA_CHANNEL(7)`|`EVAL_ICA_CHANNEL(8)`|`EVAL_ICA_CHANNEL(9)`
+        |`EVAL_ICA_CHANNEL(10)`|`EVAL_ICA_CHANNEL(11)`|`EVAL_ICA_CHANNEL(12)`|`EVAL_ICA_CHANNEL(13)`|`EVAL_ICA_CHANNEL(14)`|`EVAL_ICA_CHANNEL(15)`|`EVAL_ICA_CHANNEL(16)`|`EVAL_ICA_CHANNEL(17)`|`EVAL_ICA_CHANNEL(18)`|`EVAL_ICA_CHANNEL(19)`
+        |`EVAL_ICA_CHANNEL(20)`|`EVAL_ICA_CHANNEL(21)`|`EVAL_ICA_CHANNEL(22)`|`EVAL_ICA_CHANNEL(23)`|`EVAL_ICA_CHANNEL(24)`|`EVAL_ICA_CHANNEL(25)`|`EVAL_ICA_CHANNEL(26)`|`EVAL_ICA_CHANNEL(27)`|`EVAL_ICA_CHANNEL(28)`|`EVAL_ICA_CHANNEL(29)`
+        | chart sum(c0)  as "Client Audio Mapping"
+                sum(c1)  as "Seamless Windows screen update data (ThinWire)"  
+                sum(c2)  as "Citrix Control Virtual channel"
+                sum(c3)  as "End User Experience Montitoring"  
+                sum(c4)  as "Citrix Flash Redirection (Obsolete)"  
+                sum(c5)  as "USB Redirection"  
+                sum(c6)  as "Citrix browser Acceleration"  
+                sum(c7)  as "Smartcard"  
+                sum(c8)  as "Clipboard"  
+                sum(c9)  as "License Management" 
+                sum(c10) as "Program Neighbourhood" 
+                sum(c11) as "Remote Windows screen update data (Thinwire)" 
+                sum(c12) as "Video server video(not Thinwire video)" 
+                sum(c13) as "Client COM port mapping" 
+                sum(c14) as "Client drive mapping" 
+                sum(c15) as "Citrix Windows Multimedia Redirection" 
+                sum(c16) as "Client Management (Auto Client Update)" 
+                sum(c17) as "Printer Mapping for non-spooling client (Thin client devices)" 
+                sum(c18) as "Printer Mapping for non-spooling client (Thin client devices)" 
+                sum(c19) as "Printer mapping for spooling clients" 
+                sum(c20) as "Printer Mapping for non-spooling client (Thin client devices)" 
+                sum(c21) as "Printer Mapping for non-spooling client (Thin client devices)"
+                sum(c22) as "Special Thinwire" 
+                sum(c23) as "Control info" 
+                sum(c24) as "Pure ICA"                
+                sum(c25) as "DirectX Graphics Command Remoting" 
+                sum(c26) as "Transparent User Interface Component Interface" 
+                sum(c27) as "CTXUI" 
+                sum(c28) as "Dynamic Virtual Channel" 
+                sum(c29) as "Base" 
+                sum(c30) as "Other channel"                 
+            | transpose    
+        </searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+    </chart>
+
+    <chart>
+      <title>HDX Traffic By ICA Priority Tag</title>
+      <searchString>
+             index=cloudbridge observationPointId="$observerId$" Template=272 
+           | chart sum(lanRecvIcaPriority0Bytes) as "Priority 0"
+                   sum(lanRecvIcaPriority1Bytes) as "Priority 1" 
+                   sum(lanRecvIcaPriority2Bytes) as "Priority 2"
+                   sum(lanRecvIcaPriority3Bytes) as "Priority 3"       
+           | transpose       
+      </searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+    </chart>
+</row>
+
+<row>
+    <chart>
+      <title>HDX WAN Traffic By Encryption Levels</title>
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") (flowId=1 OR flowId=4)  
+        | join type=inner `CONNECTION` [ search index=cloudbridge observationPointId="$observerId$" `ALL_TIME` TemplateName="271_ICA_SESSION_SETUP"  | fields `CONNECTION` icaEncryptionLevelText]
+        | stats sum(octetDeltaCount) as bytes by icaEncryptionLevelText          
+      </searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+    </chart>
+    <chart>
+      <title>HDX WAN Traffic By Client Versions</title>
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") (flowId=1 OR flowId=4)  
+        | join type=inner `CONNECTION` [ search index=cloudbridge observationPointId="$observerId$" `ALL_TIME` TemplateName="271_ICA_SESSION_SETUP" clientVersion!="" | fields `CONNECTION` clientVersion ]
+        | stats sum(octetDeltaCount) as bytes by clientVersion          
+      </searchString>
+      <option name="charting.chart">pie</option>
+      <option name="charting.axisTitleX.text"></option> 
+      <option name="charting.axisTitleY.text"></option> 
+    </chart>
+</row>
+  
+</form>
+
+

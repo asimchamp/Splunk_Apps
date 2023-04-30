@@ -1,0 +1,156 @@
+<form>
+  <label>Traffic by Size</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time Picker</label>
+      <default>Last 24 hours</default>
+    </input>
+    <input type="text" token="s_ip">
+      <label>Virtual Server:</label>
+      <default></default>
+      <suffix>*</suffix>
+    </input>
+    <input type="text" token="n_ip">
+      <label>Node:</label>
+      <default></default>
+      <suffix>*</suffix>
+    </input>
+  </fieldset>
+  <searchTemplate>index="a10networks" sourcetype="a10_slb" $s_ip$ $n_ip$ | stats count by sc_bytes c_ip n_ip s_ip cs_uri_stem _time</searchTemplate>
+  <row>
+    <html>
+      <h2>SLB Traffic by Response Data Size</h2>This report breaks down your SLB traffic by the size of the response from your server.</html>
+  </row>
+  <row/>
+  <row grouping="3">
+    <single>
+      <title>Response Data Size Stats</title>
+      <searchPostProcess>stats sum(sc_bytes) as response_data_size</searchPostProcess>
+      <option name="beforeLabel">Total size:</option>
+      <option name="field">response_data_size</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>stats avg(sc_bytes) as response_data_size</searchPostProcess>
+      <option name="beforeLabel">Avg size/req:</option>
+      <option name="field">response_data_size</option>
+      <option name="linkView">search</option>
+    </single>
+    <single>
+      <searchPostProcess>stats max(sc_bytes) as response_data_size</searchPostProcess>
+      <option name="beforeLabel">Max size/req:</option>
+      <option name="field">response_data_size</option>
+      <option name="linkView">search</option>
+    </single>
+  </row>
+  <row>
+    <chart>
+      <title>Response Data Size Over Time by Source</title>
+      <searchPostProcess>timechart sum(sc_bytes) as "Response Data Size" by s_ip</searchPostProcess>
+      <Title>Response Data Size Over Time</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+      <option name="charting.axisTitleY.text">Data</option>
+      <option name="charting.axisTitleX.text">Time</option>
+    </chart>
+    <chart>
+      <title>Response Data Size Over Time by Destination</title>
+      <searchPostProcess>timechart sum(sc_bytes) as "Response Data Size" by n_ip</searchPostProcess>
+      <Title>Requests Over Time - Node</Title>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.text">Data</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">bottom</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top Virtual Server</title>
+      <searchPostProcess>stats sum(sc_bytes) by s_ip | head 10 | sort - sc_bytes</searchPostProcess>
+      <Title>Top Virtual Server</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Top Node</title>
+      <searchPostProcess>stats sum(sc_bytes) by n_ip | head 10 | sort - sc_bytes</searchPostProcess>
+      <Title>Top Node</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+    <chart>
+      <title>Top Client</title>
+      <searchPostProcess>stats sum(sc_bytes) by c_ip | head 10 | sort - sc_bytes</searchPostProcess>
+      <Title>Top Client</Title>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>URL Statistics</title>
+      <searchPostProcess>rename cs_uri_stem as URL | stats sum(sc_bytes) as "Response Data Size"  count as Requests dc(c_ip) as Clients dc(s_ip) as Servers dc(n_ip) as Nodes by URL | head 1000 | sort - "Response Data Size"</searchPostProcess>
+      <Title>URL Statistics</Title>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

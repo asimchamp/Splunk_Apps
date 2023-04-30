@@ -1,0 +1,95 @@
+<form script="inpage_drilldown_form.js" stylesheet="custom.css" version="1.1">
+  <label>IA Email Pivoting</label>
+  <description>Dashboard for FireEye IA Email Pivoting</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Search</label>
+      <default>*</default>
+      <suffix></suffix>
+    </input>
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="filter" searchWhenChanged="true">
+      <label>Filter</label>
+      <default>eventtype=fe</default>
+      <suffix></suffix>
+    </input>
+    <!-- Used for dropdown - Input field hidden using javascript. <div id = #field3 -->
+    <input type="text" token="ID" searchWhenChanged="true"></input>
+    <input type="dropdown" token="appliance">
+      <label>IA Appliance</label>
+      <search fieldForValue="system" fieldForLabel="system">
+        <query>
+        <![CDATA[ | inputlookup ia_appliances.csv ]]>
+      </query></search>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row>
+    <table id="master">
+      <title>Alerts</title>
+      <search><query>
+        $filter$ product="Email MPS" $wild$ | eval UrlHash = coalesce(file_hash,malware_url) | sort -occurred | table id, signature, severity, occurred, suser, duser, UrlHash | rename id AS ID, signature AS Malware, severity AS Severity, occurred AS Occurred, duser AS Recipient, suser AS Sender, UrlHash AS "URL/Md5sum", locations as "Location"
+      </query></search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <html>
+      <p>*Note:  Time window passed to IA pivot is +-5 minutes</p>
+    </html>
+  </row>
+  <row>
+    <table id="detail">
+      <title>Pivot points for ID: $ID$</title>
+      <search><query>
+        $filter$ product="Email MPS" id=$ID$ $wild$ | eval src_dest=suser + " &amp; " + duser | eval stime=_time-300 | eval etime=_time+300 | table stime, etime, _time, suser, duser, src_dest | rename suser AS "Mail From", duser AS "Mail To", src_dest AS "Mail From / Mail To"
+      </query></search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="fields">_time,"Mail From","Mail To","Mail From / Mail To"</option>
+      <drilldown target="_blank">
+        <condition field="_time">
+          <link>https://$appliance$/?date=$row.stime$ TO $row.etime$ FORMAT X</link>
+        </condition>
+        <condition field="Mail From">
+          <link>https://$appliance$/?date=$row.stime$ TO $row.etime$ FORMAT X&amp;mailFrom=$row.Mail From$</link>
+        </condition>
+        <condition field="Mail To">
+          <link>https://$appliance$/?date=$row.stime$ TO $row.etime$ FORMAT X&amp;mailTo=$row.Mail To$</link>
+        </condition>
+        <condition field="Mail From / Mail To">
+          <link>https://$appliance$/?date=$row.stime$ TO $row.etime$ FORMAT X&amp;mailFrom=$row.Mail From$&amp;mailTo=$row.Mail To$</link>
+        </condition>
+      </drilldown>
+      <option name="count">10</option>
+      <fields>["_time","Mail From","Mail To","Mail From / Mail To"]</fields>
+    </table>
+  </row>
+</form>

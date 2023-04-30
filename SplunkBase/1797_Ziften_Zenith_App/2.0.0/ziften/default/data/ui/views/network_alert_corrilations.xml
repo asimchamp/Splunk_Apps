@@ -1,0 +1,60 @@
+<form script="autodiscover.js,multi_select.js, multi_value_token.js">
+  <label>Network Alert Corrilations</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="multiselect" token="sfields" searchWhenChanged="true">
+      <choice value="OS">Operating System</choice>
+      <choice value="accountname">Account Name</choice>
+      <choice value="agentguid">System ID</choice>
+      <choice value="basename">File Name</choice>
+      <choice value="companyname">Vendor</choice>
+      <choice value="computername">Computer Name</choice>
+      <choice value="cve_count">CVEs</choice>
+      <choice value="fileversion">File Version</choice>
+      <choice value="first_seen">First Seen</choice>
+      <choice value="imagefilemd5">MD5</choice>
+      <choice value="ipaddress">Dst IP</choice>
+      <choice value="otx_details">OTX Tag</choice>
+      <choice value="port">Dst Port</choice>
+      <choice value="pres">User Present</choice>
+      <choice value="productversion">Product Version</choice>
+      <choice value="sample_path">File Path</choice>
+      <choice value="vt_details">VT Details</choice>
+      <choice value="vt_score">VT Score</choice>
+      <default>otx_details,computername,accountname,pres,vt_score,vt_details,cve_count,basename,port,ipaddress</default>
+      <delimiter> </delimiter>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h2>Metrics: Pipeline</h2>
+      <div id="sunburstSearch" 
+      class="splunk-manager" 
+      data-require="splunkjs/mvc/searchmanager" 
+      data-options='{
+                     "search": {
+                         "type": "token_safe",
+                         "value": "sourcetype=ziften:zenith:alert message_type=network_alert|rename details as otx_details|eval basename = replace(imagefilepath, \".*\\\\\\\\\", \"\")|join type=left imagefilemd5 [|inputlookup nvd_md5_to_cve.csv|rename md5 as imagefilemd5] |makemv delim=\",\" cve|eval cve_count=mvcount(cve)|eval cve_count=if(isnull(cve_count), 0, cve_count)|join type=left agentguid imagefilemd5 [search sourcetype=ziften:* message_type=resourceusage]|eval pres=if(isnull(elapsedtime),\"bg\",\"fg\")| join type=left imagefilemd5 [inputlookup vthistory.csv|rename md5 as imagefilemd5|rename score as vt_score|rename details as vt_details]|eval vt_score=if(isnull(vt_score), \"unkn\", vt_score)|eval vt_details=if(isnull(vt_details),\"unkn\", vt_details)|makemv delim=\",\" otx_details|mvexpand otx_details|makemv delim=\",\" vt_details|mvexpand vt_details|stats first(pres) as pres max(vt_score) as vt_score max(cve_count) as cve_count by agentguid accountname basename port otx_details vt_details ipaddress imagefilemd5|lookup system_info agentguid|lookup image_info imagefilemd5"},
+                     "earliest_time": { "type": "token_safe", "value": "$$earliest$$" },
+                     "latest_time": { "type": "token_safe", "value": "$$latest$$" },
+                     "status_buckets": 0,
+                     "cancelOnUnload": true,
+                     "auto_cancel": 90,
+                     "preview": true,
+                     "tokens": true
+                 }'/>
+      <div id="sunburstChart" class="splunk-toolkit-sunburst splunk-view sunburst" data-type="sunburst" data-component="view" data-require="app/ziften/components/sunburst/sunburst" data-options='{ "managerid": "sunburstSearch","app":"ziften", "categoryFields": "$sfields$","valueField": "count","width": 1200,"height": 1200 }'/>
+    </html>
+  </row>
+  <row>
+    <html>
+      <div id="mytable" class="splunk-view" data-require="splunkjs/mvc/tableview" data-options='{
+            "managerid":"sunburstSearch"        }'/>
+    </html>
+  </row>
+</form>

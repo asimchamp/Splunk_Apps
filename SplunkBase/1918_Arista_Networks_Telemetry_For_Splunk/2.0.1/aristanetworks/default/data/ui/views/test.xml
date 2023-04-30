@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard version="1.1">
+  <label>Sample sparkline table</label>
+  <row>
+    <table>
+      <search>source="arista_switch_ifcounter" switchname=a1-argon.sjc.aristanetworks.com | stats sparkline(max(inOctets)) as sparkline by interface</search>
+      <title>sparklines</title>
+      <format field="sparkline" type="sparkline">
+        <option name="type">bar</option>
+      </format>
+    </table>
+  </row>
+</dashboard>

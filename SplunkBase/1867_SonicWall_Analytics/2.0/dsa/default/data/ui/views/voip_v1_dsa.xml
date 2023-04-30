@@ -1,0 +1,35 @@
+<form>
+  <label>Voice Over IP v1</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-4h@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <single>
+      <title>Total Calls</title>
+      <search>
+        <query>index=sonicwall TemplateID=272 | stats count(_raw)</query>
+      </search>
+      <option name="underLabel">Total Calls</option>
+      <option name="linkView">search</option>
+      <option name="drilldown">none</option>
+    </single>
+  </row>
+  <row>
+    <table>
+      <title>Packet Loss Stats</title>
+      <search>
+        <query>index=sonicwall TemplateID=272 | eval lost_packets=(init2resp_lost_pkts + resp2init_lost_pkts) | stats count as "Total", max(lost_packets) as "Max Packet Loss", min(lost_packets) as "Min Packet Loss", range(lost_packets) as "Range Packet Loss", avg(lost_packets) as "Average Packet Loss"</query>
+      </search>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

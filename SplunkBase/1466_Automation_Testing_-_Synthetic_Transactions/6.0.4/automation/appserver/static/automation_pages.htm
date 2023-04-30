@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  </head>
+  <body>
+    <font face="Arial"><b>_PAGES_.CONF</b></font><br>
+    <br>
+    <textcontrol(q=search)><my_page_name><font face="Arial" size="-1">##&nbsp;
+          This file defines the web pages that will be available for use
+          in _sessions_.conf.<br>
+          ##&nbsp; Each web page definition specifies behavior to use
+          when browsing a specific URL.<br>
+          ##<br>
+          ##&nbsp; ** It is recommended not to use spaces in your
+          session and page names (stanza<br>
+          ##&nbsp; headers), as this may not be supported in a future
+          release.<br>
+          ##<br>
+          ##&nbsp; VALID OPTIONS:<br>
+          ##<br>
+          ##&nbsp; url - defines the URL for the web page.&nbsp; (This
+          option is required.)<br>
+          ##<br>
+          ##&nbsp; content - defines what content to log, as follows:<br>
+          ##<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          none - index performance metrics.<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          full - index performance metrics and page content.&nbsp; HTML
+          will be<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          parsed prior to indexing, removing CR/LF and excess spaces.<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          This option can be used with Splunk's "diff" command to<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          alert when trusted web pages are modified.<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; headers -
+          index all performance metrics and page header details.&nbsp;
+          (This<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          is the default setting.)<br>
+          ##<br>
+          ##&nbsp; links - defines how to follow links, as follows:<br>
+          ##<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          follow - follow all links on the page and report diagnistic
+          data.<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          (This is the default setting.)<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          form - submit a form.&nbsp; (Requires form and form_fields.)<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          none - do not follow links or submit a form.<br>
+          ##<br>
+          ##&nbsp;&nbsp; form - used with 'links=form' to define the
+          form index ID that will be<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          submitted.&nbsp; You can determine form index ID's with the
+          following<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          command, substituting the URL of your desired web page:<br>
+          ##<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          splunk cmd python automation.py --scan http://www.splunk.com<br>
+          ##<br>
+          ##&nbsp;&nbsp;&nbsp; form_fields - a pipe-separated list (|)
+          of key:value pairs to submit with<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          the form.&nbsp; Use the --scan command, above, to identify the<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          controls to fill in.&nbsp; For instance, using the command
+          above<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          yields the following for www.splunk.com's FORM_ID [0]:<br>
+          ##<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &lt;TextControl(q=Search)&gt;&gt;<br>
+          ##<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          This tells us that there is a text control called 'q' that is<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          shown as 'Search' to viewers of the web page.<br>
+          ##<br>
+          ##&nbsp; show_form_fields - (True|False) determines whether
+          form field submissions are<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          logged.&nbsp; Understanding the values provided in form
+          submissions<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          can be a valuable asset in monitoring web forms through<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          automation; however,consider disabling this feature for form<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          submissions whose values contain passwords. (Default is False)<br>
+          ##<br>
+          ##&nbsp; timeout - defines the number of seconds to wait for
+          the page to load.&nbsp; This setting<br>
+          ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          takes precedence over the timout specified in
+          _sessions_.conf.&nbsp; (Default = 2)<br>
+          ##<br>
+          ##&nbsp; You can test your page settings by using the
+          following command:<br>
+          ##<br>
+          ##&nbsp; splunk cmd python automation.py -p
+          &lt;my_page_name&gt;<br>
+          ##&nbsp; i.e. splunk cmd python automation.py -p
+          splunkbase_login<br>
+          ##<br>
+          ##&nbsp; NOTE:&nbsp; If you test a page that requires
+          authentication, but the login page<br>
+          ##&nbsp; is a separate page definition, you will need to
+          create a session that includes<br>
+          ##&nbsp; the login page first.&nbsp; (See _sessions_.conf_ for
+          information on how to test<br>
+          ##&nbsp; with sessions.)<br>
+          ##<br>
+          ##&nbsp; 'splunk cmd python automation.py --help' for
+          additional help.<br>
+          ##<br>
+          ##&nbsp; EXAMPLES:<br>
+          <br>
+          ##&nbsp; index performance data and headers for
+          http://www.splunk.com, and submit a search for "props.conf"<br>
+          [splunk]<br>
+          url = http://www.splunk.com<br>
+          content = headers<br>
+          links = form<br>
+          form = 0<br>
+          form_fields = q:props.conf<br>
+          show_form_fields = true<br>
+          <br>
+          ##&nbsp; index performance data and headers for
+          http://www.splunkbase.com and follow all links on the page<br>
+          [splunkbase]<br>
+          url = http://www.splunkbase.com<br>
+          content = headers<br>
+          links = follow<br>
+          timeout = 4<br>
+          <br>
+          ##&nbsp; login at splunk.com<br>
+          [splunkbase_login]<br>
+          url =
+https://www.splunk.com/index.php?module=roles&amp;func=showloginform&amp;artid=splunkbase&amp;redirecturl=http://splunk-base.splunk.com/account/splunk/signin/<br>
+          content = none<br>
+          links = form<br>
+          form = 1<br>
+          form_fields = uname:splunktato|pass:password<br>
+          show_form_fields = false<br>
+          <br>
+          ## index list of support cases after logging in under
+          [splunkbase_login]<br>
+          [splunk_my_cases]<br>
+          url = https://www.splunk.com/page/track_issues<br>
+          content = full<br>
+          links = none<br>
+        </font><br>
+      </my_page_name></textcontrol(q=search)>
+  </body>
+</html>

@@ -1,0 +1,129 @@
+<form version="1.1">
+  <label>Multiple Interface Rates (by Switch)</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="Interface_Switch_time" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="SwitchName" searchWhenChanged="true">
+      <label>Switch:</label>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_ifcounter" | stats count by switchname | sort switchname</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query> source="arista_switch_ifcounter" $SwitchName$ | timechart count by switchname | sort switchname</query>
+          <earliest>$Interface_Switch_time.earliest$</earliest>
+          <latest>$Interface_Switch_time.latest$</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Interface statistics on $SwitchName$ over time.</title>
+      <table>
+        <search>
+          <query>sourcetype="arista_switch_ifcounter" $SwitchName$ |
+                    stats last(description) as description,
+                    last(linkStatus) as linkStatus,
+                    max(speed) as speed,
+                    latest(speed_desc) as ifSpeed,
+                    sparkline(max(inRate)) as inRate,
+                    sparkline(max(outRate)) as outRate,
+                    sparkline(max(inOctets)) as inOctets,
+                    sparkline(max(outOctets)) as outOctets,
+                    sparkline(max(inErrors)) as inErrors,
+                    sparkline(max(inDiscards)) as inDiscards,
+                    sparkline(max(outErrors)) as outErrors,
+                    sparkline(max(outDiscards)) as outDiscards,
+                    sparkline(max(inUcastPkts)) as inUcastPkts,
+                    sparkline(max(inBroadcastPkts)) as inBroadcastPkts,
+                    sparkline(max(inMulticastPkts)), as inMulticastPkts,
+                    sparkline(max(outUcastPkts)) as outUcastPkts,
+                    sparkline(max(outBroadcastPkts)) as outBroadcastPkts,
+                    sparkline(max(outMulticastPkts)) as outMulticastPkts
+                     by switchname,interface |
+                    table interface,description,linkStatus,ifSpeed,inRate,outRate,inOctets,outOctets,inErrors,inDiscards,outErrors,outDiscards,inUcastPkts,inBroadcastPkts,inMulticastPkts,outUcastPkts,outBroadcastPkts,outMulticastPkts</query>
+          <earliest>$Interface_Switch_time.earliest$</earliest>
+          <latest>$Interface_Switch_time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+        <format field="inRate" type="sparkline">
+          <option name="type">bar</option>
+          <option name="height">40</option>
+          <option name="barColor">#5379AF</option>
+          <option name="barWidth">5px</option>
+        </format>
+        <format field="outRate" type="sparkline">
+          <option name="type">bar</option>
+          <option name="height">40</option>
+          <option name="barColor">#5379AF</option>
+          <option name="barWidth">5px</option>
+        </format>
+        <format field="inOctets" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format field="outOctets" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format field="inUcastPkts" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format field="inBroadcastPkts" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format field="inMulticastPkts" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format field="outUcastPkts" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format field="outMulticastPkts" type="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

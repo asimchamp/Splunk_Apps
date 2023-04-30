@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+
+
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Modular Alerting Framework | RedAlert</title></head><body>
+<table style="width: 100%; font-family: Helvetica,Arial,sans-serif;" border="0" cellpadding="0">
+
+  <tbody>
+    <tr>
+      <td style="width: 48%; text-align: left; vertical-align: top;"><span style="font-weight: bold;"><img style="width: 36px; height: 36px;" alt="" src="/static/app/alerts/appIcon.png" align="left" hspace="10"><big><big>Modular
+Alert Framework | RedAlert</big></big></span><big><big><br>
+      </big>for Splunk<br>
+      </big><big><br>
+RedAlert
+extends
+the alerting capabilities of Splunk by providing a simplified and
+comprehensive configuration interface for alert actions.&nbsp; In
+essence, RedAlert is like a Tag Management solution for alerts, giving
+your
+alert actions easy access to fields, search results, and alert
+arguments.&nbsp; Searches come to life and become actionable as their
+alerts issue shell commands and REST searches in response to events
+in the infrastructure.&nbsp; Alert Actions become auditable, with
+monitoring and logging of performance details, execution status, and
+errors.&nbsp; Use RedAlert to automatically file
+incidents with your CMDB, restart broken applications, lockdown ACLs in
+response to threats, or page you, all at the click of a button...&nbsp;
+or two...<br>
+      <br>
+Configuration is simple:<br>
+      </big>
+      <ol>
+        <li>
+          <p>Install RedAlert on a Search Head.<br>
+          </p>
+        </li>
+        <li>
+          <p>Copy $SPLUNK_HOME/etc/apps/alerts/bin/redalert.sh to
+$SPLUNK_HOME/bin/scripts/redalert.sh -- use redalert.bat for Windows.<br>
+</p></li>
+        <li>[Optional]&nbsp; Configure _passwd_.conf with Splunk
+credentials for REST API access.&nbsp; This is only necessary to
+support alert actions that run searches; shell commands don&#8217;t need this.<br>
+        </li>
+
+        <li>
+          <p>Define your alert actions in RedAlert's &#8220;Configuration&#8221;
+dashboard.</p>
+        </li>
+        <li>Save or Edit an alert in Splunk.&nbsp; To associate your
+alert with a RedAlert action, place the RedAlert action's ID in
+brackets, somewhere in the name of your Search/Alert.&nbsp; For
+instance, a RedAlert action
+whose ID is &#8220;SEARCH_SAMPLE&#8221; would match any search/alert that has
+"[SEARCH_SAMPLE]&#8221; in its name.</li>
+        <li>
+          <p>Select to "Run a Script" as an action for your
+alert.&nbsp; Type "redalert.sh" as the filename to run.&nbsp; (See
+Diagram 1) -- use redalert.bat for Windows.<br>
+          </p>
+        </li>
+        <li>
+          <p>Go to the &#8220;Overview&#8221; dashboard and monitor your alerts.</p>
+        </li>
+      </ol>
+      <p><big>* Use the `RedAlert` macro to search your audit logs for
+alert execution details.</big></p>
+NOTE:&nbsp;
+RedAlert will configure a Data Input (<span style="font-weight: bold;">UDP:9020</span>) that listens only for "localhost" traffic.&nbsp; This is used to capture and index performance and
+execution details for alerts.&nbsp; If this data needs to be indexed at
+another location, be sure to configure the server to forward this data.<br>
+      </td>
+      <td style="width: 4%; text-align: left; vertical-align: top;"><br>
+      </td>
+      <td style="width: 48%; text-align: left; vertical-align: top;"><br><big><span style="font-weight: bold;">DIAGRAM 1:<br>
+      <br>
+      <img style="border: 2px solid ; width: 451px; height: 372px;" alt="" src="/static/app/alerts/images/diagram_1.png"><br>
+      <br>
+</span></big><big>Troubleshooting:</big>&nbsp;<br>
+      <br>
+After configuring your alerts, check the Overview dashboard inside the
+app for status messages.&nbsp; The "Interesting Events" will show you
+alert errors, as well as errors captured in _internal:web_services.log
+and _internal:splunkd.log.<br>
+</td></tr></tbody></table></body></html>

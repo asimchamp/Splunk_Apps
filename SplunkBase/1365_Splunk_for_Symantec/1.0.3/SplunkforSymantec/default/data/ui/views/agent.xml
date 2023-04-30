@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+    <label>SEP Agent Logs</label>
+    <fieldset autoRun="true">
+        <input type="time" searchWhenChanged="true">
+            <default>Today</default>
+        </input>
+    </fieldset>
+    <row>
+        <single>
+            <searchString>`client_log_count`</searchString>
+            <option name="beforeLabel">Agent Log Events: </option>
+        </single>
+        <single>
+            <searchString>`client_log_most_failures`</searchString>
+            <option name="beforeLabel">Hosts with Failures: </option>
+        </single>
+        <single>
+            <searchString>`client_log_most_active`</searchString>
+            <option name="beforeLabel">Most Active Host: </option>
+        </single>
+    </row>
+    <row>
+        <chart>
+            <searchString>`client_log_trends`</searchString>
+            <title>Agent Event Trends</title>
+            <option name="charting.chart">line</option>
+            <option name="count">10</option>
+            <option name="charting.legend.placement">bottom</option>
+        </chart>
+    </row>
+    <row>
+        <table>
+            <searchString>`client_log_event_information_table`</searchString>
+            <title>Agent Event Information</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <option name="maxLines">10</option>
+            <option name="segmentation">outer</option>
+            <option name="softWrap">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>`client_log_systems_with_failures`</searchString>
+            <title>Hosts with Failures</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+            <option name="maxLines">10</option>
+            <option name="segmentation">outer</option>
+        </table>
+    </row>
+</form>

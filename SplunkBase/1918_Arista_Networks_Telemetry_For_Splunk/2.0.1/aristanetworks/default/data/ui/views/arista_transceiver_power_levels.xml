@@ -1,0 +1,113 @@
+<form version="1.1">
+  <label>Transceiver Optical Power levels (by Switch)</label>
+
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="timerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="dropdown1" searchWhenChanged="true">
+      <label>Switch:</label>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_inventory" AristaXcvrInventory | stats count by switchname | sort switchname</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query> source="arista_switch_inventory" AristaXcvrInventory switchname=$dropdown1$ | dedup interface | sort switchname interface | timechart count(interface) as events | sort _time</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+          <refresh>30s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Events</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Optical Power Level statistics on $dropdown1$ over time </title>
+      <table>
+        <search>
+          <query>source="arista_switch_inventory" switchname=$dropdown1$ AristaXcvrInventory | dedup interface | sort switchname interface | table switchname,interface,mfgname,model,serialnum, txPower, rxPower</query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="inRate">
+          <option name="type">bar</option>
+          <option name="height">40</option>
+          <option name="barColor">#5379AF</option>
+          <option name="barWidth">5px</option>
+        </format>
+        <format type="sparkline" field="outRate">
+          <option name="type">bar</option>
+          <option name="height">40</option>
+          <option name="barColor">#5379AF</option>
+          <option name="barWidth">5px</option>
+        </format>
+        <format type="sparkline" field="inOctets">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format type="sparkline" field="outOctets">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format type="sparkline" field="inUcastPkts">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format type="sparkline" field="inBroadcastPkts">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format type="sparkline" field="inMulticastPkts">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format type="sparkline" field="outUcastPkts">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+        <format type="sparkline" field="outMulticastPkts">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

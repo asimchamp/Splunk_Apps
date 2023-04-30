@@ -1,0 +1,82 @@
+<form version="1.1">
+  <label>DNS Tunneling</label>
+  <fieldset autoRun="true" submitButton="false">
+
+    <input type="dropdown" token="source" searchWhenChanged="true" id="source_input">
+      <label>source</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <default>*</default>
+      <search>
+        <query>| tstats count where sourcetype IN (tshark:port53, port53tttt) by source |fields source</query>
+      </search>
+    </input>
+
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+   <panel>
+   <html><table>
+           <tr>
+           <td>
+           <p>Possible DNS Tunneling indicators (see an example on the right): 
+           <ul>
+            <li>several red values in a row</li>
+            <li>requests from single source IP address</li>
+            <li>unusual DNS Query Type (not A/AAAA)</li>
+            <li>high avg_qry_len</li>
+            <li>domain looks suspicious</li>
+           </ul>
+           </p>
+           </td>
+           <td>
+         <img style="float:right; vertical-align:top; padding: 0px 10px"  src="/static/app/DNS_Insight/DNS_Insight-Detecting_DNS_Tunneling_with_Splunk_example.png" alt="DNS Insight Splunk App to detect DNS tunneling"></img>
+           </td>
+           </tr>
+         </table>
+    </html>
+    <table>
+      <title>Possible DNS Tunneling</title>
+      <search>
+      <query><![CDATA[ sourcetype=tshark:port53 OR sourcetype=port53tttt source=$source$ message_type="QUERY" record_type!="PTR" | rex field=query "(?<dns_subdomain>.*)\.(?<dns_domain>[^\.]+\.[^\.]+)$" |eval query_subdomain_length=length(dns_subdomain)|stats sparkline dc(src) AS "# src", dc(query) AS num_subdomain,avg(query_subdomain_length) AS avg_qry_len,  var(query_subdomain_length) AS Sample_Variance, stdev(query_subdomain_length) AS Standard_Deviation, values(record_type) AS "Qry Type" by dns_domain | eval Median_Length=round(Median_Length,0) | eval Sample_Variance=round(Sample_Variance,0) | eval Standard_Deviation=round(Standard_Deviation,0) | eval avg_qry_len=round(avg_qry_len,0) |eval score = num_subdomain * avg_qry_len | sort 100 - score ]]></query>
+      </search>
+      <option name="showPager">true</option>
+      <option name="count">10</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <format type="color" field="score">
+        <colorPalette type="minMidMax" maxColor="#D93F3C" midColor="#F7BC38" minColor="#FFFFFF"></colorPalette>
+        <scale type="minMidMax" maxType="percentile" maxValue="100" midType="percentile" midValue="90" minType="percentile" minValue="80"></scale>
+      </format>
+      <format type="color" field="avg_qry_len">
+        <colorPalette type="minMidMax" maxColor="#D93F3C" midColor="#F7BC38" minColor="#FFFFFF"></colorPalette>
+        <scale type="minMidMax" maxType="percentile" maxValue="100" midType="percentile" midValue="90" minType="percentile" minValue="80"></scale>
+      </format>
+      <format type="color" field="Sample_Variance">
+        <colorPalette type="minMidMax" maxColor="#D93F3C" midColor="#F7BC38" minColor="#FFFFFF"></colorPalette>
+        <scale type="minMidMax" maxType="percentile" maxValue="100" midType="percentile" midValue="90" minType="percentile" minValue="80"></scale>
+      </format>
+      <format type="color" field="Standard_Deviation">
+        <colorPalette type="minMidMax" maxColor="#D93F3C" midColor="#F7BC38" minColor="#FFFFFF"></colorPalette>
+        <scale type="minMidMax" maxType="percentile" maxValue="100" midType="percentile" midValue="90" minType="percentile" minValue="80"></scale>
+      </format>
+      <format type="color" field="num_subdomain">
+        <colorPalette type="minMidMax" maxColor="#D93F3C" midColor="#F7BC38" minColor="#FFFFFF"></colorPalette>
+        <scale type="minMidMax" maxType="percentile" maxValue="100" midType="percentile" midValue="90" minType="percentile" minValue="80"></scale>
+      </format>
+
+
+
+
+
+    </table>
+   </panel>  
+  </row>
+</form>

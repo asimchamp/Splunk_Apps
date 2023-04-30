@@ -1,0 +1,157 @@
+<form>
+  <label>Pan and Zoom Chart Controls</label>
+  <fieldset submitButton="false"/>
+  <row>
+    <panel>
+      <chart>
+        <title>Incident Trend (select time window to zoom)</title>
+        <searchString>index=sfpd | timechart count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x639BF1, 0xFF5A09]</option>
+        <option name="height">150px</option>
+      </chart>
+      <chart>
+        <searchString>index=sfpd | timechart count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x639BF1, 0xFF5A09]</option>
+        <option name="height">150px</option>
+      </chart>
+      <chart>
+        <searchString>index=sfpd | timechart count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">-45</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x639BF1, 0xFF5A09]</option>
+        <option name="height">150px</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Use Pan and Zoom to Select Time Ranges Used By Other Visualizations</title>
+        <searchString>index=sfpd | timechart count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0x1D2F3E]</option>
+        <option name="height">150px</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <selection>
+          <set token="selection.earliest">$start$</set>
+          <set token="selection.latest">$end$</set>
+          <set token="start.count">$start.count$</set>
+          <set token="end.count">$end.count$</set>
+        </selection>
+      </chart>
+      <html>
+        <p>Token Values:</p>
+        <code>New Selected Time Range: $selection.earliest$ - $selection.latest$</code>
+        <br/>
+        <code>Count Value Range: $start.count$ - $end.count$</code>
+      </html>
+      <chart>
+        <searchString>index=sfpd | top Category</searchString>
+        <earliestTime>$selection.earliest$</earliestTime>
+        <latestTime>$selection.latest$</latestTime>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.seriesColors">[0xC9E1C1]</option>
+        <option name="height">250px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h2>Pan and Zoom Chart Controls</h2>
+        <p>Intuitively explore large amounts of data in your visualizations</p>
+        <p>There are 2 different configurable behaviors for pan and zoom chart controls:</p>
+        <ul>
+          <li>Select and Zoom (Default)</li>
+          <ul>
+            <li>By default, users can click to select an area within a line/area/column chart, and the visualization will automatically zoom into the selected area</li>
+            <li>Users can then reset their selection to restore to the original scope</li>
+          </ul>
+          <li>Select and Pan</li>
+          <ul>
+            <li>You can optionally enable the selection window to drive secondary dashboard elements</li>
+            <li>This is enabled using the <code><![CDATA[<selection />]]></code> parameter</li>
+            <li>You will need to set tokens for earliest and latest for subsequent elements to reference as their time range scope</li>
+          </ul>
+<pre><![CDATA[
+        <selection>
+          <set token="selection.earliest">$start$</set>
+          <set token="selection.latest">$end$</set>
+        </selection>
+]]></pre>          
+          <li>Pan and Zoom Chart Controls is supported for line, area and column charts only</li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+</form>

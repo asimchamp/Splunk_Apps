@@ -1,0 +1,40 @@
+<form version="1.1">
+  <label>Geolocation of Attacks</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timeRange">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <map>
+        <title>Location of Attacks</title>
+        <search>
+          <query>"firewall" | fields client_ip | search client_ip!=192.168* client_ip!=0.0.* client_ip!=10.*| stats count by client_ip | eval count_label="Attacks" | eval iterator="client_ip" | eval iterator_label="Client IP" | eval movie_color="#FF0000" | eval output_file="home_threat_data.xml" | eval app="barracuda_splunk" | iplocation client_ip | geostats latfield=lat longfield=lon count by Attack_Description</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="mapping.type">marker</option>
+        <option name="refresh.display">progressbar</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top Attacking Cities</title>
+        <search>
+          <query>sourcetype="firewall" Attack_Description != NULL | fields client_ip | iplocation client_ip | table _time, client_ip, client_port, Attack_Description, lat , lon, City, Region, Country | rename _time as Time | convert timeformat="%m/%d/%Y %l:%M:%S %p" ctime(Time) |rename Attack_Description as "Attack Name" | rename lon as Longitude | rename lat as Latitude | rename client_port as "Client Port"| rename client_ip as "Client IP"</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

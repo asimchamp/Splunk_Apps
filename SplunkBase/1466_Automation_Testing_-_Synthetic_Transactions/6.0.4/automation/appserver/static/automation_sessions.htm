@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  </head>
+  <body>
+    <font face="Arial"><b>_SESSIONS_.CONF</b></font><br>
+    <br>
+    <font face="Arial" size="-1">##&nbsp; This file defines the
+      "sessions" that can be called as Data Inputs within Splunk.<br>
+      ##&nbsp; Sessions allow Splunk to emulate a user browsing a list
+      of web pages, filling in<br>
+      ##&nbsp; forms, and clicking links, while preserving session state
+      between pages during<br>
+      ##&nbsp; each session attempt (including cookies).&nbsp; For
+      instance, if a session starts by<br>
+      ##&nbsp; submitting a login form to a web site, all subsequent
+      pages indexed for the<br>
+      ##&nbsp; session will be in the context of the logged in user.<br>
+      ##<br>
+      ##&nbsp; ** NOTE: session state is preserved for all pages
+      *within* each session attempt;<br>
+      ##&nbsp; however, it is not preseved *between* session
+      attempts.&nbsp; A unique session_id is<br>
+      ##&nbsp; provide for each session attempt, giving Splunk the
+      granularity to differentiate<br>
+      ##&nbsp; and group pages by each attempt, as well as the umbrella
+      session definition.<br>
+      ##<br>
+      ##&nbsp; When creating Data Inputs within Splunk, each Data Input
+      will represent a specific<br>
+      ##&nbsp; session definition, as defined in _sessions_.conf.<br>
+      ##<br>
+      ##&nbsp; ** It is recommended not to use spaces in your session
+      and page names (stanza<br>
+      ##&nbsp; headers), as this may not be supported in a future
+      release.<br>
+      ##<br>
+      ##&nbsp; VALID OPTIONS:<br>
+      ##<br>
+      ##&nbsp; pages - defines a comma-separated list of web pages that
+      will be browsed when this<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; session
+      is evoked.&nbsp; Pages are defined in _pages_.conf.&nbsp; (This
+      setting is<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      required.)<br>
+      ##<br>
+      ##&nbsp; user_agent - defines the browser to masquerade as when
+      browsing web pages during<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      the session.<br>
+      ##<br>
+      ##<br>
+      ##&nbsp; timeout - defines the number of seconds to wait for each
+      page to load during this<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      session.&nbsp; The timeout setting in _pages_.conf will take
+      precedence for<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      an individual page.&nbsp; (Default = 2)<br>
+      ##<br>
+      ##&nbsp; cert - defines the filename of the client-side
+      certificate files to use for the<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; session -- .key
+      and .cer will be appeneded to this name.&nbsp; Place these in<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      $SPLUNK_HOME/etc/apps/automation/certs.&nbsp; These files can be
+      generated<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; using the
+      following syntax with OpenSSL:<br>
+      ##<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; openssl pkcs12
+      -in input_file.p12 -clcerts -out example.key -nocerts -nodes<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; openssl pkcs12
+      -in input_file.p12 -clcerts -out example.cer -nokeys<br>
+      ##<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To use
+      example.key and example.cer, specify 'cert = example'.<br>
+      ##<br>
+      ##&nbsp; proxy - defines a proxy to use when browsing this
+      session.<br>
+      ##<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For
+      anonymous proxy, use the following format:<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; proxy =
+      myproxy.example.com<br>
+      ##<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; For basic
+      authentication, use the following format:<br>
+      ##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; proxy =
+      username:password@proxy.example.com:1234<br>
+      ##<br>
+      ##&nbsp; You can test your page and session settings by using the
+      following command:<br>
+      ##<br>
+      ##&nbsp; splunk cmd python automation.py -s &lt;my_session&gt;<br>
+      ##&nbsp; i.e. splunk cmd python automation.py -s support<br>
+      ##<br>
+      ##&nbsp; 'splunk cmd python automation.py --help' for additional
+      help.<br>
+      ##<br>
+      ##&nbsp; EXAMPLES:<br>
+      <br>
+      ##&nbsp; define a session to browse [splunk] then [splunkbase] as
+      defined in _pages_.conf<br>
+      [splunk_home]<br>
+      pages = splunk,splunkbase<br>
+      user_agent = Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0)
+      Gecko/20100101 Firefox/19.0<br>
+      timeout = 1<br>
+    </font><br>
+    <font face="Arial" size="-1"><font face="Arial" size="-1">##&nbsp;
+        define a session to browse [splunkbase_login] then [my_cases] as
+        defined in _pages_.conf<br>
+        ##&nbsp; splunkbase_login must occur first, to establish login
+        credentials for splunk_my_cases<br>
+      </font>[splunk_support]<br>
+      pages = splunkbase_login,splunk_my_cases<br>
+    </font><br>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<form version="1.1" script="autodiscover.js">
+  <label>Hierarchy View</label>
+   <fieldset submitButton="true" autoRun="true">
+    <input type="dropdown" token="cmb_folder_tkn" searchWhenChanged="true">
+      <label>Folder</label>
+	  <default>*</default>
+      <choice value="*">All</choice>
+	  <fieldForLabel>folderName</fieldForLabel>
+      <fieldForValue>folderName</fieldForValue>
+      <search>
+        <query>| inputlookup nesa_folderid | dedup folderId,folderName | sort folderName</query>
+      </search>
+	  <change>
+		<unset token="form.cmb_array_tkn" />
+	  </change>
+    </input>
+	<input type="dropdown" token="cmb_array_tkn" searchWhenChanged="true">
+      <label>Array</label>
+	  <default>*</default>
+      <choice value="*">All</choice>
+	  <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+      <search>
+        <query>| inputlookup nesa_controllers | dedup arrayId arrayName | table arrayId arrayName | lookup nesa_folderid arrayId output folderId | fillnull value="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeebbfd" folderId | mvexpand folderId | lookup nesa_folder_hierarchy folderId OUTPUT fullPath | eval folder_hierarchy=split(fullPath,"/") | mvexpand folder_hierarchy | eval arrayflag=if("$cmb_folder_tkn$"=="*","true","false") | where (arrayflag="true" OR folder_hierarchy="$cmb_folder_tkn$") | dedup arrayId arrayName | sort arrayName | table arrayId arrayName</query>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h2>Hierarchy View</h2>
+        <p>(Folder > Array >  Controller )</p>
+         <div id="dendrogram_search" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options='{
+          "search": {
+            "type": "token_safe",
+            "value": "| inputlookup nesa_controllers | search arrayId=\&quot;$$cmb_array_tkn$$\&quot; | table arrayId arrayName controllerLabel needsAttention | lookup nesa_folderid arrayId output folderId | fillnull value=\&quot;aaaaaaaa-bbbb-cccc-dddd-eeeeeeeebbfd\&quot; folderId | mvexpand folderId | lookup nesa_folder_hierarchy folderId OUTPUT fullPath | fillnull value=\&quot;All Storage Systems\&quot; fullPath | eval folder_hierarchy=split(fullPath,\&quot;/\&quot;) | mvexpand folder_hierarchy | eval arrayflag=if(\&quot;$$cmb_folder_tkn$$\&quot;==\&quot;*\&quot;,\&quot;true\&quot;,\&quot;false\&quot;) | where (arrayflag=\&quot;true\&quot; OR folder_hierarchy=\&quot;$$cmb_folder_tkn$$\&quot;) | eval arrayName=if(needsAttention==\&quot;true\&quot;,arrayName.\&quot; (Needs Attention)\&quot;,arrayName) | eval \&quot;3\&quot;=arrayName.\&quot;##\&quot;.arrayId | eval \&quot;2\&quot;=\&quot;Arrays\&quot;,\&quot;4\&quot;=\&quot;Controllers\&quot; | eval pathcount=mvcount(split(fullPath,\&quot;/\&quot;)) | eventstats max(pathcount) as \&quot;0\&quot; | rename fullPath as \&quot;1\&quot; , controllerLabel as \&quot;5\&quot; | table \&quot;0\&quot; \&quot;1\&quot; \&quot;2\&quot; \&quot;3\&quot; \&quot;4\&quot; \&quot;5\&quot; | eseriesfolderhierarchy  "
+          },
+          "preview": true
+        }'>
+        </div>
+        <div id="dendrogram" class="splunk-view" data-require="app/netapp_app_eseries_perf/components/treelist/treeview" data-options='{
+          "managerid": "dendrogram_search",
+          "root_label": "Folders",
+          "margin_left": 200,
+		  "initial_open_level": 3,
+          "margin_right": 0
+        }'>
+        </div>
+      </html>
+    </panel>
+  </row>
+</form>

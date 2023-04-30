@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Audit</label>
+  <row>
+    <single>
+      <searchString>eventtype=sitescope_audit | search "logged in." | stats count</searchString>
+      <title>SiteScope Login Count</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </single>
+  </row>
+  <row>
+    <single>
+      <searchString>eventtype=sitescope_audit  | search "enabled in" | stats count</searchString>
+      <title>Total SiteScope Monitors Enabled</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+    </single>
+    <single>
+      <searchString>eventtype=sitescope_audit  | search "disabled in" | stats count</searchString>
+      <title>Total SiteScope Monitors Dsiabled</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">true</option>
+      <option name="drilldown">none</option>
+    </single>
+  </row>
+  <row>
+    <table>
+      <searchString>eventtype=sitescope_audit | search "updated" | table _raw</searchString>
+      <title>Most Updated Monitor Groups</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="displayRowNumbers">false</option>
+      <option name="drilldown">none</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>sourcetype=sitescope_audit "Failed to login." | fields _time, sis_op_username | rename sis_op_username AS "Username" | rename _raw AS "Log entry"</searchString>
+      <title>SiteScope Failed Logins</title>
+      <earliestTime>-1d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="drilldown">row</option>
+    </table>
+  </row>
+</dashboard>

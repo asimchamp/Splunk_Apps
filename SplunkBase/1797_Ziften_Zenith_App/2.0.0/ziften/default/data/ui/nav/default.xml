@@ -1,0 +1,83 @@
+<nav color="#00BCD4">
+    <view name="ziften_overview" default='true' />
+    
+  <collection label="Security">
+    <view name="security_alert_drilldown"/>
+      <collection label="AlienVault Open Threat Exchange">
+          <view name="otx__overview" default='true' />
+          <view name="otx__drilldown__endpoint" />
+          <view name="otx__drilldown__destination" />
+          <view name="otx__drilldown__binary" />
+          <view name="otx__drilldown__otx_tag" />
+      </collection>
+      <collection label="VirusTotal">
+        <view name="virustotal__overview" />
+        <view name="vt__drilldown__binary"/>
+        <view name="vt__drilldown__endpoint" />
+      </collection>
+    <collection label="National Vulnerability Database">
+          <view name="nvd__drilldown__endpoint" />
+          <view name="nvd__drilldown__binary" />
+      </collection>
+  </collection> 
+  
+  <collection label="Forensics">
+    <view name="process_drilldown"/>
+    <view name="system_drilldown"/>
+    <view name="system__forensics__drilldown"/>
+    <view name="system_network_drilldown"/>
+    <view name="process_network_drilldown" />
+  </collection>
+  
+  <collection label="Anomaly">
+    <view name="anomaly_system"/>
+    <view name="anomaly_process"/>
+    <view name="anomaly_service"/>
+    <view name="anomaly_user"/>
+    <view name="anomaly_file_system"/>
+  </collection>
+  
+  <collection label="Visibility">
+        <collection label="System">
+    	    <view name="systems_overview" default='true' />
+            <view name="system_users"/>
+	    </collection>
+        <collection label="Process">
+    	    <view name="process_overview" default='true' />
+            <view name="process_autostarts"/>
+          <view name="process__registry_autostarts" />
+            <view name="process_version_proliferation"/>
+	    </collection>
+        <collection label="Service">
+    	    <view name="service_overview" default='true' />
+	    </collection>
+        <collection label="Network">
+    	    <view name="network_flow" default='true' />
+            <view name="ziften__network__binary__overview" />
+	    </collection>
+  </collection>
+<!--  
+  <collection label="Tools">
+       <collection label="Ziften">
+          <view name="tools__real_time_message_monitor" />
+         <view name="modular_input__status__postgres_" />
+         <view name="modular_input__status__ziften_agent" />
+         <view name="modular_input__status__bsql" />
+         <saved name="Alert | Full Population | User" />
+      </collection>
+       <collection label="Splunk">
+          <view name="alerts" />
+          <view name="flashtimeline" />
+          <view name="data_models" />
+          <view name="reports" />
+          <view name="dashboards" isVisible="false" />
+      </collection>
+  </collection>
+-->
+  <collection label="Search">$
+     <view name="search" default="true" />$
+  </collection>$
+
+  
+
+</nav>

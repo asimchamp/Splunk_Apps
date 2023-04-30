@@ -1,0 +1,192 @@
+<form script="inpage_drilldown_form.js" stylesheet="custom.css" version="1.1">
+  <label>HX - Comprehensive</label>
+  <description>Comprehensive Dashboard for FireEye HX Events</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Search</label>
+      <default>*</default>
+      <suffix/>
+    </input>
+    <!-- Used for dropdown - Input field hidden using javascript. <div id = #field3 -->
+    <input type="text" token="ID" searchWhenChanged="true"/>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Severity</title>
+      <search><query>eventtype=fe product="HX" $wild$ | chart count by alert.matched_source_alerts{}.meta.alert_severity</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.chart.showPercent">true</option>
+      <option name="charting.fieldColors">{crit:0xFF1300,majr:0xFFDA00,minr:0x3C04F2}</option>
+    </chart>
+    <chart>
+      <title>Top 20 IOC Hosts</title>
+      <search><query>eventtype=fe product="HX" alert.source="IOC" $wild$ | top limit=20 alert.host.hostname</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+    </chart>
+    <chart>
+      <title>Top 20 IOCs</title>
+      <search><query>eventtype=fe product="HX" alert.source="IOC" $wild$ | top limit=20 alert.indicator.display_name</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <title>Top 20 Hosts with Actions</title>
+      <search><query>eventtype=fe product="HX" $wild$ | top limit=20 alert.host.hostname</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+    </chart>
+    <chart>
+      <title>Top 20 Actions</title>
+      <search><query>eventtype=fe product="HX" $wild$ | top limit=20 category</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+      <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+      <option name="charting.axisTitleY2.visibility">visible</option>
+      <option name="charting.axisY2.enabled">false</option>
+      <option name="charting.axisY2.scale">inherit</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>IOC Hits</title>
+      <search><query>eventtype=fe product="HX" alert.source="IOC" $wild$ |table  alert._id, alert.indicator.display_name, alert.host.domain, host, alert.host.ip, alert.sysinfo.mac_address, alert.host.agent_id, alert.host.agent_version, alert.event_at | rename alert._id AS ID, alert.indicator.display_name AS "IOC Name", alert.host.domain AS Domain, host AS Hostname, alert.host.ip AS "IP Address", alert.sysinfo.mac_address AS "MAC Address", alert.host.agent_id as "Agent ID", alert.host.agent_version AS "Agent Version", alert.event_at AS Occurred</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+  <row>
+    <table id="master">
+      <title>Actions Log</title>
+      <search><query>eventtype=fe product="HX"  $wild$| table alert._id, category, alert.matched_source_alerts{}.meta.alert_severity, alert.host.domain, host, alert.host.ip, alert.sysinfo.mac_address, alert.host.agent_id, alert.host.agent_version, alert.event_at | rename alert._id AS ID, category as Action, alert.matched_source_alerts{}.meta.alert_severity AS Severity, alert.host.domain AS Domain, host AS Hostname, alert.host.ip AS "IP Address", alert.sysinfo.mac_address AS "MAC Address", alert.host.agent_id as "Agent ID", alert.host.agent_version AS "Agent Version", alert.event_at AS Occurred</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>    
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+    </table>
+  </row>
+    <row>
+    <table id="detail">
+      <title>Action Detail: $ID$</title>
+      <search><query>eventtype=fe product="HX" alert._id=$ID$ $wild$ | table _raw, ext_ref | rename _raw AS "Raw Event",  ext_ref AS "Event Link"</query></search>
+      <earliest>$earliest$</earliest>
+      <latest>$latest$</latest>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">none</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

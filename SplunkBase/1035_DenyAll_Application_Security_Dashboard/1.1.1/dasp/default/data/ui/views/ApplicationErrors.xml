@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Errors</label>
+
+  <fieldset>
+    <input type="dropdown" token="application">
+      	<label>Select Application</label>
+   	<populatingSearch fieldForValue="app" fieldForLabel="app">
+     		<![CDATA[sourcetype="DASP4" | where isnotnull(applicationID) | stats values(application) AS "app"]]>
+  	 </populatingSearch>
+    </input>
+    <input type="time" />
+  </fieldset>
+  <row>
+    <chart>
+		<title>5xx Errors</title>
+		<searchTemplate>sourcetype="DASP4" application="$application$" AND HTTP_response_code="5*" | timechart count by HTTP_response_code</searchTemplate>
+		<option name="charting.chart">line</option>
+		<option name="charting.primaryAxisTitle.text">Time</option>
+		<option name="charting.secondaryAxisTitle.text"># of Errors</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+		<title>Top 404 Errors over time</title>
+		<searchTemplate>sourcetype="DASP4" application="$application$" HTTP_response_code="404" | timechart count AS "Number of 404" by URL | sort 10 "Number of 404" desc</searchTemplate>
+		<option name="charting.chart">line</option>
+		<option name="charting.primaryAxisTitle.text">Time</option>
+		<option name="charting.secondaryAxisTitle.text"># of Errors</option>
+    </chart>
+	</row>
+	<row>
+    <chart>
+      <title>5xx Errors distribution</title>
+      <searchTemplate>sourcetype="DASP4" application="$application$" AND HTTP_response_code="5*" | stats count by HTTP_response_code</searchTemplate>
+      <option name="charting.chart">pie</option>
+    </chart>
+	<table>
+		<title>Top 10 404 URLs</title>
+		<searchTemplate>sourcetype="DASP4" application="$application$" HTTP_response_code="404" | stats count AS "Number of 404" by URL | sort 10 "Number of 404" desc</searchTemplate>
+    </table>
+  </row>
+</form>

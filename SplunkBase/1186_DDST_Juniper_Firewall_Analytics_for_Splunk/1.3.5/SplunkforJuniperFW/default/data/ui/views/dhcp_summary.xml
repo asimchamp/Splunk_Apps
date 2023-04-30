@@ -1,0 +1,123 @@
+<view template="dashboard.html">
+	<label>DHCP Summary</label>
+	<module name="AccountBar" layoutPanel="navigationHeader"/>
+	<module name="AppBar" layoutPanel="navigationHeader"/>
+	<module name="Message" layoutPanel="messaging">
+		<param name="filter">*</param>
+		<param name="clearOnJobDispatch">False</param>
+		<param name="maxSize">1</param>
+	</module>
+	<module name="TitleBar" layoutPanel="navigationHeader">
+		<param name="showActionsMenu">False</param>
+	</module>
+	<module name="ViewstateAdapter" layoutPanel="panel_row1_col1" group="Juniper Firewall Devices Running DHCP">
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="savedSearch">DHCP Devices Running Service</param>
+			<module name="ViewstateAdapter">
+				<param name="suppressionList"/>
+				<module name="HiddenFieldPicker">
+					<param name="strictMode">True</param>
+					<module name="SingleValue">
+						<param name="beforeLabel">No Devices:</param>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="panel_row2_col1" group="Real Time DHCP Service Activity">		
+		<module name="HiddenSavedSearch" autoRun="True">			
+			<param name="useHistory">false</param>
+			<param name="savedSearch">DHCP MAC Activity</param>
+			<module name="JobProgressIndicator"/>
+			<module name="Paginator">
+				<param name="count">15</param>
+				<param name="maxPages">15</param>
+				<param name="entityName">results</param>
+				<module name="SimpleResultsTable">
+					<param name="drilldown">row</param>
+					<param name="entityName">results</param>
+					<module name="ConvertToDrilldownSearch">
+						<module name="ViewRedirector">
+							<param name="viewTarget">flashtimeline</param>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+	<module name="TimeRangePicker" layoutPanel="panel_row2_col2" group="DHCP Activity Summary by by MAC">
+		<param name="searchWhenChanged">True</param>
+		<param name="selected">Last 24 hours</param>
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="useHistory">false</param>
+			<param name="savedSearch">DHCP MAC IP Assignment</param>
+			<module name="JobProgressIndicator"/>
+			<module name="Paginator">
+				<param name="count">15</param>
+				<param name="maxPages">15</param>
+				<param name="entityName">results</param>
+				<module name="SimpleResultsTable">
+					<param name="drilldown">row</param>
+					<param name="entityName">results</param>
+					<module name="ConvertToDrilldownSearch">
+						<module name="ViewRedirector">
+							<param name="viewTarget">flashtimeline</param>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+	  <module name="TimeRangePicker" layoutPanel="panel_row3_col1" group="Top Vendor MAC">
+    <param name="searchWhenChanged">True</param>
+    <param name="selected">Last 60 minutes</param>
+    <module name="HiddenSavedSearch" autoRun="True">
+      <param name="useHistory">false</param>
+      <param name="savedSearch">DHCP Top MAC Vendor</param>
+      <module name="EnablePreview">
+        <param name="enable">true</param>
+        <param name="display">false</param>
+        <module name="HiddenChartFormatter">
+          <param name="chart">pie</param>
+          <module name="JSChart">
+            <param name="height">300px</param>
+            <module name="ViewRedirectorLink">
+              <param name="viewTarget">flashtimeline</param>
+              <param name="label">View full results</param>
+            </module>
+          </module>
+        </module>
+      </module>
+	  <module name="SimpleResultsTable">
+        <param name="drilldown">row</param>
+        <param name="entityName">results</param>
+        <param name="displayRowNumbers">False</param>
+      </module>
+    </module>
+  </module>
+	<module name="TimeRangePicker" layoutPanel="panel_row3_col2" group="DHCP Trend by Device">
+		<param name="searchWhenChanged">True</param>
+		<param name="selected">Last 24 hour</param>
+		<module name="HiddenSavedSearch" autoRun="True">
+			<param name="useHistory">false</param>
+			<param name="savedSearch">DHCP MAC Trend By Device</param>
+			<module name="EnablePreview">
+				<param name="enable">true</param>
+				<param name="display">false</param>
+				<module name="HiddenChartFormatter">
+					<param name="chart">line</param>
+					<param name="primaryAxisTitle.text">Time</param>
+					<param name="secondaryAxisTitle.text">Issue</param>
+					<param name="legend.placement">right</param>
+					<module name="JSChart">
+						<param name="height">300px</param>
+						<module name="ViewRedirectorLink">
+							<param name="viewTarget">flashtimeline</param>
+							<param name="label">View full results</param>
+						</module>
+					</module>
+				</module>
+			</module>
+		</module>
+	</module>
+</view>

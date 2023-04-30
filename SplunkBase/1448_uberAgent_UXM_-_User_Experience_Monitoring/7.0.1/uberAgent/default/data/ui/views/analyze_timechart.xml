@@ -1,0 +1,752 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, analyze_timechart.js" stylesheet="main.css, analyze_timechart.css">
+
+   <label>Analyze data over time</label>
+   <description>This dashboard lets you interactively analyze any filtered subset of your data over time.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterDatamodel" id="Input_FilterDatamodel">
+         <choice value="Application_BrowserPerformanceChrome">Browser: Chrome</choice>
+         <choice value="Application_BrowserPerformanceIE">Browser: IE</choice>
+         <choice value="System_GpuUsage">Machine GPU</choice>
+         <choice value="System_SystemPerformanceSummary">Machine performance</choice>
+         <choice value="Process_NetworkTargetPerformance">Network performance</choice>
+         <choice value="Application_OutlookPluginLoad">Outlook Plugin Load Performance</choice>
+         <choice value="Process_ProcessDetail">Process Detail</choice>
+         <choice value="Process_ProcessStartup">Process Startup</choice>
+         <choice value="Session_SessionDetail_Session0">Session 0</choice>
+         <choice value="System_SmbClient">SMB Client</choice>
+         <choice value="Session_SessionDetail_Users">User Sessions</choice>
+         <label>Data model:</label>
+            <change>
+               <condition value="Application_BrowserPerformanceChrome">
+                  <set token="FilterDatamodelMacro">`uA_DM_Application_BrowserPerformanceChrome`</set>
+               </condition>
+               <condition value="Application_BrowserPerformanceIE">
+                  <set token="FilterDatamodelMacro">`uA_DM_Application_BrowserPerformanceIE`</set>
+               </condition>
+               <condition value="System_GpuUsage">
+                  <set token="FilterDatamodelMacro">`uA_DM_System_GpuUsage`</set>
+               </condition>
+               <condition value="System_SystemPerformanceSummary">
+                  <set token="FilterDatamodelMacro">`uA_DM_System_SystemPerformanceSummary`</set>
+               </condition>
+               <condition value="Process_NetworkTargetPerformance">
+                  <set token="FilterDatamodelMacro">`uA_DM_Process_NetworkTargetPerformance`</set>
+               </condition>
+               <condition value="Application_OutlookPluginLoad">
+                  <set token="FilterDatamodelMacro">`uA_DM_Application_OutlookPluginLoad`</set>
+               </condition>
+               <condition value="Process_ProcessDetail">
+                  <set token="FilterDatamodelMacro">`uA_DM_Process_ProcessDetail`</set>
+               </condition>
+               <condition value="Process_ProcessStartup">
+                  <set token="FilterDatamodelMacro">`uA_DM_Process_ProcessStartup`</set>
+               </condition>
+               <condition value="Session_SessionDetail_Session0">
+                  <set token="FilterDatamodelMacro">`uA_DM_Session_SessionDetail_Session0`</set>
+               </condition>
+               <condition value="System_SmbClient">
+                  <set token="FilterDatamodelMacro">`uA_DM_System_SmbClient`</set>
+               </condition>
+               <condition value="Session_SessionDetail_Users">
+                  <set token="FilterDatamodelMacro">`uA_DM_Session_SessionDetail_Users`</set>
+               </condition>
+            </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <choice value="is">is</choice>
+         <choice value="isNot">is not</choice>
+         <default>is</default>
+         <label>Filter operator:</label>
+         <prefix></prefix>
+         <suffix></suffix>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+   </fieldset>
+   
+   <search id="Search_AllowedIndexesFilter">
+        <query>
+            | tstats count WHERE index=`uberAgent_index` by index | table index | mvcombine delim="," index | nomv index
+        </query>
+        <earliest>-30m</earliest>
+        <latest>now</latest>
+        <progress>
+            <set token="AllowedIndexesFilter">filter SourceIndex in ($result.index$)</set>
+        </progress>
+   </search>
+   
+   <search id="Search_Single">
+      <query>
+      </query>
+      <progress>
+         <condition match="$result.SessionProtocols$ == 1">
+            <set token="IsCitrixSession">true</set>
+         </condition>
+         <condition>
+            <unset token="IsCitrixSession"></unset>
+            <unset token="Panel91Title"></unset>
+            <unset token="Panel111Title"></unset>
+            <unset token="Panel131Title"></unset>
+            <unset token="Panel141Title"></unset>
+         </condition>
+      </progress>
+   </search>
+   
+   <search id="Search_Score_Base">
+      <query>
+        | pivot `uA_DM_Score_Session`  Score_Session
+            avg(session_cpu) as session_cpu
+            avg(session_ram) as session_ram
+            avg(session_diskio) as session_diskio
+            avg(session_logonduration) as session_logonduration
+            avg(session_protocollatency) as session_protocollatency
+            avg(session_score) as session_score
+         splitrow 
+            _time period minute
+         $SearchFilter$
+         $AllowedIndexesFilter$
+         | timechart span=30m
+            eval(round(avg(session_cpu),1)) as CPU
+            eval(round(avg(session_ram),1)) as RAM
+            eval(round(avg(session_diskio),1)) as "Disk IO"
+            eval(round(avg(session_logonduration),1)) as "Logon duration"
+            eval(round(avg(session_protocollatency),1)) as "Protocol latency"
+            eval(round(avg(session_score),1)) as Score
+      </query>
+   </search>
+   
+   <!-- Row 0 -->
+   <row depends="$Single01Title$">
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">$Single01Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">$Single01Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">$Single02Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">$Single02Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">$Single03Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">$Single03Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">$Single04Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">$Single04Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">$Single05Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">$Single05Title$:</option>
+         </viz>
+   
+         <html depends="$SingleRow2Header$">
+            <h2 class="AboveSingle">$SingleRow2Header$</h2>
+         </html>
+         
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">$Single06Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">$Single06Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">$Single07Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">$Single07Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">$Single08Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">$Single08Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">$Single09Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">$Single09Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">$Single10Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">$Single10Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">$Single11Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">$Single11Title$:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">$Single12Field$</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">$Single12Title$:</option>
+         </viz>
+   
+      </panel>
+   </row>
+         
+   <!-- Row 1 -->
+   <row depends="$ShowSessionScore$"> 
+      <panel id="panel_session_score">
+      <title>Session score</title>
+      <chart>
+        <search base="Search_Score_Base">
+          <query> 
+              | table _time Score
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">10.0</option>
+        <option name="charting.axisY.minimumNumber">0.0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.seriesColors">[0x77C4CF]</option>
+      </chart>
+    </panel>
+    <panel id="panel_session_score_breakdown">
+    <title>Component scores</title>
+      <chart>
+        <search base="Search_Score_Base">
+          <query> 
+              | table _time  CPU RAM "Disk IO" "Logon duration" "Protocol latency"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.maximumNumber">10.0</option>
+        <option name="charting.axisY.minimumNumber">0.0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.seriesColors">["0x5A4575","0x43B5C6","0x6B6B6B","0x3D8A94","0x333333","0xC6DBDE","0xb98b73"]</option>
+      </chart>
+    </panel>
+   
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+      <panel>
+         <title>Event and originating host count (try zooming in!)</title>
+         <description>Zoom here to modify the time range for the chart below</description>
+         <chart>
+            <search>
+               <query>
+                  | pivot $FilterDatamodelMacro$ $FilterDatamodel$
+                     count($FilterDatamodel$) as Eventcount
+                     dc(host) as Hostcount
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum(Eventcount) as "Event count"
+                     sum(Hostcount) as "Host count"
+               </query>
+            </search>
+            <option name="height">150</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.legend.masterLegend">null</option>
+            <option name="charting.chart.overlayFields">"Host count"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Host count"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">Events</option>
+            <option name="charting.axisTitleY2.text">Hosts</option>
+            <option name="charting.seriesColors">[0x324969, 0xFAC61D]</option>
+            <selection>
+               <set token="selection.earliest">$start$</set>
+               <set token="selection.latest">$end$</set>
+            </selection>
+        </chart>
+      </panel>
+   </row>
+
+   <search id="Search_FilterField">
+      <query>
+         | datamodel $FilterDatamodelRootMacro$ $FilterDatamodelRoot$
+         | spath output=temp1 path=fields{}
+         | mvexpand temp1
+         | spath input=temp1 output=column path=fieldName
+         | table column
+         | sort column
+      </query>
+   </search>
+
+   <!-- Row 3 -->
+   <row depends="$IsCitrixSession$">
+      <panel id="panel_citrix_session_connection_changes">
+         <title>Session connection changes</title>        
+         <table>
+            <search id="Search_SessionConnectionChanges">
+               <query>
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="wrap">false</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row depends="$IsCitrixSession$">
+      <panel id="panel_citrix_show_details">
+         <title>Show Citrix session details</title>
+         <input id="radiotest" type="radio" searchWhenChanged="true">
+            <choice value="1">Yes</choice>
+            <choice value="0">No</choice>
+            <default>No</default>
+            <change>
+            <condition label="Yes">
+               <set token="ShowCitrixSessionDetails"></set>
+            </condition>
+            <condition label="No">
+               <unset token="ShowCitrixSessionDetails"></unset>
+            </condition>
+            </change> 
+         </input> 
+      </panel>
+   </row>
+
+   <!-- Row 5 -->
+   <row depends="$IsCitrixSession$, $ShowCitrixSessionDetails$">
+      
+      <panel>
+         <title>Citrix settings (last seen values)</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                     latest(CdmVolumes) as "Mapped volumes"
+                     latest(DisplayModeName) as "Display mode" 
+                     latest(ThinwireColorDepth) as "Thinwire color depth (bit)"
+                     latest(ThinwireComponentEncoder) as "Thinwire component encoder"
+                     latest(ThinwireHardwareEncodeInUse) as "Thinwire hardware encode"
+                     latest(ThinwireVideoCodecType) as "Thinwire video codec type"
+                     latest(ThinwireColorspace) as "Thinwire color space"
+                     latest(ThinwireVideoCodecUse) as "Thinwire video codec usage"
+                     latest(NetworkEdtMtu) as "EDT MTU"
+                     latest(NetworkConnectedVia) as "Connected via"
+                     latest(PrinterSessionPrinter) as "Mapped printers"
+                     latest(AudioActualPriority) as "Audio channel actual priority"
+                     latest(CdmActualPriority) as "CDM channel actual priority"
+                     latest(PrinterActualPriority) as "Printer channel actual priority"
+                     latest(USBActualPriority) as "USB channel actual priority"
+                     latest(ThinwireActualPriority) as "Thinwire channel actual priority"
+                     latest(FramehawkActualPriority) as "Framehawk channel actual priority"
+                     latest(D3DActualPriority) as "DCR channel actual priority"
+                     latest(GraphicsActualPriority) as "Legacy graphics channel actual priority"                     
+                     dc(SessionGUID) as SessionGUIDDc
+
+                     splitrow
+                        SessionGUID
+                     $SearchFilter$
+                  | join type=left SessionGUID 
+                     [
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                           latest(SessionTransportProtocols) as "Transport protocols"
+                           splitrow
+                              SessionGUID 
+                           $SearchFilter$
+                        | fields + SessionGUID "Transport protocols"
+                     ] 
+                  | where SessionGUIDDc = 1
+                  | makemv "Mapped printers" delim=";"
+                  | makemv "Mapped volumes" delim=";"
+                  | fields *
+                  | fields - _timediff SessionGUID User Host SessionLogonTimeHourMinute SessionGUIDDc
+                  | transpose 0 column_name=Setting
+                  | rename "row 1" as Value
+               </query>
+            </search>
+            <option name="count">30</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="wrap">false</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+
+      <panel>
+         <title>Citrix policies (last seen values)</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                     latest(AudioPolicyAllowMicrophoneRedirection) as "Microphone redirection"
+                     latest(AudioPolicyAllowRedirection) as "Audio redirection"
+                     latest(AudioPolicyPriority) as "Audio channel priority"
+                     latest(AudioPolicySoundQuality) as "Sound quality"
+                     
+                     latest(CdmPolicyAllowDriveRedirection) as "Client drive mapping"
+                     latest(CdmPolicyReadOnly) as "Read-only client drive access"
+                     latest(CdmPolicyPriority) as "CDM channel priority"
+                     
+                     latest(ThinwirePolicyFps) as "Thinwire FPS"
+                     latest(ThinwirePolicyPriority) as "Thinwire channel priority"
+                     latest(ThinwirePolicyUseHardwareEncoding) as "Thinwire hardware encoding"
+                     latest(ThinwirePolicyUseVideoCodec) as "Thinwire video codec"
+                     latest(ThinwirePolicyVisualQuality) as "Thinwire visual quality"
+                     
+                     latest(FramehawkPolicyPriority) as "Framehawk channel priority"
+                     
+                     latest(D3DPolicyAeroRedirection) as "DCR aero redirection"
+                     latest(D3DPolicyGraphicsQuality) as "DCR graphics quality"
+                     latest(D3DPolicyPriority) as "DCR channel priority"
+                     
+                     latest(GraphicsPolicyDisplayDegradeNotifyUser) as "Legacy graphics display degrade notify user"
+                     latest(GraphicsPolicyDisplayDegradePolicy) as "Legacy graphics display degrade policy"
+                     latest(GraphicsPolicyPriority) as "Legacy graphics channel priority"
+                     
+                     latest(NetworkPolicyAcceptSessionReliabilityConnections) as "Session reliability connections"
+                     latest(NetworkPolicySessionReliabilityPort) as "Session reliability port"
+                     latest(NetworkPolicySessionReliabilityTimeout) as "Session reliability timeout (s)"
+                     latest(NetworkPolicyICAListenerPortNumber) as "ICA listener port"
+                     
+                     latest(PrinterPolicyAllowRedirection) as "Printer redirection"
+                     latest(PrinterPolicyAutoCreateClientPrintersDisplayName) as "Auto-create client printers"
+                     latest(PrinterPolicyPriority) as "Printer channel priority"
+                     
+                     latest(USBPolicyAllowPNPRedirection) as "USB PNP redirection"
+                     latest(USBPolicyAllowUSBSupport) as "USB support"
+                     latest(USBPolicyPriority) as "USB channel priority"
+                     
+                     dc(SessionGUID) as SessionGUIDDc
+
+                     splitrow
+                        SessionGUID
+                     $SearchFilter$
+                  | where SessionGUIDDc = 1                     
+                  | fields *
+                  | fields - _timediff SessionGUID SessionGUIDDc
+                  | replace "1" with "Allowed" "0" with "Prohibited"
+                  | transpose 0 column_name=Policy
+                  | rename "row 1" as Value
+               </query>
+            </search>
+            <option name="count">30</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="wrap">false</option>
+            <option name="drilldown">none</option>
+         </table>    
+      </panel>
+
+   </row>
+
+   <!-- Row 6 -->
+   <row>
+      <panel>
+         <title>Compare two metrics over time</title>
+         <input type="dropdown" token="Panel61Function1" id="Input_Panel61Function1" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function 1:</label>
+         </input>
+         <input type="dropdown" token="Panel61Field1" id="Input_Panel61Field1" searchWhenChanged="true">
+            <search base="Search_FilterField"></search>
+            <fieldForLabel>column</fieldForLabel>
+            <fieldForValue>column</fieldForValue>
+            <label>Field 1:</label>
+         </input>
+         <input type="dropdown" token="Panel61Function2" id="Input_Panel61Function2" searchWhenChanged="true">
+            <choice value="avg">average</choice>
+            <choice value="count">count</choice>
+            <choice value="max">maximum</choice>
+            <choice value="median">median</choice>
+            <choice value="min">minimum</choice>
+            <choice value="stdev">standard deviation</choice>
+            <choice value="sum">sum</choice>
+            <default>avg</default>
+            <label>Function 2:</label>
+         </input>
+         <input type="dropdown" token="Panel61Field2" id="Input_Panel61Field2" searchWhenChanged="true">
+            <search base="Search_FilterField"></search>
+            <fieldForLabel>column</fieldForLabel>
+            <fieldForValue>column</fieldForValue>
+            <label>Field 2:</label>
+         </input>
+         <chart>
+            <search type="annotation" base="Search_SessionConnectionChanges">
+               <query>
+                  | rename Time as _time
+                  | eval annotation_label = 'Session change(s)'
+                  | eval annotation_category = "Session change(s)"
+                  | table _time annotation_label annotation_category
+               </query>
+            </search>
+            <search>
+               <query>
+                  | pivot $FilterDatamodelMacro$ $FilterDatamodel$
+                     $Panel61Function1$($Panel61Field1$) as "$Panel61Function1$($Panel61Field1$)"
+                     $Panel61Function2$($Panel61Field2$) as "$Panel61Function2$($Panel61Field2$)"
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoSolo$
+                     $SearchFilter$
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">350</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.chart.overlayFields">$Panel61Function2$($Panel61Field2$)</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">$Panel61Function2$($Panel61Field2$)</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 7 -->
+   <row>
+      <panel id="Panel_71" depends="$Panel71Title$">
+         <title>$Panel71Title$</title>
+         <chart id="Chart_Panel71">
+            <search type="annotation" base="Search_SessionConnectionChanges">
+               <query>
+                  | rename Time as _time
+                  | eval annotation_label = 'Session change(s)'
+                  | eval annotation_category = "Session change(s)"
+                  | table _time annotation_label annotation_category
+               </query>
+            </search>           
+            <search id="Search_Panel71Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 8 -->
+   <row>
+      <panel id="Panel_81" depends="$Panel81Title$">
+         <title>$Panel81Title$</title>
+         <chart id="Chart_Panel81">
+            <search id="Search_Panel81Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">$Panel81ChartStackMode$</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 9 -->
+   <row>
+      <panel id="Panel_91" depends="$Panel91Title$">
+         <title>$Panel91Title$</title>
+         <chart id="Chart_Panel91">
+            <search id="Search_Panel91Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">$Panel91ChartStackMode$</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 10 -->
+   <row>
+      <panel id="Panel_101" depends="$Panel101Title$">
+         <title>$Panel101Title$</title>
+         <chart id="Chart_Panel101">
+            <search id="Search_Panel101Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+      
+   <!-- Row 11 -->
+   <row>
+      <panel id="Panel_111" depends="$Panel111Title$">
+         <title>$Panel111Title$</title>
+         <chart id="Chart_Panel111">
+            <search type="annotation" base="Search_SessionConnectionChanges">
+               <query>
+                  | rename Time as _time
+                  | eval annotation_label = 'Session change(s)'
+                  | eval annotation_category = "Session change(s)"
+                  | table _time annotation_label annotation_category
+               </query>
+            </search>
+            <search id="Search_Panel111Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+      
+   <!-- Row 12 -->
+   <row>
+      <panel id="Panel_121" depends="$Panel121Title$">
+         <title>$Panel121Title$</title>
+         <table id="Table_Panel121">
+            <search id="Search_Panel121Table">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+   <!-- Row 13 -->
+   <row>
+      <panel id="Panel_131" depends="$Panel131Title$">
+         <title>$Panel131Title$</title>
+         <chart id="Chart_Panel131">
+            <search type="annotation" base="Search_SessionConnectionChanges">
+               <query>
+                  | rename Time as _time
+                  | eval annotation_label = 'Session change(s)'
+                  | eval annotation_category = "Session change(s)"
+                  | table _time annotation_label annotation_category
+               </query>
+            </search>            
+            <search id="Search_Panel131Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 14 -->
+   <row>
+      <panel id="Panel_141" depends="$Panel141Title$">
+         <title>$Panel141Title$</title>
+         <chart id="Chart_Panel141">
+            <search type="annotation" base="Search_SessionConnectionChanges">
+               <query>
+                  | rename Time as _time
+                  | eval annotation_label = 'Session change(s)'
+                  | eval annotation_category = "Session change(s)"
+                  | table _time annotation_label annotation_category
+               </query>
+            </search>
+            <search id="Search_Panel141Chart">
+               <query>
+               </query>
+               <earliest>$selection.earliest$</earliest>
+               <latest>$selection.latest$</latest>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+</form>

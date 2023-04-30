@@ -1,0 +1,263 @@
+/**********************************
+Global
+***********************************/
+
+
+.layoutRow {
+	background-color:#FFFFFF;
+}
+
+a {
+	color: #580000;
+}
+
+* {
+	border-color = #FFFFFF;
+}
+
+/**********************************
+Headers
+***********************************/
+
+
+/* change the app logo here.  set the height/width for your image, as well as the path to the image */
+.appLogo {
+    height: 43px; 
+    width: 80px;
+    padding-right: 5px;
+    float: left;    
+	background: url(splunk_logo_mono_black.png) no-repeat 0 0;
+}
+
+/*background: url(splunk_logo_dasp.png) no-repeat 0 0;*/
+/* background: url(splunk_logo_mono_black.png) no-repeat 0 0; */
+
+.appHeader {
+	background-color:#FFFFFF;
+}
+
+.appHeaderWrapper h1 {
+    color:#580000;
+}
+
+.appHeaderWrapper a {
+    color:#000000;
+}
+
+ul.appBarNav li a {
+	color: #FFFFFF;
+}
+
+.AppBar .auxLinks a {
+	color: #FFFFFF;
+}
+/* 
+use this to display the name of the app. 
+use line-height to adjust alignment with logo. if
+if the name of the app is in the logo,  set this to display: none;  
+
+.appHeaderWrapper h1 {
+    display: none;
+} 
+*/
+
+.splHeader h2, .splHeader-primary h2 {
+	color:#000000;
+}
+
+.splHeader-navigation, .AppBar .splHeader {
+	background-color:#580000;	
+}
+
+.TitleBar .splHeader {
+	background-color:#FFFFFF;
+}
+
+.ResultsHeader .splHeader-primary, .FlashTimeline .splHeader-primary {
+	background-color: #580000;
+}
+
+
+/**********************************
+Menu
+***********************************/
+
+/* primary menu */
+.splMenu-primary ul {
+    background-color: #580000;
+    border-color: #CCC;
+}
+.splMenu-primary, .splMenu-primary a, .splMenu-primary a:visited, .splMenu-primary a:hover {
+    color: #FFFFFF;
+}
+
+.splMenu-primary li:hover {
+    background-color: #FFFFFF;
+}
+.splMenu-primary a:hover {
+    color: #580000;   
+}
+
+/* secondary menu, used for apps pulldown */
+.splMenu-secondary ul {
+    background-color: #FFFFFF;
+}
+.splMenu-secondary, .splMenu-secondary a {
+    color: #580000;
+}
+
+/* disabled elements */
+.splMenu-secondary li.disabled a {
+    color: #666;
+}   
+.splMenu-secondary li:hover {
+    background-color: #580000;
+}
+.splMenu-secondary a:hover {
+    color: #fff;   
+}
+
+/**********************************
+Search
+***********************************/
+
+
+/*** Search Bar ***/
+
+.SearchBar .saTypeaheadWrapper, .mainSearchControls, .splSearchControls-inline table.mainSearchControlsTable {
+	background-color: #FFFFFF;
+	border-color: #FFFFFF;
+}
+
+.SearchBar .searchFieldWrapperInner {
+    border-color: #580000;
+}
+
+input.searchButton {
+	background-color: #000000;
+}
+
+input.searchButton:hover,
+input.searchButton:focus {
+    background-color: #580000;
+    background-position:-40px 0;   
+}
+
+.SearchBar .assistantActivator {
+	background-color: #000000;
+}
+
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper {
+	background-color: #000000;
+	border-color: #FFFFFF;
+}
+ 
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper:hover,
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper:focus {
+	background-color: #000000;
+}
+table.mainSearchControlsTable input.searchButton {
+	border-color: #FFFFFF;
+}
+
+table.mainSearchControlsTable .SearchBar .searchFieldWrapper {
+	background-color: #FFFFFF;
+	border-color: #FFFFFF;
+}
+
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivator {
+    padding-top: 3px;
+	background-color: #000000;
+	border-color: #FFFFFF;
+}
+
+table.mainSearchControlsTable .TimeRangePicker {
+	border-color: #FFFFFF;
+}
+
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper .dropDown {
+    background-color: #000000;
+	background-position: -27px -367px;
+    margin-top: 11px;
+}
+
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper .dropDown:hover,
+table.mainSearchControlsTable .TimeRangePicker .timeRangeActivatorWrapper .dropDown :focus {
+	background-color: #000000;
+}
+
+
+/**********************************
+Charts
+***********************************/
+
+/* flash timeline specific */
+/*
+  background-color -> controls bgcolor
+  border-left-color -> controls foregroundColor
+  color -> controls fontColor
+  border-right-color -> controls seriesColor
+controls and and font color get screened via an alpha layer, so should probably be set to all black or white, depending on main background
+*/
+div.FlashTimeline, div.FlashTimeline .splHeader {
+    background-color: #fbfbfb;
+    border-left-color: #000;
+    color: #000;
+    /* the color of the histogram bar. border-right-color = fill */
+    border-right-color: #580000; 
+}
+
+/* All flash charts */
+/*
+  background-color -> controls bgcolor
+  border-left-color -> controls foregroundColor
+  color -> controls fontColor
+  controls and and font color get screened via an alpha layer, so should probably be set to all black or white, depending on main background
+*/
+div.FlashChart {
+    background-color: #fbfbfb;
+    border-left-color:#000;
+    color: #000;
+}
+
+
+/* popup bar chart; should be same color as flash timeline */
+.splBarGraphBar {
+background-color: #580000;
+}
+
+/* background of bar graph */
+.splBarGraph {
+background:#FFFFFF;
+}
+
+/**********************************
+Buttons
+***********************************/
+
+.splButtonGroup .splButton-tertiary,
+.splButtonGroup .splButton-tertiary:first-child {
+	border-left-color: #000000;
+}
+
+.splButton-primary {
+    background-color: #580000;
+    border: 1px solid #580000;
+    color: #FFFFFF;
+}
+
+.splButton-primary:hover,
+.splButton-primary:focus {
+    background-color: #e92857;
+}
+
+.splButton-tertiary {
+    background-color: #000000;
+    border: 1px solid #000000;
+    color: #FFFFFF;
+}
+
+.splButton-tertiary:hover,
+.splButton-tertiary:focus {
+    background-color: #999999;
+}

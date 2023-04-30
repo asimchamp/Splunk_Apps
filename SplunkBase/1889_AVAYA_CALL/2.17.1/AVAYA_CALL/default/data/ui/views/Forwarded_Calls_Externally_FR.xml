@@ -1,0 +1,287 @@
+<form>
+  <label>Appels Transférés vers l'Extérieur</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Période</label>
+      <default>
+        <earliest>@w0</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="TimeWindow">
+      <label>Fenêtre Temps Spécifique</label>
+      <choice value="&quot;&quot;">Tout le Temps</choice>
+      <choice value="`TimeWindow_WorkingDays`">Jours Ouvrés</choice>
+      <choice value="`TimeWindow_DayClosed`">Jours Fermés</choice>
+      <choice value="`TimeWindow_Weekend`">Weekend</choice>
+      <choice value="`TimeWindow_NightTime`">Nuits</choice>
+      <choice value="`TimeWindow_Lunch`">Déjeuner</choice>
+      <default>""</default>
+      <initialValue>""</initialValue>
+    </input>
+    <input type="text" token="Token_Party1Name" searchWhenChanged="true">
+      <label>Utilisateur</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="Token_Caller" searchWhenChanged="true">
+      <label>Numéro Appelant</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="Token_Called" searchWhenChanged="true">
+      <label>Numéro Appelé</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Transfert d'Appel</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+(AVAYA_External_Targeting_Cause="*fu" OR AVAYA_External_Targeting_Cause="*fb" OR AVAYA_External_Targeting_Cause="*fnr" OR AVAYA_External_Targeting_Cause="*fdnd")
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur" "Cause Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Cause Appel Externe">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Cause Ciblage Externe">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Jumelage Mobile</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+AVAYA_External_Targeting_Cause="*MT"
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur" "Cause Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Utilisateur">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Télétravailleur</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+AVAYA_External_Targeting_Cause="*TW"
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur" "Cause Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Conférence d'Appel</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+(AVAYA_External_Targeting_Cause="*CfP" OR AVAYA_External_Targeting_Cause="*Cfd")
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur" "Cause Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Numéro Appelé">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Transfert d'Appel sur Demande</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+(AVAYA_External_Targeting_Cause="*XfP" OR AVAYA_External_Targeting_Cause="*Xfd")
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur" "Cause Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Cause Appel Externe">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Cause Ciblage Externe">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Groupement d'Appel</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+AVAYA_External_Targeting_Cause="HG*"
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur" "Cause Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Numéro Appelant">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Autre Transfert d'Appel Détaillé</title>
+        <search>
+          <query>`sourcelog`
+AVAYA_Call_Duration!="00:00:00"
+((AVAYA_External_Targeting_Cause="AA*") OR (AVAYA_External_Targeting_Cause="ICR*") OR (AVAYA_External_Targeting_Cause="RAS*") OR (AVAYA_External_Targeting_Cause="?*"))
+AVAYA_Is_Internal=0
+AVAYA_Direction=O
+AVAYA_Party1Name=$Token_Party1Name$
+AVAYA_Caller=$Token_Caller$
+AVAYA_Called_Number=$Token_Called$
+$TimeWindow$
+`Call_Global_Time`
+| eval "Direction"=AVAYA_Direction."".AVAYA_Is_Internal
+| lookup AVAYA_DirectionFusion_FR.csv "Direction" OUTPUTNEW "Calling Direction"
+| lookup AVAYA_Cause_FR.csv "AVAYA_External_Targeting_Cause" OUTPUTNEW "External Targeting Cause"
+`FR_DetailCall_RENAME`
+| table Date Heure "Temps Global d'Appel" "Numéro Appelant" "Numéro Appelé" "Utilisateur"   "Cause Ciblage Externe" "Code Ciblage Externe"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Cause Appel Externe">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Cause Ciblage Externe">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

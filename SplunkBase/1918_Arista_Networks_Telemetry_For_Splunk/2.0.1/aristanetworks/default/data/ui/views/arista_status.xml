@@ -1,0 +1,114 @@
+<form version="1.1">
+  <label>Summary</label>
+  <fieldset autoRun="true" submitButton="false"></fieldset>
+  <row>
+    <panel>
+      <title>Aggregate Traffic across all switches</title>
+      <input type="time" token="traffic_Switch" searchWhenChanged="true">
+        <default>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=main "AristaIfCounters" | timechart sum(inOctets) as inTraffic,sum(outOctets) as outTraffic by switchname</query>
+          <earliest>$traffic_Switch.earliest$</earliest>
+          <latest>$traffic_Switch.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">sum(outOctets)</option>
+        <option name="charting.chart.stackMode">stacked</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Alerts/Logs across all switches</title>
+      <input type="time" token="Alert_Log_time" searchWhenChanged="true">
+        <default>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>source="arista_switch_log" | stats count(eval(severity="0")) as Emergency, count(eval(severity="1")) as Alerts, count(eval(severity="2")) as Critical, count(eval(severity="3")) as Errors, count(eval(severity="4")) as Warnings, count(eval(severity="5")) as Notifications, count(eval(severity="6")) as Informational by host | sort host</query>
+          <earliest>$Alert_Log_time.earliest$</earliest>
+          <latest>$Alert_Log_time.latest$</latest>
+        </search>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">preview</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Notifications">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Informational">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Errors">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Warnings">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <drilldown>
+          <link target="_self">search?q=source%3D%22arista_switch_log%22%20$click.value$%20severity_desc%3D$click.name2$%20%7C%20fields%20_time%2C%20severity_desc%2Cfacility%2C%20msg%2C%20message&amp;earliest=0&amp;latest=</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Drops across all switches</title>
+      <input type="time" token="drop_Switch_time" searchWhenChanged="true">
+        <default>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=main "AristaIfCounters" | timechart sum(inDiscards), sum(outDiscards) by switchname</query>
+          <earliest>$drop_Switch_time.earliest$</earliest>
+          <latest>$drop_Switch_time.latest$</latest>
+        </search>
+         <option name="charting.axisTitleX.text">Time</option>
+         <option name="charting.axisTitleY.text">sum(outDiscards)</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart">column</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Errors across all switches</title>
+      <input type="time" token="Error_Switch_time" searchWhenChanged="true">
+        <default>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <chart>
+        <search>
+          <query>index=main "AristaIfCounters" | timechart sum(inErrors), sum(outErrors) by switchname</query>
+          <earliest>$Error_Switch_time.earliest$</earliest>
+          <latest>$Error_Switch_time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">sum(outErrors)</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">1</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+      </chart>
+    </panel>
+  </row>
+</form>

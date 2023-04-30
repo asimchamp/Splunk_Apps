@@ -1,0 +1,116 @@
+<form>
+  <label>User Session Detail</label>
+  
+  <search id="searchUserSessionProcess">
+    <query>`xd_perfmon_index` host="$servername$" sourcetype="PerfmonMk:Process" 
+      [search `xd_index` sourcetype="WMI:SessionProcess" host="$servername$" SessionId="$sessionId$" | stats count by ProcessId | fields ProcessId | rename ProcessId AS ID_Process] | 
+      rename IO_Write_Operations/sec AS iowrite | rename IO_Read_Operations/sec AS ioread | 
+      eval iops = iowrite + ioread | 
+      stats count by _time instance %_Processor_Time Working_Set_-_Private iops ioread iowrite
+    </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  
+  <search id="userSessionDetail">
+    <query>
+      `xd_index` sourcetype=xenapp:*:session host="$servername$" UserName="$username$" SessionId="$sessionId$" | 
+      stats latest(UserName) AS UserName latest(ServerName) AS ServerName latest(CurrentTime) AS CurrentTime latest(LogOnTime) AS LogOnTime latest(ClientName) AS ClientName 
+      latest(ClientVersion) AS ClientVersion latest(SessionId) AS SessionId latest(ClientBuildNumber) AS ClientBuildNumber latest(ClientType) AS ClientType latest(ClientIPV4) AS ClientIPV4 
+      latest(ClientProductId) AS ClientProductId latest(DirectXEnabled) AS DirectXEnabled latest(FlashEnabled) AS FlashEnabled latest(UsbEnabled) AS UsbEnabled latest(WmpEnabled) AS WmpEnabled | 
+      lookup deviceTypes ClientProductId OUTPUT DeviceType | 
+      eval "Login Time" = LogOnTime | 
+      convert timeformat="%m/%d/%Y %H:%M:%S" mktime(CurrentTime) mktime(LogOnTime) | 
+      eval SessionDuration = tostring(CurrentTime - LogOnTime, "duration") | 
+      eval ClientVersion = ClientVersion." (Build ".ClientBuildNumber.")" | 
+      rename UserName AS "User Name" ServerName AS "Server Name" SessionId AS "Session ID" SessionDuration AS "Session Duration" ClientName AS "Client Name" ClientVersion AS "Client Version" ClientType AS "Client Type" 
+      ClientIPV4 AS "Client Address" DirectXEnabled AS "DirectX Enabled" FlashEnabled AS "Flash Enabled" UsbEnabled AS "USB Enabled" WmpEnabled AS "WMP Enabled" DeviceType AS "Device Type" |
+      table "User Name" "Server Name" "Login Time" "Session ID" "Session Duration" "Client Name" "Client Version" "Client Type" "Client Address" "DirectX Enabled" "Flash Enabled" "USB Enabled" "WMP Enabled" "Device Type"
+    </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  
+  <fieldset autoRun="false" submitButton="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time Range:</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="username">
+      <label>User Name:</label>
+    </input>
+    <input type="text" token="servername" id="server" searchWhenChanged="true">
+      <label>Server Name:</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="sessionId">
+      <label>Session ID:</label>
+    </input>
+  </fieldset>
+
+  <row>
+    <panel>
+      <table>
+        <title>Session Details</title>
+        <search base="userSessionDetail"></search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Avg. Processor Time</title>
+        <search base="searchUserSessionProcess">
+          <query>
+            timechart avg(%_Processor_Time) AS "Avg. % Processor Time" BY instance
+          </query>
+        </search>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Avg. Memory Usage in Bytes</title>
+        <search base="searchUserSessionProcess">
+          <query>timechart avg(Working_Set_-_Private) AS "Avg. Memory" BY instance</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Avg. IOPS</title>
+        <search base="searchUserSessionProcess">
+          <query>timechart avg(iops) AS "Avg. IOPS" by instance</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Process Details</title>
+        <search base="searchUserSessionProcess">
+          <query>stats avg(%_Processor_Time) AS "Avg. % Processor Time" avg(Working_Set_-_Private) AS "Avg. Memory" avg(iops) AS "Avg. IOPS" avg(ioread) AS "Avg. Read IO" avg(iowrite) AS "Avg. Write IO" BY instance</query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

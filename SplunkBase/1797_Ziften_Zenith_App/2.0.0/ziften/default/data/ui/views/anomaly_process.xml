@@ -1,0 +1,77 @@
+<form>
+  <label>Process Anomaly</label>
+  <fieldset submitButton="false">
+    <input type="time">
+      <label>TIme</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Excessive Application Faults</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:* message_type=eventlogrecord sourcename="Application *" | rex field=imagefilepath ".*\\\\(?&lt;filename&gt;.*)" | stats c(sourcename) as events latest(imagefilepath) as filepath latest(modulefilename) as modulefilename by agentguid, filename | where events &gt;= 10 | sort 0 - events</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Unusual System 32 FIlename</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:* message_type=processinventory  | eval filepath=lower(replace(imagefilepath,".*:","")) | search "\\windows\\system32\\"  | stats latest(imagefilemd5) as md5, latest(fileversion) as fileversion by agentguid, filepath | eval filename = lower(replace(filepath,".*\\\\","")) | eventstats dc(agentguid) as win_systems | eventstats dc(agentguid) as fn_systems values(agentguid) as systems by filename | stats first(win_systems) as win_systems, first(fn_systems) as fn_systems, values(systems) as systems values(fileversion) as fileversions, values(md5) as md5s by filename | eval rarity = fn_systems/win_systems | where rarity &lt; 0.005 and md5s!="" | sort 0 rarity, filename | head 100</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Frequent Interference By Unusual MD5</title>
+      <table>
+        <search>
+          <query>sourcetype=ziften:*  message_type=interferingprocess | eventstats dc(agentguid) as systems by imagefilemd5 | stats sum(numberintervals) as interferences, latest(imagefilepath) as imagefilepath, latest(systems) as systems by agentguid, imagefilemd5 | where isnotnull(imagefilemd5) and systems &lt;= 10 and interferences &gt;= 100 | sort 0 - interferences/systems | head 100</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>sourcetype=ziften:* | top systeminventory</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+  </row>
+</form>

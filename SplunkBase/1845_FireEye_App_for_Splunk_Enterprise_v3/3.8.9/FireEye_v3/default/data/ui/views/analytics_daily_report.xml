@@ -1,0 +1,214 @@
+<form refresh="3600" stylesheet="custom.css" version="1.1">
+  <label>FireEye Analytics</label>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="false">
+    <!-- Add Wildcard Filter -->
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="wild">
+      <label>Search</label>
+      <default>*</default>
+      <suffix/>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Total</title>
+        <search><query>
+          eventtype=fe product!="HX" OR (eventtype=fe product="HX" severity="IOC Hit") | stats count
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  
+    <panel>
+      <single>
+        <title>Web MPS</title>
+        <search><query>
+          
+          eventtype=fe product="Web MPS" | stats count
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+
+        <drilldown target="_blank">
+          <link>
+          <![CDATA[
+            /app/FireEye_v3/nx_analysis
+          ]]>
+          </link>
+        </drilldown>
+
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Email MPS</title>
+        <search><query>
+          eventtype=fe product="Email MPS" | stats count
+          </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        
+        <drilldown target="_blank">
+          <link>
+          <![CDATA[
+            /app/FireEye_v3/ex_analysis
+          ]]>
+          </link>
+        </drilldown>
+
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>MAS</title>
+        <search><query>
+          eventtype=fe product="MAS" | stats count
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+
+        <drilldown target="_blank">
+          <link>
+          <![CDATA[
+            /app/FireEye_v3/ax_analysis
+          ]]>
+          </link>
+        </drilldown>
+        
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>DOD</title>
+        <search>
+          <query>eventtype=fe report_id=$wild$ | stats count</query>
+        </search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+
+        <drilldown target="_blank">
+          <link>
+          <![CDATA[
+            /app/FireEye_v3/dod_analysis
+          ]]>
+          </link>
+        </drilldown>
+        
+      </single>
+    </panel>
+
+    <panel>
+      <single>
+        <title>File MPS</title>
+        <search><query>
+          eventtype=fe product="File MPS" | stats count
+          </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+
+        <drilldown target="_blank">
+          <link>
+          <![CDATA[
+            /app/FireEye_v3/fx_analysis
+          ]]>
+          </link>
+        </drilldown>
+        
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>HX</title>
+        <search><query>
+          eventtype=fe product="HX" severity="IOC Hit" | stats count
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+
+        <drilldown target="_blank">
+          <link>
+          <![CDATA[
+            /app/FireEye_v3/hx_analysis
+          ]]>
+          </link>
+        </drilldown>
+        
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Most Active Attack Vectors</title>
+        <search><query>
+          eventtype=fe product!="HX" OR (eventtype=fe product="HX" severity="IOC Hit") | top limit=10 product | eval percent = round(percent,2) | rename product AS Product, count AS Count, percent AS Percent
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Most Active Appliances</title>
+        <search><query>
+          eventtype=fe product!="HX" OR (eventtype=fe product="HX" severity="IOC Hit") | top limit=20 dvc_host | eval percent = round(percent,2) | rename dvc_host AS Appliance, count AS Count, percent AS Percent
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Events per Attack Vector</title>
+        <search><query>
+          eventtype=fe product!="HX" OR (eventtype=fe product="HX" severity="IOC Hit") | timechart count by product
+        </query></search>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+        <option name="charting.chart.stackMode">stacked</option>
+      </chart>
+    </panel>
+  </row>
+</form>

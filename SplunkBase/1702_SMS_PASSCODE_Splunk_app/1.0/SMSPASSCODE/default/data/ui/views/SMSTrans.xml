@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Transmission</label>
+  <fieldset>
+    <input type="time">
+      <default>Last 24 hours</default> 
+    </input> 
+  </fieldset>
+
+  <row>
+    <chart>
+      <searchString>
+	`smspasscode-index` source="WinEventLog:SmsTrans" "SMS sent to " | timechart count by LoginName useother=f limit=10
+      </searchString>
+      <title>Top 10 SMS Transmissions by login name</title>
+      <option name="charting.axisTitleX.text">Date</option>
+      <option name="charting.axisTitleY.text">SMS sent</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.layout.splitSeries">false</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.primaryAxisTitle.text"/>
+      <option name="charting.secondaryAxis.maximumNumber">""</option>
+      <option name="charting.secondaryAxis.minimumNumber">""</option>
+      <option name="charting.secondaryAxis.scale">""</option>
+      <option name="charting.secondaryAxisTitle.text"/>
+      <option name="count">50</option>
+      <option name="displayRowNumbers">true</option>
+    </chart>
+  </row>
+  
+  <row>
+    <table>
+      <searchString>
+	`smspasscode-index` source="WinEventLog:SmsTrans" SourceName="SMS Dispatcher" Modem_initialization_count > 0| eval HostComport = ComputerName."/".ComPort |
+	table _time HostComport Modem_initialization_count SMS_count Average_transmission_time Transmission_error_count Up_time |
+	dedup HostComport |
+	rename HostComport AS "HOST/ComPort", Modem_initialization_count AS "Modem initializations", SMS_count AS "SMS Sent", Average_transmission_time AS "Average transmission time", Transmission_error_count AS "Transmission errors", Up_time AS "Uptime"
+      </searchString>
+      <title>Last modem statistics</title>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+	`smspasscode-index` source="WinEventLog:SmsTrans" EventCode=210 | chart count over LoginName by TRDispatchType | sort -"SMS sent to"
+      </searchString>
+      <title>SMS Sent by user</title>
+    </table>
+  </row>
+
+
+</form>

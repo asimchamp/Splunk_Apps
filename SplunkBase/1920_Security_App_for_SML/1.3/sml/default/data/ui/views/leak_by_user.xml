@@ -1,0 +1,105 @@
+<form script="leak_by_user.js">
+  <label>ユーザ別漏えい危険度</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" token="sourcetype" searchWhenChanged="true">
+      <label>ログ種別を選んでください:</label>
+      <prefix>sourcetype=smllog_</prefix>
+      <default>400 inout_category=outside</default>
+      <choice value="400 inout_category=outside">メール</choice>
+      <choice value="0 file_subtype=takeout">デバイス持ち出し</choice>
+      <choice value="6 FINISH">印刷</choice>
+      <choice value="300 web_subtype=upload">ウェブアップロード</choice>
+      <choice value="0 file_subtype=takein">デバイス持ち込み</choice>
+    </input>
+    <input type="dropdown" token="leak_category" searchWhenChanged="true">
+      <label>危険度を選んでください:</label>
+      <default>A.機密</default>
+      <choice value="A.機密">A.機密</choice>
+      <choice value="B1.営業">B1.営業</choice>
+      <choice value="B2.研究・開発">B2.研究・開発</choice>
+      <choice value="C.一般">C.一般</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart id="leak_top_users">
+        <title>$leak_category$のユーザランキング</title>
+        <searchString>index=smllog $sourcetype$ leak_category="$leak_category$" 
+            | top user_account</searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="leak_user_mail">
+        <title>$user_account$の$leak_category$のメール添付</title>
+        <searchString>
+            index=smllog $sourcetype$ leak_category="$leak_category$" user_account="$user_account$" 
+            | eval mail_attach=split(mail_attach, "/") | eval to_mail=split(to_mail, "/")
+            | table pc_name, log_date, log_time, subject, mail_attach, to_mail
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="leak_user_takeout">
+        <title>$user_account$の$leak_category$のファイル持ち出し</title>
+        <searchString>
+            index=smllog $sourcetype$ leak_category="$leak_category$" user_account="$user_account$" 
+            | table pc_name, log_date, log_time, operate, file0, file1
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="leak_user_print">
+        <title>$user_account$の$leak_category$の印刷</title>
+        <searchString>
+            index=smllog $sourcetype$ leak_category="$leak_category$" user_account="$user_account$" 
+            | table pc_name, log_date, log_time, doc_name
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="leak_user_webup">
+        <title>$user_account$の$leak_category$のウェブアップロード</title>
+        <searchString>
+            index=smllog $sourcetype$ leak_category="$leak_category$" user_account="$user_account$" 
+            | table pc_name, log_date, log_time, method, url, upload_filename
+        </searchString>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+</form>

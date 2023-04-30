@@ -1,0 +1,38 @@
+<form version="1.1">
+  <label>Field Removable Unit Inventory</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="switch_chart_switch_name" searchWhenChanged="true">
+      <label>Switch:</label>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_inventory" | stats count by switchname | sort switchname</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+    <input type="time" token="switch_chart_timerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Matching Events</title>
+      <table>
+        <search>
+          <query>
+            sourcetype="arista_switch_inventory" switchname = $switch_chart_switch_name$ | eval make=coalesce(make,mfgname) | eval status=coalesce(status,operstate) | eval slot=coalesce(slot,module) | table switchname, slot,make,model,numfans,description,serialnum,status,hwrev,softwarerev,mfgdate,minmacaddress,maxmacaddress
+          </query>
+          <earliest>$switch_chart_timerange.earliest$</earliest>
+          <latest>$switch_chart_timerange.latest$</latest>
+        </search>
+        <option name="count">50</option>
+      </table>
+    </panel>
+  </row>
+</form>

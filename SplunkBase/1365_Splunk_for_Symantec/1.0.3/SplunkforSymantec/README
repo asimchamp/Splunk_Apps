@@ -1,0 +1,41 @@
+############################################################################
+#
+#   Splunk for Symantec
+#
+#   Description:
+#       Field extractions and dashboards for Symantec Endpoint Protection
+#
+#   Splunk Version:     4.3.x, 5.x
+#   Last Modified:      02/2013
+#
+#   Authors:            David Dorsey - Splunk, Inc.
+#
+############################################################################
+
+
+App version: 1.0.3
+Supported Products: Symantec Endpoint Protect 11 and 12
+
+#### IMPORTANT ####
+
+This app works on Splunk 4.3.x, 5.x, and 6.x.
+
+For setup help or any questions, please post them to answers.splunk.com
+and tag them with SplunkforSymantec.
+
+#### Installation ####
+
+After downloading the app and going through the set up process, you still
+need to install either the Symantec 11 Technology Add-on or Symantec 12
+Technology Add-on. If you are currently running both products, you should
+install both TAs. They are included with this app in the appserver/addons
+directory. For single server Splunk instances, the TAs will be on the same
+server as the app. For distributed Splunk instances, the TAs just needs to
+go on the indexers and the app just goes on the search heads.
+
+
+#### Configuring the TA ####
+
+Data can be received via syslog or by monitoring the SEP log files on the SEP Manager. To receive data over syslog, manually set the sourcetype for the associated data input to either 'sep11:log' or 'sep12:log'. To monitor the files directly, you should install a Splunk Universal Forwarder on your management console. You'll need to set the log file location in the inputs.conf file and enable the associated file inputs. An example inputs.conf file is provided for you in the apps default directory. It's called inputs.conf.local. The default path in inputs.conf assumes that the SEP Manager is installed in C:\Program Files\Symantec\Symantec Endpoint Protection Manager. Edit this path to the actual location of the SEP Manager if necessary.
+	
+

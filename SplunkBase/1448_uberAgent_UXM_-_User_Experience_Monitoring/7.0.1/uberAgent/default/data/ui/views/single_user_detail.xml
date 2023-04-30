@@ -1,0 +1,599 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js, single_user_detail.js" stylesheet="main.css, single_user_detail.css">
+
+   <label>Single User Detail</label>
+   <description>This dashboard displays detailed information about a specific user account.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1d</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Single_User_Detail</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            values(SessionUser) as SessionUsers
+            values(SessionProtocol) as SessionProtocols
+            dc(SessionGUID) as SessionCount
+            dc(SessionFgAppName) as SessionFgAppCount
+            dc(host) as HostCount
+            avg(SessionCPUUsagePercent) as AvgSessionCPUUsagePercent
+            avg(SessionIOPS) as AvgSessionIOPS
+            avg(SessionWorkingSetMB) as AvgSessionWorkingSetMB
+            $SearchFilter$
+         | eval AvgSessionCPUUsagePercentRounded=round(AvgSessionCPUUsagePercent,1)
+         | eval AvgSessionIOPSRounded=round(AvgSessionIOPS,1)
+         | eval AvgSessionWorkingSetMBRounded=round(AvgSessionWorkingSetMB,0)
+         | eval SessionUsers = mvjoin(SessionUsers, ", ")
+         | eval SessionProtocols = if(SessionProtocols=="ICA",1,0)
+         | appendcols
+         [
+         | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+            sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+            sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+            $SearchFilter$
+         | eval AvgNetSendLatencyMsRounded=round(SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+            sum(UIDelayMs) as SumUIDelayMs
+            $SearchFilter$
+         | eval SumUIDelayS = round(SumUIDelayMs/1000,1)
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+            dc(SessionGUID) as LogonCount
+            avg(TotalLogonTimeMs) as AvgTotalLogonTimeMs
+            $SearchFilter$
+         | eval AvgTotalLogonTimeSRounded = if(isnull(AvgTotalLogonTimeMs), "n/a", round(AvgTotalLogonTimeMs/1000,2))
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Application_Errors` Application_Errors
+            count(ErrorType) as ErrorCount
+            $SearchFilter$
+         ]
+         | appendcols
+         [
+         | pivot `uA_DM_Tags_UserHost` Tags_UserHost 
+            dc(TagName) as TagsNameCount
+            filter TagType is 2
+            $SearchFilter$
+         ]
+      </query>
+      <progress>
+         <condition match="$result.SessionProtocols$ == 1">
+            <set token="IsCitrixSession">true</set>
+         </condition>
+         <condition>
+            <unset token="IsCitrixSession"></unset>
+         </condition>
+      </progress>
+   </search>
+   
+   <!-- Row 0 -->
+   <row>
+      <panel>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">SessionUsers</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">User:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">SessionCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Sessions:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">HostCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">#Hosts:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">SessionFgAppCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">#Apps in foreground:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">LogonCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">#Logons:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">TagsNameCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">#Tags:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+         </viz>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">AvgSessionCPUUsagePercentRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Avg. CPU:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel">%</option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">AvgSessionWorkingSetMBRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Avg. RAM:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel">MB</option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">AvgSessionIOPSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Avg. disk:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel">IOPS</option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">AvgNetSendLatencyMsRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Avg. net latency:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel">ms</option>
+            <option name="uberAgent.uberagent-singlevalue.5-field">SumUIDelayS</option>
+            <option name="uberAgent.uberagent-singlevalue.5-title">Total UI wait time:</option>
+            <option name="uberAgent.uberagent-singlevalue.5-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.6-field">AvgTotalLogonTimeSRounded</option>
+            <option name="uberAgent.uberagent-singlevalue.6-title">Avg. logon duration:</option>
+            <option name="uberAgent.uberagent-singlevalue.6-afterLabel">s</option>
+            <option name="uberAgent.uberagent-singlevalue.7-field">ErrorCount</option>
+            <option name="uberAgent.uberagent-singlevalue.7-title">App errors:</option>
+            <option name="uberAgent.uberagent-singlevalue.7-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+
+   <!-- Row 2 -->
+   <row>
+      <panel>
+         <title>Sessions</title>
+         <table id="Table_Panel21">
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     latest(host) as Host
+                     latest(SessionID) as ID
+                     latest(SessionProtocol) as "Protocol"
+                     latest(SessionConnectionState) as "Last state"
+                     values(SessionClientName) as RemotingClients
+                     avg(SessionProcessCount) as AvgSessionProcessCount
+                     avg(SessionCPUUsagePercent) as AvgSessionCPUUsagePercent
+                     avg(SessionIOPS) as AvgSessionIOPS
+                     avg(SessionWorkingSetMB) as AvgSessionWorkingSetMB
+                     avg(SessionNetKBPS) as AvgSessionNetKBPS
+                     avg(SessionRpLatencyMs) as AvgSessionRpLatencyMs
+                     avg(SessionRoundTripTimeMs) as AvgSessionRoundTripTimeMs
+                     latest(_time) as LastSeen
+                     latest(SessionLogonTime) as SessionLogonTime
+                     sum(SessionIODurationMs) as SumSessionIODurationMs
+                     sum(SessionIOCount) as SumSessionIOCount
+                     splitrow
+                        SessionGUID
+                     $SearchFilter$
+                  | join type=outer SessionGUID 
+                     [
+                        | pivot `uA_DM_Logon_LogonDetail` Logon_LogonDetail
+                           sum(TotalLogonTimeMs) as TotalLogonTimeMs
+                           splitrow
+                              SessionGUID
+                        | fields +
+                           SessionGUID
+                           TotalLogonTimeMs
+                     ]
+                  | eval "Remoting clients" = mvjoin(RemotingClients, ", ")
+                  | eval "Avg. #processes" = round(AvgSessionProcessCount,0)
+                  | eval "Avg. CPU (%)" = round(AvgSessionCPUUsagePercent,1)
+                  | eval "Avg. IOPS" = round(AvgSessionIOPS,1)
+                  | eval "Avg. RAM (MB)" = round(AvgSessionWorkingSetMB,0)
+                  | eval "Avg. network (KB/s)" = round(AvgSessionNetKBPS,1)
+                  | eval "Avg. ICA latency (ms)" = round(AvgSessionRpLatencyMs,1)
+                  | eval "Avg. ICA RTT (ms)" = round(AvgSessionRoundTripTimeMs,1)
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Avg. IO latency (ms)"=round(SumSessionIODurationMs/SumSessionIOCount,1)
+                  | eval "Logon time"=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Logon duration (s)"=round(TotalLogonTimeMs/1000,2)
+                  | eval sortfield=lower('Logon time')
+                  | sort limit=0 -sortfield
+                  | table
+                     SessionGUID
+                     Host
+                     ID
+                     "Logon time"
+                     "Logon duration (s)"
+                     "Last seen"
+                     "Last state"
+                     "Protocol"
+                     "Avg. #processes"
+                     "Avg. CPU (%)"
+                     "Avg. IOPS"
+                     "Avg. IO latency (ms)"
+                     "Avg. RAM (MB)"
+                     "Avg. network (KB/s)"
+                     "Avg. ICA latency (ms)"
+                     "Avg. ICA RTT (ms)"
+                     "Remoting clients"
+               </query>
+            </search>
+            <fields>Host,ID,"Logon time","Logon duration (s)","Last seen","Last state","Protocol","Avg. #processes","Avg. CPU (%)","Avg. IOPS","Avg. IO latency (ms)","Avg. RAM (MB)","Avg. network (KB/s)","Avg. ICA latency (ms)","Avg. ICA RTT (ms)","Remoting clients"</fields>
+            <option name="count">15</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_user_detail_explanation.html">
+         </html>
+      </panel>
+   </row>
+
+   <!-- Row 3 -->
+   <row depends="$IsCitrixSession$">
+      <panel>
+         <title>Citrix settings (last seen values)</title>
+         <table id="Table_Panel31">
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                     latest(CdmVolumes) as "Mapped volumes"
+                     latest(DisplayModeName) as "Display mode" 
+                     latest(ThinwireColorDepth) as "Thinwire color depth (bit)"
+                     latest(ThinwireComponentEncoder) as "Thinwire component encoder"
+                     latest(ThinwireHardwareEncodeInUse) as "Thinwire hardware encode"
+                     latest(ThinwireVideoCodecType) as "Thinwire video codec type"
+                     latest(ThinwireColorspace) as "Thinwire color space"
+                     latest(ThinwireVideoCodecUse) as "Thinwire video codec usage"
+                     latest(NetworkEdtMtu) as "EDT MTU"
+                     latest(NetworkConnectedVia) as "Connected via"
+                     latest(PrinterSessionPrinter) as "Mapped printers"
+                     latest(AudioActualPriority) as "Audio channel actual priority"
+                     latest(CdmActualPriority) as "CDM channel actual priority"
+                     latest(PrinterActualPriority) as "Printer channel actual priority"
+                     latest(USBActualPriority) as "USB channel actual priority"
+                     latest(ThinwireActualPriority) as "Thinwire channel actual priority"
+                     latest(FramehawkActualPriority) as "Framehawk channel actual priority"
+                     latest(D3DActualPriority) as "DCR channel actual priority"
+                     latest(GraphicsActualPriority) as "Legacy graphics channel actual priority"
+                     latest(SessionUser) as User
+                     latest(host) as Host
+                     splitrow
+                        SessionGUID
+                     $SearchFilter$
+                  | join type=left SessionGUID 
+                     [
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                           latest(SessionTransportProtocols) as "Transport protocols"
+                           latest(SessionLogonTime) as SessionLogonTime
+                           splitrow
+                              SessionGUID 
+                           $SearchFilter$
+                        | eval SessionLogonTimeHourMinute=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%H:%M") 
+                        | fields + SessionGUID SessionLogonTimeHourMinute "Transport protocols"
+                     ] 
+                  | makemv "Mapped printers" delim=";"
+                  | makemv "Mapped volumes" delim=";"
+                  | eval CustomHeader = replace(User,"([^\\\\]+\\\\)([^\\\\]+)","\\2")."@".'Host'." (".'SessionLogonTimeHourMinute'.")" 
+                  | fields *
+                  | fields - _timediff SessionGUID User Host SessionLogonTimeHourMinute
+                  | transpose 0 column_name=Setting header_field=CustomHeader
+               </query>
+            </search>
+            <option name="count">30</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="wrap">false</option>
+            <option name="drilldown">none</option>
+         </table>
+      </panel>
+   </row>
+
+   <!-- Row 4 -->
+   <row depends="$IsCitrixSession$">
+      <panel>
+         <title>Citrix policies (last seen values)</title>
+         <table id="Table_Panel41">
+            <search>
+               <query>
+                  | pivot `uA_DM_CitrixSession_SessionConfig` CitrixSession_SessionConfig
+                     latest(AudioPolicyAllowMicrophoneRedirection) as "Microphone redirection"
+                     latest(AudioPolicyAllowRedirection) as "Audio redirection"
+                     latest(AudioPolicyPriority) as "Audio channel priority"
+                     latest(AudioPolicySoundQuality) as "Sound quality"
+                     
+                     latest(CdmPolicyAllowDriveRedirection) as "Client drive mapping"
+                     latest(CdmPolicyReadOnly) as "Read-only client drive access"
+                     latest(CdmPolicyPriority) as "CDM channel priority"
+                     
+                     latest(ThinwirePolicyFps) as "Thinwire FPS"
+                     latest(ThinwirePolicyPriority) as "Thinwire channel priority"
+                     latest(ThinwirePolicyUseHardwareEncoding) as "Thinwire hardware encoding"
+                     latest(ThinwirePolicyUseVideoCodec) as "Thinwire video codec"
+                     latest(ThinwirePolicyVisualQuality) as "Thinwire visual quality"
+                     
+                     latest(FramehawkPolicyPriority) as "Framehawk channel priority"
+                     
+                     latest(D3DPolicyAeroRedirection) as "DCR aero redirection"
+                     latest(D3DPolicyGraphicsQuality) as "DCR graphics quality"
+                     latest(D3DPolicyPriority) as "DCR channel priority"
+                     
+                     latest(GraphicsPolicyDisplayDegradeNotifyUser) as "Legacy graphics display degrade notify user"
+                     latest(GraphicsPolicyDisplayDegradePolicy) as "Legacy graphics display degrade policy"
+                     latest(GraphicsPolicyPriority) as "Legacy graphics channel priority"
+                     
+                     latest(NetworkPolicyAcceptSessionReliabilityConnections) as "Session reliability connections"
+                     latest(NetworkPolicySessionReliabilityPort) as "Session reliability port"
+                     latest(NetworkPolicySessionReliabilityTimeout) as "Session reliability timeout (s)"
+                     latest(NetworkPolicyICAListenerPortNumber) as "ICA listener port"
+                     
+                     latest(PrinterPolicyAllowRedirection) as "Printer redirection"
+                     latest(PrinterPolicyAutoCreateClientPrintersDisplayName) as "Auto-create client printers"
+                     latest(PrinterPolicyPriority) as "Printer channel priority"
+                     
+                     latest(USBPolicyAllowPNPRedirection) as "USB PNP redirection"
+                     latest(USBPolicyAllowUSBSupport) as "USB support"
+                     latest(USBPolicyPriority) as "USB channel priority"
+                     
+                     latest(SessionUser) as User
+                     latest(host) as Host
+                     splitrow
+                        SessionGUID
+                     $SearchFilter$
+                  | join type=left SessionGUID 
+                     [
+                        | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                           latest(SessionLogonTime) as SessionLogonTime
+                           splitrow
+                              SessionGUID 
+                           $SearchFilter$
+                        | eval SessionLogonTimeHourMinute=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%H:%M") 
+                        | fields + SessionGUID SessionLogonTimeHourMinute
+                     ] 
+                  | fillnull value="n/a" SessionLogonTimeHourMinute 
+                  | eval CustomHeader = replace(User,"([^\\\\]+\\\\)([^\\\\]+)","\\2")."@".'Host'." (".'SessionLogonTimeHourMinute'.")" 
+                  | fields *
+                  | fields - _timediff SessionGUID User Host SessionLogonTimeHourMinute
+                  | replace "1" with "Allowed" "0" with "Prohibited"
+                  | transpose 0 column_name=Policy header_field=CustomHeader
+               </query>
+            </search>
+            <option name="count">30</option>
+            <option name="dataOverlayMode">none</option>
+            <option name="wrap">false</option>
+            <option name="drilldown">none</option>
+         </table>    
+      </panel>
+   </row>
+
+   <!-- Row 5 -->
+   <row>
+      <!-- Column 1 -->
+      <panel>
+         <title>Network data volume &amp; latency over time</title>
+         <chart id="Chart_Pane51">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                     sum(NetTargetSendMB) as SumNetTargetSendMB
+                     sum(NetTargetReceiveMB) as SumNetTargetReceiveMB
+                     sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                     sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                     splitrow
+                        _time
+                        period $PivotPeriodAutoTimechart$
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     sum(SumNetTargetSendMB) as "Send volume (MB)"
+                     sum(SumNetTargetReceiveMB) as "Receive volume (MB)"
+                     eval(round(sum(SumNetTargetSendDurationMs)/sum(SumNetTargetSendLatencyCount),1)) as "Avg. send latency (ms)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.chart.stackMode">stacked</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"Avg. send latency (ms)"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Avg. send latency (ms)"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">Data volume (MB)</option>
+            <option name="charting.axisTitleY2.text">Latency (ms)</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+      
+      <!-- Column 2 -->
+      <panel>
+         <title>CPU &amp; RAM over time</title>
+         <chart id="Chart_Panel52">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     sum(ProcCPUPercent) as ProcCPUPercent
+                     sum(ProcWorkingSetMB) as ProcWorkingSetMB
+                     splitrow
+                        time as _time
+                     splitrow
+                        host as host
+                     $SearchFilter$
+                  | timechart
+                     `uberAgent_dynamic_span`
+                     eval(round(avg(ProcWorkingSetMB),1)) as "Avg. RAM (MB)"
+                     eval(round(avg(ProcCPUPercent),1)) as "Avg. CPU (%)"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">column</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.chart.overlayFields">"Avg. CPU (%)"</option>
+            <option name="charting.axisY2.enabled">true</option>
+            <option name="charting.axisY2.fields">"Avg. CPU (%)"</option>
+            <option name="charting.axisY.includeZero">true</option>
+            <option name="charting.axisY2.includeZero">true</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.text">RAM (MB)</option>
+            <option name="charting.axisTitleY2.text">CPU (%)</option>
+            <option name="charting.axisTitleY2.visibility">visible</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+         </chart>
+      </panel>
+   </row>
+   
+   <!-- Row 6 -->
+   <row>
+      <panel>
+         <title>Applications</title>
+         <table id="Table_Panel61">
+            <search>
+               <query>
+                  | pivot `uA_DM_Process_ProcessDetail` Process_ProcessDetail
+                     values(ProcName) as ProcName
+                     sum(ProcCPUPercent) as ProcCPUPercent
+                     sum(ProcIOPS) as ProcIOPS
+                     sum(ProcIOCount) as ProcIOCount
+                     sum(ProcIODurationMs) as ProcIODurationMs
+                     sum(ProcWorkingSetMB) as ProcWorkingSetMB
+                     sum(ProcNetKBPS) as ProcNetKBPS
+                     splitrow
+                        AppName as "App name"
+                     splitrow
+                        time as _time
+                     splitrow
+                        host as host
+                     $SearchFilter$
+                  | stats
+                     values(ProcName) as "Process name(s)"
+                     avg(ProcCPUPercent) as AvgProcCPUPercent
+                     avg(ProcIOPS) as AvgProcIOPS
+                     sum(ProcIOCount) as SumProcIOCount
+                     sum(ProcIODurationMs) as SumProcIODurationMs
+                     avg(ProcWorkingSetMB) as AvgProcWorkingSetMB
+                     avg(ProcNetKBPS) AS AvgProcNetKBPS
+                     by
+                        "App name"
+                  | join
+                     type=outer "App name"
+                     [
+                        | pivot `uA_DM_Process_NetworkTargetPerformance` Process_NetworkTargetPerformance
+                              sum(NetTargetSendLatencyCount) as SumNetTargetSendLatencyCount
+                              sum(NetTargetSendDurationMs) as SumNetTargetSendDurationMs
+                           splitrow
+                              AppName as "App name"
+                           $SearchFilter$
+                        | fields +
+                           "App name"
+                           SumNetTargetSendLatencyCount
+                           SumNetTargetSendDurationMs
+                     ]
+                  | join
+                     type=outer "App name"
+                     [
+                        | pivot `uA_DM_Application_UIDelay` Application_UIDelay
+                           sum(UIDelayMs) as SumUIDelayMs
+                           splitrow
+                              AppName as "App name"
+                           $SearchFilter$
+                        | fields +
+                           "App name"
+                           SumUIDelayMs
+                     ]
+                  | eval "Avg. CPU (%)" = round(AvgProcCPUPercent, 1)
+                  | eval "Avg. IOPS" = round (AvgProcIOPS,1)
+                  | eval "Avg. IO latency (ms)" = round (SumProcIODurationMs/SumProcIOCount,1)
+                  | eval "Avg. RAM (MB)" = round(AvgProcWorkingSetMB, 0)
+                  | eval "Avg. net thruput (KB/s)" = round (AvgProcNetKBPS,1)
+                  | eval "Avg. net latency (ms)" = round (SumNetTargetSendDurationMs/SumNetTargetSendLatencyCount,1)
+                  | eval "UI unresponsiveness (s)" = round(SumUIDelayMs/1000,1)
+                  | eval sortfield = lower("App name")
+                  | table
+                     "App name"
+                     "Process name(s)"
+                     "Avg. CPU (%)"
+                     "Avg. IOPS"
+                     "Avg. IO latency (ms)"
+                     "Avg. RAM (MB)"
+                     "Avg. net thruput (KB/s)"
+                     "Avg. net latency (ms)"
+                     "UI unresponsiveness (s)"
+                     sortfield
+                  | sort limit=0 sortfield
+                  | fields -
+                     sortfield
+               </query>
+            </search>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+         </table>
+         
+         <html src="single_user_detail_explanation_2.html">
+         </html>
+      </panel>
+   </row>
+
+   <!-- Row 7 -->
+   <row>
+      <panel>
+         <title>Tags</title>
+         <table id="Table_Panel71">
+            <search>
+               <query>
+                     | pivot `uA_DM_Tags_UserHost` Tags_UserHost 
+                        latest(TagName) as "Tag name"
+                        values(TagData) as "Tag data"
+                        splitrow
+                           host as Host
+                        splitrow
+                           TagName
+                        filter TagType is 2
+                        $SearchFilter$
+                     | fields - TagName
+               </query>
+            </search>
+            <option name="count">10</option>
+            <option name="drilldown">none</option>
+         </table>
+         
+         <html src="single_user_detail_explanation_3.html">
+         </html>
+      </panel>
+   </row>
+</form>

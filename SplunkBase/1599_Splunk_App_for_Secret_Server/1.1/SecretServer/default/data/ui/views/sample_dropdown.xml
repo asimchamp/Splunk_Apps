@@ -1,0 +1,86 @@
+<form>
+    <label>Search Events</label>
+
+    <!-- define master search template, with replacement tokens delimited with $ -->
+    <searchTemplate>EventID="$action$"</searchTemplate>
+
+    <fieldset>
+        <!-- Define a simple dropdown form driven by a search -->
+        <input type="dropdown" token="action" searchWhenChanged="true">
+            <label>Filter by Audit Action</label>
+            <choice value="">Select Action</choice>
+<choice value="15">CONFIGURATION - EDIT</choice>
+<choice value="10016">EXPORT SECRETS - EXPORTED</choice>
+<choice value="7">FOLDER - CREATE</choice>
+<choice value="8">FOLDER - DELETE</choice>
+<choice value="14">FOLDER - EDIT PERMISSIONS</choice>
+<choice value="10017">IMPORT SECRETS - IMPORTED</choice>
+<choice value="10024">LICENSES - EXPIRES IN 30 DAYS</choice>
+<choice value="10027">POWERSHELLSCRIPT - CREATE</choice>
+<choice value="10028">POWERSHELLSCRIPT - DEACTIVATE</choice>
+<choice value="10029">POWERSHELLSCRIPT - EDIT</choice>
+<choice value="10030">POWERSHELLSCRIPT - REACTIVATE</choice>
+<choice value="10031">POWERSHELLSCRIPT - VIEW</choice>
+<choice value="9">ROLE - CREATE</choice>
+<choice value="10">ROLE - ASSIGN USER OR GROUP</choice>
+<choice value="11">ROLE - UNASSIGN USER OR GROUP</choice>
+<choice value="20">ROLE - ENABLE ROLE</choice>
+<choice value="21">ROLE - DISABLE ROLE</choice>
+<choice value="12">ROLE PERMISSION - ADDED TO ROLE</choice>
+<choice value="13">ROLE PERMISSION - REMOVED FROM ROLE</choice>
+<choice value="10001">SECRET - CREATE</choice>
+<choice value="10002">SECRET - DELETE</choice>
+<choice value="10003">SECRET - UNDELETE</choice>
+<choice value="10004">SECRET - VIEW</choice>
+<choice value="10005">SECRET - EDIT</choice>
+<choice value="10006">SECRET - LAUNCH</choice>
+<choice value="10008">SECRET - DEPENDENCY FAILURE</choice>
+<choice value="10009">SECRET - EXPIRED TODAY</choice>
+<choice value="10010">SECRET - EXPIRES IN 1 DAY</choice>
+<choice value="10013">SECRET - EXPIRES IN 3 DAYS</choice>
+<choice value="10011">SECRET - EXPIRES IN 7 DAYS</choice>
+<choice value="10012">SECRET - EXPIRES IN 15 DAYS</choice>
+<choice value="10019">SECRET - SESSION RECORDING VIEW</choice>
+<choice value="10020">SECRET - COPY</choice>
+<choice value="10025">SECRET - CHECKIN</choice>
+<choice value="10026">SECRET - CHECKOUT</choice>
+<choice value="10007">SECRET - HEARTBEAT FAILURE</choice>
+<choice value="10032">SECRET - HEARTBEAT SUCCESS</choice>
+<choice value="10033">SECRET - HOOK FAILURE</choice>
+<choice value="10034">SECRET - HOOK SUCCESS</choice>
+<choice value="10035">SECRET - HOOK CREATE</choice>
+<choice value="10036">SECRET - HOOK EDIT</choice>
+<choice value="10037">SECRET - HOOKD ELETE</choice>
+<choice value="10038">SECRET - CUSTOM AUDIT</choice>
+<choice value="10039">SECRET - PASSWORD DISPLAYED</choice>
+<choice value="10040">SECRET - PASSWORD COPIED TO CLIPBOARD</choice>
+<choice value="10041">SECRET - EDIT_VIEW</choice>
+<choice value="10021">SECRET TEMPLATE - CREATE</choice>
+<choice value="10022">SECRET TEMPLATE - EDIT</choice>
+<choice value="10023">SECRET TEMPLATE - TEMPLATE COPIED FROM</choice>
+<choice value="10042">SECRET TEMPLATE - FIELD ENCRYPTED</choice>
+<choice value="10043">SECRET TEMPLATE - FIELD EXPOSED</choice>
+<choice value="10014">UNLIMITED ADMIN - ENABLE</choice>
+<choice value="10015">UNLIMITED ADMIN - DISABLE</choice>
+<choice value="1">USER - CREATE</choice>
+<choice value="2">USER - DISABLE</choice>
+<choice value="3">USER - ENABLE</choice>
+<choice value="4">USER - LOCKOUT</choice>
+<choice value="5">USER - ADDED TO GROUP</choice>
+<choice value="6">USER - REMOVED FROM GROUP</choice>
+<choice value="16">USER - LOGIN</choice>
+<choice value="17">USER - LOGOUT</choice>
+<choice value="18">USER - LOGIN FAILURE</choice>
+<choice value="19">USER - PASSWORD CHANGE</choice>
+<choice value="10018">USER AUDIT - EXPIRE NOW</choice>
+        </input>
+    </fieldset>
+
+    <row>
+        <!-- output the results as a 50 row events view -->
+        <event>
+            <title>Results</title>
+            <option name="count">50</option>
+        </event>
+    </row>
+</form>

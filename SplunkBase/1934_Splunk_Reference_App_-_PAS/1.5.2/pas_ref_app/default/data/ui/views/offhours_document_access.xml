@@ -1,0 +1,42 @@
+<form stylesheet="help_hover.css,offhours_document_access.css">
+    <label>Off-Hours Accesses</label>
+    <fieldset autoRun="true" submitButton="false">
+        <input type="time" searchWhenChanged="true">
+            <default>
+                <earliestTime>-24h</earliestTime>
+                <latestTime>now</latestTime>
+            </default>
+        </input>
+    </fieldset>
+    <row>
+        <panel>
+            <chart>
+                <title>Accesses Outside Working Hours</title>
+                <searchString>| pivot ri_pas_datamodel Invalid_Time_Access count(Invalid_Time_Access) AS count SPLITROW _time AS _time PERIOD auto SORT 0 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</searchString>
+                <option name="charting.chart">line</option>
+                <option name="link.visible">false</option>
+            </chart>
+            <html>
+                <div class="help-hover" title="The information on this dashboard is extracted using a custom data model. It requires a complex query linking to external data. CLICK TO LEARN MORE."> 
+                    <a class="external" target="_blank" href="http://dev.splunk.com/goto/dmcim"><i class="icon-bulb"></i>
+                    Learn more about data models</a>
+                </div>
+                <div class="help-hover" title="How to construct a complex query that uses a lookup and overlays additional time data. CLICK TO LEARN MORE."> 
+                    <a class="external" target="_blank" href="http://dev.splunk.com/goto/complexquery">
+                        <i class="icon-bulb"></i>
+                    Learn more lookups</a>
+                </div>
+            </html>
+        </panel>
+    </row>
+    <row>
+        <table>
+            <title>Top Users</title>
+            <searchString>| pivot ri_pas_datamodel Invalid_Time_Access count(Invalid_Time_Access) AS count SPLITROW user AS user SORT 0 user ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</searchString>
+        </table>
+        <table>
+            <title>Top Documents</title>
+            <searchString>| pivot ri_pas_datamodel Invalid_Time_Access count(Invalid_Time_Access) AS count SPLITROW object AS object SORT 100 object ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</searchString>
+        </table>
+    </row>
+</form>

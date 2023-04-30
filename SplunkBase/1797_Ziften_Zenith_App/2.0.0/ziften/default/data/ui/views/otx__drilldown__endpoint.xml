@@ -1,0 +1,81 @@
+<form stylesheet="inpage_drilldown_form.css" script="inpage_drilldown_form_endpoint.js">
+  <label>OTX | Drilldown | Endpoint</label>
+  <description>AlienVault Open Threat Exchange</description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="text" token="guid" searchWhenChanged="true"/>
+    <input type="text" token="ipaddress" searchWhenChanged="true"/>
+  </fieldset>
+  <row>
+    <chart>
+      <title>Systems With OTX Tags Over Time</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx"|lookup system_info agentguid |timechart count as "Systems With OTX Tags" by computername</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">area</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">none</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table id="master">
+      <title>OTX Tags by System</title>
+      <search><query>sourcetype=ziften:zenith:alert feed=otx |stats dc(ipaddress) as "Unique Tagged IPs Seen" count(ipaddress) as "Gross Tagged IP Traffic Seen" dc(imagefilemd5) as "Unique MD5s With Associated Tags" by agentguid  |lookup system_info agentguid|fields computername agentguid "Unique Tagged IPs Seen" "Gross Tagged IP Traffic Seen" "Unique MD5s With Associated Tags"     |sort -"Unique Tagged IPs Seen"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table id="detail">
+      <title>System OTX Tags</title>
+      <search><query>sourcetype=ziften:zenith:alert feed=otx |where agentguid="$guid$" |stats count as "Gross Tagged IP Traffic Seen" values(details) as "OTX Tags" dc(imagefilemd5) as "Unique MD5s Tag Association" by ipaddress|makemv delim="," "OTX Tags"|sort -"Gross Tagged IP Traffic Seen"</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>System MD5s for Tagged OTX Destination</title>
+      <search><query>sourcetype=ziften:zenith:alert feed="otx" agentguid="$guid$" ipaddress="$ipaddress$"| stats count as seen_comunications first(imagefilepath) as fullpath values(accountname) as "User Associations" by imagefilemd5|lookup image_info imagefilemd5|fields imagefilemd5 fullpath companyname productversion fileversion "User Associations" seen_comunications | sort -seen_comunications</query></search>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <drilldown target="OTX Info">
+        <link>
+          <![CDATA[
+  http://www.alienvault.com/apps/rep_monitor/ip/$ipaddress$
+       ]]>
+        </link>
+      </drilldown>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

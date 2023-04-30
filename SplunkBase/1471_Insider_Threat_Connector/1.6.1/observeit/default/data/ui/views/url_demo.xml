@@ -1,0 +1,16 @@
+<!-- Copyright (C) 2010-2019 Sideview LLC.  All Rights Reserved. -->
+<view autoCancelInterval="90" isVisible="false">
+  <label>Browse</label>
+
+  <module name="SideviewUtils" layoutPanel="appHeader" />
+
+  <module name="URLLoader" layoutPanel="viewHeader" autoRun="True">
+
+    <module name="HTML" layoutPanel="viewHeader">
+      <param name="html"><![CDATA[
+        [[picture this iframe showing the screenshot at <br>
+        $ViewerURL$]]
+      ]]></param>
+    </module>
+  </module>
+</view>

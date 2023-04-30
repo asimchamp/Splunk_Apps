@@ -1,0 +1,59 @@
+
+<div class="dashboardContent">
+	<div class="NotReallyASplunkModule SearchSelectLister" id="SearchSelectLister_1_3_0" s:parentmodule="#ConvertToIntention_0_2_0">
+		<label for="SearchSelectLister_1_3_0_id">Grupos de hosts</label>
+		<select title="Este filtro sólo está disponible en la versión Premium" id="SearchSelectLister_1_3_0_id" disabled="1">
+			<option value="%">Todos</option>
+			<option value="servers" key="hostgroup_name">
+				servidores
+			</option>
+			<option value="network" key="hostgroup_name">
+				elementos de red
+			</option>
+			<option value="web" key="hostgroup_name">
+				web
+			</option>
+			<option value="mail" key="hostgroup_name">
+				mail
+			</option>
+			<option value="database" key="hostgroup_name">
+				database
+			</option>
+		</select>
+	</div>
+
+
+	<div class="NotReallyASplunkModule SearchSelectLister" id="SearchSelectLister_2_5_0" s:parentmodule="#ConvertToIntention_1_4_0">
+		<label for="SearchSelectLister_2_5_0_id">Grupos de servicios</label>
+		<select title="Este filtro sólo está disponible en la versión Premium" id="SearchSelectLister_2_5_0_id" disabled="1">
+			<option value="%">Todos</option>
+		</select>
+	</div>
+
+	<div class="NotReallyASplunkModule StaticRadio" s:parentmodule="#ConvertToIntention_2_6_0" id="StaticRadio_0_7_0">
+
+		<fieldset>
+			<input title="Este filtro sólo está disponible en la versión Premium" type="radio" value="0" name="ack_name" id="ack_name_0" disabled="1"/>
+			<label for="ack_name_0">Sin ACK</label>
+			<br />
+			<input title="Este filtro sólo está disponible en la versión Premium" type="radio" value="%" name="ack_name" id="ack_name_1" disabled="1"/>
+			<label for="ack_name_1">Con ACK</label>
+			<br />
+		</fieldset>
+	</div>
+
+	<div class="NotReallyASplunkModule StaticRadio" s:parentmodule="#ConvertToIntention_3_8_0" id="StaticRadio_1_9_0">
+		<fieldset>
+			<input title="Este filtro sólo está disponible en la versión Premium" type="radio" value="0" name="down_name" id="down_name_0"
+			disabled="1"/>
+			<label for="down_name_0">Sin DOWNTIME</label>
+			<br />
+			<input title="Este filtro sólo está disponible en la versión Premium" type="radio" value="%" name="down_name" id="down_name_1"
+			disabled="1"/>
+			<label for="down_name_1">Con DOWNTIME</label>
+			<br />
+		</fieldset>
+	</div>
+
+</div>
+<div class="NotReallyASplunkModule informative">El filtro avanzado sólo está disponible en la versión Premium</div>

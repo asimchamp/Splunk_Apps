@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<form>
+
+
+
+    <label>Time Recorder for windows</label>
+
+    <searchTemplate>
+
+        source="WinEventLog:System" (EventCode=6005 OR EventCode=6006)  $yyyymm$ host=$host$|
+
+         table host, _time, EventCode  | eval Date=strftime(_time,"%Y-%m-%d") | stats min(_time) as st,max(_time) as ed by host,Date | eval IN_Time=strftime(st,"%H:%M")  | eval OUT_Time=strftime(ed,"%H:%M") |eval in=tonumber(substr(IN_Time,1,2))*60+tonumber(substr(IN_Time,4,2))|eval out=tonumber(substr(OUT_Time,1,2))*60+tonumber(substr(OUT_Time,4,2))|eval dur=out-in |addtotals col=t fieldname=dur dur| eval h=floor(dur/60)|eval m=dur-(h*60)|eval h=if(len(h)==1,"0"+tostring(h),tostring(h))|eval m=if(len(m)==1,"0"+tostring(m),tostring(m))|eval WorkingHours=h+":"+m|table host,Date,IN_Time,OUT_Time,WorkingHours
+
+        
+
+    </searchTemplate>
+
+
+
+    <fieldset>
+
+
+
+        <input type="dropdown" token="yyyymm">
+
+            <label>Target Month</label>
+
+            <populatingSearch fieldForValue="trng" fieldForLabel="yyyymm">
+
+                <![CDATA[source="WinEventLog:System" (EventCode=6005 OR EventCode=6006) | table _time | eval yyyymm=strftime(_time,"%m/%Y")|dedup yyyymm| eval sdate=substr(yyyymm,1,2)+"/01/"+substr(yyyymm,4,4)+":0:0:0" | eval edate=strftime(relative_time(strptime(sdate,"%m/%d/%Y:%H:%M:%S"),"+1month"),"%m/%d/%Y:%H:%M:%S")  |  eval trng="earliest="+sdate+" latest="+edate]]>
+
+            </populatingSearch>
+
+        </input>
+
+        <input type="dropdown" token="host">
+
+            <label>Target HOST</label>
+
+                <populatingSearch fieldForValue="host" fieldForLabel="host">
+
+                    <![CDATA[source="WinEventLog:System" (EventCode=6005 OR EventCode=6006) | table host |dedup host]]>
+
+                </populatingSearch>
+
+        </input>
+
+        
+
+    </fieldset>
+
+  <row>
+
+    <table>
+
+      <title>Time Recorder</title>
+
+      <option name="count">50</option>
+
+      <option name="showPager">true</option>
+
+    </table>
+
+  </row>
+
+</form>

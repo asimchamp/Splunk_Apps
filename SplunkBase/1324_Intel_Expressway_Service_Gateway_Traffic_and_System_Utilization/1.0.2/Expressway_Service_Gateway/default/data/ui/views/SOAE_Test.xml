@@ -1,0 +1,59 @@
+<dashboard>
+  <label>Dashboard SOAE</label>
+<row>
+  <table>
+    <title>Table 1</title>
+    <searchName>Count of Requests by Latency last 7 days</searchName>
+    <earliestTime>-60m</earliestTime>
+    <latestTime>now</latestTime>
+    <option name="showPager">true</option>
+  </table>
+
+  <chart>
+    <title>Top Client IPs by Number of Requests</title>
+    <searchName>Top Client IPs by Number of Requests</searchName>
+    <option name="height">400px</option>
+  </chart>
+    
+</row>
+
+
+<row>
+  <chart>
+    <title>Count of Requests by Latency last 7 days</title>
+    <searchName>Count of Requests by Latency last 7 days</searchName>
+    <option name="height">200px</option>
+  </chart>
+</row>
+
+<row>
+<html>
+  <script type="text/javascript" src="/static/app/amMap/ammap/swfobject.js"></script>
+        <div id="flashcontent">
+                <strong>If you see this message you most likley need to install the amMap plugin for splunk. 
+
+<br/>
+http://splunkbase.splunk.com/apps/All/4.x/app:Splunk+for+use+with+amMap+Flash+Maps
+<br/>
+
+http://www.splunkbase.com/apps/All/4.x/Add-On/app:Geo+Location+Lookup+Script
+
+</strong>
+        </div>
+
+        <script type="text/javascript">
+                // <![CDATA[
+                var so = new SWFObject("/static/app/amMap/ammap/ammap.swf", "ammap", "100%", "400", "8", "#FFFFFF");
+                so.addVariable("path", "/static/app/amMap/ammap/");
+                so.addVariable("settings_file", escape("/static/app/amMap/ammap/ammap_settings.xml"));                  // you can set two or more different settings files here (separated by commas)
+                so.addVariable("data_file", escape("/static/app/Expressway_Service_Gateway/xml_out/map1data.xml"));
+                so.write("flashcontent");
+so.addParam('wmode', 'transparent');
+                // ]]>
+        </script>
+</html>
+
+</row>
+
+</dashboard>
+

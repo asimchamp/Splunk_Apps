@@ -1,0 +1,236 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+  <label>City Information</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+  <module name="Message" layoutPanel="navigationHeader">
+    <param name="level">warn</param>
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="TimeRangePicker" layoutPanel="panel_row1_col1">
+    <param name="searchWhenChanged">True</param>
+    <param name="default">All Time</param>
+  <module name="HiddenSearch" layoutPanel="panel_row2_col1" group="Top Origin Cities" autoRun="True">
+    <param name="search">sourcetype="airline_csv" | top 10 OriginCityName</param>
+    <param name="groupLabel">Top Origin Cities</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+        <item>displayRowNumbers</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.secondaryAxisTitle.text</item>
+        <item>charting.layout.splitSeries</item>
+        <item>charting.secondaryAxis.scale</item>
+        <item>charting.axisTitleY.text</item>
+        <item>charting.secondaryAxis.maximumNumber</item>
+        <item>charting.axisTitleX.text</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.secondaryAxis.minimumNumber</item>
+        <item>charting.legend.placement</item>
+        <item>charting.primaryAxisTitle.text</item>
+        <item>count</item>
+        <item>charting.legend.labelStyle.overflowMode</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">bar</param>
+              <param name="charting.chart.nullValueMode">gaps</param>
+              <param name="charting.layout.splitSeries">false</param>
+              <param name="charting.legend.placement">none</param>
+              <param name="charting.axisTitleY.text">## of Flights</param>
+              <param name="charting.secondaryAxis.maximumNumber">""</param>
+              <param name="charting.axisTitleX.text">City</param>
+              <param name="charting.chart.stackMode">default</param>
+              <param name="charting.secondaryAxis.minimumNumber">""</param>
+              <param name="charting.secondaryAxis.scale">""</param>
+              <param name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row2_col2" group="Top Destination Cities" autoRun="True">
+    <param name="search">sourcetype="airline_csv" | top 10 DestCityName</param>
+    <param name="groupLabel">Top Destination Cities</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+        <item>displayRowNumbers</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.secondaryAxisTitle.text</item>
+        <item>charting.layout.splitSeries</item>
+        <item>charting.secondaryAxis.scale</item>
+        <item>charting.axisTitleY.text</item>
+        <item>charting.secondaryAxis.maximumNumber</item>
+        <item>charting.axisTitleX.text</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.secondaryAxis.minimumNumber</item>
+        <item>charting.legend.placement</item>
+        <item>charting.primaryAxisTitle.text</item>
+        <item>count</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">bar</param>
+              <param name="charting.chart.nullValueMode">gaps</param>
+              <param name="charting.layout.splitSeries">false</param>
+              <param name="charting.legend.placement">none</param>
+              <param name="charting.axisTitleY.text">## of Flights</param>
+              <param name="charting.secondaryAxis.maximumNumber">""</param>
+              <param name="charting.axisTitleX.text">City</param>
+              <param name="charting.chart.stackMode">default</param>
+              <param name="charting.secondaryAxis.minimumNumber">""</param>
+              <param name="charting.secondaryAxis.scale">""</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row3_col1" group="Average Distances to Cities" autoRun="True">
+    <param name="search">sourcetype="airline_csv"| stats avg(Distance) AS avgDist by DestCityName | sort - avgDist | eval avgDist=round(avgDist) | head 10 | rename DestCityName AS Destination, avgDist AS "Average Distance To (Miles)"</param>
+    <param name="groupLabel">Average Distances to Cities</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+        <item>displayRowNumbers</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.layout.splitSeries</item>
+        <item>charting.secondaryAxis.scale</item>
+        <item>charting.secondaryAxis.maximumNumber</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.secondaryAxis.minimumNumber</item>
+        <item>charting.legend.placement</item>
+        <item>count</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">column</param>
+              <param name="charting.chart.nullValueMode">gaps</param>
+              <param name="charting.layout.splitSeries">false</param>
+              <param name="charting.legend.placement">right</param>
+              <param name="charting.secondaryAxis.maximumNumber">""</param>
+              <param name="charting.chart.stackMode">default</param>
+              <param name="charting.secondaryAxis.minimumNumber">""</param>
+              <param name="charting.secondaryAxis.scale">""</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row4_col1" group="Hub Cities" autoRun="True">
+    <param name="search">sourcetype="airline_csv" | stats dc(AirlineID) AS dcAirline, count by OriginCityName | eval hubscore=(dcAirline * log(count)) | sort - hubscore | head 10 | rename OriginCityName AS City | fields City, hubscore
+</param>
+    <param name="groupLabel">Hub Cities</param>
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+        <item>displayRowNumbers</item>
+        <item>charting.chart.nullValueMode</item>
+        <item>charting.legend.labelStyle.overflowMode</item>
+        <item>charting.axisY.minimumNumber</item>
+        <item>charting.secondaryAxis.maximumNumber</item>
+        <item>charting.chart.stackMode</item>
+        <item>charting.secondaryAxis.minimumNumber</item>
+        <item>charting.legend.placement</item>
+        <item>charting.secondaryAxis.scale</item>
+        <item>count</item>
+        <item>charting.layout.splitSeries</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="display">False</param>
+            <param name="enable">True</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">bar</param>
+              <param name="charting.chart.nullValueMode">gaps</param>
+              <param name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</param>
+              <param name="charting.axisY.minimumNumber">45</param>
+              <param name="charting.secondaryAxis.maximumNumber">""</param>
+              <param name="charting.chart.stackMode">default</param>
+              <param name="charting.legend.placement">none</param>
+              <param name="charting.secondaryAxis.scale">""</param>
+              <param name="charting.layout.splitSeries">false</param>
+              <module name="JSChart">
+                <param name="width">100%</param>
+                <module name="Gimp"/>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+  </module>
+</view>
+

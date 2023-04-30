@@ -1,0 +1,25 @@
+<style type="text/css">
+#note
+	{
+		width:8%;
+		display: inline-block;
+		font-size:12px;
+		font-weight:bold;
+	}
+	
+#chassis
+	{
+		width: 10.5em;
+	}
+</style>
+
+<%namespace name="lib" file="//lib.html" import="*"/>
+<label id="note">Chassis :</label>
+<select  id="chassis">
+<option value="None" selected>None</option>
+%if (availableChassis):
+	 % for entry in availableChassis:
+ 	     <option value="${entry}">${entry}</option>
+	 % endfor
+% endif
+</select>

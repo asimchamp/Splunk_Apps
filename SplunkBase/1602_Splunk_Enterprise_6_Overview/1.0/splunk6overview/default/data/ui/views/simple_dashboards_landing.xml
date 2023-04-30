@@ -1,0 +1,66 @@
+<dashboard isVisible="false">
+	<label>Simple Dashboards</label>
+	<row>
+        <html>
+		<div>
+			<a href="/app/splunk6overview/predictive_landing"><h2 align="left">Previous: Predictive Analytics</h2></a>
+		</div>
+	</html>
+	<html>
+		<div>
+			<a href="/app/splunk6overview/maps_landing"><h2 align="right">Next: Splunk Maps</h2></a>
+		</div>
+	</html>
+	</row>
+        <row>
+        <html>
+		<p>Splunk’s Simple XML syntax allows any user to create and manage dashboards through the visual dashboard editor. Users can also manage privacy settings, modify searches, and
+		manage panel controls for form inputs. The simple dashboard engine also no longer depends on the Advanced XML module system. Dashboards are now rendered in HTML and JavaScript,
+		providing web developers with a more familiar interface for customizing their dashboards. </p>
+		<h1>Key Features:</h1>
+            <ul>
+                <li>Improved Experience with Forms - Changing your simple xml dashboard to form now retains all the same edit controls (drag-and-drop panel, add/edit panel controls, and more)</li>
+                <li>Enhanced Token Replacement - Form input tokens may now be used throughout your dashboard (panel titles, html panels, charting options, and more)</li>
+                <li>Removed Panel per Row Limits - May now include more than 3 panels per row</li>
+                <li>Cascading Form Inputs - Ability to use the selection of one form input to reduce/set the values of another form input</li>
+	    </ul>
+            <h1>Using the Simple dashboard</h1>
+            <div STYLE="margin-left: 20px;">
+		<p>Creating a dashboard is easily done from a search.  Start by creating a simple search as shown below:</p>
+		<p><img src="/static/app/splunk6overview/images/simplexml_search.png" alt="search index=faa | stats count by DestState DestAirport | sort - count"/></p>
+		<p>Once the search results are generated use the "Save as Dashboard" to create the dashboard.  Once the dashboard is created you can either add new search results or edit the
+		underlying XML using the "Edit Source".</p>
+		<p>There are many ways to customize and enhance your dashboards using simple XML</p>
+		<ul>
+			<li>One-click Add a time range picker</li>
+			<li>Full range of charts</li>
+			<li>Integrated Splunk <a href="/app/splunk6overview/maps_landing">Maps</a> support</li>
+			<li>Customization extensions</li>
+			<li>Form inputs</li>
+		</ul>
+	    </div>
+	    <h1>Examples</h1>
+	    <div STYLE="margin-left: 20px;">
+		<p>The following dashboards are examples of the ways to customize a dashboard.  For a view of the underlying Simple XML you can edit the source code</p>
+                    <ul>
+                        <li><a href="/app/splunk6overview/splunk6_dashboards_example">Cancelled Flights Analysis (simple)</a></li>
+                        <li><a href="/app/splunk6overview/splunk6_dashboards_form_inputs">Airport Analysis (forms)</a></li>
+                        <li><a href="/app/splunk6overview/splunk6_dashboards_maps">Cancelled Flights by Airport (maps)</a></li>
+                    </ul>
+            </div>
+	</html>
+	<html>
+		<div>
+			<img src="/static/app/splunk6overview/images/simplexml_forms.png" />
+		</div>
+        </html>
+    </row>
+	<row>
+		<html>
+			<h1>Resources</h1>
+			<a href="http://localhost:8000/en-US/help?location=whatsnew.simplexmlediting"><h2>Learn More about</h2></a>
+			<a href="http://docs.splunk.com/Documentation/Splunk/6.0beta/ReleaseNotes/MeetSplunk" target="_blank"><h2>Intro to Splunk 6 documentation</h2></a>
+		</html>
+	</row>
+</dashboard>
+	

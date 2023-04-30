@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html" stylesheet="vm_storage.css">
+  <label>Virtual Machine Storage Overview</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="DashboardTitleBar" layoutPanel="viewHeader"/>
+  <module name="Message" layoutPanel="navigationHeader">
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+    <param name="level">warn</param>
+  </module>
+        
+  <module name="TimeRangePicker" layoutPanel="panel_row1_col1" autoRun="true">
+    <param name="searchWhenChanged">true</param>
+    <param name="default">Last 4 Hours</param>
+      
+    <module name="HiddenSearch" layoutPanel="panel_row1_col1">
+        <param name="search">
+            index=xenserver sourcetype=Hypervisor:XenServer:VBD type="Disk" | dedup vbd_uuid | 
+            join vdi_uuid [search `hypervisor_index` `vDisk` | fields vdi_uuid, sr_uuid, name_label, virtual_size, physical_utilisation | join sr_uuid [search `hypervisor_index` `vm_store` | fields sr_uuid, shared] ] | 
+            join vm_uuid [search `hypervisor_index` `vm` | fields name_label, vm_uuid | rename name_label as vm_name] |
+            `getDiskStats(shared, virtual_size, physical_utilisation)` |
+            table vm_name, name_label, diskUtil |
+            rename name_label as "Disk Name" vm_name as "VM" diskUtil as "Details"
+        </param>
+        <module name="JobProgressIndicator"/>
+        <module name="StaticContentSample" layoutPanel="panel_row1_col1">
+            <param name="text"><![CDATA[<img src="/static/app/SplunkForXenServer/info.gif" class="info_icon" />]]> Click on a row below to view more details about the virtual machine.</param>
+        </module>
+        
+        <module name="Paginator" layoutPanel="panel_row1_col1">
+            <param name="count">10</param>
+            <param name="entityName">results</param>
+            
+            <module name="SimpleResultsTable">
+                <param name="displayMenu">true</param>
+                <param name="drilldown">row</param>
+                <param name="displayRowNumbers">False</param>
+                <module name="NullModule" />
+            </module>
+            <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+            </module>
+        
+        </module>
+            
+    </module>
+  
+  </module> <!-- TimeRangePicker -->
+
+</view>

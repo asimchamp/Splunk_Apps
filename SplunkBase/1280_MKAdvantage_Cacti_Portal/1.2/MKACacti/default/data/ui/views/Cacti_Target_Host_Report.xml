@@ -1,0 +1,28 @@
+<form>
+  <label>Target Host Report: Adv Ping</label>
+  
+  
+  <searchTemplate>index=cacti_perf target_host="*$target_host$*" poller="*$poller$*"| fields + target_host, loss, avg, min, max </searchTemplate>
+
+  <fieldset>
+      
+  <input type="text" token="target_host">
+    <label>Target Host (default is all hosts)</label>
+      <default>*</default>
+  </input>
+    
+  <input type="text" token="poller">
+      <label>Poller (default is all pollers)</label>
+      <default>*</default>
+    </input>
+    
+  </fieldset>
+  <row>
+      <!-- output the results as a 50 row events view -->
+      <event>
+            <title>Results</title>
+            <option name="count">50</option>
+      </event>
+  </row>
+  
+</form>

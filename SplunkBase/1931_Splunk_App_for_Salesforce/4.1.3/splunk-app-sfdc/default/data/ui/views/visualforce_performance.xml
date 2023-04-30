@@ -1,0 +1,239 @@
+<form version="1.1" script="table_icons_rangemap.js" stylesheet="table_decorations.css">
+  <label>VisualForce Performance</label>
+  <description></description>
+  <fieldset submitButton="false" autoRun="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="status">
+      <label>Report Status</label>
+      <choice value="">All</choice>
+      <choice value="REQUEST_STATUS=F">Fail</choice>
+      <choice value="REQUEST_STATUS=S">Success</choice>
+      <choice value="REQUEST_STATUS=U">Uninitialized</choice>
+      <default></default>
+    </input>
+    <input type="multiselect" token="USER_ID" searchWhenChanged="true">
+      <label>Username</label>
+      <choice value="">All</choice>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>USER_ID</fieldForValue>
+      <search>
+        <query>
+      eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest| stats count by Name USER_ID | sort -count | eval label=Name." (".count.")" | eval USER_ID="USER_ID=".USER_ID
+ </query>
+      </search>
+      <default></default>
+    </input>
+    <input type="multiselect" token="PAGE_NAME" searchWhenChanged="true">
+      <label>VF Page Name</label>
+      <choice value="">All</choice>
+      <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>PAGE_NAME</fieldForValue>
+      <search>
+        <query>
+        eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest | stats count by PAGE_NAME | sort -count | eval label=PAGE_NAME." (".count.")" | eval PAGE_NAME="PAGE_NAME=".PAGE_NAME
+        </query>
+      </search>
+      <default></default>
+      <delimiter> </delimiter>
+    </input>
+    <input type="multiselect" token="BrowserType" searchWhenChanged="true">
+      <label>Browser Type</label>
+      <choice value="">All</choice>
+      <fieldForLabel>BrowserType</fieldForLabel>
+      <fieldForValue>value</fieldForValue>
+      <search>
+        <query>
+        eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest  | eval b= substr(USER_AGENT, 1, 3) | eval BrowserType=case((b=="110"), "Firefox",(b=="130"), "Chrome" , (b=="140"), "Safari", (b=="100"), "IE", (b==150), "Opera" ) | eval value= "USER_AGENT=".b."*"| stats count by BrowserType value
+        </query>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Visual Force Average Execution Time</title>
+        <search>
+          <query>
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest $BrowserType$ $status$ $USER_ID$ $PAGE_NAME$ |  eval b= substr(USER_AGENT, 1, 3) | eval BrowserType=case((b=="110"), "Firefox",(b=="130"), "Chrome" , (b=="140"), "Safari", (b=="100"), "IE", (b==150), "Opera" ) |  eval rt=RUN_TIME/1000 |  where NOT isnull(BrowserType)|  timechart AVG(rt) As "Average Run Time (sec)"  span=6h by BrowserType
+           </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">linear</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Visual Force Average Execution Count</title>
+        <search>
+          <query>
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest $BrowserType$ $status$ $USER_ID$ $PAGE_NAME$ |  eval b= substr(USER_AGENT, 1, 3) | eval BrowserType=case((b=="110"), "Firefox",(b=="130"), "Chrome" , (b=="140"), "Safari", (b=="100"), "IE", (b==150), "Opera" ) |  eval rt=RUN_TIME/1000 |  where NOT isnull(BrowserType) | timechart count AS "VisualForce Execution Count" span=6h by BrowserType</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">linear</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.overlayFields">"Average Run Time (sec)",Median</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Most Active VisualForce Page</title>
+        <search>
+          <query>
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest $BrowserType$ $status$ $USER_ID$ $PAGE_NAME$  | eval  STATUS = if (REQUEST_STATUS=="", "S" ,  REQUEST_STATUS) |stats  count by PAGE_NAME   | sort  10 -count | fields - total | rename count AS "VF PAGE  Count"
+          </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Most Active VF Pages by Distinct Users</title>
+        <search>
+          <query>
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest $BrowserType$ $status$ $USER_ID$ $PAGE_NAME$   | stats dc(Username) as u by PAGE_NAME   | sort  10 -u| rename u AS "VF Page count by Distinct User"
+          </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table id="table2">
+        <title>Reports by Most Active Username Table</title>
+        <search>
+          <query>
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest $BrowserType$ $status$ $USER_ID$ $PAGE_NAME$ | stats count by Name, Username, USER_ID | sort -count| rename count AS "VF Run Count"
+          </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown target="SFDC User">
+          <link>https://splunk.my.salesforce.com/$row.USER_ID$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table1">
+        <title>VF Page Performance - Sorted by Slowest</title>
+        <search>
+          <query>
+          eventtype=sfdc-event-log EVENT_TYPE=VisualforceRequest $BrowserType$ $status$ $USER_ID$ $PAGE_NAME$ | eval rt=RUN_TIME/1000 | eval fail = if(REQUEST_STATUS=="F", "1", "0") |  eval  STATUS = if (REQUEST_STATUS=="", "S" ,  REQUEST_STATUS) |chart count  AVG(rt) as avg MAX(rt) as max median(rt) as median perc90(rt) as perc90 sum(fail) as sum_fail by PAGE_NAME |  eval load=count*avg | sort -load | rangemap field=avg low=0-1 elevated=2-50 severe=50-1000 default=severe |  rename sum_fail AS "Number of Failure" | rename max as "Max Run Time (sec)" | rename avg as "Average Run Time (sec)" | rename perc90 as "90th Percentile Run Time (sec)" | rename median as "Median Run Time (Sec)"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

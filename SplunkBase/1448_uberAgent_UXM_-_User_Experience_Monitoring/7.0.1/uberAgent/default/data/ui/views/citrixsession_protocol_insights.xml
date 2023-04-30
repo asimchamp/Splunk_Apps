@@ -1,0 +1,512 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css, citrixsession_protocol_insights.css">
+
+  <label>Citrix Session Protocol Insights</label>
+  <description>This dashboard displays detailed information about Citrix HDX virtual channels and network metrics.</description>
+
+  <fieldset autoRun="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time range:</label>
+      <default>
+        <earliest>-1h</earliest>
+        <latest>now</latest>
+      </default>
+      <change>
+        <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+        <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+        <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+      </change>
+    </input>
+    <input type="dropdown" token="FilterField" id="Input_FilterField">
+      <label>Filter field:</label>
+    </input>
+    <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+      <label>Filter operator:</label>
+    </input>
+    <input type="text" token="FilterExpression" id="Input_FilterExpression">
+      <label>Filter expression:</label>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+    </input>
+    <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+    </input>
+    <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+    </input>
+    <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+    </input>
+    <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+    </input>
+    <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+    </input>
+    <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+    </input>
+    <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+    </input>
+    <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+    </input>
+    <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+    </input>
+    <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+    </input>
+    <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+    </input>
+    <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+    </input>
+    <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+    </input>
+    <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+    </input>
+    <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+    </input>
+    <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+    <default>CitrixSession_ProtocolInsights</default>
+    </input>
+  </fieldset>
+
+  <search id="Search_Single">
+    <query>
+      | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+          latest(SessionUser) as Users
+          latest(host) as Hosts
+          sum(VirtualChannelDataVolumeInputOutputMB) as SumSessionDataVolumeMB
+          splitrow
+            SessionGUID
+          $SearchFilter$
+      | stats
+          avg(SumSessionDataVolumeMB) as AvgSessionDataVolumeMB
+          dc(SessionGUID) as UniqueSessions
+          dc(Users) as UniqueUsers
+          dc(Hosts) as UniqueHosts
+      | addinfo
+      | eval AvgSessionDataVolumeMBPerHour = round(AvgSessionDataVolumeMB/((info_max_time-info_min_time)/60/60),1)
+      | fields UniqueSessions UniqueUsers UniqueHosts AvgSessionDataVolumeMBPerHour
+      | appendcols
+        [
+          | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+              avg(SessionRpLatencyMs) as AvgSessionRpLatencyMs
+              avg(SessionRoundTripTimeMs) as AvgSessionRoundTripTimeMs
+              filter SessionProtocol in ("ICA") 
+              $SearchFilter$
+          | eval AvgSessionRpLatencyMs = if(isnull(AvgSessionRpLatencyMs), "n/a", round(AvgSessionRpLatencyMs,1)) 
+          | eval AvgSessionRoundTripTimeMs = if(isnull(AvgSessionRoundTripTimeMs), "n/a", round(AvgSessionRoundTripTimeMs,1)) 
+          | fields AvgSessionRpLatencyMs AvgSessionRoundTripTimeMs        
+        ]
+      | appendcols
+        [
+          | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+              sum(VirtualChannelDataVolumeInputOutputMB) as SumSessionDataVolumeMB
+              splitrow
+                VirtualChannel
+              $SearchFilter$
+          | eval SumSessionDataVolumeMB = round(SumSessionDataVolumeMB,1) 
+          | eval VcInUse = if(SumSessionDataVolumeMB &gt; 0,1,0) 
+          | eval VcNotInUse = if(SumSessionDataVolumeMB &lt;= 0,1,0)
+          | stats sum(VcInUse) as VcInUse count as VcTotal
+          | eval VcCompared = VcInUse + "/" + VcTotal
+        ]
+    </query>
+  </search>
+
+  <search id="Search_Single2">
+    <query>
+      | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+          sum(VirtualChannelDataVolumeInputOutputMB) as SumSessionDataVolumeMB
+          splitrow
+            VirtualChannel
+          $SearchFilter$
+      | eval SumSessionDataVolumeMB = round(SumSessionDataVolumeMB,1) 
+      | eval VcInUse = if(SumSessionDataVolumeMB &gt; 0,1,0) 
+      | eval VcNotInUse = if(SumSessionDataVolumeMB &lt;= 0,1,0)
+    </query>
+  </search>
+
+  <!-- Row 1 -->  
+  <row>
+    <panel>
+        <title>Citrix session overview</title>
+        <viz type="uberAgent.uberagent-singlevalue">
+          <search base="Search_Single" />
+          <option name="uberAgent.uberagent-singlevalue.1-field">UniqueHosts</option>
+          <option name="uberAgent.uberagent-singlevalue.1-title">#Hosts:</option>
+          <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+          <option name="uberAgent.uberagent-singlevalue.2-field">UniqueUsers</option>
+          <option name="uberAgent.uberagent-singlevalue.2-title">#Users:</option>
+          <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+          <option name="uberAgent.uberagent-singlevalue.3-field">UniqueSessions</option>
+          <option name="uberAgent.uberagent-singlevalue.3-title">#Sessions:</option>
+          <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+          <option name="uberAgent.uberagent-singlevalue.4-field">AvgSessionDataVolumeMBPerHour</option>
+          <option name="uberAgent.uberagent-singlevalue.4-title">Avg. session data volume/hour:</option>
+          <option name="uberAgent.uberagent-singlevalue.4-afterLabel">MB</option>
+          <option name="uberAgent.uberagent-singlevalue.5-field">AvgSessionRpLatencyMs</option>
+          <option name="uberAgent.uberagent-singlevalue.5-title">Avg. ICA latency:</option>
+          <option name="uberAgent.uberagent-singlevalue.5-afterLabel">ms</option>
+          <option name="uberAgent.uberagent-singlevalue.6-field">AvgSessionRoundTripTimeMs</option>
+          <option name="uberAgent.uberagent-singlevalue.6-title">Avg. ICA round-trip time:</option>
+          <option name="uberAgent.uberagent-singlevalue.6-afterLabel">ms</option>
+          <option name="uberAgent.uberagent-singlevalue.7-field">VcCompared</option>
+          <option name="uberAgent.uberagent-singlevalue.7-title">#Virtual channel(s) in use/total:</option>
+          <option name="uberAgent.uberagent-singlevalue.7-afterLabel"></option>
+        </viz>
+    </panel>
+  </row>
+
+  <!-- Row 2 -->
+  <row>
+
+    <!-- Column 1 -->
+    <panel>
+
+      <title>Data volume</title>
+      
+      <input type="dropdown" token="Panel21GroupBy" searchWhenChanged="true">
+        <choice value="SessionGUID">User@host</choice>
+        <choice value="VirtualChannel">Virtual channel</choice>
+        <default>SessionGUID</default>
+        <label>Group by:</label>
+        <change>
+          <condition value="SessionGUID">
+            <set token="GroupBySessionGUID">true</set>
+            <unset token="GroupByVirtualChannel"></unset>
+          </condition>
+         <condition value="VirtualChannel">
+            <set token="GroupByVirtualChannel">true</set>
+            <unset token="GroupBySessionGUID"></unset>
+          </condition>
+        </change>
+      </input>
+      
+      <chart id="Chart_Panel21">
+        <title>Session data volume (top 10)</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+                sum(VirtualChannelDataVolumeOutputMB) as SumVirtualChannelDataVolumeOutputMB
+                sum(VirtualChannelDataVolumeInputMB) as SumVirtualChannelDataVolumeInputMB
+                sum(VirtualChannelDataVolumeInputOutputMB) as SumVirtualChannelDataVolumeInputOutputMB
+                latest(User) as User
+                latest(host) as Host
+                splitrow
+                  $Panel21GroupBy$
+                $SearchFilter$
+            | eval SumVirtualChannelDataVolumeOutputMB = round(SumVirtualChannelDataVolumeOutputMB,1) 
+            | eval SumVirtualChannelDataVolumeInputMB = round(SumVirtualChannelDataVolumeInputMB,1) 
+            | eval SumVirtualChannelDataVolumeInputOutputMB = round(SumVirtualChannelDataVolumeInputOutputMB,1) 
+            | stats
+                sum(SumVirtualChannelDataVolumeOutputMB) as "Output volume (MB)"
+                sum(SumVirtualChannelDataVolumeInputMB) as "Input volume (MB)"
+                sum(SumVirtualChannelDataVolumeInputOutputMB) as "Input+Output (MB)"
+                latest(User) as User
+                latest(Host) as Host
+                by
+                  $Panel21GroupBy$
+            | where 'Input+Output (MB)' &gt; 0
+            | eval "User@host" = replace(User,"([^\\\\]+\\\\)([^\\\\]+)","\\2")."@".'Host'
+            | eval "Group by" = if(SessionGUID == SessionGUID,'User@host','VirtualChannel')
+            | sort limit=10 -"Input+Output (MB)"
+            | fields
+                "Group by"
+                "Output volume (MB)"
+                "Input volume (MB)"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250</option>
+      </chart>
+
+    </panel>
+
+    <!-- Column 2 -->
+    <panel>
+      
+      <title>Network</title>
+      
+      <input type="dropdown" token="Panel21SortBy" searchWhenChanged="true">
+        <choice value="+ ">Ascending</choice>
+        <choice value="- ">Descending</choice>
+        <default>Descending</default>
+        <label>Sort order:</label>
+      </input>
+
+      <input type="dropdown" token="Panel22SortBy" searchWhenChanged="true">
+        <choice value="&quot;Avg. ICA latency (ms)&quot;">Avg. ICA latency (ms)</choice>
+        <choice value="&quot;Avg. ICA round-trip time (ms)&quot;">Avg. ICA round-trip time (ms)</choice>
+        <default>Avg. ICA latency (ms)</default>
+        <label>Sort by:</label>
+      </input>
+      
+      <chart id="Chart_Panel22">
+        <title>Average ICA latency/ICA round-trip time (top 10)</title>
+        <search>
+          <query>
+            | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                avg(SessionRpLatencyMs) as AvgIcaLatencyMs
+                avg(SessionRoundTripTimeMs) as AvgSessionRoundTripTimeMs
+                latest(User) as User
+                latest(host) as Host
+                splitrow
+                  SessionGUID
+                filter SessionProtocol in ("ICA") 
+               $SearchFilter$
+            | eval "Avg. ICA latency (ms)" = round(AvgIcaLatencyMs,1)
+            | eval "Avg. ICA round-trip time (ms)" = round(AvgSessionRoundTripTimeMs,1)
+            | eval "User@host" = replace(User,"([^\\\\]+\\\\)([^\\\\]+)","\\2")."@".'Host'
+            | sort limit=10 $Panel21SortBy$ $Panel22SortBy$
+            | table
+               "User@host"
+               "Avg. ICA latency (ms)"
+               "Avg. ICA round-trip time (ms)"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250</option>
+      </chart>
+
+    </panel>
+
+  </row>
+
+  <!-- Row 3 -->
+  <row>
+
+    <!-- Column 1 -->
+    <panel>
+
+      <chart id="Chart_Panel31_1" depends="$GroupBySessionGUID$">
+        <title>Session data volume over time</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+                sum(VirtualChannelDataVolumeInputMB) as SumVirtualChannelDataVolumeInputMB
+                sum(VirtualChannelDataVolumeOutputMB) as SumVirtualChannelDataVolumeOutputMB
+                splitrow
+                  _time
+                  period $PivotPeriodAutoTimechart$
+                $SearchFilter$
+            | eval SumVirtualChannelDataVolumeInputMB = round(SumVirtualChannelDataVolumeInputMB,1)
+            | eval SumVirtualChannelDataVolumeOutputMB = round(SumVirtualChannelDataVolumeOutputMB,1)
+            | timechart
+                `uberAgent_dynamic_span`
+                sum(SumVirtualChannelDataVolumeOutputMB) as "Output volume (MB)"
+                sum(SumVirtualChannelDataVolumeInputMB)  as "Input volume (MB)"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+
+      <chart id="Chart_Panel31_2" depends="$GroupByVirtualChannel$">
+        <title>Virtual channel data volume (MB) over time</title>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+                sum(VirtualChannelDataVolumeInputOutputMB) as SumVirtualChannelDataVolumeInputOutputMB
+                splitrow
+                  VirtualChannel
+                splitrow
+                  _time
+                period $PivotPeriodAutoTimechart$
+                $SearchFilter$ 
+            | eval SumVirtualChannelDataVolumeInputOutputMB = round(SumVirtualChannelDataVolumeInputOutputMB,1)
+            | where SumVirtualChannelDataVolumeInputOutputMB &gt; 0 
+            | timechart
+                `uberAgent_dynamic_span`
+                sum(SumVirtualChannelDataVolumeInputOutputMB) as "Data volume (MB)"
+                  by VirtualChannel
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+
+    </panel>
+
+    <!-- Column 2 -->
+    <panel>
+
+      <chart id="Chart_Panel32">
+        <title>Average ICA latency/ICA RTT over time</title>
+
+        <search>
+          <query>
+            | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                avg(SessionRpLatencyMs) as AvgSessionRpLatencyMs
+                avg(SessionRoundTripTimeMs) as AvgSessionRoundTripTimeMs
+                splitrow
+                  _time
+                  period $PivotPeriodAutoTimechart$
+                filter SessionProtocol in ("ICA")
+                $SearchFilter$ 
+            | timechart
+                `uberAgent_dynamic_span`
+                eval(round(avg(AvgSessionRpLatencyMs),1)) as "Avg. ICA latency (ms)"
+                eval(round(avg(AvgSessionRoundTripTimeMs),1)) as "Avg. ICA round-trip time (ms)"
+          </query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+
+    </panel>
+
+  </row>
+
+  <!-- Row 4 -->
+  <row>
+
+    <!-- Column 1 -->
+    <panel>
+      <chart>
+        <title>Virtual channel usage</title>
+        <search base="Search_Single2">
+          <query>
+            | stats sum(VcInUse) as "Virtual channel(s) in use" sum(VcNotInUse) as "Virtual channel(s) not in use"
+            | transpose
+            | rename column as "Type" "row 1" as "Count"
+          </query>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>       
+    </panel>    
+    
+    <!-- Column 2 -->
+    <panel>
+      <table>
+        <title>Virtual channel list</title>
+        <search base="Search_Single2">
+          <query>
+            | rename VirtualChannel as "Virtual channel" SumSessionDataVolumeMB as "Total data volume (MB)"
+            | fields "Virtual channel" "Total data volume (MB)"
+            | sort -"Total data volume (MB)"
+          </query>
+        </search>
+        <option name="count">6</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>  
+    
+  </row>
+  
+  <!-- Row 5 -->
+  <row>
+    <panel>
+      <title>Data table</title>
+      <input type="multiselect" token="Panel51Filter" id="Input_Panel51" searchWhenChanged="true">
+        <choice value="&quot;User&quot;">User</choice>
+        <choice value="&quot;Host&quot;">Host</choice>
+        <choice value="&quot;Logon time&quot;">Logon time</choice>
+        <choice value="&quot;Last seen&quot;">Last seen</choice>
+        <choice value="&quot;Last state&quot;">Last state</choice>
+        <choice value="&quot;Avg. data volume&quot;">Avg. data volume</choice>
+        <choice value="&quot;Total data volume&quot;">Total data volume</choice>
+        <label>Fields to display:</label>
+        <fieldForLabel>VirtualChannelDisplay</fieldForLabel>
+        <fieldForValue>VirtualChannelValue</fieldForValue>
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+                sum(VirtualChannelDataVolumeInputOutputMB) as SumVirtualChannelDataVolumeInputOutputMB
+                splitrow VirtualChannel 
+                $SearchFilter$
+            | eval SumVirtualChannelDataVolumeInputOutputMB = round(SumVirtualChannelDataVolumeInputOutputMB,1) 
+            | where SumVirtualChannelDataVolumeInputOutputMB &gt; 0
+            | eval VirtualChannelValue = "\"".VirtualChannel."\""
+            | eval VirtualChannelDisplay = 'VirtualChannel'
+            | fields VirtualChannelValue VirtualChannelDisplay
+          </query>
+        </search>
+        <default>
+          "User",
+          "Host",
+          "Logon time",
+          "Last seen",
+          "Last state",
+          "Avg. data volume",
+          "Total data volume"
+        </default>
+      </input>
+      <table id="Table_Panel51">
+        <search>
+          <query>
+            | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+              sum(VirtualChannelDataVolumeInputOutputMB)
+              splitrow
+                SessionGUID
+              splitcol
+                VirtualChannel
+              $SearchFilter$
+            | join type=left SessionGUID 
+              [
+                | pivot `uA_DM_CitrixSession_VirtualChannelDetail` CitrixSession_VirtualChannelDetail
+                  sum(VirtualChannelDataVolumeInputOutputMB) as SumVirtualChannelDataVolumeInputOutputMB
+                  splitrow SessionGUID
+                  splitrow
+                    _time
+                    period $PivotPeriodAutoTimechart$
+                  $SearchFilter$
+                | stats avg(SumVirtualChannelDataVolumeInputOutputMB) as "Avg. data volume" by SessionGUID
+                | fields + SessionGUID "Avg. data volume"
+              ] 
+            | join type=left SessionGUID 
+              [
+                | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                    latest(_time) as LastSeen
+                    latest(host) as Host
+                    latest(SessionUser) as User
+                    latest(SessionConnectionState) as "Last state"
+                    latest(SessionLogonTime) as SessionLogonTime
+                    splitrow
+                      SessionGUID
+                    $SearchFilter$ 
+                | eval "Last seen" = strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S") 
+                | eval "Logon time" = strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S") 
+                | fields + SessionGUID User Host "Last seen" "Last state" "Logon time"
+              ] 
+          | addtotals fieldname="Total data volume"
+          | eval "Total data volume"='Total data volume'-'Avg. data volume'
+          | sort limit=0 -"Logon time" 
+          | table $Panel51Filter$ SessionGUID
+          </query>
+        </search>
+        <option name="count">25</option>
+        <format type="number">
+          <option name="precision">1</option>
+          <option name="unit">MB</option>
+        </format>
+        <drilldown>
+          <link>
+            <![CDATA[
+                analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterExpression=$row.SessionGUID$
+            ]]>
+          </link>
+        </drilldown>
+      </table>
+      <html src="citrixsession_protocol_insights_explanation.html">
+      </html>
+    </panel>
+  </row>
+
+</form>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?><form class="formsearch">
+  <label>PeopleSoft IP Dashboard</label>
+  <description>PeopleSoft Search by IP</description>
+  <fieldset>
+    <input type="text" token="clientip">
+      <label>IP address</label>
+      <default>*</default>
+    </input>
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Users &amp; IPs</title>
+      <searchString>`ps_app_index` `ps_prd_app_servers` sourcetype=psft_appsrv_appsrv "authentication succeeded" `extract_remote_host` | dnslookup forward remote_host ip | search ip=$clientip$ | dedup user ip | table user ip | stats values(ip) as IPs by user | fields IPs, user</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <!--      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>-->
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">none</option>
+      <option name="list.drilldown">full</option>
+      <option name="list.wrap">1</option>
+      <option name="maxLines">1</option>
+      <option name="raw.drilldown">full</option>
+      <option name="table.drilldown">1</option>
+      <option name="table.wrap">1</option>
+      <option name="type">table</option>
+      <option name="count">10</option>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">pie</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </table>
+    <event>
+      <title>Web Logs</title>
+      <searchString>`ps_web_index` `ps_prd_web_servers` NOT source=status $clientip$  earliest=$earliest$ |eval latest=coalesce("$latest$", now())</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <!--      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>-->
+      <option name="list.drilldown">full</option>
+      <option name="list.wrap">0</option>
+      <option name="maxLines">5</option>
+      <option name="raw.drilldown">full</option>
+      <option name="rowNumbers">0</option>
+      <option name="table.drilldown">1</option>
+      <option name="table.wrap">0</option>
+      <option name="type">list</option>
+      <option name="count">5</option>
+      <fields>["host","source","sourcetype"]</fields>
+    </event>
+  </row>
+  <row>
+    <table>
+      <title>Pages Search</title>
+      <searchString>`ps_web_index` `ps_prd_web_servers` $clientip$ `extract_page_menu` | search page_name=* | dedup action menu_name page_name | table _time action menu_name page_name</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">cell</option>
+      <option name="list.drilldown">full</option>
+      <option name="list.wrap">0</option>
+      <option name="maxLines">5</option>
+      <option name="raw.drilldown">full</option>
+      <option name="table.drilldown">1</option>
+      <option name="table.wrap">0</option>
+      <option name="type">list</option>
+    </table>
+  </row>
+</form>

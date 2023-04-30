@@ -1,0 +1,51 @@
+<form script="autodiscover.js">
+  <label>sunburst sequence</label>
+  <description>checkout: https://github.com/i-splunk/i-splunk-code</description>
+  <row>
+    <html>
+      <br />
+      This is a d3.js sunburst implementation. See <a href="http://bl.ocks.org/kerryrodden/7090426">http://bl.ocks.org/kerryrodden/7090426</a> 
+      for more information about the d3.js implementation.
+      <br />
+      <br />
+      A sequence sunburst may be useful to show the clickstream path for web statistics.<br />
+      required inputs for the diagram are following two Splunk fields:<br />
+      <ul>
+        <li><b>path</b> (in form of a string-sequence like "node1-node2-node3-node4")</li>
+        <li><b>count </b>(the sequence count)</li>
+      </ul>
+      <br />
+      <br />
+    </html>
+
+  </row>
+  <row>
+    <table>
+      <title>sequence table</title>
+      <searchString>|inputlookup visit-sequences.csv | table path count </searchString>
+      <option name="wrap">true</option>
+    </table>
+    <html>
+      <h2>sunburst sequence</h2>
+      <hr />
+      <div id="sunburst-search" 
+	    class="splunk-manager splunk-searchmanager" 
+		data-require="splunkjs/mvc/searchmanager" 
+		data-options='{                         
+		  "app": "custom_simplexml_extensions",                      
+		  "search":  "|inputlookup visit-sequences.csv | table path count"
+		}'/>
+      <div id="sunburst" 
+		class="splunk-view" 
+		data-require="app/custom_simplexml_extensions/components/sunburstchart/sunburst" 
+		data-options='{
+	      "managerid": "sunburst-search",
+		  "pathField": "path",
+          "count": "count",
+		  "height": 500
+		}'/>
+	<hr />
+    </html>
+</row>
+
+</form>

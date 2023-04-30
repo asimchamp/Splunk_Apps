@@ -1,0 +1,96 @@
+<form script="link_switcher.js, autodiscover.js, table_data_bar.js, forminput_panels.js" stylesheet="table_data_bar.css, forminput_panels.css, single_decorations.css">
+  <label>Overview</label>
+  <description>This is a little overview about the puppet activities</description>
+    <row grouping="6">
+        <html>
+            <h2>Puppet Agent</h2>
+            <div class="link-switcher" data-items="link1,link2,link3,link4,link5"></div>
+        </html>
+	    <table id="link1">
+            <title>In Error State</title>
+            <searchString>index=* puppet-agent daemon.error main | transaction host | table host | rename host as "Puppet Client"</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="drilldown">none</option>
+        </table>
+        <table id="link2">
+            <title>Catalog Problem</title>
+            <searchString>index=* puppet-agent Could not retrieve catalog NOT skipping | dedup host | table host | rename host as "Puppet Client"</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="drilldown">none</option>
+        </table>
+        <table id="link3">
+            <title>Certificate Problem</title>
+            <searchString>index=* puppet-agent Could not request certificate | dedup host | table host | rename host as "Puppet Client"</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="drilldown">none</option>
+        </table>
+        <table id="link4">
+            <title>With No Run</title>
+            <searchString>| metadata type=hosts index=* | lookup collect_agents.csv host | where NOT Status="OK" | table host | rename host as "Puppet Client"</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="drilldown">none</option>
+        </table>
+        <table id="link5">
+            <title>Facts Problem</title>
+            <searchString>index=* puppet-agent "Could not retrieve local facts" | dedup host | table host | rename host as "Puppet Client"</searchString>
+            <earliestTime>@d</earliestTime>
+            <option name="drilldown">none</option>
+        </table>
+    </row>
+	<row>
+	    <single>
+		    <title>Failed Resources</title>
+            <searchString>index=* puppet-agent daemon.error main | stats count as value | rangemap field=value severe=0-10000 default=severe</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="classField">range</option>
+            <option name="field">value</option>
+        </single>
+        <single>
+		    <title>Skipped Resources</title>
+            <searchString>index=* puppet-agent daemon.warning main "Skipping because of failed dependencies" | stats count as value | rangemap field=value elevated=0-10000 default=elevated</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="classField">range</option>
+            <option name="field">value</option>
+        </single>
+        <single>
+		    <title>Applied Resources</title>
+            <searchString>index=* puppet-agent (daemon.notice OR daemon.info) main changed | stats count as value | rangemap field=value low=0-10000 default=low</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="classField">range</option>
+            <option name="field">value</option>
+        </single>
+        <single>
+		    <title>Restarted Resources</title>
+            <searchString>index=* puppet-agent (daemon.notice OR daemon.info) main "refresh of service" | stats count as value | rangemap field=value guarded=0-10000 default=guarded</searchString>
+            <earliestTime>@d</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="classField">range</option>
+            <option name="field">value</option>
+        </single>
+	</row>
+    <row>
+        <chart>
+            <title>Puppet Runtime Over A Week</title>
+            <searchString>index=* puppet-agent Finished catalog run in | rex field=_raw "Finished\s\w+\s\w+\s\w+\s(?&lt;seconds&gt;.*)\s\w+" | fields+ seconds, _time | timechart sum(seconds) as Runtime | fillnull Runtime</searchString>
+            <earliestTime>-6d@d</earliestTime>
+            <latestTime>+d@d</latestTime>
+            <option name="charting.chart">area</option>
+            <option name="charting.drilldown">none</option>
+        </chart>
+        <chart>
+            <title>Puppet Resources Over A Week</title>
+            <searchString>index=* puppet-agent daemon.warning main "Skipping because of failed dependencies" | timechart count(sourcetype) as "Skipped" | appendcols [search index=* puppet-agent daemon.error main | timechart count(sourcetype) as "Failed"] | appendcols [search index=* puppet-agent (daemon.notice OR daemon.info) main "refresh of service" | timechart count(sourcetype) as "Restarted"] | appendcols [search index=* puppet-agent (daemon.notice OR daemon.info) main changed | timechart count(sourcetype) as "Applied"] | fillnull value=0 Skipped, Failed, Restarted, Applied</searchString>
+            <earliestTime>-6d@d</earliestTime>
+            <latestTime>+d@d</latestTime>            
+            <option name="charting.chart">area</option>
+            <option name="charting.drilldown">none</option>
+        </chart>
+    </row>
+</form>

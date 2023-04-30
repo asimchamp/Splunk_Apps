@@ -1,0 +1,212 @@
+<form version="1.1" stylesheet="application.css" script="set_perf_threshold_token.js,timerange.js,perf_volumes_drilldown.js">
+  <label>Performance - Volume Group/Pool by Volume</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" id="timerange" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="arrayId">
+      <label>Array</label>
+      <search>
+        <query>| inputlookup nesa_volume_groups | stats count by arrayId, arrayName</query>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>host="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="controllerLabel" searchWhenChanged="true">
+      <label>Controller</label>
+      <search>
+        <query>| inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ | dedup controllerLabel</query>
+      </search>
+      <fieldForLabel>controllerLabel</fieldForLabel>
+      <fieldForValue>controllerLabel</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>controllerLabel="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="volumeGroup" id="clvgid">
+      <label>Volume Group or Pool</label>
+      <search id="clvg_id">
+        <query>| inputlookup nesa_volumes | join type=LEFT controllerRef [inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ | rename host as arrayId | table controllerRef, controllerLabel] | fields controllerLabel, volumeGroupRef | join type=LEFT volumeGroupRef [| inputlookup nesa_volume_groups | search [| inputlookup nesa_volumes | search [| inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ controllerLabel=* | rename host as arrayId | fields arrayId, controllerRef] | fields arrayId, volumeGroupRef ]] | dedup arrayName, controllerLabel, volumeGroup | sort volumeGroup, controllerLabel | search $controllerLabel$ | dedup volumeGroup | table volumeGroup</query>
+      </search>
+      <valuePrefix>volumeGroup="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <fieldForLabel>volumeGroup</fieldForLabel>
+      <fieldForValue>volumeGroup</fieldForValue>
+    </input>
+    <input type="multiselect" token="volumeName">
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <label>Volumes</label>
+      <search id="search_volumeName_id">
+        <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ | table host  controllerLabel volumeGroup volumeName | dedup volumeName</query>
+      </search>
+      <valuePrefix>volumeName="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <fieldForLabel>volumeName</fieldForLabel>
+      <fieldForValue>volumeName</fieldForValue>
+    </input>
+    <input type="text" token="perfThreshold">
+      <label>Latency Threshold (in ms) &gt;=</label>
+      <default>$perfThreshold$</default>
+    </input>
+  </fieldset>
+  <search id="baseSearch">
+    <query>
+      `get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ $volumeName$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | bucket _time span=1m | fields _time label readIOps writeIOps readThroughput writeThroughput
+    </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  <row>
+    <panel id="detail1">
+      <single>
+        <search>
+          <query>| stats count | eval class="None" | eval label="Performance - Controller by Volume Group/Pool"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="field">label</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown>
+          <link>
+            <![CDATA[/app/netapp_app_eseries_perf/perf_vgroups?form.arrayId=$form.arrayId$&form.controllerLabel=$form.controllerLabel$]]>
+          </link>
+        </drilldown>
+      </single>
+      <single id="single_id">
+        <search>
+          <query>| stats count | eval class="None" | eval label="Configuration - Volume"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="field">label</option>
+        <option name="refresh.time.visible">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+Go back to the <a id="perf_volumes_breadcrumb" href="/app/netapp_app_eseries_perf/perf_vgroups?form.arrayId=$form.arrayId$&amp;form.controllerLabel=$form.controllerLabel$">Performance - Controller by Volume Group/Pool</a> view for this array.
+<p/>
+View the <a id="perf_volumes_configuration" href="/app/netapp_app_eseries_perf/config_volumes?form.arrayId=$form.arrayId$&amp;&amp;form.controllerLabel=$controllerLabel$&amp;form.volumeGroup=$volumeGroup$">Configuration - Volume</a> view for this volume groups/pools.
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="readIOpsM">
+        <title>Read IOPS by Volume</title>
+        <search base="baseSearch">
+          <query>stats sum(readIOps) as readIOpsM by label, _time | timechart span=5m useother=f limit=0 mean(readIOpsM) AS reads by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">IOps</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart id="writeIOpsM">
+        <title>Write IOPS by Volume</title>
+        <search base="baseSearch">
+          <query>stats sum(writeIOps) as writeIOpsM by label, _time | timechart span=5m useother=f limit=0 mean(writeIOpsM) AS writes by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">IOps</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="read_latency">
+        <title>Read Latency by Volume (base on threashold value)</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ $volumeName$ | where readResponseTime&gt;=$perfThreshold$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | timechart useother=f limit=0 span=5m mean(readResponseTime) AS read_latency by label</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart id="write_latency">
+        <title>Write Latency by Volume (base on threashold value)</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ $volumeName$ | where writeResponseTime&gt;=$perfThreshold$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | timechart useother=f limit=0 span=5m mean(writeResponseTime) AS write_latency by label</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="read_thru">
+        <title>Read Throughput by Volume</title>
+        <search base="baseSearch">
+          <query>stats sum(readThroughput) as readThroughputM by label, _time | timechart span=5m useother=f limit=0 mean(readThroughputM) AS read_thru by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">MBytes</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart id="write_thru">
+        <title>Write Throughput by Volume</title>
+        <search base="baseSearch">
+          <query>stats sum(writeThroughput) as writeThroughputM by label, _time | timechart span=5m useother=f limit=0 mean(writeThroughputM) AS write_thru by label</query>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">MBytes</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

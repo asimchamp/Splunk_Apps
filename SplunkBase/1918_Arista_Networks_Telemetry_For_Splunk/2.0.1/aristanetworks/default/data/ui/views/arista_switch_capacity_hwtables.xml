@@ -1,0 +1,88 @@
+<form version="1.1">
+  <label>Switch Hardware Capacity</label>
+  <description>Filter using any field [ switchname=All Switches/select one from dropdown ]</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="dropdown" token="switchName" searchWhenChanged="true">
+      <label>filter:</label>
+      <default>*</default>--&gt;<choice value="*">All Switches</choice>
+      <fieldForLabel>switchname</fieldForLabel>
+      <fieldForValue>switchname</fieldForValue>
+      <search>
+        <query>source="arista_switch_ifcounter" | stats count by switchname | sort switchname</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+    </input>
+    <input type="time" token="timerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Matching Events</title>
+      <table>
+        <search>
+          <query>
+            sourcetype="arista_switch_inventory" AristaSwitchCapacity $switchName$| stats 
+            latest(platform_capacity_ipv4_host_routes) as ipv4_host_routes,
+            latest(platform_capacity_ipv6_host_routes) as ipv6_host_routes,
+            latest(platform_capacity_ipv4_lpm_routes) as ipv4_lpm_routes,
+            latest(platform_capacity_ipv6_lpm_routes) as ipv6_lpm_routes,
+            latest(platform_lpm_used) as platform_lpm_capacity(%),
+            sparkline(max(eval(rtrim(platform_lpm_used,"%")))) as platform_lpm_used_history,
+            latest(platform_capacity_acl_used) as platform_acl_capacity(%),
+            sparkline(max(eval(rtrim(platform_capacity_acl_used,"%")))) as platform_acl_used_history,
+            latest(platform_capacity_l2_mac) as platform_mac_capacity(%)
+            sparkline(max(eval(rtrim(platform_capacity_l2_mac,"%")))) as platform_mac_used_history
+            by switchname | table
+            switchname,
+            platform_lpm_capacity(%), platform_lpm_used_history, 
+            platform_acl_capacity(%), platform_acl_used_history, 
+            platform_mac_capacity(%), platform_mac_used_history,
+            ipv4_host_routes, ipv6_host_routes, ipv4_lpm_routes, ipv6_lpm_routes
+          </query>
+          <earliest>$timerange.earliest$</earliest>
+          <latest>$timerange.latest$</latest>
+        </search>
+        <format field="platform_lpm_used_history" type="sparkline">
+          <option name="type">bar</option>
+          <option name="barColor">green</option>
+          <option name="chartRangeMax">100</option>
+          <option name="chartRangeMin">0</option>
+          <option name="colorMap">
+            <option name="70:80">yellow</option>
+            <option name="81:87">orange</option>
+            <option name="88:">red</option>
+          </option>
+        </format>
+        <format field="platform_acl_used_history" type="sparkline">
+          <option name="type">bar</option>
+          <option name="barColor">green</option>
+          <option name="chartRangeMax">100</option>
+          <option name="chartRangeMin">0</option>
+          <option name="colorMap">
+            <option name="70:80">yellow</option>
+            <option name="81:87">orange</option>
+            <option name="88:">red</option>
+          </option>
+        </format>
+        <format field="platform_mac_used_history" type="sparkline">
+          <option name="type">bar</option>
+          <option name="barColor">green</option>
+          <option name="chartRangeMax">100</option>
+          <option name="chartRangeMin">0</option>
+          <option name="colorMap">
+            <option name="70:80">yellow</option>
+            <option name="81:87">orange</option>
+            <option name="88:">red</option>
+          </option>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

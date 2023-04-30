@@ -1,0 +1,41 @@
+<form>
+  <label>Technology Overview</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>1381363200</earliestTime>
+        <latestTime>1382054400</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Visits by Browser</title>
+      <searchString>| pivot GlassWherehouse DI count(DI) AS "Events" dc(cs) AS "Sessions" SPLITROW browser_type AS "Browser" SORT 100 browser_type</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>Visits by Device</title>
+      <searchString>| pivot GlassWherehouse DI count(DI) AS "Events" dc(cs) AS "Sessions" SPLITROW device_type AS "Device Type" TOP 100 count(DI)</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>| pivot GlassWherehouse DI count(DI) AS "Count of DI" SPLITROW ua AS "User Agent" SORT 100 ua</searchString>
+      <earliestTime>0</earliestTime>
+    </table>
+  </row>
+</form>

@@ -1,0 +1,93 @@
+<form script="table_drilldown_url_field.js, autodiscover.js">
+  <label>Message Content Dashboard</label>
+  <row>
+    <panel>
+      <html>
+      <h2>Popular words</h2>
+        <div id="bubbleSearch" class="splunk-manager" data-require="splunkjs/mvc/searchmanager" data-options="{               &quot;search&quot;: &quot;`googlehangouts` | where user_name_sender=user_name_self | eval word = split(text,\&quot; \&quot;) | mvexpand(word) | eval length=len(word) | where length&gt;0 | eval word=lower(word) | stats count by word | sort -count&quot;,               &quot;earliest_time&quot;: &quot;&quot;,               &quot;status_buckets&quot;: 0,               &quot;cancelOnUnload&quot;: true,               &quot;auto_cancel&quot;: 90,               &quot;preview&quot;: true               }">
+        </div>
+        <div id="bubbleChart" class="splunk-view" data-require="app/hangouts/components/bubblechart/bubblechart" data-options="{               &quot;managerid&quot;: &quot;bubbleSearch&quot;,               &quot;nameField&quot;: &quot;word&quot;,               &quot;categoryField&quot;: &quot;word&quot;,               &quot;valueField&quot;: &quot;count&quot;,               &quot;height&quot;: 450               }">
+        </div>
+    </html>
+    </panel>
+    <panel>
+      <table id="link">
+        <title>Hyperlinks history</title>
+        <searchString>`googlehangouts` | search hyperlink=* | eval link=hyperlink | table _time user_name_sender hyperlink link| sort -_time</searchString>
+        <earliestTime/>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="word1" searchWhenChanged="true">
+        <label>Word</label>
+        <default>Yes</default>
+      </input>
+      <single>
+        <title>How often do you write "$word1$"?</title>
+        <searchString>`googlehangouts` | where user_name_sender=user_name_self | eval text=lower(text)|  search (text="$word1$" OR text="$word1$%" OR text="% $word1$ %" OR text="% $word1$")| stats count</searchString>
+        <earliestTime/>
+        <latestTime/>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <input type="text" token="word2" searchWhenChanged="true">
+        <label>Word</label>
+        <default>No</default>
+      </input>
+      <single>
+        <title>How often do you write "$word2$"?</title>
+        <searchString>`googlehangouts` | where user_name_sender=user_name_self | eval text=lower(text)|  search (text="$word2$" OR text="$word2$ %" OR text="% $word2$ %" OR text="% $word2$")| stats count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="word3" searchWhenChanged="true">
+        <label>Word</label>
+        <default>Yes</default>
+      </input>
+      <table>
+        <title>Occurences of word by user</title>
+        <searchString>`googlehangouts` | eval text=lower(text)|  search (text="$word3$" OR text="$word3$%" OR text="% $word3$ %" OR text="% $word3$")| stats count by user_name_sender | sort -count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="text" token="word4" searchWhenChanged="true">
+        <label>Word</label>
+        <default>No</default>
+      </input>
+      <table>
+        <title>Occurences of word by user</title>
+        <searchString>`googlehangouts` | eval text=lower(text)|  search (text="$word4$" OR text="$word4$ %" OR text="% $word4$ %" OR text="% $word4$")| stats count by user_name_sender | sort -count</searchString>
+        <earliestTime>0</earliestTime>
+        <latestTime/>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

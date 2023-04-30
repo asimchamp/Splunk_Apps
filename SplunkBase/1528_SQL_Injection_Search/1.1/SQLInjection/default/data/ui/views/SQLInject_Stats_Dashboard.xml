@@ -1,0 +1,51 @@
+<form>
+  <label>SQL Injection Statistics Dashboard based on query field length</label>
+  <searchTemplate>
+    `sqlinjection_stats($sourcetype_field$, $my_field$)`|eval uri_query_field=$my_field$|eval clientip_field=clientip
+  </searchTemplate>
+  <fieldset>      
+      <input type="text" token="sourcetype_field">
+          <label>Enter Sourcetype to check against</label>
+      </input>
+      <input type="text" token="my_field">
+          <label>Enter URL Query Field</label>
+      </input>
+      <input type="time" />
+  </fieldset>
+ <row>
+      <chart>
+          <title>Top Outliers</title>
+          <searchPostProcess>top uri_query_field</searchPostProcess>
+          <option name="charting.chart">pie</option>
+          <option name="charting.legend.placement">none</option>
+      </chart>
+
+      <chart>
+          <title>Count of Outliers over Time</title>
+          <searchPostProcess>timechart count by uri_query_field</searchPostProcess>
+          <option name="charting.chart">column</option>
+          <option name="charting.legend.placement">none</option>
+      </chart>
+  </row>
+
+  <row>
+    <map>
+      <title>Map of client IP locations for injections</title>
+      <searchPostProcess>rename clientip_field as ip|iplocation ip|geostats count by ip</searchPostProcess>
+      <option name="mapping.data.maxClusters">500</option>
+      <option name="mapping.markerLayer.markerMaxSize">20</option>
+      <option name="mapping.seriesColors">[0x0060DD]</option>
+      <option name="mapping.map.zoom">2</option>
+    </map>
+  </row>
+
+ <row>
+      <table>
+          <title>Possible Injections</title>
+          <searchPostProcess>table clientip_field uri_query_field </searchPostProcess>
+      </table>
+ </row>
+
+
+</form>
+

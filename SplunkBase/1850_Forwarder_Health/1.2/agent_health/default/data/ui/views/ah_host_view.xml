@@ -1,0 +1,84 @@
+<form>
+  <label>Internal Logs - Host View</label>
+  <description/>
+  <fieldset autoRun="False">
+    <input type="dropdown" token="host">
+      <label>Select Host:</label>
+      <populatingSearch fieldForValue="host" fieldForLabel="host">
+        <![CDATA[index=_internal | dedup host | rex field=host "(?<host_s>[^\.]+)" | eval host_s = lower(host_s) | sort host_s | fields host]]>
+      </populatingSearch>
+    </input>
+    <input type="time" searchWhenChanged="False">
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h3>Data Coming Into Splunk</h3>
+      <p>While this panel does not show any internal logs it can be useful to see what data this system is bringing in. There is not a quick way to compare the volume of logs by sourcetype against the average volume for that sourcetype across the environment which admittedly would be a bit more useful.</p>
+      <h3>Internal Log Components</h3>
+      <p>This panel gives you a breakdown of all internal logs by component. This does not take into account logs blacklisted by the agent_internal_logs_blacklist macro.</p>
+      <h3>Clustered Internal Logs</h3>
+      <p>The<a href="http://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Cluster" target="_blank"> cluster </a>command is useful for sorting logs by similarity. This is the primary panel to use in figuring out why a particular forwarder is generating a lot of logs. If something isn't working correctly Splunk tends to generate a lot of the same log messages over and over. At this point I would do a combination of searching Splunk answers and Splunk documentation to see what information you can find.</p>
+    </html>
+  </row>
+  <row>
+    <table>
+      <title>Data Coming Into Splunk (Not Internal)</title>
+      <searchString>| metasearch host=$host$ | stats count as events by sourcetype index | sort -events</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">none</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>Internal Log Components (All Logs)</title>
+      <searchString>index=_internal host=$host$ | stats count by component log_level | stats sum(count) as "Total Events" list(log_level) as "Log Level" list(count) as Count by component | rename component as Component | sort -"Total Events"</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+  <row>
+    <chart>
+      <title>Chart of Internal Logs (Trimmed)</title>
+      <searchString>index=_internal `agent_internal_logs_blacklist` host=$host$ | timechart count as events</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">none</option>
+    </chart>
+    <table>
+      <title>Clustered Internal Logs (Trimmed)</title>
+      <searchString>index=_internal `agent_internal_logs_blacklist` host=$host$ | cluster showcount=t | table cluster_count _raw | sort -cluster_count</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

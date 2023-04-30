@@ -1,0 +1,38 @@
+<form>
+  <label>Drilldown: CPU Usage Alerts</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Alerts for $form.host$</title>
+      <searchString>index=extnet sourcetype=log cpu host=$form.host$ | dedup _time host | rex "\&lt;Warn:EPM.cpu\&gt;\sCPU\sutilization\smonitor:\sprocess\s(?&lt;procName&gt;\w+)\sconsumes\s(?&lt;procPct&gt;\d+)\s" | search procName=* | eval eventTime=strftime(_time,"%Y-%m-%d %H:%M:%S") | table eventTime,host,procName,procPct | sort -eventTime | rename eventTime as "Event Time" host as "IP Address" procName as "Process" procPct as "Percent CPU Utilization"</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

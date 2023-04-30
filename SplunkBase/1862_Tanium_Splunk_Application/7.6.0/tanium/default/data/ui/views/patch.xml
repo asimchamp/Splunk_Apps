@@ -1,0 +1,262 @@
+<form version="1.1">
+  <label>Tanium Patch</label>
+  <description>Patch Analysis and Compliance</description>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="OS_Type">
+      <label>OS Type</label>
+      <choice value="*">All OS's</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <fieldForLabel>OS_Type</fieldForLabel>
+      <fieldForValue>OS_Type</fieldForValue>
+      <search>
+        <query>`tanium_index` sourcetype="tanium:updates" NOT "[no results]" NOT CVE_IDs="" | stats dc(OS_Type) by OS_Type</query>
+      </search>
+    </input>
+    <input type="time" token="time">
+      <label>Time Picker</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Mean Time to Patch by Results</title>
+        <search>
+          <query>index=tanium Question="Splunk-Patch-Mean-Time" NOT "Could not get results" NOT "No Deployment Results Found" NOT "No Matching Deployments Found" NOT "Unable to load PatchLib"  | sort Computer_Name, patchmeantime
+| stats max(patchmeantime) as MaxAge by Computer_Name
+| stats avg(MaxAge) as MTTP by Computer_Name 
+| eval Mean_Time_To_Patch = round (MTTP, 0) 
+| stats avg(Mean_Time_To_Patch) as Mean_Time_To_Patch | eval Mean_Time_To_Patch=round(Mean_Time_To_Patch,0)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Reboot Required</title>
+        <search>
+          <query>`tanium_index` Question="Splunk-Last-Reboot" Reboot_Required=Yes | timechart span=1d count</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Patch Severity over Time</title>
+      <chart>
+        <search>
+          <query>`tanium_index` sourcetype::tanium:updates NOT "[no results]" NOT CVE_IDs="" OS_Type="$OS_Type$" | bucket span=1d _time | replace "None" with "Low" in Severity | timechart span=1d count(Severity) by Severity | fields - NULL</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.fieldColors">{"Moderate":0xffc04c, "Critical": 0xFF0000, "Informational":0xC0C0C0, "Medium":FFFF00, "Low":0xFFFF00, "Important":0xf58f39}</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20sourcetype%3A%3Atanium%3Aupdates%20NOT%20%22%5Bno%20results%5D%22%20OS_Type%3D%22$OS_Type$%22%20%7C%20bucket%20span%3D1d%20_time%20%7C%20replace%20%22None%22%20with%20%22Low%22%20in%20Severity%20%7C%20timechart%20span%3D1d%20count(Severity)%20by%20Severity%20%7C%20fields%20-%20NULL&amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Patch Severity</title>
+      <chart>
+        <search>
+          <query>`tanium_index` sourcetype::tanium:updates NOT "[no results]" NOT CVE_IDs="" OS_Type="$OS_Type$"  | stats sum(Count) as Count by Severity | replace "None" with "Low" in Severity</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.fieldColors">{"Moderate":0xffc04c, "Critical": 0xFF0000, "Informational":0xC0C0C0, "Medium":FFFF00, "Low":0xFFFF00, "Important":0xf58f39}</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20sourcetype%3A%3Atanium%3Aupdates%20NOT%20CVE_IDs%3D%22%5Bno-results%5D%22%20NOT%20CVE_IDs%3D%22%22%20OS_Type%3D%22*%22%20%20%7C%20stats%20dc(Computer_Name)%20by%20Computer_Name%20Title%20CVE_IDs%20KB_Articles%20%7C%20replace%20%22None%22%20with%20%22Low%22%20in%20Severity%20%7C%20fields%20-%20dc(Computer_Name)&amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Patch by Install Status</title>
+      <chart>
+        <search>
+          <query>`tanium_index` sourcetype::tanium:updates NOT "[no results]" NOT CVE_IDs="" OS_Type="$OS_Type$" | dedup KB_Articles, CVE_IDs, Title  | replace "None" with "Low" in Severity | chart count over Install_Status by Severity | rename Install_Status as "Install Status"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <drilldown>
+          <link target="_blank">search?q=%60tanium_index%60%20sourcetype%3A%3Atanium%3Aupdates%20NOT%20CVE_IDs%3D%22%5Bno-results%5D%22%20NOT%20CVE_IDs%3D%22%22%20OS_Type%3D%22*%22%20%20%7C%20stats%20dc(Computer_Name)%20by%20Computer_Name%20Title%20CVE_IDs%20KB_Articles%20Severity%20Bulletins%20Install_Status%20%7C%20replace%20%22None%22%20with%20%22Low%22%20in%20Severity%20%7C%20fields%20-%20dc(Computer_Name)&amp;earliest=$time.earliest$&amp;latest=$time.latest$</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Patch Compliance All Patches</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Splunk-Patch-List-Compliance" Patch_List_Name="All-Patches" OS_Type="$OS_Type$"
+| stats dc(Computer_Name) as Count by Compliance_Status</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Patch Compliance over Time</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Splunk-Patch-List-Compliance" Patch_List_Name="All-Patches" OS_Type="$OS_Type$"
+| bucket span=1d _time | timechart count by Compliance_Status</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Patch Deployment Results over Time</title>
+      <chart>
+        <search>
+          <query>`tanium_index` Question="Splunk-Patch-Deployment-Results" | timechart count(KB_Articles) by Result</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

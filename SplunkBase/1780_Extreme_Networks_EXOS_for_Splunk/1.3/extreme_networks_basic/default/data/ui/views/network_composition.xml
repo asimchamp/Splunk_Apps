@@ -1,0 +1,38 @@
+<form>
+  <label>Network Search</label>
+  <description></description>
+  <fieldset autorun="false">
+    <input type="text" token="input">
+      <label>Serial Number, EXOS Version, etc...</label>
+      <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <table>
+      <title>Matching Devices</title>
+      <search>
+        <query>index=extnet | rex max_match=0 "Slot-(?&lt;slotNum&gt;\d+)\s+\:\s+(?&lt;slotDevice&gt;\w{6}-\w{2}-\w{2})\s(?&lt;slotSN&gt;\w{5}-\w{5})\s+(?&lt;revNum&gt;Rev\s\d+.\d+)\s+BootROM\:\s+(?&lt;bootROM&gt;\d+.\d+.\d+.\d+)\s+IMG\:\s+(?&lt;img&gt;\d+.\d+.\d+.\d+)\s+" | mvexpand slotSN | mvexpand slotDevice | mvexpand host | mvexpand revNum | mvexpand bootROM | mvexpand img | dedup slotSN | search slotSN=$form.input$ OR host=$form.input$ OR img=$form.input$ OR bootROM=$form.input$ | table slotSN slotDevice host img bootROM revNum | sort slotSN | rename slotSN as "Serial Number" slotDevice as "Product Number" revNum as "Revision" bootROM as "BootROM" img as "EXOS Version" host as "Host"</query>
+        <earliest>-2w@w</earliest>
+        <latest>now</latest>
+      </search>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

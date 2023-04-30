@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+  
+  <label>Citrix ADC Virtual Server Performance</label>
+  <description>This dashboard displays performance information about virtual servers on Citrix ADCs monitored with uberAgent. uberAgent only collects performance data from the primary Citrix ADC.</description>
+
+  <fieldset autoRun="true">
+    <input type="time" searchWhenChanged="true">
+      <label>Time range:</label>
+      <default>
+        <earliest>-1h</earliest>
+        <latest>now</latest>
+      </default>
+      <change>
+         <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+         <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+         <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+      </change>
+    </input>
+    <input type="dropdown" token="CitrixADCFilterString" searchWhenChanged="true">
+         <choice value="*">All</choice>
+         <default>*</default>
+         <label>Citrix ADC:</label>
+         <fieldForLabel>HostName</fieldForLabel>
+         <fieldForValue>HostName</fieldForValue>
+         <allowCustomValues>false</allowCustomValues>
+         <search>
+            <query>
+               | pivot `uA_DM_CitrixADC_Gateway` CitrixADC_Gateway
+                  latest(HostName) as HostName
+               | eval sortfield = lower (HostName)
+               | sort sortfield
+               | table
+                  HostName
+            </query>
+         </search>
+    </input>
+  </fieldset>
+  <!-- Row 1 -->
+  <row>
+    <panel>
+        <title>SSL sessions over time</title>
+         <chart>
+            <search>
+                <query>
+                    | pivot `uA_DM_CitrixADC_AppliancePerformance` CitrixADC_AppliancePerformance
+                        avg(SSLSessions) as "SSL sessions"
+                        splitrow
+                            _time 
+                            period $PivotPeriodAutoSolo$
+                        filter HostName is $CitrixADCFilterString|s$
+                </query>
+            </search>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.axisY.includeZero">1</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="height">250</option>
+         </chart>
+    </panel>
+  </row>
+  
+  
+  <row>
+    <!-- Column 1 -->
+    <panel>
+      <title>Data volume per virtual server (top 10)</title>
+      <chart>
+        <search>
+          <query>
+                  | pivot `uA_DM_CitrixADC_vServer` CitrixADC_vServer
+                     sum(RequestMBRate) as RequestMBRate
+                     sum(ResponseMBRate) as ResponseMBRate
+                     splitrow
+                        vServerName as "Virtual server"
+                  filter HostName is $CitrixADCFilterString|s$
+                  | eval "Receive volume (MB)" = round(RequestMBRate,1)
+                  | eval "Send volume (MB)" = round(ResponseMBRate,1)
+                  | eval Total = 'Receive volume (MB)' + 'Send volume (MB)'
+                  | sort limit=10 - Total
+                  | table
+                     "Virtual server"
+                     "Receive volume (MB)"
+                     "Send volume (MB)"
+               </query>
+        </search>
+        <option name="height">250</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+      </chart>
+    </panel>
+    <!-- Column 2 -->
+    <panel>
+      <title>Data volume over time</title>
+      <chart>
+          <search>
+             <query>
+                | pivot `uA_DM_CitrixADC_vServer` CitrixADC_vServer
+                     sum(RequestMBRate) as RequestMBRate
+                     sum(ResponseMBRate) as ResponseMBRate
+                   splitrow
+                      _time 
+                      period $PivotPeriodAutoTimechart$
+                   splitrow
+                      vServerName as "Virtual server"
+                   filter HostName is $CitrixADCFilterString|s$
+                | eval RequestMBRate = round(RequestMBRate,1)
+                | eval ResponseMBRate = round(ResponseMBRate,1)
+                | stats
+                  avg(RequestMBRate) as RequestMBRate
+                  avg(ResponseMBRate) as ResponseMBRate
+                     by _time
+                | timechart
+                   `uberAgent_dynamic_span`
+                   sum(RequestMBRate) as "Receive volume (MB)"
+                   sum(ResponseMBRate) as "Send volume (MB)"
+             </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">line</option>
+            <option name="charting.legend.placement">bottom</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.axisTitleY.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+            <option name="charting.chart.nullValueMode">zero</option>
+         </chart>
+    </panel>
+  </row>
+  <!-- Row 2 -->
+  <row>
+    <!-- Column 1 -->
+    <panel>
+      <title>Virtual server data grouped</title>
+      <input type="dropdown" token="Panel21GroupBy" searchWhenChanged="true">
+        <choice value="HostName">Citrix ADC</choice>
+        <choice value="Type">Type</choice>
+        <default>HostName</default>
+        <label>Group by:</label>
+        <change>
+          <condition value="*">
+            <set token="Panel21GroupByDisplay">$label$</set>
+            <unset token="DrilldownFilterBy21"></unset>
+          </condition>
+        </change>
+      </input>
+      <table>
+        <search>
+          <query>
+                 | pivot `uA_DM_CitrixADC_vServer` CitrixADC_vServer
+                     dc(HostName) as "#Citrix ADCs"
+                     dc(vServerName) as "#Virtual servers"
+                     dc(PrimaryIpAddress) as "#IP addresses"
+                     dc(PrimaryPort) as "#Ports"
+                     dc(Type) as "#Types"
+                     splitrow
+                        $Panel21GroupBy$ as "$Panel21GroupByDisplay$" 
+                     filter HostName is $CitrixADCFilterString|s$
+                  | table
+                    "$Panel21GroupByDisplay$"
+                    "#Citrix ADCs"
+                    "#Types"
+                    "#Virtual servers"
+                    "#IP addresses"
+                    "#Ports"
+               </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="DrilldownFilterBy21">$click.value$</set>
+        </drilldown>
+      </table>
+    <html src="citrixadc_virtual_server_performance_explanation.html">
+    </html>
+    </panel>
+  </row>
+  <!-- Row 3 -->
+  <row depends="$DrilldownFilterBy21$">
+    <!-- Column 1 -->
+    <panel>
+      <title>Virtual servers in selected group: $Panel21GroupByDisplay$ = $DrilldownFilterBy21$</title>
+      <table>
+        <search>
+          <query>
+                  | pivot `uA_DM_CitrixADC_vServer` CitrixADC_vServer
+                    latest(HostName) as CitrixADC
+                    latest(PrimaryIpAddress) as "IP address"
+                    latest(PrimaryPort) as Port
+                    latest(Type) as Type
+                    latest(State) as State
+                    latest(ActSvcs) as "Active services"
+                    latest(TotHits) as "Total hits"
+                    latest(VSLBHealth) as Health
+                    splitrow
+                       vServerName as "Virtual server"
+                    filter HostName is $CitrixADCFilterString|s$
+                    filter $Panel21GroupBy$ is $DrilldownFilterBy21$
+                  | table
+                    "Virtual server"
+                    CitrixADC
+                    "IP address"
+                    Port
+                    Type
+                    State
+                    "Active services"
+                    "Total hits"
+                    Health
+               </query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                     single_citrixadc_virtual_server_performance?earliest=$earliest$&latest=$latest$&form.CitrixADCFilterString=$click.value$
+                  ]]>
+          </link>
+        </drilldown>
+      </table>
+    <html src="citrixadc_virtual_server_performance_explanation_2.html" depends="$DrilldownFilterBy21$">
+    </html>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,280 @@
+<form version="1.1" stylesheet="row_underline.css" script="set_threshold_token.js,latency_inpage_drilldown.js,timerange.js">
+  <label>Performance - Volumes by Latency Threshold</label>
+  <fieldset>
+    <input type="time" searchWhenChanged="true" id="timerange">
+      <label>Time</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="arrayId">
+      <label>Array</label>
+      <search>
+        <query>| inputlookup nesa_volume_groups | stats count by arrayId, arrayName</query>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>host="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="controllerLabel">
+      <label>Controller</label>
+      <search>
+        <query>
+          | inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ | dedup controllerLabel
+        </query>
+      </search>
+      <fieldForLabel>controllerLabel</fieldForLabel>
+      <fieldForValue>controllerLabel</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>controllerLabel="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="volumeGroup" id="clvgid">
+      <label>Volume Group or Pool</label>
+      <search id="clvg_id">
+        <query>| inputlookup nesa_volumes | join type=LEFT controllerRef [inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ | rename host as arrayId | table controllerRef, controllerLabel] | fields controllerLabel, volumeGroupRef | join type=LEFT volumeGroupRef [| inputlookup nesa_volume_groups | search [| inputlookup nesa_volumes | search [| inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ controllerLabel=* | rename host as arrayId | fields arrayId, controllerRef] | fields arrayId, volumeGroupRef ]] | dedup arrayName, controllerLabel, volumeGroup | sort volumeGroup, controllerLabel|search $controllerLabel$ | dedup volumeGroup | table volumeGroup</query>
+      </search>
+      <valuePrefix>volumeGroup="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <fieldForLabel>volumeGroup</fieldForLabel>
+      <fieldForValue>volumeGroup</fieldForValue>
+    </input>
+    <input type="multiselect" token="volumeName">
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <label>Volumes</label>
+      <search>
+        <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ | table volumeName | dedup volumeName</query>
+      </search>
+      <valuePrefix>volumeName="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <fieldForLabel>volumeName</fieldForLabel>
+      <fieldForValue>volumeName</fieldForValue>
+    </input>
+    <input type="text" token="thresholdValue">
+      <label>Response Time Threshold (in ms) &gt;=</label>
+      <default>$thresholdValue$</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <div style="position:absolute;">
+	        <span style="font-size:16px;">Volume Groups/Pools wise Exceeded read threshold Volumes</span>
+          <br/>
+    	    <font style="font-size:12px;">
+            <i> * Click on individual Volume Groups/Pools to view VG/Pools Wise read response time data</i>
+          </font>
+	    </div>
+      </html>
+      <table id="readTable">
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ readResponseTime&gt;=$thresholdValue$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | stats count(volumeName) by volumeGroup,volumeName,arrayName,controllerLabel,host | stats count(volumeName) as CNT by volumeGroup,arrayName,controllerLabel,host | search CNT&gt;0 | fields host,arrayName,controllerLabel,volumeGroup,CNT | rename arrayName as "Array" ,controllerLabel as "Controller Label",volumeGroup as "Volume Groups/Pools", CNT as "No of Volumes exceeded Threshold"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <fields>"Array","Controller Label","Volume Groups/Pools","No of Volumes exceeded Threshold"</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <chart id="readChart">
+        <title>Read Response Time by Volume</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats host="$readArrayId$" controllerLabel="$readControllerLabel$" volumeGroup="$readVolumeGroup$" | where readResponseTime&gt;=$thresholdValue$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | timechart useother=f limit=0 span=5m mean(readResponseTime) AS reads by label</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <div style="position:absolute;">
+	        <span style="font-size:16px;">Volume Groups/Pools wise Exceeded write threshold Volumes</span>
+          <br/>
+	        <font style="font-size:12px;">
+            <i> * Click on individual Volume Groups/Pools to view VG/Pools Wise write response time data</i>
+          </font>
+        </div>
+      </html>
+      <table id="writeTable">
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ writeResponseTime&gt;=$thresholdValue$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | stats count(volumeName) by volumeGroup,volumeName,arrayName,controllerLabel,host | stats count(volumeName) as CNT by volumeGroup,arrayName,controllerLabel,host | search CNT&gt;0 | fields host,arrayName,controllerLabel,volumeGroup,CNT | rename arrayName as "Array",controllerLabel as "Controller Label",volumeGroup as "Volume Groups/Pools", CNT as "No of Volumes exceeded Threshold"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <fields>"Array","Controller Label","Volume Groups/Pools","No of Volumes exceeded Threshold"</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <chart id="writeChart">
+        <title>Write Response Time by Volume</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats host="$writeArrayId$" controllerLabel="$writeControllerLabel$" volumeGroup="$writeVolumeGroup$" | where writeResponseTime&gt;=$thresholdValue$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | timechart useother=f limit=0 span=5m mean(writeResponseTime) AS Write by label</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="readChartMain">
+        <title>Read Response time by Volume</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ $volumeName$ | where readResponseTime&gt;=$thresholdValue$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | timechart useother=f limit=0 span=5m mean(readResponseTime) AS reads by label</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart id="writeChartMain">
+        <title>Write Response time by Volume</title>
+        <search>
+          <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ $volumeName$ | where writeResponseTime&gt;=$thresholdValue$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | timechart useother=f limit=0 span=5m mean(writeResponseTime) AS writes by label</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Milliseconds</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

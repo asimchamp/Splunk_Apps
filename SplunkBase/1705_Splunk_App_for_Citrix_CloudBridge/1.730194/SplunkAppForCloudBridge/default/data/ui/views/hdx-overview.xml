@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>HDX Overview</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+    <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+  </fieldset>
+  
+  <row>
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Users: </option>
+        <searchString>
+            index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") 
+            | `JOIN_ICA_USER_NAME($observerId$)` 
+            | where userName != "" 
+            | stats distinct_count(userName)
+        </searchString>
+    </single>
+
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Apps: </option>
+          <!--
+            This gets the data from the ICA app launch but is wrong if we  miss the 274 Template. 
+            index=cloudbridge observationPointId="$observerId$" TemplateName="274_ICA_APP_LAUNCH" | stats distinct_count(applicationName)  
+            -->
+        <searchString>
+             index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS")  
+            | `JOIN_ICA_ALL_TIME($observerId$)`
+            | stats distinct_count(appName)  
+        </searchString>
+    </single>
+
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Active HDX Connections: </option>
+        <searchString>
+            index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` | stats count BY `CONNECTION` | stats count  
+        </searchString>
+    </single>
+  </row>
+  <row>
+    <chart>
+      <title>HDX WAN Throughput</title>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.chart">line</option>
+      <option name="charting.axisTitleX.text">Time</option> 
+      <option name="charting.axisTitleY.text">Mbps</option> 
+      <option name="charting.chart.nullValueMode">connect</option>
+      <searchString>
+            index=cloudbridge observationPointId="$observerId$" (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") (flowId=1 OR flowId=4)            
+            | join type=inner `CONNECTION` 
+             [
+                   search index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` (flowId=1 OR flowId=4) 
+                 | fields `CONNECTION`
+             ]            
+            | eval sent=if(flowId==4, octetDeltaCount, 0)            
+            | eval received=if(flowId==1, octetDeltaCount, 0)             
+            | eval sent = `BYTES_TO_MBITS(sent)` 
+            | eval received = `BYTES_TO_MBITS(received)`
+            | timechart per_second(sent) AS "Sent" per_second(received) AS "Received"      
+      </searchString>
+    </chart>
+  </row>
+  <row>
+
+    <chart>
+      <title>Avg WAN Latency(RTT) By Top User</title>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.axisTitleX.text">User</option> 
+      <option name="charting.axisTitleY.text">ms</option> 
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" TemplateName="257_EGRESS" flowId=4 roundTripTime>=0                    
+        | `JOIN_ICA_USER_NAME($observerId$)` 
+        | stats avg(roundTripTime) AS "WAN Latency" by userName 
+        | sort -num("WAN Latency")            
+        | head 10
+      </searchString>
+    </chart>
+
+    <chart>
+      <title>Avg WAN Latency(RTT) By Top Application</title>
+      <option name="charting.legend.placement">none</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.axisTitleX.text">Application</option> 
+      <option name="charting.axisTitleY.text">ms</option> 
+      <searchString>
+        index=cloudbridge observationPointId="$observerId$" TemplateName="257_EGRESS" flowId=4 roundTripTime>=0                    
+        | join type=inner `CONNECTION` [search index=cloudbridge observationPointId="$observerId$" `ICA_TEMPLATES` | fields `CONNECTION`]                    
+        | stats avg(roundTripTime) AS rtt_conn  values(appName) as appName by `CONNECTION` 
+        | `ICA_APP_NAME_FIX(appName)`
+        | stats avg(rtt_conn) AS "WAN Latency" by appName  
+        | sort -num("WAN Latency")            
+        | head 10
+      </searchString>
+    </chart>
+
+  </row>
+  
+</form>
+
+

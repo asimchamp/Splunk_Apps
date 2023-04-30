@@ -1,0 +1,18 @@
+<panel>
+  <title>Top Businesses by Violations</title>
+  <table>
+    <search>
+      <query>index="sf_food_health" sourcetype=sf_food_violations neighborhood=* risk_category=* 
+| stats values(name) as name values(address) as address values(neighborhood) as neighborhood count(eval(risk_category="High Risk")) as "High Risk" count(eval(risk_category="Moderate Risk")) as "Moderate Risk" count(eval(risk_category="Low Risk")) as "Low Risk" count as "Total Violations" by business_id  
+| fields - business_id  
+| sort -"Total Violations"</query>
+      <earliest>0</earliest>
+      <latest></latest>
+    </search>
+    <option name="wrap">true</option>
+    <option name="rowNumbers">true</option>
+    <option name="dataOverlayMode">none</option>
+    <option name="drilldown">cell</option>
+    <option name="count">10</option>
+  </table>
+</panel>

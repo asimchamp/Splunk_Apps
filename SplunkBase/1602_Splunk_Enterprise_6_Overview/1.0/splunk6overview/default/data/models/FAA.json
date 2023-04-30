@@ -1,0 +1,483 @@
+{
+    "objectSummary": {
+        "Event-Based": 17, 
+        "Search-Based": 0, 
+        "Interfaces": 0, 
+        "Transaction-Based": 1, 
+        "Interface Implementations": 0
+    }, 
+    "displayName": "Federal Aviation Administration", 
+    "modelName": "FAA", 
+    "description": "Data model for the FAA data set", 
+    "objectNameList": [
+        "flights", 
+        "cancelled_flights", 
+        "cancelled_carrier", 
+        "cancelled_weather", 
+        "cancelled_nas", 
+        "cancelled_security", 
+        "delayed", 
+        "delay_carrier", 
+        "delay_weather", 
+        "delay_nas", 
+        "delay_security", 
+        "delay_late_aircraft", 
+        "arrival_on_time", 
+        "diverted", 
+        "fly_return_flights", 
+        "dest_reached_diverted", 
+        "dest_not_reached_diverted", 
+        "flight_path"
+    ], 
+    "objects": [
+        {
+            "calculations": [], 
+            "objectName": "flights", 
+            "fields": [
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "AirlineDescription", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "AirlineDescription"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_month", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "Month"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "date_wday", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "Weekday"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "Dest", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "Dest"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "DestAirport", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "DestAirport"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "DestCityName", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "DestCityName"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "DestLatitude", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "DestLatitude"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "DestLongitude", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "DestLongitude"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "DestState", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "DestState"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "DestStateName", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "DestStateName"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "FlightDate", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "FlightDate"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "FlightNum", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "FlightNum"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "Origin", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "Origin"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "OriginAirport", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "OriginAirport"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "OriginCityName", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "OriginCityName"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "OriginLatitude", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "OriginLatitude"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "OriginLongitude", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "OriginLongitude"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "OriginState", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "OriginState"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "OriginStateName", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "OriginStateName"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "Quarter", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "Quarter"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "Year", 
+                    "type": "number", 
+                    "comment": "", 
+                    "displayName": "Year"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "CancellationCode", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "CancellationCode"
+                }, 
+                {
+                    "hidden": false, 
+                    "multivalue": false, 
+                    "required": false, 
+                    "fieldName": "TailNum", 
+                    "type": "string", 
+                    "comment": "", 
+                    "displayName": "TailNum"
+                }
+            ], 
+            "parentName": "BaseEvent", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "index=faa sourcetype=flightdata"
+                }
+            ], 
+            "displayName": "All Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "cancelled_flights", 
+            "fields": [], 
+            "parentName": "flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "Cancelled=1"
+                }
+            ], 
+            "displayName": "Cancelled Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "cancelled_carrier", 
+            "fields": [], 
+            "parentName": "cancelled_flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "CancellationCode = A"
+                }
+            ], 
+            "displayName": "Carrier Cancelled Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "cancelled_weather", 
+            "fields": [], 
+            "parentName": "cancelled_flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "CancellationCode = B"
+                }
+            ], 
+            "displayName": "Weather Cancelled Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "cancelled_nas", 
+            "fields": [], 
+            "parentName": "cancelled_flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "CancellationCode = C"
+                }
+            ], 
+            "displayName": "National Air System Cancelled Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "cancelled_security", 
+            "fields": [], 
+            "parentName": "cancelled_flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "CancellationCode = D"
+                }
+            ], 
+            "displayName": "Security Cancelled Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "delayed", 
+            "fields": [], 
+            "parentName": "flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "ArrDelay >= 15"
+                }
+            ], 
+            "displayName": "Delayed Arrival Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "delay_carrier", 
+            "fields": [], 
+            "parentName": "delayed", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "CarrierDelay > 0"
+                }
+            ], 
+            "displayName": "Carrier Delay Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "delay_weather", 
+            "fields": [], 
+            "parentName": "delayed", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "WeatherDelay > 0 "
+                }
+            ], 
+            "displayName": "Weather Delay Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "delay_nas", 
+            "fields": [], 
+            "parentName": "delayed", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "NASDelay > 0"
+                }
+            ], 
+            "displayName": "NAS Delay Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "delay_security", 
+            "fields": [], 
+            "parentName": "delayed", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "SecurityDelay > 0"
+                }
+            ], 
+            "displayName": "Security Delay Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "delay_late_aircraft", 
+            "fields": [], 
+            "parentName": "delayed", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "LateAircraftDelay > 0"
+                }
+            ], 
+            "displayName": "Late Aircraft Delay Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "arrival_on_time", 
+            "fields": [], 
+            "parentName": "flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "ArrDelay < 15 AND ArrDelay > -15"
+                }
+            ], 
+            "displayName": "On Time Arrival Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "diverted", 
+            "fields": [], 
+            "parentName": "flights", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "DivAirportLandings > 0"
+                }
+            ], 
+            "displayName": "Diverted Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "fly_return_flights", 
+            "fields": [], 
+            "parentName": "diverted", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "DivAirportLandings = 9"
+                }
+            ], 
+            "displayName": "Fly Return Flights"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "dest_reached_diverted", 
+            "fields": [], 
+            "parentName": "diverted", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "DivReachedDest = 1"
+                }
+            ], 
+            "displayName": "Destination Reached"
+        }, 
+        {
+            "calculations": [], 
+            "objectName": "dest_not_reached_diverted", 
+            "fields": [], 
+            "parentName": "diverted", 
+            "comment": "", 
+            "constraints": [
+                {
+                    "search": "DivReachedDest = 0"
+                }
+            ], 
+            "displayName": "Destination Not Reached"
+        }, 
+        {
+            "objectName": "flight_path", 
+            "objectsToGroup": [
+                "flights"
+            ], 
+            "parentName": "BaseTransaction", 
+            "groupByFields": [
+                "FlightDate", 
+                "FlightNum", 
+                "TailNum"
+            ], 
+            "transactionMaxTimeSpan": "", 
+            "calculations": [], 
+            "constraints": [], 
+            "fields": [], 
+            "comment": "", 
+            "transactionMaxPause": "", 
+            "displayName": "Flight Path"
+        }
+    ], 
+    "editable": true
+}

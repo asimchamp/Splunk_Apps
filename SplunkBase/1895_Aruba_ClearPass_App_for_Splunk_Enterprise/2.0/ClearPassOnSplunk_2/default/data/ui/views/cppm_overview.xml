@@ -1,0 +1,97 @@
+<form refresh="120">
+  <label>Overview</label>
+
+  <description>
+	Overview of ClearPass Status
+  </description>
+
+  <fieldset autoRun="True" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-15m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+   <input type="dropdown" token="server">
+      <label>ClearPass Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <populatingSearch fieldForValue="cphost" fieldForLabel="cphost">
+        <![CDATA[eventtype=cppm | stats count by cphost]]>
+      </populatingSearch>
+    </input>
+  </fieldset>
+
+  <searchTemplate>
+      eventtype=cppm-authentication cphost=$server$
+  </searchTemplate>
+
+  <row>
+    <single>
+      <searchString> eventtype=cppm-fail-authentication cphost=$server$ |dedup user_name | stats count </searchString>
+      <option name="underLabel">Failed Attempts</option>
+       <option name="linkFields">underlabel</option>
+       <option name="linkSearch">eventtype=cppm-fail-authentication cphost=$server$</option>
+    </single>
+    <single>
+      <searchString> eventtype=cppm-pass-authentication cphost=$server$ |dedup mac_address | stats count </searchString>
+      <option name="underLabel">Endpoints Authenticated</option>
+    </single>  
+    <single>
+      <searchString> eventtype=cppm-authentication cphost=$server$ nas_ip="*" AND NOT nas_ip="127.0.0.1" | dedup nas_ip | stats count </searchString>
+      <option name="underLabel">NAS Devices</option>
+    </single>
+    <single>
+      <searchPostProcess> dedup cphost | stats count</searchPostProcess>
+      <option name="underLabel">ClearPass Servers</option>
+    </single>
+  </row>
+
+  <row>
+    <chart>
+      <title>Incoming Requests</title>
+      <searchPostProcess>
+         timechart span=10m count by login_status
+      </searchPostProcess>
+      <option name="charting.seriesColors">
+               [0x00FF00,0xFF0000,0xFFFF00]
+      </option>
+      <option name="charting.chart">area</option>
+    </chart>
+
+    <chart>
+      <title>Auth Rate per Min</title>
+      <searchPostProcess>
+        bucket _time span=1m | stats count as APM by _time| head 1 | table APM
+      </searchPostProcess>
+      <option name="charting.chart">radialGauge</option>
+      <option name="charting.chart.rangeValues">[0,200,500,1000]</option>
+      <option name="charting.chart.usePercentageValue">False</option>
+      <option name="charting.chart.usePercentageRange">False</option>
+    </chart>
+   </row>
+
+   <row> 
+    <table>
+      <title>Last 10 Auth Requests</title>
+      <searchString>
+      eventtype=cppm-authentication cphost=$server$ | head 10 |table user_name service_name 
+      </searchString>
+    </table>
+
+    <table>
+      <title>Last 10 Auth Failures</title>
+      <searchString>
+      eventtype=cppm-fail-authentication cphost=$server$ | head 10 |table user_name error_code_str 
+      </searchString>
+    </table>
+
+    <table>
+      <title>Last 10 Alerts</title>
+      <searchString>
+      eventtype=cppm-alert cphost=$server$ | head 10 | table cphost service_name alert 
+      </searchString>
+    </table>
+   </row>
+ 
+</form>

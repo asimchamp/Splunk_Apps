@@ -1,0 +1,22 @@
+<setup>
+	<block title="Configuration" endpoint="sfgae/config" entity="sfgae_entity">
+		<input field="app">
+			<label>Application Name</label>
+			<type>text</type>
+		</input>
+		<input field="version">
+			<label>Application Version</label>
+			<type>text</type>
+		</input>
+	</block>
+	<block title="Credentials" endpoint="storage/passwords" entity="_new">
+		<input field="name">
+			<label>GAE Username</label>
+			<type>text</type>
+		</input>
+		<input field="password">
+			<label>GAE Password</label>
+			<type>password</type>
+		</input>
+	</block>
+</setup>

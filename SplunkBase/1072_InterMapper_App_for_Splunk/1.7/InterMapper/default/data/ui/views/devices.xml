@@ -1,0 +1,117 @@
+<view autoCancelInterval="90" decomposeIntentions="false" isPersistable="true" isSticky="true" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+  <label>Device List</label>
+  <module name="AccountBar" layoutPanel="appHeader" />
+  <module name="AppBar" layoutPanel="navigationHeader" />
+  <module name="Message" layoutPanel="messaging">
+    <param name="maxSize">2</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="filter">*</param>
+  </module>
+  <module name="Message" layoutPanel="messaging">
+	<param name="level">warn</param>
+    <param name="maxSize">2</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="filter">splunk.search.job</param>
+  </module>
+  <module name="TitleBar" layoutPanel="viewHeader">
+    <param name="actionsMenuFilter">dashboard</param>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row1_col1" autoRun="True">
+    <param name="search">| imstatus</param>
+    <module name="HiddenFieldPicker">
+      <module name="NullModule" />
+    </module>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row1_col1" group="Monitored Devices List" autoRun="True">
+    <param name="search">| inputlookup deviceTable.csv | rename ip as "Device IP" | join "Device IP" type=left [inputlookup append=t switchPort.csv] | fields - type | rename deviceIMID AS "Device ID", label AS "Device Name", mapname as "Map Name", Switch as "Connected to Switch", Port AS "Switch Port", probe AS "Probe Name" | table "Device ID", "Device Name", "Probe Name", "Device IP", "Device MAC", "Map Name", "Connected to Switch", "Switch Port", notification_level | dedup "Device Name", "Device ID" | join type=left "Device ID" [search sourcetype=intermapper | sort - timestamp | rename device_imid as "Device ID" | table "Device ID", notification_level | dedup "Device ID"] | eval notification_level=case(notification_level="Down","1 - Down",notification_level="Critical","2 - Critical",notification_level="Alarm","3 - Alarm",notification_level="Warning","4 - Warning",notification_level="OK","5 - OK",notification_level="ACK","6 - ACK") | fillnull value="5 - OK" notification_level | search notification_level="$reportTypeToken$" | rename notification_level AS "Current Status" 
+    | fillnull value="Not Available" "Device MAC","Connected to Switch","Switch Port" | sort "Current Status", "Map Name", "Device Name", "Device IP"</param>
+    <param name="earliest">-1m</param>
+    <param name="latest">now</param>
+    <param name="groupLabel">Monitored Devices List</param>
+    <module name="StaticSelect">
+      <param name="selected">Sourcetype</param>
+      <param name="searchWhenChanged">True</param>
+      <param name="settingToCreate">reportTypeToken_setting</param>
+      <param name="staticFieldsToDisplay">
+        <list>
+          <param name="value">*</param>
+          <param name="label">All Notifications</param>
+        </list>
+        <list>
+          <param name="value">1 - Down</param>
+          <param name="label">Down</param>
+        </list>
+        <list>
+          <param name="value">2 - Critical</param>
+          <param name="label">Critical</param>
+        </list>
+        <list>
+          <param name="value">3 - Alarm</param>
+          <param name="label">Alarm</param>
+        </list>
+        <list>
+          <param name="value">4 - Warning</param>
+          <param name="label">Warning</param>
+        </list>
+        <list>
+          <param name="value">5 - OK</param>
+          <param name="label">OK</param>
+        </list>
+        <list>
+          <param name="value">6 - ACK</param>
+          <param name="label">Acknowledged</param>
+        </list>
+      </param>
+      <param name="label">Select Notification Level -</param>
+      <module name="ConvertToIntention">
+        <param name="intention">
+          <param name="arg">
+            <param name="reportTypeToken">
+              <param name="default">Sourcetype</param>
+              <param name="fillOnEmpty">True</param>
+              <param name="value">$target$</param>
+            </param>
+          </param>
+          <param name="name">stringreplace</param>
+        </param>
+        <param name="settingToConvert">reportTypeToken_setting</param>
+        <module name="ViewstateAdapter">
+          <module name="HiddenFieldPicker">
+            <param name="strictMode">True</param>
+            <module name="JobProgressIndicator" />
+            <module name="EnablePreview">
+              <param name="enable">True</param>
+              <param name="display">False</param>
+              <module name="Count" layoutPanel="panel_row1_col1">
+                <param name="options">
+                  <list>
+                    <param name="text">10</param>
+                    <param name="value">10</param>
+                  </list>
+                  <list>
+                    <param name="text">20</param>
+                    <param name="value">20</param>
+                  </list>
+                  <list>
+                    <param name="selected">True</param>
+                    <param name="text">50</param>
+                    <param name="value">50</param>
+                  </list>
+                </param>
+                <module name="Paginator">
+                  <param name="entityName">events</param>
+                  <param name="count">20</param>
+                  <module name="SimpleResultsTable">
+                    <param name="drilldown">row</param>
+                    <module name="DeviceDashboardRedirector">
+                    </module>
+                  </module>
+                </module>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+    </module>
+  </module>
+</view>

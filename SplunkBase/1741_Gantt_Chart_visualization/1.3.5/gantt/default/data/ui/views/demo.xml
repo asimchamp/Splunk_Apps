@@ -1,0 +1,51 @@
+<form script="autodiscover.js">
+    <label>Gantt Chart demo</label>
+    <fieldset submitButton="false">
+        <input type="time" token="time" searchWhenChanged="true">
+            <label></label>
+            <default>
+                <earliest>-4h@m</earliest>
+                <latest>now</latest>
+            </default>
+        </input>
+        <input type="dropdown" token="filter">
+            <label>Duration of transactions</label>
+            <choice value="90">Short</choice>
+            <choice value="50">Medium</choice>
+            <choice value="10">Long</choice>
+            <default>50</default>
+        </input>
+    </fieldset>
+    <row>
+        <html>
+            <h2>Gantt Chart demo</h2>
+            <div id="demo-search"
+                 class="splunk-manager"
+                 data-require="splunkjs/mvc/searchmanager"
+                 data-options='{
+                    "search": { "type": "token_safe", "value": "index=_internal sourcetype=splunkd | where random()%100&lt;$$filter$$ | eval resource=\"resource\".random()%10 | transaction maxpause=1m resource | search duration&gt;0 | eval user=\"user\".random()%7 | eval extras=\"{\\\"Source Type\\\":\\\"\"+sourcetype+\"\\\"}\"" },
+                    "earliest_time": { "type": "token_safe", "value": "$$time.earliest$$" },
+                    "latest_time": { "type": "token_safe", "value": "$$time.latest$$" },
+                    "cancelOnUnload": true,
+                    "preview": true
+                 }'>
+            </div>
+
+            <div id="demo-view"
+                 class="splunk-view"
+                 data-require="app/gantt/components/gantt/gantt"
+                 data-options='{
+                    "managerid": "demo-search",
+                    "startField": "_time",
+                    "durationField": "duration",
+                    "categoryLabel": "Resource",
+                    "categoryField": "resource",
+                    "categorySearch": "search index=_internal | stats count | eval resource=\"Magic\"",
+                    "seriesLabel": "User",
+                    "seriesField": "user",
+                    "extrasField": "extras"
+                 }'>
+            </div>
+        </html>
+    </row>
+</form>

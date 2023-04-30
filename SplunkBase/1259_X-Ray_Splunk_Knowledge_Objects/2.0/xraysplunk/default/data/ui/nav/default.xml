@@ -1,0 +1,24 @@
+<nav>
+  <view name="ko_app_welcome" default="true" />
+    <collection label="Dashboards">
+        <view name="all_ko_details"/>
+        <view name="knowledge_objects_summary"/>
+        <view source="unclassified" match="dashboard"/>
+    </collection>
+    <collection label="Find Knowledge Objects">
+        <view name="knowledge_object_search_form" />
+        <view name="ko_search_by_name_and_type" />
+        <view name="where_is_it_used" />
+        <view name="what_does_it_use" />
+        <view name="ko_config_grep" />
+        <view name="greap2" />
+        <view source="unclassified" match="form"/>
+    </collection>
+    <collection label="Views">
+	<view name="flashtimeline"/>
+        <view source="unclassified" />
+    </collection>
+    <collection label="Reports">
+        <saved source="unclassified" />
+    </collection>
+</nav>

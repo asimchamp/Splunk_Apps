@@ -1,0 +1,44 @@
+<form stylesheet="inpage_drilldown_form.css" script="inpage_drilldown_form_binary.js">
+  <label>NVD | Drilldown | Binary</label>
+  <description></description>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="text" token="guid" searchWhenChanged="true"></input>
+    <input type="text" token="md5" searchWhenChanged="true"></input>
+  </fieldset>
+  <row>
+    <panel>
+      <table id="master">
+        <title>Binaries With NVD Hits</title>
+        <search>
+          <query>sourcetype=ziften:zenith:alert feed="nvd"|stats first(imagefilepath) as "Sample Path" first(details) as details dc(agentguid) as "Unique MD5 Prev" count as "Gross MD5 Count" min(_time) as "First Seen" max(_time) as "Last Seen" by imagefilemd5|lookup image_info imagefilemd5|sort -"Unique MD5 Prev" |convert ctime("First Seen") ctime("Last Seen")|makemv delim="," details|eval "CVE Count"=mvcount(details)| fields imagefilemd5 "CVE Count" "Sample Path"  companyname fileversion productversion "Unique MD5 Prev" "Gross MD5 Count" "First Seen" "Last Seen"</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="detail">
+        <title>Systems With NVD Binaries</title>
+        <search>
+          <query>sourcetype=ziften:zenith:alert feed="nvd" |where imagefilemd5="$md5$" |makemv delim="," details |stats first(imagefilepath) as "Sample Path"  values(details) as "CVEs" values(accountname) as "Seen User Associations" by agentguid |lookup system_info agentguid|fields computername  "Sample Path" "CVEs" agentguid</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

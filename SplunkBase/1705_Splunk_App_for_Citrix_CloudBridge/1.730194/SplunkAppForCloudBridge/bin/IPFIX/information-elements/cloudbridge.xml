@@ -1,0 +1,557 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="ipfix.xsl"?>
+<?oxygen RNGSchema="ipfix.rng" type="xml"?>
+<registry xmlns="http://www.iana.org/assignments" id="ipfix">
+    <title>Cloudbridge information elements</title>
+    <created>2007-05-10</created>
+    <updated>2012-09-20</updated>
+    <note>For the IPFIX schema, please see <xref type="uri" data="http://www.iana.org/assignments/xml-registry/schema/ipfix.xsd"/>.</note>
+
+    <registry id="ipfix-information-elements">
+        <title>Cloudbridge-specific IPFIX Information Elements</title>
+        <registration_rule>16734</registration_rule>
+        <expert></expert>
+        <xref type="rfc" data="rfc5102"/>
+
+             <record>
+                <name>deviceInstanceId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27233</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sessionId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27234</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>cbConnectionId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27235</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connectionState</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27237</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>partnerCbInstanceId</name>
+                <dataType>ipv4Address</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27239</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>wanSendDeltaPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27262</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>wanRecvDeltaPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27263</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanSendDeltaPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27264</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanRecvDeltaPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27265</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>wanSendDeltaBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27240</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>wanRecvDeltaBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27241</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanSendDeltaBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27242</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanRecvDeltaBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27243</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanWanByteRatio</name>
+                <dataType>float32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27272</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanSideTcpRtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27244</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>wanSideTcpRtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27245</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>compressionClearTextDeltaBytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27246</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>compressionCipherTextDeltaBytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27247</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>decompressionClearTextDeltaBytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27248</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>decompressionCipherTextDeltaBytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27249</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>compressionRatio</name>
+                <dataType>float32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27250</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>fastRTOs</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27251</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>slowRTOs</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27252</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connectionDuration</name>
+                <dataType>dateTimeSeconds</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27253</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connectionIdleTime</name>
+                <dataType>dateTimeSeconds</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27254</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>updateInterval</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27255</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>configuredAccelerationPolicy</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27273</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>negotiatedAccelerationPolicy</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27274</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>cbPartnerType</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27275</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>cbBrandingModel</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27277</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sendDeltaPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27282</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>recvDeltaPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27283</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>sendDeltaBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27284</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>recvDeltaBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27285</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>connUnacceleratedReasonCode</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27256</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientRetransmitBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27332</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>clientRetransmitPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27333</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverRetransmitBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27334</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverRetransmitPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27335</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>retranLanSendBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27336</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>retranWanSendBytes</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27337</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>retranLanSendPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27338</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>retranWanSendPackets</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27339</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>serverFarmName</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27292</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaProtocolType</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27293</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaEncryptionLevel</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27294</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaStreamType</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27295</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>parentAppId</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27343</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>deviceProductId</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27344</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>recordSequenceNumber</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27341</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>launchMechanismStr</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27340</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>systemInitTimeSeconds</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27329</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>observationPointGroupId</name>
+                <dataType>unsigned16</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27330</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaWdRtt</name>
+                <dataType>unsigned32</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27331</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanRecvIcaPriority0Bytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27297</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanRecvIcaPriority1Bytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27298</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanRecvIcaPriority2Bytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27299</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>lanRecvIcaPriority3Bytes</name>
+                <dataType>unsigned64</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27300</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>packetTerminateCmd</name>
+                <dataType>unsigned8</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27301</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+             <record>
+                <name>icaClientLauncher</name>
+                <dataType>string</dataType>
+                <dataTypeSemantics></dataTypeSemantics>
+                <elementId>27302</elementId>
+                <status>current</status>
+                <description></description>
+            </record>
+
+    </registry>
+</registry>

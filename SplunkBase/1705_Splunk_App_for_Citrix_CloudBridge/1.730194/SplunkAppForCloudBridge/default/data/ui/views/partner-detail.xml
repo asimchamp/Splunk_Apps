@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Partner Details</label>
+  
+  <fieldset autoRun="true">
+    <input type="time">
+      <default>Last 24 hours</default>
+    </input>
+    <input type="text" token="partnerCbInstanceId"> 
+        <label>Partner</label>
+    </input> 
+    <input type="dropdown" token="observerId">
+       <label>Observer</label>
+       <choice value="*">All</choice>
+       <populatingSearch fieldForValue="observationPointId" fieldForLabel="Address">
+           | inputlookup CloudBridgeObserver.csv
+       </populatingSearch>
+       <default>*</default>
+    </input>
+  </fieldset>
+ 
+  <row>
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Bandwidth Savings: </option>
+        <searchString>
+            index=cloudbridge (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") 
+            | join type=inner connectionId [search index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$ ]
+            | `BW_SAVINGS_PERCENT`
+        </searchString>
+    </single>
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Compression Ratio: </option>
+        <searchString>
+            index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$| 
+            `COMPRESSION_RATIO`
+        </searchString>
+    </single>
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">Connections: </option>
+        <searchString>
+            index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$| 
+            stats count by `CONNECTION` |
+            stats count
+        </searchString>
+    </single>
+  </row>
+
+  <row>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Clients: </option>
+      <searchString>
+            index=cloudbridge TemplateName="256_INGRESS" flowId = 1 
+            | join type=inner connectionId [search index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$ ]
+            | stats distinct_count(sourceIPv4Address) AS cnt | fields cnt
+      </searchString>
+    </single>
+    <single>
+      <option name="additionalClass">singleValueCompact</option>
+      <option name="beforeLabel">Avg WAN Latency(RTT): </option>
+      <option name="afterLabel">ms</option>
+      <searchString>
+           index=cloudbridge TemplateName="257_EGRESS" flowId = 4  roundTripTime >= 0
+           | join type=inner connectionId [search index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$ ]
+           | stats avg(roundTripTime) as avg_wan_latency | fields avg_wan_latency
+        </searchString>
+    </single>
+    <single>
+        <option name="additionalClass">singleValueCompact</option>
+        <option name="beforeLabel">WAN RTOs: </option>
+        <searchString>
+            index=cloudbridge TemplateName="257_EGRESS" flowId = 4  roundTripTime >= 0 
+           | join type=inner connectionId [search index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$ ]
+           | stats sum(slowRTOs) AS wan_rtos | fields wan_rtos
+         </searchString>
+    </single>
+  </row>
+
+  <row>
+    <chart>
+        <searchString>
+            index=cloudbridge (TemplateName="256_INGRESS" OR TemplateName="257_EGRESS") (flowId=1 OR flowId=4) 
+           | join type=inner connectionId [search index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$ ]
+           | eval sent=if(flowId==4, octetDeltaCount, 0) 
+           | eval received=if(flowId==1, octetDeltaCount, 0) 
+           | eval sent= `BYTES_TO_MBITS(sent)` 
+           | eval received = `BYTES_TO_MBITS(sent)` 
+           | timechart per_second(sent) AS "Sent" per_second(received) AS "Received"      
+        </searchString>
+        <title>WAN Throughput</title>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option> 
+        <option name="charting.axisTitleY.text">Mbps</option> 
+    </chart>
+  </row>
+
+  <row>
+    <chart>
+        <searchString>
+            index=cloudbridge (TemplateName="257_EGRESS") (flowId=2 OR flowId=4) roundTripTime >= 0
+           | join type=inner connectionId [search index=cloudbridge TemplateName="604_ACCELERATED" partnerCbInstanceId=$partnerCbInstanceId$ ]
+           | eval type = if(flowId = 4, "WAN", "LAN") 
+           | timechart avg(roundTripTime) by type
+        </searchString>
+        <title>Latency(RTT)</title>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option> 
+        <option name="charting.axisTitleY.text">ms</option> 
+    </chart>
+  </row>
+   
+</form>

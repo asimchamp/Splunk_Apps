@@ -1,0 +1,35 @@
+<form version="1.1">
+  <label>Switch Inventory Chart</label>
+  <fieldset autoRun="true" submitButton="false">
+    <html>
+         <p>Filter using any field [ switchname=* make=* model=* description=* serialnum=* switchtype=* systemmacaddr=* mfgdate=* ]</p>
+      </html>
+    <input type="text" token="Switch_inventory_switch_name">
+      <default>switchname=*</default>
+      <suffix/>
+    </input>
+    <input type="time" token="Switch_inventorytimerange" searchWhenChanged="true">
+      <default>All time</default>
+      <label></label>
+      <default>
+        <earliest>-15m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Matching Events</title>
+        <search>
+          <query>
+                  sourcetype="arista_switch_inventory" AristaSwitchInventory $Switch_inventory_switch_name$ | table switchname, make, model, description, serialnum, switchtype, systemmacaddr, mfgdate | dedup serialnum | sort switchname | stats count by model
+          </query>
+          <earliest>$Switch_inventorytimerange.earliest$</earliest>
+          <latest>$Switch_inventorytimerange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+  </row>
+</form>

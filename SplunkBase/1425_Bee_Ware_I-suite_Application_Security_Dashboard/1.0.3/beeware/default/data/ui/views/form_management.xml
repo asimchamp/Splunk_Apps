@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+  <label>Management</label>
+  	<searchTemplate>sourcetype=beeware AND (bw_eventlogs_class="USERS" OR bw_eventlogs_class="APPLY" OR bw_eventlogs_class="SYSTEM" OR bw_eventlogs_class="ENGINE" OR bw_eventlogs_class="UPDATE") bw_ibox_name="$bw_ibox_name$" | fields bw_eventlogs_class users_authresult bw_ibox_name bw_eventlogs_message users_src_ip users_username </searchTemplate>    
+    <fieldset autoRun="true">
+        <input type="dropdown" token="bw_ibox_name">
+   <label>filter by ibox name </label>
+   <populatingSearch fieldForValue="bw_ibox_name" fieldForLabel="bw_ibox_name"><![CDATA[sourcetype=beeware AND (bw_eventlogs_class="USERS" OR bw_eventlogs_class="APPLY" OR bw_eventlogs_class="SYSTEM" OR bw_eventlogs_class="ENGINE" OR bw_eventlogs_class="UPDATE") | table bw_ibox_name | dedup bw_ibox_name]]></populatingSearch>
+<choice value="*">All</choice>
+</input>
+
+        <input type="time">
+      <default>Last 4 hours</default>
+    </input>
+  </fieldset>
+
+  <row>
+    <single>
+      <searchPostProcess>search bw_eventlogs_class="USERS" users_authresult = "Access Denied" | stats count(users_authresult) as result | rangemap field=result low=0-5 elevated=10-20 default=severe</searchPostProcess>
+      <title>Authentications failed</title>
+    </single>
+    <single>
+      <searchPostProcess>search bw_eventlogs_class="USERS" users_authresult = "Access granted" | stats count(users_authresult) as result </searchPostProcess>
+      <title>Logins</title>
+    </single>
+	<single>
+      <searchPostProcess> search bw_eventlogs_class="APPLY" | stats count(bw_eventlogs_class) as result </searchPostProcess>
+		<title>Configuration changes</title>
+    </single>
+  </row>
+
+  <row>
+    <table>
+      <searchPostProcess>table _time bw_ibox_name bw_eventlogs_message | rename bw_ibox_name AS ibox bw_eventlogs_message as message </searchPostProcess>
+        <option name="count">10</option>
+        <title>Management actions</title>
+    </table>
+
+  </row>
+
+  <row>
+    <table>
+      <searchPostProcess>search bw_eventlogs_class="USERS" users_authresult = "Access Denied" | stats count(users_authresult) as Hits by users_src_ip | sort -Hits | rename users_src_ip as "source IP"</searchPostProcess>
+      <title>Failed authentications attemps by IP</title>
+        <option name="dataOverlayMode">heatmap</option>
+    </table>
+    <table>
+      <searchPostProcess>search bw_eventlogs_class="USERS" users_authresult = "Access Denied" | stats count(users_authresult) as Hits by users_username | sort -Hits | rename users_username  as "username" </searchPostProcess>
+        <option name="dataOverlayMode">heatmap</option>
+      <title>Failed authentications attemps by username</title>
+    </table>
+   </row>
+
+   <row>
+    <chart>
+      <searchPostProcess>search bw_eventlogs_class=APPLY | stats count(bw_eventlogs_class) as changes by bw_ibox_name | rename bw_ibox_name as ibox</searchPostProcess>
+      <title>Configuration changes by ibox</title>
+      <option name="charting.chart">bar</option>
+    </chart>
+       
+  </row>
+
+  <row>
+    <table>
+      <searchPostProcess>search bw_eventlogs_class="UPDATE" | table _time bw_ibox_name bw_eventlogs_message | rename bw_ibox_name as ibox bw_eventlogs_message as message </searchPostProcess>
+      <title>Update operations history</title>
+    </table>
+    <table>
+      <searchPostProcess>search bw_eventlogs_class="SYSTEM" bw_eventlogs_message="*backup*" | table _time bw_ibox_name bw_eventlogs_message | rename bw_ibox_name as ibox bw_eventlogs_message as message </searchPostProcess>
+      <title>Backup operations history</title>
+    </table>
+      
+  </row>
+
+</form>

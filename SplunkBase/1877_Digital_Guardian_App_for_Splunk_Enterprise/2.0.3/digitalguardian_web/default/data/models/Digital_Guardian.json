@@ -1,0 +1,374 @@
+{
+    "modelName": "Digital_Guardian",
+    "displayName": "Digital Guardian",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 3,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "DG_Event",
+            "displayName": "DG Event",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "Application",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Application",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "command",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "command",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Computer_Name",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Computer_Name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "DNS_Hostname",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "DNS_Hostname",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Operation",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Operation",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "User_Name",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "User_Name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Email_Domain",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Email_Domain",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Source_Directory",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Source_Directory",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Source_File_Extension",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Source_File_Extension",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Destination_Directory",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Destination_Directory",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Destination_File_Extension",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Destination_File_Extension",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Event_ID",
+                    "owner": "DG_Event",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Event_ID",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "`index_macro` `events_sourcetype`",
+                    "owner": "DG_Event"
+                }
+            ],
+            "lineage": "DG_Event"
+        },
+        {
+            "objectName": "DG_Alert",
+            "displayName": "DG Alert",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "command",
+                    "owner": "DG_Alert",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "command",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "`index_macro` `alerts_sourcetype`",
+                    "owner": "DG_Alert"
+                }
+            ],
+            "lineage": "DG_Alert"
+        },
+        {
+            "objectName": "DG_Process",
+            "displayName": "DG Process",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "command",
+                    "owner": "DG_Process",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "command",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "`index_macro` `process_sourcetype`",
+                    "owner": "DG_Process"
+                }
+            ],
+            "lineage": "DG_Process"
+        }
+    ],
+    "objectNameList": [
+        "DG_Event",
+        "DG_Alert",
+        "DG_Process"
+    ]
+}

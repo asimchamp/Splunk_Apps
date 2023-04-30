@@ -1,0 +1,135 @@
+<form version="1.1">
+  <label>ISE Unknown Devices - Specific Location</label>
+
+  <fieldset autoRun="false">
+    
+    <input type="dropdown" token="location">
+      <label>Location:</label>
+      <fieldForLabel>Location</fieldForLabel>
+      <fieldForValue>Location</fieldForValue>
+      <search>
+        <query>
+        | inputlookup ISE_Locations.csv
+        </query>
+      </search>
+    </input>
+    
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    
+  </fieldset>
+  
+  <row>
+    <panel>
+      <html>
+        <p>This dashboard and these panels extract device information for a specific location for all users.</p>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <chart>
+        <title>Unknown Devices Operational View</title>
+        <search>
+          <query>
+          eventtype=cisco-ise EndPointMatchedProfile="Unknown" Location="$location$" | chart count by Location
+        </query>
+      </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  
+  <row>
+    <panel>
+      <chart>
+        <title>Unknown Devices - Passed Authentication </title>
+        <search>
+          <query>
+          eventtype=cisco-ise-passed-authentication EndPointMatchedProfile="Unknown" Location="$location$" | chart count by UserName
+        </query>
+      </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <search>
+          <query>
+          eventtype=cisco-ise-passed-authentication EndPointMatchedProfile="Unknown" Location="$location$" |
+    fillnull value="NULL" EapAuthentication |
+          stats count by EndPointMACAddress UserName IdentityGroup AuthenticationMethod EapAuthentication NAS_IP_Address NAS_Port NetworkDeviceName NetworkDeviceGroups AuthenticationIdentityStore |
+          `format_field_names`
+        </query>
+      </search>
+      </table>
+    </panel>
+  </row>
+  
+  <row>
+    <panel>
+      <chart>
+        <title>Unknown Devices - Failed Authentication </title>
+        <search>
+          <query>
+          eventtype=cisco-ise-failed-authentication EndPointMatchedProfile="Unknown" Location="$location$" | chart count by FailureReason
+        </query>
+      </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <search>
+          <query>
+          eventtype=cisco-ise-failed-authentication EndPointMatchedProfile="Unknown" Location="$location$" |
+    fillnull value="NULL" EapAuthentication |
+          stats count by FailureReason EndPointMACAddress UserName IdentityGroup AuthenticationMethod EapAuthentication NAS_Identifier NAS_IP_Address NAS_Port NetworkDeviceName NetworkDeviceGroups  |
+          `format_field_names`
+        </query>
+      </search>
+      </table>
+    </panel>
+  </row>
+</form>

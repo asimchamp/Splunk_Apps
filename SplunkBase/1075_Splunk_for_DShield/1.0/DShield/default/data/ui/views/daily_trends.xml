@@ -1,0 +1,92 @@
+<view autoCancelInterval="90" isVisible="true" objectMode="SimpleDashboard" onunloadCancelJobs="true" refresh="-1" template="dashboard.html">
+  <label>DShield trends</label>
+  <module name="AccountBar" layoutPanel="appHeader"/>
+  <module name="AppBar" layoutPanel="navigationHeader"/>
+  <module name="Message" layoutPanel="messaging">
+    <param name="filter">*</param>
+    <param name="clearOnJobDispatch">False</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="Message" layoutPanel="navigationHeader">
+    <param name="filter">splunk.search.job</param>
+    <param name="clearOnJobDispatch">True</param>
+    <param name="maxSize">1</param>
+  </module>
+  <module name="HiddenSearch" layoutPanel="panel_row1_col1" group="Distinct attacker source IPs per day" autoRun="True">
+    <param name="search">index=dshield sourcetype=dshield | timechart span=1d dc(SourceIP) AS DistinctAttackers</param>
+
+    <module name="TimeRangePicker">
+      <param name="default">Last 7 days</param>
+      <param name="searchWhenChanged">True</param>
+
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="enable">True</param>
+            <param name="display">False</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">column</param>
+              <module name="FlashChart">
+                <param name="width">100%</param>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+      </module>
+    </module>
+  </module>
+
+  <module name="HiddenSearch" layoutPanel="panel_row2_col1" group="DShield reports per day" autoRun="True">
+    <param name="search">index=dshield sourcetype=dshield | timechart span=1d sum(Reports) AS TotalReports</param>
+
+    <module name="TimeRangePicker">
+      <param name="default">Last 7 days</param>
+      <param name="searchWhenChanged">True</param>
+
+    <module name="ViewstateAdapter">
+      <param name="suppressionList">
+        <item>charting.chart</item>
+      </param>
+      <module name="HiddenFieldPicker">
+        <param name="strictMode">True</param>
+        <module name="JobProgressIndicator">
+          <module name="EnablePreview">
+            <param name="enable">True</param>
+            <param name="display">False</param>
+            <module name="HiddenChartFormatter">
+              <param name="charting.chart">column</param>
+              <module name="FlashChart">
+                <param name="width">100%</param>
+                <module name="ConvertToDrilldownSearch">
+                  <module name="ViewRedirector">
+                    <param name="viewTarget">flashtimeline</param>
+                  </module>
+                </module>
+              </module>
+              <module name="ViewRedirectorLink">
+                <param name="viewTarget">flashtimeline</param>
+              </module>
+            </module>
+          </module>
+        </module>
+      </module>
+      </module>
+    </module>
+  </module>
+
+</view>
+

@@ -1,0 +1,294 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form version="1.1" script="main.js" stylesheet="main.css">
+
+   <label>Session Info: VMware</label>
+   <description>This dashboard displays detailed information about VMware RDP/PCoIP sessions.</description>
+
+   <fieldset autoRun="true">
+      <input type="time" searchWhenChanged="true">
+         <label>Time range:</label>
+         <default>
+            <earliest>-1h</earliest>
+            <latest>now</latest>
+         </default>
+         <change>
+            <eval token="TimeRangePickerSpan">relative_time(now(), latest) - relative_time(now(), earliest)</eval>
+            <eval token="PivotPeriodAutoSolo">case('TimeRangePickerSpan' &lt; 350000, "auto", 'TimeRangePickerSpan' &lt; 610000, "hour", 1=1, "auto")</eval>
+            <eval token="PivotPeriodAutoTimechart">case('TimeRangePickerSpan' &lt; 1200, "second", 'TimeRangePickerSpan' &lt; 300000, "minute", 'TimeRangePickerSpan' &lt; 700000, "hour", 1=1, "day")</eval>
+         </change>
+      </input>
+      <input type="dropdown" token="FilterField" id="Input_FilterField">
+         <label>Filter field:</label>
+      </input>
+      <input type="dropdown" token="FilterOperator" id="Input_FilterOperator">
+         <label>Filter operator:</label>
+      </input>
+      <input type="text" token="FilterExpression" id="Input_FilterExpression">
+         <label>Filter expression:</label>
+         <default>*</default>
+      </input>
+      <input type="dropdown" token="FilterField2" id="Input_FilterField2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterOperator2" id="Input_FilterOperator2" depends="$FilterLevel2$">
+      </input>
+      <input type="text" token="FilterExpression2" id="Input_FilterExpression2" depends="$FilterLevel2$">
+      </input>
+      <input type="dropdown" token="FilterField3" id="Input_FilterField3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterOperator3" id="Input_FilterOperator3" depends="$FilterLevel3$">
+      </input>
+      <input type="text" token="FilterExpression3" id="Input_FilterExpression3" depends="$FilterLevel3$">
+      </input>
+      <input type="dropdown" token="FilterField4" id="Input_FilterField4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterOperator4" id="Input_FilterOperator4" depends="$FilterLevel4$">
+      </input>
+      <input type="text" token="FilterExpression4" id="Input_FilterExpression4" depends="$FilterLevel4$">
+      </input>
+      <input type="dropdown" token="FilterField5" id="Input_FilterField5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterOperator5" id="Input_FilterOperator5" depends="$FilterLevel5$">
+      </input>
+      <input type="text" token="FilterExpression5" id="Input_FilterExpression5" depends="$FilterLevel5$">
+      </input>
+      <input type="dropdown" token="FilterField6" id="Input_FilterField6" depends="$FilterLevel6$">
+      </input>
+      <input type="dropdown" token="FilterOperator6" id="Input_FilterOperator6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterExpression6" id="Input_FilterExpression6" depends="$FilterLevel6$">
+      </input>
+      <input type="text" token="FilterLevels" id="Input_FilterLevels" depends="$FilterLevels_Hidden$">
+      </input>
+      <input type="text" token="FilterDatamodel" id="Input_FilterDatamodel" depends="$FilterDatamodel_Hidden$">
+         <default>Session_SessionDetail_Users</default>
+      </input>
+   </fieldset>
+
+   <search id="Search_Single">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            dc(SessionClientName) as SessionClientNameCount
+            dc(SessionClientPlatform) as SessionClientPlatformCount
+            dc(SessionClientIdVmw) as SessionClientIdVmwCount
+            dc(SessionClientIp) as SessionClientIpCount
+            filter SessionBrokerType is "VMware"
+            $SearchFilter$
+      </query>
+   </search>
+   
+   <!-- Row 1 -->
+   <row>
+      <panel>
+         <title>Totals for all sessions</title>
+         <viz type="uberAgent.uberagent-singlevalue">
+            <search base="Search_Single" />
+            <option name="uberAgent.uberagent-singlevalue.1-field">SessionClientPlatformCount</option>
+            <option name="uberAgent.uberagent-singlevalue.1-title">Client platforms:</option>
+            <option name="uberAgent.uberagent-singlevalue.1-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.2-field">SessionClientNameCount</option>
+            <option name="uberAgent.uberagent-singlevalue.2-title">Client names:</option>
+            <option name="uberAgent.uberagent-singlevalue.2-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.3-field">SessionClientIpCount</option>
+            <option name="uberAgent.uberagent-singlevalue.3-title">Client IPs:</option>
+            <option name="uberAgent.uberagent-singlevalue.3-afterLabel"></option>
+            <option name="uberAgent.uberagent-singlevalue.4-field">SessionClientIdVmwCount</option>
+            <option name="uberAgent.uberagent-singlevalue.4-title">Client IDs:</option>
+            <option name="uberAgent.uberagent-singlevalue.4-afterLabel"></option>
+         </viz>
+      </panel>
+   </row>
+   
+   <search id="Search_Charts">
+      <query>
+         | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+            dc(SessionClientName) as DcSessionClientName
+            splitrow
+               SessionClientTimezoneVmw
+            splitrow
+               SessionClientPlatform
+            filter SessionBrokerType is "VMware"
+            $SearchFilter$
+      </query>
+   </search>
+   
+   <!-- Row 2 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Client timezones (top 10)</title>
+         <chart>
+            <search base="Search_Charts">
+               <query>
+                  fields
+                     SessionClientTimezoneVmw
+                     DcSessionClientName
+                  | rename
+                     DcSessionClientName as "Clients per timezone"
+                     SessionClientTimezoneVmw as "Client timezone"
+                  | sort limit=10 - "Clients per timezone"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Client platforms (top 10)</title>
+         <chart>
+            <search base="Search_Charts">
+               <query>
+                  fields
+                     SessionClientPlatform
+                     DcSessionClientName
+                  | rename
+                     DcSessionClientName as "Clients per platform"
+                     SessionClientPlatform as "Client platform"
+                  | sort limit=10 - "Clients per platform"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   
+   <!-- Row 3 -->
+   <row>
+
+      <!-- Column 1 -->
+      <panel>
+         <title>Session connection states</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     count(SessionConnectionState) as "Connection state count"
+                     splitrow
+                        SessionConnectionState
+                     filter SessionBrokerType is "VMware"
+                     $SearchFilter$
+                  | sort limit=10 - "Connection state count"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+
+      <!-- Column 2 -->
+      <panel>
+         <title>Published names used to launch sessions (top 10)</title>
+         <chart>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     latest(SessionPublishedName) as "Published name"
+                     splitrow
+                        SessionGUID
+                     filter SessionBrokerType is "VMware"
+                     $SearchFilter$
+                  | top "Published name" showcount=false percentfield="Published name percentage"
+               </query>
+            </search>
+            <option name="height">250</option>
+            <option name="charting.chart">bar</option>
+            <option name="charting.legend.placement">none</option>
+            <option name="charting.axisTitleX.visibility">collapsed</option>
+            <option name="charting.drilldown">none</option>
+         </chart>
+      </panel>
+   </row>
+
+   <!-- Row 5 -->
+   <row>
+      <panel>
+         <title>Data table</title>
+         <table>
+            <search>
+               <query>
+                  | pivot `uA_DM_Session_SessionDetail_Users` Session_SessionDetail_Users
+                     latest(SessionUserLower) as User
+                     latest(host) as Host
+                     latest(SessionID) as ID
+                     latest(SessionLogonTime) as SessionLogonTime
+                     latest(_time) as LastSeen
+                     latest(SessionProtocol) as "Protocol"
+                     latest(SessionConnectionState) as "Last state"
+                     values(SessionClientName) as "Client name(s)"
+                     values(SessionClientIp) as "Client IP(s)"
+                     values(SessionClientPlatform) as "Client platform(s)"
+                     values(SessionClientTimezoneVmw) as "Client timezone(s)"
+                     values(SessionClientVersion) as "Client version(s)"
+                     latest(SessionDisplaySpecs) as "Display specs"
+                     values(SessionPublishedName) as "Pub. name"
+                     latest(SessionTypeVmw) as "Session type"
+                     latest(SessionBrokerDnsVmw) as "Broker"
+                     splitrow
+                        SessionGUID
+                     filter SessionBrokerType is "VMware"
+                     $SearchFilter$
+                  | join type=outer SessionGUID 
+                     [
+                        | pivot `uA_DM_Logoff_LogoffDetail` Logoff_LogoffDetail
+                           latest(SessionEndTime) as SessionEndTime
+                           splitrow
+                              SessionGUID
+                        | fields + SessionGUID SessionEndTime
+                     ]
+                  | eval "Last seen"=strftime(strptime(LastSeen, "%Y-%m-%dT%H:%M:%S.%Q%z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Logon time"=strftime(strptime(SessionLogonTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval "Session end"=strftime(strptime(SessionEndTime,"%Y-%m-%d %H:%M:%S.%Q %z"), "%Y-%m-%d %H:%M:%S")
+                  | eval sortfield=lower('Logon time')
+                  | sort limit=0 -sortfield
+                  | table
+                     SessionGUID
+                     User
+                     Host
+                     ID
+                     "Logon time"
+                     "Last seen"
+                     "Session end"
+                     "Protocol"
+                     "Last state"
+                     "Client name(s)"
+                     "Client IP(s)"
+                     "Client platform(s)"
+                     "Client timezone(s)"
+                     "Client version(s)"
+                     "Display specs"
+                     "Pub. name"
+                     "Session type"
+                     "Broker"
+               </query>
+            </search>
+            <fields>User,Host,ID,"Logon time","Last seen","Session end","Protocol","Last state","Client name(s)","Client IP(s)","Client platform(s)","Client timezone(s)","Client version(s)","Display specs","Pub. name","Session type","Broker"</fields>
+            <option name="count">50</option>
+            <option name="drilldown">row</option>
+            <drilldown>
+               <link>
+                  <![CDATA[
+                     analyze_timechart?earliest=$earliest$&latest=$latest$&form.FilterDatamodel=Session_SessionDetail_Users&form.FilterField=sSessionGUID&form.FilterOperator=in&form.FilterExpression=$row.SessionGUID$
+                  ]]>
+               </link>
+            </drilldown>
+         </table>
+
+      <html src="session_info_vmw_explanation.html">
+      </html>
+      </panel>
+   </row>
+
+</form>

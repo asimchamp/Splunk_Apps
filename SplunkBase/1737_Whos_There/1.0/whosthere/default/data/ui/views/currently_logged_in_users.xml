@@ -1,0 +1,55 @@
+<form>
+  <label>Splunk users monitoring</label>
+  <fieldset submitButton="false" autoRun="true"/>
+  <row>
+    <panel>
+      <table>
+        <title>Currently logged in users</title>
+        <searchString>index=_internal (action=login OR action=logout) sourcetype="splunk_web_service" | stats latest(action) AS lastAction by user,clientip,session | where lastAction="login" | JOIN type=inner session [| rest /services/authentication/httpauth-tokens | search (NOT userName="splunk-system-user") searchId="" | rename authString as session] | fields user, clientip, timeAccessed</searchString>
+        <earliestTime>rt-1d</earliestTime>
+        <latestTime>rt</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="time" token="field1" searchWhenChanged="true">
+        <label/>
+        <default>
+          <earliestTime>@d</earliestTime>
+          <latestTime>now</latestTime>
+        </default>
+      </input>
+      <chart>
+        <title>Activity by user</title>
+        <searchString>index=_internal sourcetype=splunk_web_access user!="-" (uri_path="*/app/*" OR uri_path="*/manager/*" OR uri_path="*/debug/*") | eval usr = toString(user) + "-" + toString(clientip) | timechart count by usr</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

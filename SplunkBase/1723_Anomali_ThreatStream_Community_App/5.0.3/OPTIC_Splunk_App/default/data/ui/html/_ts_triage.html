@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Matches</title>
+    <link rel="shortcut icon" href="{{SPLUNKWEB_URL_PREFIX}}/static/img/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/build/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="{{SPLUNKWEB_URL_PREFIX}}/static/css/build/pages/dashboard-simple-bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/OPTIC_Splunk_App/dashboard.css" />
+</head>
+<style>
+	.edit-dashboard-menu {
+		padding-top: 0 !important;
+	}
+</style>
+<body class="simplexml preload locale-en">
+<!--
+BEGIN LAYOUT
+This section contains the layout for the dashboard. Splunk uses proprietary
+styles in <div> tags, similar to Bootstrap's grid system.
+-->
+<a class="navSkip" href="#navSkip" tabindex="1">Screen reader users, click here to skip the navigation bar</a>
+<div class="header splunk-header">
+        <div id="placeholder-splunk-bar">
+            <a href="{{SPLUNKWEB_URL_PREFIX}}/app/launcher/home" class="brand" title="splunk &gt; listen to your data">splunk<strong>&gt;</strong></a>
+        </div>
+            <div id="placeholder-app-bar"></div>
+</div>
+<a id="navSkip"></a>
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+    <div class="dashboard-header clearfix" style="margin-bottom: 0;">        
+        <h2>Matches</h2>
+        <div class="threatAd" style="float:right; margin-top: 10px;">
+	        <div class="bgBox">
+	            <img src="{{SPLUNKWEB_URL_PREFIX}}/static/app/OPTIC_Splunk_App/images/01_magglass_small.png"/>
+	            <div class="threatInfo">
+	                <span class="threatHead"><b>ADVANCED THREAT MATCHING</b></span>
+	                <div class="threatDetail">Check for matches against 1M+ IOCs from the Anomali Threat Database.</div>
+	                <span class="learnMore"><b>Learn More</b></span>
+	                <span class="sliderText">ENABLE</span>
+	                <span class="slider off">&nbsp;</span>
+	            </div>
+	        </div>
+	    </div>
+    </div>
+    <div class="fieldset">
+        <div class="input input-dropdown" id="input1">
+            <label>Impact Type</label>
+        </div>
+        <div class="input input-text" id="input2">
+            <label>Minimum Confidence</label>
+        </div>
+        <div class="input input-dropdown" id="input3">
+            <label>Associated Bulletin</label>
+        </div>
+        <div class="input input-multiselect" id="input4">
+            <label>Status</label>
+        </div>
+        <div class="input input-timerangepicker" id="input5">
+            <label>&nbsp;</label>
+        </div>
+    </div>
+
+
+    <div id="row1" class="dashboard-row dashboard-row1">
+        <div id="panel1" class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel clearfix">
+
+                <div class="panel-element-row">
+                    <div id="element1" class="dashboard-element table" style="width: 100%">
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fpos" class="modal fade" style="display:none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h3 class="modal-title" style="font-size:20px;word-wrap:break-word;">Report&nbsp;<span id="fposName">this IOC</span>&nbsp;as a false positive</h3>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:15px">Why would you like to report this indicator as false positive?</p>
+                <br>
+                <select id="selectReason" style="width:100%;">
+                    <option value="">Select reason</option>
+                    <option value="The indicator used to be malicious but is no longer">The indicator used to be malicious but is no longer</option>
+                    <option value="The indicator may be malicious but it is also serving content that I care about">The indicator may be malicious but it is also serving content that I care about</option>
+                    <option value="The indicator is mislabeled">The indicator is mislabeled (Use text area below to indicate a new label)</option>
+                    <option value="I do not care about this kind of indicator within my environment">I do not care about this kind of indicator within my environment</option>
+                    <option value="The indicator is not malicious and it probably never was">The indicator is not malicious and it probably never was</option>
+                </select>
+                <br>
+                <br>
+                <textarea rows="4" id="comment" style="width:97%; max-height:200px"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="close-modal" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="report">Report</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<div class="footer"></div>
+
+<!--
+END LAYOUT
+-->
+
+<script src="{{SPLUNKWEB_URL_PREFIX}}/config?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/i18n.js"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/i18ncatalog?autoload=1"></script>
+<script src="{{SPLUNKWEB_URL_PREFIX}}/static/js/build/simplexml.min/config.js"></script>
+<script type="text/javascript">
+// <![CDATA[
+require.config({
+	paths: {
+    	cloudMatch: '../app/OPTIC_Splunk_App/cloudMatch'
+    },
+    baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+    waitSeconds: 0 // Disable require.js load timeout
+});
+
+//
+// LIBRARY REQUIREMENTS
+//
+// In the require function, we include the necessary libraries and modules for
+// the HTML dashboard. Then, we pass variable names for these libraries and
+// modules as function parameters, in order.
+//
+// When you add libraries or modules, remember to retain this mapping order
+// between the library or module and its function parameter. You can do this by
+// adding to the end of these lists, as shown in the commented examples below.
+
+require([
+    "splunkjs/mvc",
+    "splunkjs/mvc/utils",
+    "splunkjs/mvc/tokenutils",
+    "underscore",
+    "jquery",
+    "cloudMatch",
+    "splunkjs/mvc/simplexml",
+    "splunkjs/mvc/headerview",
+    "splunkjs/mvc/footerview",
+    "splunkjs/mvc/simplexml/dashboardview",
+    "splunkjs/mvc/simplexml/dashboard/panelref",
+    "splunkjs/mvc/simplexml/element/chart",
+    "splunkjs/mvc/simplexml/element/event",
+    "splunkjs/mvc/simplexml/element/html",
+    "splunkjs/mvc/simplexml/element/list",
+    "splunkjs/mvc/simplexml/element/map",
+    "splunkjs/mvc/simplexml/element/single",
+    "splunkjs/mvc/simplexml/element/table",
+    "splunkjs/mvc/simpleform/formutils",
+    "splunkjs/mvc/simplexml/eventhandler",
+    "splunkjs/mvc/simpleform/input/dropdown",
+    "splunkjs/mvc/simpleform/input/radiogroup",
+    "splunkjs/mvc/simpleform/input/multiselect",
+    "splunkjs/mvc/simpleform/input/checkboxgroup",
+    "splunkjs/mvc/simpleform/input/text",
+    "splunkjs/mvc/simpleform/input/timerange",
+    "splunkjs/mvc/simpleform/input/submit",
+    "splunkjs/mvc/searchmanager",
+    "splunkjs/mvc/savedsearchmanager",
+    'splunkjs/mvc/tableview',
+    "splunkjs/mvc/postprocessmanager",
+    "splunkjs/mvc/simplexml/urltokenmodel"
+    // Add comma-separated libraries and modules manually here, for example:
+    // ..."splunkjs/mvc/simplexml/urltokenmodel",
+    // "splunkjs/mvc/tokenforwarder"
+    ],
+    function(
+        mvc,
+        utils,
+        TokenUtils,
+        _,
+        $,
+        cloudMatch,
+        DashboardController,
+        HeaderView,
+        FooterView,
+        Dashboard,
+        PanelRef,
+        ChartElement,
+        EventElement,
+        HtmlElement,
+        ListElement,
+        MapElement,
+        SingleElement,
+        TableElement,
+        FormUtils,
+        EventHandler,
+        DropdownInput,
+        RadioGroupInput,
+        MultiSelectInput,
+        CheckboxGroupInput,
+        TextInput,
+        TimeRangeInput,
+        SubmitButton,
+        SearchManager,
+        SavedSearchManager,
+        TableView,
+        PostProcessManager,
+        UrlTokenModel
+
+        // Add comma-separated parameter names here, for example:
+        // ...UrlTokenModel,
+        // TokenForwarder
+        ) {
+
+        var pageLoading = true;
+
+
+        //
+        // TOKENS
+        //
+
+        // Create token namespaces
+        var urlTokenModel = new UrlTokenModel();
+        mvc.Components.registerInstance('url', urlTokenModel);
+        var defaultTokenModel = mvc.Components.getInstance('default', {create: true});
+        var submittedTokenModel = mvc.Components.getInstance('submitted', {create: true});
+
+        urlTokenModel.on('url:navigate', function() {
+            defaultTokenModel.set(urlTokenModel.toJSON());
+            if (!_.isEmpty(urlTokenModel.toJSON()) && !_.all(urlTokenModel.toJSON(), _.isUndefined)) {
+                submitTokens();
+            } else {
+                submittedTokenModel.clear();
+            }
+        });
+
+        // Initialize tokens
+        defaultTokenModel.set(urlTokenModel.toJSON());
+
+        function submitTokens() {
+            // Copy the contents of the defaultTokenModel to the submittedTokenModel and urlTokenModel
+            FormUtils.submitForm({ replaceState: pageLoading });
+        }
+
+        function setToken(name, value) {
+            defaultTokenModel.set(name, value);
+            submittedTokenModel.set(name, value);
+        }
+
+        function unsetToken(name) {
+            defaultTokenModel.unset(name);
+            submittedTokenModel.unset(name);
+        }
+        
+        var ep = 'configs/conf-savedsearches/Generating and Uploading Summaries';
+        var service = mvc.createService({ owner: "nobody" });
+
+        function getCloudMatchStatus() {
+            service.get(ep, null, function(err, result) {
+	            if (err) {
+	                console.warn('service.get error', err);
+	            } else {
+	            	var isDisabled = result.data.entry[0].content.disabled;
+	 			    console.log(isDisabled);
+	 			    if(isDisabled) {
+	               		$('span.slider').addClass("off");
+	               		$('.sliderText').html("ENABLE");
+	 			    } else {
+	               		$('span.slider').removeClass("off");
+	               		$('.sliderText').html("DISABLE");
+	 			    }
+	 			}
+        	});
+        }
+
+        function toggleCloudMatchStatus(flag) {
+        	var record = {
+        		"disabled": !flag,
+        	};
+        	var callback = function(err, response) {
+              if (err) {
+                console.log('error while toggleSearch: ' + err);
+              } else {
+                console.log('toggleSearch is successful');
+              }
+          };
+        	service.request(ep, 'POST', null,  null, JSON.stringify(record), {
+        		'Content-Type': 'application/json'
+        	},  callback);
+        }
+
+        //set init status
+        getCloudMatchStatus();
+
+        var currIOC;
+        var addDrop = TableView.BaseCellRenderer.extend({
+            canRender: function(cell) {
+                return _([
+                    'Action'
+                ]).contains(cell.field);
+            },
+            render: function($td, cell) {
+                var data = cell.value;
+                if(!data) {
+                    return;
+                }
+                var values = data.split(',');
+                var markStatus = values[1], ioc = values[0], user = values[2], date = values[3] + "," + values[4];
+                if(markStatus=="new"){
+                    //var selection = $('<select name="options"><option value="new">New</option><option value="falpos">Mark as False Positive</option><option value="ack">Acknowledge</select>');
+                    var selection = $('<div><a href="" value="falpos" title="Mark as False Positive">False Positive</a><span style="color: #333;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="" value="ack" title="Acknowledge">Acknowledge</a></div>');
+                    $td.append(selection);
+                    //selection.on("change", function(evt) {
+                    //    takeAction(selection.val(), ioc);
+                    //})
+                    selection.on("click", function(evt) {
+                      var actionVal = evt.target.getAttribute('value');
+                      takeAction(actionVal, ioc);
+                    });
+                }
+                else{
+                   // get date and display in the html
+                   $td[0].innerHTML = 'User "' + user + '" marked this as ' + markStatus + ' on ' + date;
+                }
+            }
+        });
+
+        function takeAction(action, ioc) {
+            if(action == "falpos") {
+                //false positive
+                currIOC  = ioc;
+                $('#fposName').html('"' + ioc + '"');
+                $('#fpos').modal('show');
+            } else if(action = "ack") {
+                console.log("action: ack");
+                markAck(ioc);
+            }
+
+        }
+
+
+
+        //
+        // SEARCH MANAGERS
+        //
+
+        var _bsearch = '| inputlookup ts_ioc_matches | eval _time=if(isnull(_time), now(), _time) | addinfo | eval info_max_time=if(info_max_time=="+Infinity", info_search_time, info_max_time) | where _time >= info_min_time AND _time <= info_max_time | fillnull value=None ts_tb_id  | fillnull value=new status | search ts_itype=$ts_itype$ |  search ts_confidence>= $ts_confidence$  | search ts_tb_id=*$ts_bulletin$* | where match("$ts_status$", status) | mvexpand sourcetype | eval ts_tb_id=trim(split(ts_tb_id, ",")) | eval review_ioc=ts_lookup_key_value + "," + status + "," + if(isnull(updated_by), "", updated_by) + "," + if(isnull(last_modified), "", last_modified) | fillnull value=Bulletin match_type | stats values(src) as Victim, values(ts_itype) as iType, values(ts_confidence) as Confidence, values(ts_severity) as Severity, values(status) as Status, values(updated_by) as User, values(last_modified) as "Last Updated", sum(count) as count, values(match_type) as match_source by ts_lookup_key_value, review_ioc, ts_tb_id, sourcetype | search ts_tb_id=$ts_bulletin$ | rename ts_lookup_key_value as Indicator | join type=outer ts_tb_id [| inputlookup tm_tipreport | rename id as ts_tb_id | table ts_tb_id, name ]| fields review_ioc, Indicator,  ts_tb_id, name, Victim,  match_source, sourcetype, iType, Confidence, Severity, Status, User, "Last Updated" | rename name as "Bulletin Name", match_source as "Match Source" | join type=outer [ | inputlookup ts_itypes.csv.gz | rename itype as iType | table iType, desc] | rename desc as "Impact Type", review_ioc as Action';
+        var search1 = new SearchManager({
+            "id": "search1",
+            "status_buckets": 0,
+            "sample_ratio": null,
+            "latest_time": "$time_range.latest$",
+            "earliest_time": "$time_range.earliest$",
+            "search": _bsearch,
+            "cancelOnUnload": true,
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true, tokenNamespace: "submitted"});
+
+        var search2 = new SearchManager({
+            "id": "search2",
+            "status_buckets": 0,
+            "sample_ratio": null,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "| inputlookup ts_itypes.csv.gz | table desc, itype",
+            "cancelOnUnload": true,
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true});
+
+        var search3 = new SearchManager({
+            "id": "search3",
+            "status_buckets": 0,
+            "sample_ratio": null,
+            "latest_time": "$latest$",
+            "earliest_time": "$earliest$",
+            "search": "| inputlookup tm_tipreport | table id, name",
+            "cancelOnUnload": true,
+            "app": utils.getCurrentApp(),
+            "auto_cancel": 90,
+            "preview": true,
+            "runWhenTimeIsUndefined": false
+        }, {tokens: true});
+
+        $('span.slider').click(function() {
+        	var elem = $(this);
+        	if(elem.hasClass("off")) {
+        		cloudMatch.toggleCloudIOCMatch(true, function() {
+              		$('.sliderText').html("DISABLE");
+        			elem.toggleClass('off');
+        		}, true);
+        	} else {
+        		cloudMatch.toggleCloudIOCMatch(false, function() {
+              		$('.sliderText').html("ENABLE");
+        			elem.toggleClass('off');
+        		}, true);
+        	}
+        });
+        $('.learnMore').click(function() {
+          var elem = $('span.slider');
+          if(elem.hasClass("off")) {
+        		cloudMatch.toggleCloudIOCMatch(true, function() {
+              		$('.sliderText').html("DISABLE");
+        			elem.toggleClass('off');
+        		}, false);
+        	} else {
+        		cloudMatch.toggleCloudIOCMatch(false, function() {
+              		$('.sliderText').html("ENABLE");
+        			elem.toggleClass('off');
+        		}, false);
+        	}
+        });
+
+        //
+        // SPLUNK HEADER AND FOOTER
+        //
+
+        new HeaderView({
+            id: 'header',
+            section: 'dashboards',
+            el: $('.header'),
+            acceleratedAppNav: true,
+            useSessionStorageCache: true,
+            splunkbar: true,
+            appbar: true,
+            litebar: false,
+        }, {tokens: true}).render();
+
+        new FooterView({
+            id: 'footer',
+            el: $('.footer')
+        }, {tokens: true}).render();
+
+
+        //
+        // DASHBOARD EDITOR
+        //
+
+        new Dashboard({
+            id: 'dashboard',
+            el: $('.dashboard-body'),
+            showTitle: true,
+            editable: true
+        }, {tokens: true}).render();
+
+
+        //
+        // VIEWS: VISUALIZATION ELEMENTS
+        //
+
+        var element1 = new TableElement({
+            "id": "element1",
+            "count": 10,
+            "dataOverlayMode": "none",
+            "drilldown": "cell",
+            "rowNumbers": "false",
+            "wrap": "true",
+            "fields": ["Indicator", "Bulletin Name", "Victim", "Match Source", "Impact Type", "Confidence", "Severity", "Status", "User", "Last Updated", "Action"],
+            "managerid": "search1",
+            "el": $('#element1')
+        }, {tokens: true, tokenNamespace: "submitted"}).render();
+
+
+        element1.on("click", processClick);
+
+        function processClick(e) {
+          e.preventDefault();
+          var data = e.data;
+          console.log(data);
+          var field = e.field;
+          switch(field) {
+              case "Bulletin Name":
+                var bid = data["row.ts_tb_id"];
+                var url = Splunk.util.make_full_url("/");
+                url += "app/OPTIC_Splunk_App/_ts_bulletin_detail?bid=" + bid;
+                window.open(url, "_self");
+                break;
+              case "Action":
+                  //do nothing;
+                  break;
+              case "Indicator":
+            	  var ioc =  data["row.Indicator"];
+            	  var url = "https://reports.anomali.com/detail/" + ioc;
+            	  window.open(url, "_self");
+                  //do nothing;
+                  break;
+              case "Victim":
+                  var prefix = Splunk.util.make_full_url("/") + "app/OPTIC_Splunk_App/";
+                  var query = 'search?q=sourcetype=$row.sourcetype$ $row.Indicator$ | where match("$row.Victim$", src) OR match("$row.Victim$", dest) | eval ts_tb_id=$row.ts_tb_id$ | eval ts_lookup_key_value="$row.Indicator$" | eval tb_title="$row.Bulletin Name$" &earliest=$earliest$&latest=$latest$';
+                  var url = TokenUtils.replaceTokenNames(prefix + query, _.extend(submittedTokenModel.toJSON(), data), TokenUtils.getEscaper('url'));
+                  window.open(url, "_self");
+                  break;
+              default:
+            	  //do nothing
+          }
+        }
+
+        element1.getVisualization(function(tableView) {
+            tableView.table.addCellRenderer(new addDrop());
+            tableView.table.render();
+        });
+
+       $('#report').on("click", function() {
+            reported = true;
+            var reason = document.getElementById('selectReason').value;
+            var comment = document.getElementById('comment').value;
+            markFalsepositive(currIOC, reason, comment);
+        });
+
+        //mark acknowledge
+        function markAck(currIoc) {
+            //console.log(currIoc);
+            var service = mvc.createService({});
+            var currentUser = Splunk.util.getConfigValue("USERNAME");
+            var date = new Date();
+            var searchQuery = '| inputlookup ts_ioc_matches | search ts_lookup_key_value="' + currIoc + '" | eval status="acknowledged" | eval updated_by="' + currentUser + '" | eval last_modified="' + date.toGMTString() + '" | outputlookup append=true ts_ioc_matches';
+            var searchParams = {
+                    exec_mode: "blocking"
+                };
+            // Run a blocking search and get back a job
+            service.search(
+                searchQuery,
+                searchParams,
+                function(err, job) {
+                    // Get the job from the server to display more info
+                    job.fetch(function(err) {
+                        // Get the results and display them
+                        job.results({}, function(err, results) {
+                            if (!err) {
+                                //alert('Added false positive.');
+                                refresh();
+                            } else {
+                                alert('There was an error: ' + err);
+                            }
+                        })
+                    });
+                }
+            );
+         }
+
+        //mark false positive
+        function markFalsepositive(currIoc, reason, comment) {
+            var service = mvc.createService({});
+            var currentUser = Splunk.util.getConfigValue("USERNAME");
+            var date = new Date();
+            var searchQuery = '| inputlookup ts_ioc_matches | search ts_lookup_key_value="' + currIoc + '" | eval status="falsepositive" | eval updated_by="' + currentUser + '" | eval last_modified="' + date.toGMTString() + '" | outputlookup append=true ts_ioc_matches';
+            // Set the search parameters
+            var searchParams = {
+                exec_mode: "blocking"
+            };
+            // Run a blocking search and get back a job
+            service.search(
+                searchQuery,
+                searchParams,
+                function(err, job) {
+                    // Get the job from the server to display more info
+                    job.fetch(function(err) {
+                        // Get the results and display them
+                        job.results({}, function(err, results) {
+                            if (!err) {
+                                //alert('Added false positive.');
+                                refresh();
+                            } else {
+                                alert('There was an error: ' + err);
+                            }
+                        })
+
+                    });
+                }
+            );
+            var searchQuery2 = '| tsreportfalpos reason=' + reason + ' comment=' + comment;
+            // Run a blocking search and get back a job
+            service.search(
+                searchQuery2,
+                searchParams,
+                function(err, job) {
+                    //do nothing
+                }
+            );
+
+            //create an entry in ts_ioc_falsepos
+            var searchQuery3 = '| stats count | eval indicator="' + currIoc + '" | eval updated_by="' + currentUser + '" | eval last_modified="' + date.toGMTString() + '" | eval _time=' + date.getTime()/1000 + ' |outputlookup append=true ts_ioc_falsepos | script ts_remove_falpos';
+            service.search(
+                searchQuery3,
+                searchParams,
+                function(err, job) {
+                    //do nothing
+                }
+            );
+            $('#fpos').modal('hide');
+        }
+
+        function refresh() {
+            search1.startSearch();
+        }
+
+
+        //
+        // VIEWS: FORM INPUTS
+        //
+               //get parameters
+        var bulletinId = Splunk.util.getParameter("bid");
+        var earliest_time =  Splunk.util.getParameter("earliest");
+        var latest_time = Splunk.util.getParameter("latest");
+
+
+        var input1 = new DropdownInput({
+            "id": "input1",
+            "choices": [
+                {"label": "All", "value": "*"}
+            ],
+            "showClearButton": true,
+            "initialValue": "*",
+            "searchWhenChanged": true,
+            "default": "*",
+            "labelField": "desc",
+            "valueField": "itype",
+            "selectFirstChoice": false,
+            "value": "$form.ts_itype$",
+            "managerid": "search2",
+            "el": $('#input1')
+        }, {tokens: true}).render();
+
+        input1.on("change", function(newValue) {
+            FormUtils.handleValueChange(input1);
+        });
+
+        var input2 = new TextInput({
+            "id": "input2",
+            "default": "0",
+            "initialValue": "0",
+            "searchWhenChanged": true,
+            "value": "$form.ts_confidence$",
+            "el": $('#input2')
+        }, {tokens: true}).render();
+
+        input2.on("change", function(newValue) {
+            FormUtils.handleValueChange(input2);
+        });
+
+        var input3 = new DropdownInput({
+            "id": "input3",
+            "choices": [
+                {"label": "All", "value": "*"}
+            ],
+            "showClearButton": true,
+            "initialValue": "*",
+            "searchWhenChanged": true,
+            "default": "*",
+            "labelField": "name",
+            "valueField": "id",
+            "selectFirstChoice": false,
+            "value": "$form.ts_bulletin$",
+            "managerid": "search3",
+            "el": $('#input3')
+        }, {tokens: true}).render();
+
+        input3.on("change", function(newValue) {
+            FormUtils.handleValueChange(input3);
+        });
+        //set bulletin id
+        if(bulletinId) {
+            input3.val(bulletinId);
+        }
+
+        var input4 = new MultiSelectInput({
+            "id": "input4",
+            "choices": [
+                {"label": "New", "value": "new"},
+                {"label": "False Positive", "value": "falsepositive"},
+                {"label": "Acknowledged", "value": "acknowledged"}
+            ],
+            "default": ["new"],
+            "initialValue": ["new"],
+            "searchWhenChanged": true,
+            "value": "$form.ts_status$",
+            "el": $('#input4')
+        }, {tokens: true}).render();
+
+        input4.on("change", function(newValue) {
+            FormUtils.handleValueChange(input4);
+        });
+
+        var input5 = new TimeRangeInput({
+            "id": "input5",
+            "default": {"latest_time": "now", "earliest_time": "0"},
+            "searchWhenChanged": true,
+            "earliest_time": "$form.time_range.earliest$",
+            "latest_time": "$form.time_range.latest$",
+            "el": $('#input5')
+        }, {tokens: true}).render();
+
+        input5.on("change", function(newValue) {
+            FormUtils.handleValueChange(input5);
+        });
+
+        //set time range
+        if(earliest_time && latest_time) {
+            //
+            input5.val({
+                earliest_time: earliest_time,
+                latest_time:latest_time
+            })
+        }
+
+        DashboardController.onReady(function() {
+            if (!submittedTokenModel.has('earliest') && !submittedTokenModel.has('latest')) {
+                submittedTokenModel.set({ earliest: '0', latest: '' });
+            }
+        });
+
+        // Initialize time tokens to default
+        if (!defaultTokenModel.has('earliest') && !defaultTokenModel.has('latest')) {
+            defaultTokenModel.set({ earliest: '0', latest: '' });
+        }
+
+        if (!_.isEmpty(urlTokenModel.toJSON())){
+            submitTokens();
+        }
+
+		document.title = "Matches";
+        //
+        // DASHBOARD READY
+        //
+
+        DashboardController.ready();
+        pageLoading = false;
+
+    }
+);
+// ]]>
+</script>
+</body>
+</html>

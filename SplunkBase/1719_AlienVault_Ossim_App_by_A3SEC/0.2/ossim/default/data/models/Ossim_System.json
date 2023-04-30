@@ -1,0 +1,132 @@
+{
+    "displayName": "Ossim_System", 
+    "modelName": "Ossim_System", 
+    "objectSummary": {
+        "Interfaces": 0, 
+        "Transaction-Based": 0, 
+        "Search-Based": 0, 
+        "Event-Based": 3, 
+        "Interface Implementations": 0
+    }, 
+    "objectNameList": [
+        "Ossim_System", 
+        "WarningPlugin", 
+        "CRITICALEV"
+    ], 
+    "description": "All the Ossim Log Files (sourcetype=ossim_internal)", 
+    "objects": [
+        {
+            "objectName": "Ossim_System", 
+            "displayName": "Ossim_System", 
+            "fields": [
+                {
+                    "fieldName": "plugin_id", 
+                    "displayName": "plugin_id", 
+                    "hidden": false, 
+                    "type": "number", 
+                    "required": false, 
+                    "comment": "", 
+                    "multivalue": false
+                }, 
+                {
+                    "fieldName": "plugin_sid", 
+                    "displayName": "plugin_sid", 
+                    "hidden": false, 
+                    "type": "number", 
+                    "required": false, 
+                    "comment": "", 
+                    "multivalue": false
+                }, 
+                {
+                    "fieldName": "process", 
+                    "displayName": "process", 
+                    "hidden": false, 
+                    "type": "string", 
+                    "required": false, 
+                    "comment": "", 
+                    "multivalue": false
+                }, 
+                {
+                    "fieldName": "type", 
+                    "displayName": "type", 
+                    "hidden": false, 
+                    "type": "string", 
+                    "required": false, 
+                    "comment": "", 
+                    "multivalue": false
+                }, 
+                {
+                    "fieldName": "warnMessage", 
+                    "displayName": "warnMessage", 
+                    "hidden": false, 
+                    "type": "string", 
+                    "required": false, 
+                    "comment": "", 
+                    "multivalue": false
+                }
+            ], 
+            "calculations": [], 
+            "comment": "", 
+            "parentName": "BaseEvent", 
+            "constraints": [
+                {
+                    "search": "sourcetype=ossim_internal"
+                }
+            ]
+        }, 
+        {
+            "objectName": "WarningPlugin", 
+            "displayName": "WarningPlugin", 
+            "fields": [], 
+            "calculations": [
+                {
+                    "inputField": "_raw", 
+                    "calculationID": "3ddw4kjsiz4cxr", 
+                    "calculationType": "Rex", 
+                    "expression": "RULE:\\s+(?<rule>\\d+)\\s+\\-\\s+(?<plugin>.*)", 
+                    "comment": "", 
+                    "outputFields": [
+                        {
+                            "fieldName": "rule", 
+                            "displayName": "Rule", 
+                            "hidden": false, 
+                            "type": "string", 
+                            "required": false, 
+                            "comment": "", 
+                            "multivalue": false
+                        }, 
+                        {
+                            "fieldName": "plugin", 
+                            "displayName": "Plugin", 
+                            "hidden": false, 
+                            "type": "string", 
+                            "required": false, 
+                            "comment": "", 
+                            "multivalue": false
+                        }
+                    ]
+                }
+            ], 
+            "comment": "", 
+            "parentName": "Ossim_System", 
+            "constraints": [
+                {
+                    "search": "process=\"Agent\" type=WARNING \"is not a valid\"  "
+                }
+            ]
+        }, 
+        {
+            "objectName": "CRITICALEV", 
+            "displayName": "CRITICAL-EV", 
+            "fields": [], 
+            "calculations": [], 
+            "comment": "", 
+            "parentName": "Ossim_System", 
+            "constraints": [
+                {
+                    "search": "CRITICAL"
+                }
+            ]
+        }
+    ]
+}

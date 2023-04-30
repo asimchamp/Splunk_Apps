@@ -1,0 +1,69 @@
+<dashboard version="1.1">
+  <label>Alerts/Logs</label>
+  <init>
+    <set token="severity_desc">$click.name2$</set>
+    <set token="single">show</set>
+  </init>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>source="arista_switch_log" | stats count(eval(severity="0")) as Emergency, count(eval(severity="1")) as Alerts, count(eval(severity="2")) as Critical, count(eval(severity="3")) as Errors, count(eval(severity="4")) as Warnings, count(eval(severity="5")) as Notifications, count(eval(severity="6")) as Informational by host | sort host</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>source="arista_switch_log" | stats count(eval(severity="0")) as Emergency, count(eval(severity="1")) as Alerts, count(eval(severity="2")) as Critical, count(eval(severity="3")) as Errors, count(eval(severity="4")) as Warnings, count(eval(severity="5")) as Notifications, count(eval(severity="6")) as Informational by host | sort host</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">preview</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Notifications">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Informational">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Errors">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Warnings">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <drilldown>
+          <link target="_self">search?q=source%3D%22arista_switch_log%22%20$click.value$%20severity_desc%3D$click.name2$%20%7C%20fields%20_time%2C%20severity_desc%2Cfacility%2C%20msg%2C%20message&amp;earliest=0&amp;latest=</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Recently Fired Alerts</title>
+      <table>
+        <search>
+          <query>index=_audit action=alert_fired | eval ttl=expiration-now() | convert ctime(trigger_time) |search ttl&gt;0 | rename ss_name as alert_name | rename ss_app as app | table app trigger_time alert_name triggered_alerts severity</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

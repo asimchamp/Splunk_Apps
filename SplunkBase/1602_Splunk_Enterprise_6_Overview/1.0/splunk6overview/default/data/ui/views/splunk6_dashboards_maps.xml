@@ -1,0 +1,58 @@
+<form>
+	<label>Cancelled Flights by Airport (maps)</label>
+	<description/>
+	<fieldset autoRun="true" submitButton="false">
+		<input type="dropdown" token="s_cancel_type" searchWhenChanged="true">
+			<label>Cancellation Type:</label>
+                        <default>*</default>
+			<choice value="*">ANY</choice>
+			<choice value="Weather">Weather</choice>
+			<choice value="Carrier">Carrier</choice>
+			<choice value="National Air System">National Air System</choice>
+			<choice value="Security">Security</choice>
+		</input>
+	</fieldset>
+	<row>
+		<single id="element1">
+			<searchString>index=faa cancellation="$s_cancel_type$" 
+| stats count
+| eval count = tostring(count,"commas")</searchString>
+			<earliestTime>1357027200</earliestTime>
+			<latestTime>1359705600</latestTime>
+			<option name="classField"/>
+			<option name="beforeLabel">Cancelled Flights:</option>
+			<option name="afterLabel"/>
+			<option name="underLabel"/>
+		</single>
+	</row>
+	<row>
+		<table id="element2">
+			<title>Cancellations by Airport</title>
+			<searchString>index=faa cancellation="$s_cancel_type$" 
+| stats count sparkline by OriginAirport 
+| sort -count
+            </searchString>
+			<earliestTime>1357027200</earliestTime>
+			<latestTime>1359705600</latestTime>
+			<option name="count">10</option>
+			<option name="displayRowNumbers">true</option>
+			<option name="wrap">true</option>
+			<option name="drilldown">row</option>
+		</table>
+		<map id="element3">
+			<searchString>index=faa cancellation="$s_cancel_type$" 
+| geostats latfield=OriginLatitude longfield=OriginLongitude count by cancellation</searchString>
+			<earliestTime/>
+			<latestTime/>
+			<option name="mapping.markerLayer.markerOpacity">0.8</option>
+   			<option name="mapping.markerLayer.markerMinSize">10</option>
+   			<option name="mapping.markerLayer.markerMaxSize">50</option>
+			<option name="mapping.fieldColors">{Weather:0x0000FF, Carrier:0xFF8C00, "National Air System":0x32CD32, Security:0xDC143C}</option>
+          	<option name="mapping.data.maxClusters">1000</option>
+			<option name="mapping.map.center">(39.8282,-98.5795)</option>
+			<option name="mapping.map.zoom">4</option>
+   			<option name="mapping.tileLayer.minZoom">2</option>
+   			<option name="mapping.tileLayer.maxZoom">10</option>
+		</map>
+	</row>
+</form>

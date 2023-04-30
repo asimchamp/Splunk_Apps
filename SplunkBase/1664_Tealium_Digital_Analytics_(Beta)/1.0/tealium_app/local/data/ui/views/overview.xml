@@ -1,0 +1,62 @@
+<form>
+  <label>Overview</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>1381363200</earliestTime>
+        <latestTime>1382054400</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <chart>
+      <searchString>host=gw | eval du=mvindex(split(mvindex(split(mvindex(split(urldecode(du),"?"),0),"#"),0),".com"),1) | eventstats count as totalPageViews by du | eventstats avg(totalPageViews) as avgTotalPageViews | stats first(du) as bouncePage last(du) as entryPage, first(totalPageViews) as totalPageViews, first(avgTotalPageViews) as avgTotalPageViews by vi, du | stats count as bounceCount, first(totalPageViews) as totalPageViews, first(avgTotalPageViews) as avgTotalPageViews by bouncePage | eval bounceRate=round((bounceCount/totalPageViews)*100,2) | where totalPageViews &gt; avgTotalPageViews*.25 | sort -bounceRate | search NOT du="order-confirmation.ep" | table bouncePage bounceCount bounceRate | sort -bounceRate</searchString>
+      <earliestTime>0</earliestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">scatter</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>User Stats</title>
+      <searchString>host=gw | eval du=mvindex(split(mvindex(split(mvindex(split(urldecode(du),"?"),0),"#"),0),".com"),1) | eventstats count as views| eventstats dc(cs) as visits | eventstats dc(cs) as vv by vi | stats first(views) as views, avg(vv) as vv, first(visits) as visits, count(du) as pageCount by vi | stats  first(views) as views, first(visits) as visits, dc(vi) as uniqueVisits, avg(pageCount) as "avg pages/visit", first(vv) as "avg visits/visitor" | transpose | rename column as type, "row 1" as count</searchString>
+      <earliestTime>$earliest$</earliestTime>
+      <latestTime>$latest$</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>Top Entry Pages</title>
+      <searchString>host=gw | eval du=mvindex(split(mvindex(split(mvindex(split(urldecode(du),"?"),0),"#"),0),".com"),1) | eventstats count as totalPageViews by du | eventstats avg(totalPageViews) as avgTotalPageViews | stats first(du) as bouncePage last(du) as entryPage, first(totalPageViews) as totalPageViews, first(avgTotalPageViews) as avgTotalPageViews by vi, du | stats count as bounceCount, first(totalPageViews) as totalPageViews, first(avgTotalPageViews) as avgTotalPageViews by entryPage | top entryPage by totalPageViews | sort -totalPageViews | table totalPageViews, entryPage</searchString>
+      <earliestTime>0</earliestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+    <table>
+      <title>Visits by State</title>
+      <searchName>Visits - State</searchName>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">10</option>
+    </table>
+  </row>
+</form>

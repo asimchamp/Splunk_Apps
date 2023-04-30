@@ -1,0 +1,182 @@
+{% extends "sentry:template/base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block sentry_content %}
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-head">
+                        <!--<h3>Search</h3>-->
+                        <div class="heading_wrapper">
+                            <span class="heading_3">Search</span>
+                            <div id="help_icon" class="eyeIcon">i
+		                        <div id="help_info_outer" class="custom-dropdown-menu hidden">
+			                        <div id="help_info_inner" class="custom-dropdown-msg">
+			                            - Fields support asterix (*) wildcard searching.<br>
+			                            - Fields must not be left blank but should use an asterix (*) instead.<br>
+			                            - Triaged events can be unhidden by category.<br>
+			                            - To search for all activity for a specific user or customer set the one you're looking for and set the other to an asterix (*).
+			                        </div>
+		                        </div>
+		                    </div>
+                    	</div>
+                   	</div>
+                    <div class="panel-body">
+                        <span class=inputBoxLabel>User ID</span>
+                        {% textinput id="inputUserID" default="*" value="$selUserID$"|token_safe %}
+                        <span class=inputBoxLabel>Cust ID</span>
+                        {% textinput id="inputCustID" default="*" value="$selCustID$"|token_safe %}
+                        <span class=inputBoxLabel>App</span>
+                        {% dropdown id="dropdownApp" managerid="searchPopulateApp" labelField="label" valueField="value" value="$selApp$"|token_safe showClearButton=False width="170" %}
+                        {% timerange id="timerange"
+                           earliest_time="$earlyTime$"|token_safe
+                           latest_time="$lateTime$"|token_safe %}
+                        <button id="buttonSearch" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock sentry_content %}
+
+
+{% block sentry_managers %}
+
+  
+	{# Search to populate the available Apps #}
+	{% searchmanager
+	    id="searchPopulateApp"
+	    search='| inputlookup app.csv'
+	%}
+
+{% endblock sentry_managers %}
+
+
+{% block sentry_js %}
+<script src="{{STATIC_URL}}sentry/customJS.js" type="text/javascript"></script>
+<script>
+    require(["splunkjs/ready!"], function(mvc) {
+    	require.config({
+	        baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+	        waitSeconds: 0 // Disable require.js load timeout 
+	    });
+	    
+        // Fetch a reference to the views and managers
+        tokens = mvc.Components.getInstance("default");
+
+        // Search user input
+        dropdownApp = mvc.Components.getInstance("dropdownApp");
+        timerange = mvc.Components.getInstance("timerange");
+
+        // The array of search managers that are controlled and started
+        // by the top search controls search button
+        searches = new Array();
+        
+        
+        
+    	// Initialization 
+    	
+    	// Set up static choices for the App dropdown 
+        dropdownApp.settings.set("choices", [{value: "*", label: "All"}]);
+    	
+    	
+    	// Event Handlers
+
+		
+		
+        // Function definitions
+
+        
+        $( document ).ready(function() {
+            // This removes empty h3 elements that are
+            // automatically applied in the panel-head divs
+            
+            
+            
+            setTimeout(function(){
+                $("h3").each(function(index, element){ if (element.innerHTML == ""){ element.style.display='none';}});
+            }, 100);
+
+            // This loops through all 'custom-dropdown-menu' divs 
+            // and sets the top css property to just above the title 
+            var topOffset = -42; //This value can be adjusted to raise/lower the description box. 
+            $("[id='help_info_outer']").each(function(index, element){
+            	$(element).css("top", topOffset - ($(element).css("height").split(/(in|cm|mm|em|ex|pt|pc|px)/)[0]));
+            	
+            });
+        });
+
+		// show help_info messages. 
+        $( "div[id*='help_icon']" ).click(function(e) {
+           var clicked_element = e.target;
+           if (clicked_element.id != "help_info_outer" && clicked_element.id != "help_info_inner"){
+			    $(e.target.children[0]).toggleClass("hidden");               
+           }
+           e.stopPropagation();
+        });
+
+		// hide help_info messages. 
+        $("body").click(function(e) {
+            var clicked_element = e.target;
+               if (clicked_element.type != "submit" && clicked_element.id != "help_info_outer" && clicked_element.id != "help_info_inner"){
+                  $("[id*='help_info_outer']").addClass("hidden");
+               }              
+		 });
+
+
+        function startSearches(searches){
+            for (i=0; i<searches.length; i++){
+                searches[i].startSearch();
+            };
+        };
+
+
+        // Sanitize customer id input (whitespace trim and zero padding)
+        function sanitizeCustID(tokenName){
+            padding = "00000000"
+            var trimmedCustID = $.trim(tokens.get(tokenName));
+            var paddedCustID = (padding + trimmedCustID).slice(-padding.length);
+            var newToken = {};
+            newToken[tokenName] = paddedCustID;
+            tokens.set(newToken);
+        };
+
+
+        // Search Button Click
+        $("#buttonSearch").on("click", function() {
+
+            if (!(tokens.get("selUserID")) || typeof tokens.get("selUserID") === "undefined") {
+                tokens.set({"selUserID": "*"});
+            } else {
+                tokens.set({"selUserID": $.trim(tokens.get("selUserID"))});
+            }
+
+            if (!(tokens.get("selCustID")) || typeof tokens.get("selCustID") === "undefined") {
+                tokens.set({"selCustID": "*"});
+            } else if (tokens.get("selCustID") != "*") {
+                //tokens.set({"selCustID": $.trim(tokens.get("selCustID"))});
+                sanitizeCustID("selCustID");
+            }
+
+            setTimeout(function(){
+                startSearches(searches);
+            },1000);
+        });
+        
+        
+        paramsExist = urlparse(tokens);
+
+        if (paramsExist){
+            timerange.val({"earliest_time": tokens.get("earlyTime"), "latest_time": tokens.get("lateTime")});
+            //$("#buttonSearch").click();
+        };
+        
+        // Start all searches
+        $("#buttonSearch").click();
+	        
+		
+    });
+</script>
+{% endblock sentry_js %}

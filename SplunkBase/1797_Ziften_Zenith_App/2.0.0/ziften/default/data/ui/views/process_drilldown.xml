@@ -1,0 +1,165 @@
+<form>
+  <label>Process: Search</label>
+  <description></description>
+  <search>sourcetype=ziften:* earliest=$field1.earliest$ latest=$field1.latest$ imagefilemd5=$md5$ |append [search sourcetype=ziften:zenith:alert imagefilemd5=$md5$]| lookup system_info agentguid|eval computername=if(isnull(computername), agentguid, computername)|eval basename = replace(imagefilepath, ".*\\\\", "")|stats count(eval(eventtype="autostarts" OR eventtype="autoruns" OR eventtype="services")) as is_autostart count(eval(eventtype="eventlogrecord")) as "Crashes" count(eval(eventtype="services")) as is_service count(feed) as alerts values(port) as ports values(ipaddress) as ips values(accountname) as accountnames by computername</search>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <input type="multiselect" token="process_fields" searchWhenChanged="true">
+        <label>Fields To Show</label>
+        <choice value="companyname">companyname</choice>
+        <choice value="productname">productname</choice>
+        <choice value="internalname">internalname</choice>
+        <choice value="basename">basename</choice>
+        <choice value="imagefilepath">imagefilepath</choice>
+        <choice value="fileversion">fileversion</choice>
+        <choice value="productversion">productversion</choice>
+        <choice value="prevalence">prevalence</choice>
+        <default>companyname,productname,basename,fileversion,prevalence</default>
+      </input>
+      <input type="text" token="search_filter" searchWhenChanged="true">
+        <label>Search Filter</label>
+        <initialValue>*</initialValue>
+      </input>
+      <table id="master">
+        <title>Processes</title>
+        <search>
+          <query>sourcetype=ziften:zenith:processinventory $search_filter$|lookup system_info agentguid|eval basename = replace(trim(imagefilepath,"\""), ".*\\\\", "")|stats count dc(agentguid) as prev_guid dc(computername) as prevalence by companyname productname internalname originalfilename basename  imagefilepath productversion fileversion imagefilemd5|sort -prevalence|fields $process_fields$ imagefilemd5</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <set token="md5">$row.imagefilemd5$</set>
+          <set token="form.md5">$row.imagefilemd5$</set>
+          <unset token="detail"></unset>
+          <unset token="form.detail"></unset>
+          <unset token="system"></unset>
+          <unset token="form.system"></unset>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table depends="$md5$">
+        <title>Process Details</title>
+        <search>
+          <query>sourcetype=ziften:zenith:processinventory imagefilemd5=$md5$|head 1|table productname companyname originalfilename filedescription internalname fileversion productversion legalcopyright imagefilemd5|transpose|rename column as attribute "row 1" as value</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <drilldown>
+          <set token="search_filter">$row.value$</set>
+          <set token="form.search_filter">$row.value$</set>
+          <unset token="md5"></unset>
+          <unset token="form.md5"></unset>
+          <unset token="detail"></unset>
+          <unset token="form.detail"></unset>
+          <unset token="system"></unset>
+          <unset token="form.system"></unset>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <table depends="$md5$">
+        <title>Population Details</title>
+        <search base="global">
+          <query>stats dc(computername) as prevalence dc(ports) as "Ports Used" dc(ips) as dst_ip dc(accountnames) as "Process Owners" sum("Crashes") as "Crashes" sum(alerts) as alerts sum(is_autostart) as is_autostart sum(is_service) as is_service |eval is_autostart=if(is_autostart &gt; 0, "True", "False")|eval is_service=if(is_service &gt; 0, "True", "False")|eval networked=if(dst_ip &gt; 0, "True", "False")|rename dst_ip as "Dest IPs"|transpose|rename column as attribute "row 1" as total</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <drilldown>
+          <set token="detail">$row.attribute$</set>
+          <set token="form.detail">$row.attribute$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <chart depends="$detail$">
+        <title>$detail$</title>
+        <search base="global">
+          <query>| stats dc(computername) as prevalence dc(ports) as "Ports Used" dc(ips) as dst_ip dc(accountnames) as "Process Owners" sum("Crashes") as "Crashes" sum(alerts) as alerts sum(is_autostart) as is_autostart sum(is_service) as is_service by computername|eval networked=dst_ip|rename dst_ip as "Dest IPs"| fields computername "$detail$"</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="detail" depends="$md5$">
+        <title>System Details for $md5$</title>
+        <search base="global">
+          <query>stats dc(ports) as "Ports Used" dc(ips) as dst_ip dc(accountnames) as "Process Owners" sum("Crashes") as "Crashes" sum(alerts) as alerts sum(is_autostart) as is_autostart sum(is_service) as is_service by computername|eval is_autostart=if(is_autostart &gt; 0, "True", "False")|eval is_service=if(is_service &gt; 0, "True", "False")|eval networked=if(dst_ip &gt; 0, "True", "False")|rename dst_ip as "Dest IPs"</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <drilldown>
+          <set token="system">$row.computername$</set>
+          <set token="form.system">$row.computername$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table depends="$system$">
+        <title>Binary Details for System</title>
+        <search base="global">
+          <query>search computername=$system$</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

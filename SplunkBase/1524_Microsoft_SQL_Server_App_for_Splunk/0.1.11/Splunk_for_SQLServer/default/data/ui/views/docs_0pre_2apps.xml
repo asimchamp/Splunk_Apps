@@ -1,0 +1,23 @@
+<dashboard isVisible="false">
+	<label>Download and deploy required Splunk Add-ons</label>
+	<row>
+		<html>
+<p>The Splunk App for SQL Server supports Windows Server 2008R2 and above and SQL Server 2008R2 and above.  
+For full data coverage, you must install the following Add-ons:</p>
+
+<ul>
+	<li><a href="http://splunk-base.splunk.com/apps/28933/splunk-for-windows-technology-add-on">Splunk Technology Add-on for Windows</a></li>
+	<li><a href="http://splunk-base.splunk.com/apps/82353/splunk-add-on-for-microsoft-powershell">Splunk Add-on for PowerShell</a></li>
+	<li>Splunk Technology Add-on for SQL Server</li>
+</ul>
+
+<p>The Splunk Technology Add-on for SQL Server is distributed with the Splunk App for SQL Server and is
+located in the <tt>Splunk_for_SQLServer/appserver/addons</tt> directory.</p>
+
+<p>If you have followed the Splunk recommendation of enabling the deployment server, you may use the
+deployment server to push out these apps.  They do not require any configuration.  An example
+serverclass.conf file is provided with the app.  It just needs to have a machine whitelist added.</p>
+
+		</html>
+	</row>
+</dashboard>

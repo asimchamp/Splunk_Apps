@@ -1,0 +1,211 @@
+<form version="1.1" script="timerange.js">
+  <label>Performance - Cache Hits by Volume</label>
+  <fieldset>
+    <input type="time" id="timerange" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-24h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="arrayId">
+      <label>Array</label>
+      <search>
+        <query>| inputlookup nesa_volume_groups | stats count by arrayId, arrayName</query>
+      </search>
+      <fieldForLabel>arrayName</fieldForLabel>
+      <fieldForValue>arrayId</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>host="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="controllerLabel" searchWhenChanged="false">
+      <label>Controller</label>
+      <search>
+        <query>
+          | inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ | dedup controllerLabel
+        </query>
+      </search>
+      <fieldForLabel>controllerLabel</fieldForLabel>
+      <fieldForValue>controllerLabel</fieldForValue>
+      <delimiter> OR </delimiter>
+      <valuePrefix>controllerLabel="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+    <input type="multiselect" token="volumeGroup" id="clvgid">
+      <label>Volume Group or Pool</label>
+      <search id="clvg_id">
+        <query>| inputlookup nesa_volumes | join type=LEFT controllerRef [inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ | rename host as arrayId | table controllerRef, controllerLabel] | fields controllerLabel, volumeGroupRef | join type=LEFT volumeGroupRef [| inputlookup nesa_volume_groups | search [| inputlookup nesa_volumes | search [| inputlookup nesa_controllers | rename arrayId as host | search $arrayId$ controllerLabel=* | rename host as arrayId | fields arrayId, controllerRef] | fields arrayId, volumeGroupRef ]] | dedup arrayName, controllerLabel, volumeGroup | sort volumeGroup, controllerLabel | search $controllerLabel$ | dedup volumeGroup | table volumeGroup</query>
+      </search>
+      <valuePrefix>volumeGroup="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <fieldForLabel>volumeGroup</fieldForLabel>
+      <fieldForValue>volumeGroup</fieldForValue>
+    </input>
+    <input type="multiselect" token="volumeName">
+      <choice value="*">ALL</choice>
+      <default>*</default>
+      <label>Volumes</label>
+      <search>
+        <query>`get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ | table volumeName | dedup volumeName</query>
+      </search>
+      <fieldForLabel>volumeName</fieldForLabel>
+      <fieldForValue>volumeName</fieldForValue>
+      <valuePrefix>volumeName="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+    </input>
+  </fieldset>
+  <search id="baseSearch">
+    <query>
+      `get_nesa_index` sourcetype=eseries:volume-stats $arrayId$ $controllerLabel$ $volumeGroup$ $volumeName$ | lookup nesa_controllers arrayId as host controllerLabel as controllerLabel output arrayName | eval label = 'arrayName'." / ".'controllerLabel'." / ".'volumeGroup'." / ".'volumeName' | fields _time label readHitOps writeHitOps readHitBytes writeHitBytes
+    </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <chart>
+        <title>Number of read IO operations that hit cache</title>
+        <search base="baseSearch">
+          <query>timechart useother=f limit=0 per_second(readHitOps) AS reads by label</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">IOps</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Number of write IO operations that hit cache</title>
+        <search base="baseSearch">
+          <query>timechart useother=f limit=0 per_second(writeHitOps) AS writes by label</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">IOps</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Number of bytes of read IO operations that hit cache</title>
+        <search base="baseSearch">
+          <query>timechart useother=f limit=0 per_second(readHitBytes) AS reads by label</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Bytes</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Number of bytes of write IO operations that hit cache</title>
+        <search base="baseSearch">
+          <query>timechart useother=f limit=0 per_second(writeHitBytes) AS writes by label</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Bytes</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

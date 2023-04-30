@@ -1,0 +1,13 @@
+# export any search commands from this app and make available to admin
+
+[*]
+access = read : [ * ], write : [ * ]
+export = system
+
+[commands]
+access = read : [ * ], write : [ admin ]
+export = system
+
+[searchbnf]
+access = read : [ * ], write : [ admin ]
+export = system

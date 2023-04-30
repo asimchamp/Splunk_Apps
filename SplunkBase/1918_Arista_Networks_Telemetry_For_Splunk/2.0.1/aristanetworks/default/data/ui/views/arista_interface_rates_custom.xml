@@ -1,0 +1,53 @@
+<form version="1.1">
+  <label>Single Interface Rates (by custom search)</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="searchquery" searchWhenChanged="true">
+      <label>Filter/Enter Query Here: </label>
+      <default>source="arista_switch_ifcounter" switchname=* OR interface=* OR description=* | chart max(inRate) AS inRate, max(outRate) AS outRate, max(inErrors) AS inErrors, max(outErrors) AS outErrors, max(inDiscards) AS inDiscards, max(outDiscards) as outDiscards over _time</default>
+    </input>
+    <input type="time" token="CustomQueryTime" searchWhenChanged="true">
+      <label>Time:</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="graph_type">
+      <label>Graph Type:</label>
+      <choice value="bar">Bar</choice>
+      <choice value="column">Column</choice>
+      <choice value="line">Line</choice>
+      <choice value="area">Area</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>$searchquery$</query>
+          <earliest>$CustomQueryTime.earliest$</earliest>
+          <latest>$CustomQueryTime.latest$</latest>
+        </search>
+        <option name="charting.chart">$graph_type$</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Interface statistics over time</title>
+      <table>
+        <search>
+          <query>$searchquery$</query>
+          <earliest>$CustomQueryTime.earliest$</earliest>
+          <latest>$CustomQueryTime.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,92 @@
+{% extends "sentry:template/sentry_base_with_search_controls_no_triage.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}} | Redacted Report{% endblock title %}
+{% block css %}
+    <!-- Style sheets are loaded here -->
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <style>
+
+    </style>
+{% endblock css %}
+
+{% block sentry_header %}
+<div class="dashboard-body container-fluid main-section-body" data-role="main">
+        <div class="span12 dashboard-header clearfix">
+            <h2>Redacted Report</h2>
+        </div>
+{% endblock sentry_header %}
+
+
+{% block content %}
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="panel-element-row">
+                    <div class="dashboard-element chart" id="tableAccessLogs" style="width: 100%">
+                        <div class="panel-head">
+                            <h3>Access Logs</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content%}
+
+{% block managers %}
+
+    {% searchmanager
+        id="searchAccessLogs"
+        search='index="sentry" user_id="$selUserID$" cust_id="$selCustID$" app="$selApp$" | `emp_demo` | lookup metrics metric_id OUTPUT metric_description | eval cust_name = substr(cust_first_name,1,1) + ". " + substr(cust_last_name,1,1) + "." | eval cust_id = "*****" + substr(cust_id, -3) | fields access_time,emp_name,user_id,app,access_type,metric_name,metric_description,user_id,cust_name,cust_id'|token_safe
+        earliest_time="$earlyTime$"|token_safe
+        latest_time="$lateTime$"|token_safe
+        autostart=false
+    %}
+    
+{% endblock managers %}
+
+{% block js %}
+<script>
+    require(["splunkjs/mvc"], function() {
+	    require.config({
+	        baseUrl: "{{SPLUNKWEB_URL_PREFIX}}/static/js",
+	        waitSeconds: 0 // Disable require.js load timeout 
+	    });
+
+		require(["splunkjs/ready!", 
+	             "splunkjs/mvc/simplexml/element/table"], function(mvc, TableElement) {
+	                 
+
+			searches.push(mvc.Components.getInstance("searchAccessLogs"))
+			
+	
+	        // Initialization 
+	
+	        if (!paramsExist){
+				// Set the default time range 
+		        timerange.val({"earliest_time": "-7d@h", "latest_time": "now"});
+	        }
+	
+	
+	        // Tables 
+	
+	        var tableAccessLogs = new TableElement({
+	            "id": "tableAccessLogs",
+	            "managerid": "searchAccessLogs",
+	            "fields": "access_time,emp_name,user_id,app,access_type,metric_name,metric_description,cust_name,cust_id",
+	            "pageSize": "20",
+	            "drilldown": "none",
+	            "link.inspectSearch.visible": false,
+	            "link.openSearch.visible": false,
+	            "el": $('#tableAccessLogs')
+	        }, {tokens: true}).render();
+	
+	       
+		});
+    });
+</script>
+{% endblock js %}

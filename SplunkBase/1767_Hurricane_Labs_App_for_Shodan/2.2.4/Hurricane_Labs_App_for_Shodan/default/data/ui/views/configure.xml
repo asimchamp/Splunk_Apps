@@ -1,0 +1,51 @@
+<dashboard version="1.1" hideEdit="true" stylesheet="application.css" script="edit.js">
+  <label>Configure Subnets</label>
+  <description>Add new addresses here. These addresses will be used to autopopulate results in the Overview dashboard. NOTE: It may take a minute or so before changes made here show up on the Overview dashboard.</description>
+  <search id="addRow">
+    <query>| inputlookup  shodan_my_subnets | eval key=_key | append [| stats count  | eval ipAddress="$ip_address_add_tok$" | eval critical="$critical_add_tok$" | eval description="$description_add_tok$"] 
+| table critical, key, ipAddress, description  | outputlookup  shodan_my_subnets</query>
+  </search>
+  <search id="removeRow">
+    <query>| inputlookup  shodan_my_subnets | eval key=_key | WHERE NOT key="$key_tok_remove$" | outputlookup shodan_my_subnets</query>
+  </search>
+  <search id="updateRow">
+    <query>| inputlookup shodan_my_subnets | eval key=_key | WHERE key="$key_tok_update$" | eval ipAddress="$ip_address_update_tok$" | eval critical="$critical_update_tok$" | eval description="$description_update_tok$" | outputlookup shodan_my_subnets append=t</query>
+  </search>
+  <row>
+    <panel id="lookupPanel">
+      <table id="lookupTable">
+        <title>Addresses</title>
+        <search id="lookupSearch">
+          <query>| inputlookup  shodan_my_subnets
+| eval Remove="Remove" | eval key=_key | eval Edit="Edit" | table * Edit, Remove | rename critical AS "Is Critical?", description AS Description, ipAddress AS "IP Address"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <progress>
+            <condition match="'job.resultCount' > 0">
+                <set token="panel_show">true</set>
+            </condition>
+            <condition>
+                <unset token="panel_show"/>
+            </condition>
+          </progress> 
+        </search>
+      </table>
+      <html>
+        <div id="shodanDataStatus"></div>
+      </html>
+    </panel>
+    <panel id="shodanPanel">
+      <html>
+        <div id="shodanLink">
+	        <p>You will need a Shodan API key for this App to work. If you don't have one already, get one here:</p>
+	        <a href="http://www.shodanhq.com/" target="_blank">
+            <img src="/static/app/Hurricane_Labs_App_for_Shodan/Shodan_logo.png" width="192px" height="57px" alt="Shodan"/>
+          </a>
+		      <p>Already have an API key? Make sure it's entered
+		      <a href="/app/Hurricane_Labs_App_for_Shodan/setup">here</a>
+          </p>
+	      </div>
+      </html>
+    </panel>
+  </row>
+</dashboard>

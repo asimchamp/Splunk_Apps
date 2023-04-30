@@ -1,0 +1,227 @@
+<form version="1.1">
+  <label>Activities by User</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="USER_ID" searchWhenChanged="true">
+      <label>Username</label>
+      <choice value="">All</choice>
+            <fieldForLabel>label</fieldForLabel>
+      <fieldForValue>Username</fieldForValue>
+            <search>
+        <query>
+          eventtype=sfdc-login-history  | stats count by Name Username | sort -count | eval label=Name." (".count.")" | eval Username="Username=".Username
+          </query>
+        <earliest>-14d@d</earliest>
+        <latest>now</latest>
+      </search>
+       <default></default>
+    </input>
+    <input type="radio" token="active">
+      <label>Active/Inactive User</label>
+      <choice value="IsActive=true">Active</choice>
+      <choice value="IsActive=false">Inactive</choice>
+      <choice value="">All</choice>
+       <default></default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Login over time</title>
+         <search>
+                  <query>
+        eventtype=sfdc-login-history $USER_ID$ $active$|  eval fail=if(Status=="Success", "0", "1") | eval success=if(Status=="Success", "1", "0") | eval login_status=if(Status=="Success", "Success", "Fail")| timechart span=6h SUM(success) as successful_logins SUM(fail) as failed_logins |  rename successful_logins AS "Successful login count" | rename failed_logins AS "Failed login count" | rename failure_ratio AS "Percentage Failure Rate"</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+         </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.rangeValues">[]</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.chart.overlayFields">"Failed login count"</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Total Reports Accessed</title>
+                 <search>
+                  <query>
+        eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) $USER_ID$ $active$ |  where REPORT_ID!="" | stats count</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+
+      </single>
+      <table>
+        <title>Most Accessed Reports</title>
+          <search>
+                  <query>
+        eventtype=sfdc-event-log (EVENT_TYPE=Report OR EVENT_TYPE=AsyncReportRun) $USER_ID$ $active$ | eval r=case(NOT REPORT_ID=="", "private_".REPORT_ID)  | eval REPORT_NAME=if( isnull(REPORT_NAME),r, REPORT_NAME)   |  chart count last(_time) as lt sparkline(count, 6h) as trend by REPORT_NAME | sort -count | eval last_access = strftime(lt, "%H:%M:%S %m-%d-%y") | fields + REPORT_NAME last_access count  trend |rename REPORT_NAME AS "Report Name" </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Dashboards Accessed</title>
+          <search>
+                  <query>eventtype=sfdc-event-log (EVENT_TYPE=Dashboard) $USER_ID$ $active$ | stats count  
+                  </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+      </single>
+      <table>
+        <title>Most Accessed Dashboards</title>
+        <search><query>eventtype=sfdc-event-log (EVENT_TYPE=Dashboard) $USER_ID$ $active$|  chart count last(_time) as lt sparkline(count, 6h) as trend by DASHBOARD_NAME | sort -count | eval last_access = strftime(lt, "%H:%M:%S %m-%d-%y") | fields + DASHBOARD_NAME last_access count  trend | rename DASHBOARD_NAME AS "Dashboard Name"</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Most Exported Reports</title>
+        <search><query>eventtype=sfdc-event-log  EVENT_TYPE=ReportExport $USER_ID$ $active$ | 
+  eval REPORT_ID=substr(URI, 2, len(URI)-1) | lookup lookup_sfdc_objects object_id AS REPORT_ID OUTPUT object_name AS REPORT_NAME |eval aa=case(REPORT_ID=="00O", "Export of Unsaved Report", isnull(REPORT_NAME), "private_".REPORT_ID, NOT isnull(REPORT_NAME), REPORT_NAME) |  chart count last(_time) as lt sparkline(count, 6h) as trend by aa | sort -count | eval last_access = strftime(lt, "%H:%M:%S %m-%d-%y") | fields + aa last_access count  trend | rename aa AS "Report Name"</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Most Accessed Documents</title>
+        <search><query>
+          eventtype=sfdc-event-log $USER_ID$ $active$ EVENT_TYPE=DocumentAttachmentDownloads FILE_TYPE!="image/png" FILE_TYPE!="image/jpeg" FILE_TYPE!="image/gif" |  chart count last(_time) as lt sparkline(count, 6h) as trend by FILE_NAME| sort -count | eval last_access = strftime(lt, "%H:%M:%S %m-%d-%y") | fields + FILE_NAME last_access count  trend | rename FILE_NAME AS "File Name"</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Most Accessed Opportunities</title>
+        <search><query>
+        eventtype=sfdc-event-log  EVENT_TYPE=URI $USER_ID$ URI=/006* $active$| rex field=URI "/(?&lt;object_id&gt;006.{12})" |  lookup lookup_sfdc_opportunities.csv  object_id AS object_id OUTPUT object_name as opportunity_name   | chart count sparkline(count, 6h) as trend by opportunity_name |  rename opportunity_name AS "Opportunity Name"| sort -count
+        </query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">7</option>
+        <!-- Set sparkline options here; make sure that field matches field name of the search results -->
+        <format type="sparkline" field="trend">
+          <option name="type">bar</option>
+          <option name="height">40</option>
+          <!--option name="barColor">#A9BCF5</option -->
+          <option name="colorMap">
+            <option name="50:">#5379AF</option>
+            <option name=":49">#9ac23c</option>
+          </option>
+          <option name="barWidth">5</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Most Accessed Accounts</title>
+      
+        <search><query>eventtype=sfdc-event-log  EVENT_TYPE=URI   URI=/001*  $USER_ID$ $active$ | rex field=URI "/(?&lt;object_id&gt;001.{12})" | lookup lookup_sfdc_accounts.csv object_id AS object_id OUTPUT object_name as account_name | chart count sparkline(count, 6h) as trend by account_name | sort -count</query>
+        <earliest>$field1.earliest$</earliest>
+        <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">7</option>
+        <format type="sparkline" field="trend">
+          <option name="type">bar</option>
+          <option name="height">40</option>
+        
+          <option name="colorMap">
+            <option name="50:">#5379AF</option>
+            <option name=":49">#9ac23c</option>
+          </option>
+          <option name="barWidth">5px</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
