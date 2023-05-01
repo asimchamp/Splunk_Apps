@@ -17,10 +17,6 @@ echo
 #splunk_home='/workspace/Splunk_installation'
 splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 
-n=2882
-k=1
-l=1
-
 #splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
 splunk_token=$SPLUNK_TOKEN
 
@@ -205,14 +201,10 @@ fi
 }
 
 ########## Checking app avaibility on Splunk Base #################
-while [ $k -le 5 ]
-
+for i in $(cat $splunk_home/workflow/workflow$workflow_number/app_id.txt)
 do
-   i=`expr $k \+ $n`
    echo "Performing app avaibility function"
    previous_check_func
-
-   ((++k))
 
 done
 
@@ -223,15 +215,8 @@ rm -rf $splunk_home/workflow/workflow$workflow_number/merge.txt $splunk_home/wor
 echo "Loop Completed for list"
 
 
-# Looping i, i should be less than
-# or equal to 10 
-while [ $l -le 5 ]
+for e in $(cat $splunk_home/workflow/workflow$workflow_number/app_id.txt)
 do
-e=`expr $l \+ $n`
-
-# printing on console
-echo "$e"
-
    download_app=$(cat $splunk_home/workflow/workflow$workflow_number/splunk_name.txt | grep $e | wc -l )
    
    if [ "$download_app" = "1" ];
@@ -256,9 +241,6 @@ echo "$e"
       echo "ID=$e"  "Folder not Present for deleting."
 
 fi
-
-# incrementing i by one  
-   ((++l))
 
 done
 
