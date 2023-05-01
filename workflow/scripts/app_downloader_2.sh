@@ -11,13 +11,20 @@ echo '################################################'
 echo
 echo
 
+
 ################ Variables Sections ################
 
+#splunk_home='/workspace/Splunk_installation'
 splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 
+n=2882
+k=1
+l=1
+
+#splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
 splunk_token=$SPLUNK_TOKEN
 
-workflow_number='_2'
+workflow_number='_1'
 
 ### Checking the Workflow folder present or not
 
@@ -41,11 +48,12 @@ workflow_number_folder=$(ls $splunk_home/workflow/ | grep -cw workflow$workflow_
 if [ "$workflow_number_folder" = "1" ];
    then
       echo "workflow folder number present."
-
+	  
    else
       echo "workflow Folder not Present."
       mkdir $splunk_home/workflow/workflow$workflow_number
       echo "workflow Folder Created."
+	  
 
 fi
 
@@ -62,6 +70,8 @@ if [ "$SplunkBase_folder" = "1" ];
       echo "SplunkBase Folder Created."
 
 fi
+
+
 
 app_download_func ()
 {
@@ -103,9 +113,10 @@ fi
 
 file_size=$(curl -s -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i | awk -F",\"release\":" '{print $2}' | awk -F"\"size\":" '{print $2}' | cut -d ',' -f 1)
 
-if [ "$file_size" -gt "50000000" ];
+if [[ "$file_size" -gt "50000000" ]];
    then
       echo "file_size=$file_size" "File size too large."
+	  
    else
 	  echo "file_size=$file_size" "File size normal."
 	  tar_file_func
@@ -129,26 +140,45 @@ if [ "$file_tgz" = "1" ];
       cd $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/
       curl -s -L -J -O -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/
       sleep 2
-      tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER
-      sleep 2
+	  tar_file_size
+
 fi
 
 }
 
+tar_file_size()
+{
+
+check_tar_size=$( find $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/ -type f -name "*.tgz" -size +50M | wc -l )
+
+if [ "$check_tar_size" = "1" ];
+   then
+   echo "Tar file size more than 50MB, deleting file"
+   rm -rf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz
+   
+   else
+      echo "Tar file size less than 50MB, unzip tar tile"
+      tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER
+      sleep 2
+
+fi
+}
 
 rm -rf $splunk_home/workflow/workflow$workflow_number/splunk_name.txt
 
 previous_check_func()
 {
 
-previous_download_app=$(cat $splunk_home/workflow/workflow$workflow_number/null_app.txt | grep "$e" | wc -l )
+previous_download_app=$(cat $splunk_home/workflow/workflow$workflow_number/null_app.txt | grep "$i" | wc -l )
 
 if [ "$previous_download_app" = "1" ];
    then
    echo "App Present on old data bsase"
+   echo "previous_download_app=$previous_download_app"
    
 else
    echo "Checking on Splunkbase Portal"
+   echo "previous_download_app=$previous_download_app"
    check_splunkbase_func
 
 fi
@@ -175,10 +205,14 @@ fi
 }
 
 ########## Checking app avaibility on Splunk Base #################
-for i in $(cat $splunk_home/workflow/workflow$workflow_number/app_id.txt)
+while [ $k -le 2 ]
+
 do
+   i=`expr $k \+ $n`
    echo "Performing app avaibility function"
    previous_check_func
+
+((++k))
 
 done
 
@@ -188,8 +222,16 @@ rm -rf $splunk_home/workflow/workflow$workflow_number/merge.txt $splunk_home/wor
 
 echo "Loop Completed for list"
 
-for e in $(cat $splunk_home/workflow/workflow$workflow_number/app_id.txt)
+
+# Looping i, i should be less than
+# or equal to 10 
+while [ $l -le 2 ]
 do
+e=`expr $l \+ $n`
+
+# printing on console
+echo "$e"
+
    download_app=$(cat $splunk_home/workflow/workflow$workflow_number/splunk_name.txt | grep $e | wc -l )
    
    if [ "$download_app" = "1" ];
@@ -214,6 +256,9 @@ do
       echo "ID=$e"  "Folder not Present for deleting."
 
 fi
+
+# incrementing i by one  
+((++l))
 
 done
 
