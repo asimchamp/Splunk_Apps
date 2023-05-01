@@ -205,7 +205,7 @@ fi
 }
 
 ########## Checking app avaibility on Splunk Base #################
-while [ $k -le 2 ]
+while [ $k -le 500 ]
 
 do
    i=`expr $k \+ $n`
@@ -225,7 +225,7 @@ echo "Loop Completed for list"
 
 # Looping i, i should be less than
 # or equal to 10 
-while [ $l -le 2 ]
+while [ $l -le 500 ]
 do
 e=`expr $l \+ $n`
 
