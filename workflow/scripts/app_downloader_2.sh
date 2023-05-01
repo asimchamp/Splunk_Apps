@@ -205,14 +205,14 @@ fi
 }
 
 ########## Checking app avaibility on Splunk Base #################
-while [ $k -le 500 ]
+while [ $k -le 5 ]
 
 do
    i=`expr $k \+ $n`
    echo "Performing app avaibility function"
    previous_check_func
 
-$((++k))
+   ((++k))
 
 done
 
@@ -225,7 +225,7 @@ echo "Loop Completed for list"
 
 # Looping i, i should be less than
 # or equal to 10 
-while [ $l -le 500 ]
+while [ $l -le 5 ]
 do
 e=`expr $l \+ $n`
 
@@ -258,7 +258,7 @@ echo "$e"
 fi
 
 # incrementing i by one  
-$((++l))
+   ((++l))
 
 done
 
