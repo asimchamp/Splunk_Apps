@@ -1,0 +1,43 @@
+<form stylesheet="custom.css">
+  <label>XOR Converter</label>
+  <searchTemplate>| script xor __EXECUTE__ "$input$" "$key$" | transpose</searchTemplate>
+      <description>XOR data below:</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>Input</label>
+      <suffix/>
+    </input>
+    <input type="text" token="key">
+      <label>Key</label>
+      <default>asdf</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Result</title>
+        <searchPostProcess>table "row 1" | rename "row 1" as ASCII</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Result (Hex)</title>
+        <searchPostProcess>table "row 3" | rename "row 3" as "Hex Answer"</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,105 @@
+<form>
+  <label>Monitor - User Activity - By Event Type</label>
+  <fieldset submitButton="false">
+    <input type="time" token="selector" searchWhenChanged="true">
+      <label>Select Time:</label>
+      <default>
+        <earliest>-1mon@mon</earliest>
+        <latest>@mon</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="user" searchWhenChanged="true">
+      <label>Select User:</label>
+      <search>
+        <query>index="orgsecure" sourcetype="orgsecure:logon"  | table  user | dedup user</query>
+      </search>
+      <fieldForLabel>user</fieldForLabel>
+      <fieldForValue>user</fieldForValue>
+      <choice value="0">Select User</choice>
+      <default>0</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>PC Access Log</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:logon"  user=$user$ |  table _time user src action | eval_time = strftime(_time, "%Y-%d-%m %H:%M:%S") | rename _time as Day user as User src as PC rem as Action</query>
+          <earliest>$selector.earliest$</earliest>
+          <latest>$selector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Removable Media Activity</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:device"  user=$user$ | eval rem=action | table _time user src rem file_tree | eval_time = strftime(_time, "%Y-%d-%m %H:%M:%S") | rename _time as Day user as User src as PC rem as Action file_tree as "Media Files"</query>
+          <earliest>$selector.earliest$</earliest>
+          <latest>$selector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Files Accessed</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:file"  user=$user$ |  table _time user src filename content  | eval_time = strftime(_time, "%Y-%d-%m %H:%M:%S") | rename _time as Day user as User src as PC filename AS FileName</query>
+          <earliest>$selector.earliest$</earliest>
+          <latest>$selector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Details of Emails Sent</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:email"  user=$user$ |  table _time user src to cc bcc from action size attachment   | eval_time = strftime(_time, "%Y-%d-%m %H:%M:%S") | rename _time as Day user as User src as PC</query>
+          <earliest>$selector.earliest$</earliest>
+          <latest>$selector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Websites Visited</title>
+        <search>
+          <query>index=orgsecure sourcetype="orgsecure:http"  user=$user$ |  table _time user src cs_uri_authority url  content | eval_time = strftime(_time, "%Y-%d-%m %H:%M:%S") | rename _time as Day user as User src as PC rem as Action cs_uri_authority As Site content as Content url As URL</query>
+          <earliest>$selector.earliest$</earliest>
+          <latest>$selector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,71 @@
+<form>
+  <label>Configure</label>
+  <description>This dashboard is used to initially configure all the Linux Auditd app's lookups. Please use the time picker to determine how far back the app should learn then click 'Submit'.</description>
+  <fieldset submitButton="true">
+    <input type="time" token="time_selector">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>auditd_hosts lookup</title>
+        <search>
+	  <query> | tstats values(host) as host WHERE [|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] | mvexpand host limit=0 | outputlookup auditd_hosts</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>auditd_host_inventory KVStore collection</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type="DAEMON_START" | dedup host | rex field=kernel "^(?&lt;kernel_version&gt;[0-9\-\.]+)\.(?&lt;distribution_release&gt;[^\.]+)\.?(?&lt;architecture&gt;.*)" | eval architecture=if(architecture=="","unknown",architecture) | table host kernel_version distribution_release architecture | rename host as _key | lookup auditd_host_inventory _key OUTPUT last_boot | outputlookup append=true auditd_host_inventory</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>learnt_posix_identities KVStore collection</title>
+        <search>
+          <query>[|inputlookup auditd_indices] [|inputlookup auditd_sourcetypes] type="USER_START" acct=* NOT acct=root NOT auid=0 terminal=/dev/tty* OR NOT addr=? | dedup auid | table auid acct | rename auid as _key | rename acct as user | outputlookup append=true learnt_posix_identities</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>auditd_indices lookup</title>
+        <search>
+          <query>| tstats values(sourcetype) as sourcetype where index=* [|inputlookup auditd_sourcetypes] by index | table index | outputlookup auditd_indices</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

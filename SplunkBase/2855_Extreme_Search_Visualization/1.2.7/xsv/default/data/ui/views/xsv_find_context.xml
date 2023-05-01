@@ -1,0 +1,49 @@
+<form script="xsv_find_context.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Redefine Context</label>
+  <description>Enter the criteria below to find an existing context that you have permissions to access.  Click the "Submit" button to view and/or redefine the selected context.</description>
+  <row id="xsv_select_row">
+    <html>
+      <div class="row-fluid">
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Scope:
+          </label>
+          <select id="scopeSelect">
+            <option value="public" selected="selected">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* App:
+            <span class="xsv_populating xsv_app"> Populating...</span>
+          </label>
+          <select id="appSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Container Name:
+            <span class="xsv_populating xsv_container"> Populating...</span>
+          </label>
+          <select id="containerSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Field (Context) Name:
+            <span class="xsv_populating xsv_context"> Populating...</span>
+          </label>
+          <select id="contextSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Class Name:
+            <span class="xsv_populating xsv_class"> Populating...</span>
+          </label>
+          <select id="classSelect">
+          </select>
+        </div>
+        <div class="buttons-wrapper clearfix" style="margin-left:20px;margin-top:20px;display:inline-block;">
+           <a id="submitButton" class="btn btn-primary pull-right" href="#" style="display:inline;margin-bottom:10px;">Submit</a>
+        </div>
+      </div>
+    </html>
+  </row>
+</form>

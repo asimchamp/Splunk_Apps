@@ -1,0 +1,432 @@
+{
+    "meta": {
+        "name": "TA_EMC-Isilon",
+        "displayName": "Dell PowerScale Add-on for Splunk",
+        "version": "3.0.0",
+        "restRoot": "TA_EMC_Isilon",
+        "schemaVersion": "0.0.3"
+    },
+    "pages": {
+        "configuration": {
+            "title": "Configuration",
+            "description": "Set up your add-on",
+            "tabs": [
+                {
+                    "entity": [
+                        {
+                            "help": "Enter a unique name for this cluster node.",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "minLength": 1,
+                                    "errorMsg": "Length of Cluster Node name should be between 1 and 50",
+                                    "type": "string",
+                                    "maxLength": 50
+                                },
+                                {
+                                    "pattern": "^[a-zA-Z]\\w*$",
+                                    "errorMsg": "Cluster Node name must start with a letter and followed by alphabetic letters, digits or underscores.",
+                                    "type": "regex"
+                                }
+                            ],
+                            "label": "Cluster Node Name",
+                            "type": "text",
+                            "field": "name"
+                        },
+                        {
+                            "field": "ip_address",
+                            "label": "IP Address",
+                            "type": "text",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                                    "errorMsg": "Please provide valid IP Address without Scheme.",
+                                    "type": "regex"
+                                }
+                            ],
+                            "help": "Enter the IP Address for this cluster node without scheme."
+                        },
+                        {
+                            "field": "username",
+                            "label": "Username",
+                            "type": "text",
+                            "required": true,
+                            "help": "Enter the username for this cluster node.",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 200,
+                                    "errorMsg": "Length of username should be between 1 and 200"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "password",
+                            "label": "Password",
+                            "type": "text",
+                            "encrypted": true,
+                            "required": true,
+                            "help": "Enter the password for this cluster node.",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 8192,
+                                    "errorMsg": "Length of password should be between 1 and 8192"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "index",
+                            "label": "Index",
+                            "type": "singleSelect",
+                            "defaultValue": "isilon",
+                            "help": "Enter the index in which you want to collect the data. Make sure that this index is already present.",
+                            "required": true,
+                            "options": {
+                                "endpointUrl": "data/indexes",
+                                "createSearchChoice": true,
+                                "denyList": "^_.*$"
+                            },
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 80,
+                                    "errorMsg": "Length of index name should be between 1 and 80."
+                                }
+                            ]
+                        },
+                        {
+                            "field": "verify_ssl",
+                            "label": "Verify SSL Certificate",
+                            "type": "checkbox",
+                            "defaultValue": true,
+                            "required": false,
+                            "help": "Should we verify your SSL certificate?"
+                        }
+                    ],
+                    "table": {
+                        "actions": [
+                            "edit",
+                            "delete",
+                            "clone"
+                        ],
+                        "header": [
+                            {
+                                "label": "Cluster Node Name",
+                                "field": "name"
+                            },
+                            {
+                                "label": "IP Address",
+                                "field": "ip_address"
+                            },
+                            {
+                                "label": "Username",
+                                "field": "username"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "saveValidator": "function(formData) { if(formData.name === 'proxy' || formData.name === 'logging' || formData.name === 'true' || formData.name === 'false' || formData.name === 'additional_parameters' || formData.name === 'additional_settings') { return 'Can not create Cluster Node named anyone of [proxy, logging, true, false, additional_parameters, additional_settings]. These are reserved keywords in Splunk.' ; } return true; }"
+                    },
+                    "name": "account",
+                    "title": "Cluster Node"
+                },
+                {
+                    "name": "proxy",
+                    "title": "Proxy",
+                    "entity": [
+                        {
+                            "field": "proxy_enabled",
+                            "label": "Enable",
+                            "type": "checkbox"
+                        },
+                        {
+                            "field": "proxy_type",
+                            "label": "Proxy Type",
+                            "type": "singleSelect",
+                            "options": {
+                                "disableSearch": true,
+                                "placeholder": "Select a Value",
+                                "autoCompleteFields": [
+                                    {
+                                        "label": "http",
+                                        "value": "http"
+                                    },
+                                    {
+                                        "label": "socks5",
+                                        "value": "socks5"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "http"
+                        },
+                        {
+                            "field": "proxy_url",
+                            "label": "Host",
+                            "type": "text",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 4096,
+                                    "errorMsg": "Max host length is 4096"
+                                }
+                            ],
+                            "options": {
+                                "placeholder": " "
+                            }
+                        },
+                        {
+                            "field": "proxy_port",
+                            "label": "Port",
+                            "type": "text",
+                            "validators": [
+                                {
+                                    "type": "number",
+                                    "range": [
+                                        1,
+                                        65535
+                                    ]
+                                }
+                            ],
+                            "options": {
+                                "placeholder": " "
+                            }
+                        },
+                        {
+                            "field": "proxy_username",
+                            "label": "Username",
+                            "type": "text",
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 50,
+                                    "errorMsg": "Max length of username is 50"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "proxy_password",
+                            "label": "Password",
+                            "type": "text",
+                            "encrypted": true,
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 0,
+                                    "maxLength": 8192,
+                                    "errorMsg": "Max length of password is 8192"
+                                }
+                            ]
+                        }
+                    ],
+                    "options": {
+                        "saveValidator": "function(formData) { if(!formData.proxy_enabled || formData.proxy_enabled === '0') { return true; } if(formData.proxy_enabled || formData.proxy_enabled === '1') { if(!formData.proxy_type) { return 'Proxy Type can not be empty'; } if(!formData.proxy_url) { return 'Proxy Host can not be empty.'; } if(!formData.proxy_port) { return 'Proxy Port can not be empty.'; } if ((!formData.proxy_username && formData.proxy_password) || (formData.proxy_username && !formData.proxy_password)) { return 'Either provide Proxy Username and Password both or none.'; } } return true; }"
+                    }
+                },
+                {
+                    "name": "logging",
+                    "title": "Logging",
+                    "entity": [
+                        {
+                            "field": "loglevel",
+                            "label": "Log level",
+                            "type": "singleSelect",
+                            "options": {
+                                "disableSearch": true,
+                                "placeholder": "Select a Value",
+                                "autoCompleteFields": [
+                                    {
+                                        "label": "DEBUG",
+                                        "value": "DEBUG"
+                                    },
+                                    {
+                                        "label": "INFO",
+                                        "value": "INFO"
+                                    },
+                                    {
+                                        "label": "WARNING",
+                                        "value": "WARNING"
+                                    },
+                                    {
+                                        "label": "ERROR",
+                                        "value": "ERROR"
+                                    },
+                                    {
+                                        "label": "CRITICAL",
+                                        "value": "CRITICAL"
+                                    }
+                                ]
+                            },
+                            "defaultValue": "INFO",
+                            "required": true
+                        }
+                    ]
+                }
+            ]
+        },
+        "inputs": {
+            "title": "Inputs",
+            "description": "Manage your data inputs",
+            "table": {
+                "header": [
+                    {
+                        "field": "name",
+                        "label": "Name"
+                    },
+                    {
+                        "field": "interval",
+                        "label": "Interval"
+                    },
+                    {
+                        "field": "index",
+                        "label": "Index"
+                    },
+                    {
+                        "field": "global_account",
+                        "label": "Cluster Node"
+                    },
+                    {
+                        "field": "disabled",
+                        "label": "Status"
+                    }
+                ],
+                "moreInfo": [
+                    {
+                        "field": "name",
+                        "label": "Name"
+                    },
+                    {
+                        "field": "interval",
+                        "label": "Interval"
+                    },
+                    {
+                        "field": "index",
+                        "label": "Index"
+                    },
+                    {
+                        "field": "disabled",
+                        "label": "Disabled"
+                    },
+                    {
+                        "field": "global_account",
+                        "label": "Cluster Node"
+                    },
+                    {
+                        "field": "endpoint",
+                        "label": "Endpoint"
+                    }
+                ],
+                "actions": [
+                    "edit",
+                    "enable",
+                    "delete",
+                    "clone"
+                ]
+            },
+            "services": [
+                {
+                    "name": "isilon",
+                    "title": "New Input",
+                    "entity": [
+                        {
+                            "field": "name",
+                            "label": "Name",
+                            "type": "text",
+                            "help": "Enter a unique name for the data input",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "pattern": "^[a-zA-Z]\\w*$",
+                                    "errorMsg": "Input Name must start with a letter and followed by alphabetic letters, digits or underscores."
+                                },
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 100,
+                                    "errorMsg": "Length of input name should be between 1 and 100"
+                                }
+                            ]
+                        },
+                        {
+                            "field": "interval",
+                            "label": "Interval",
+                            "type": "text",
+                            "defaultValue": 3600,
+                            "required": true,
+                            "help": "Time interval of input in seconds.",
+                            "validators": [
+                                {
+                                    "type": "regex",
+                                    "pattern": "^\\-[1-9]\\d*$|^\\d*$",
+                                    "errorMsg": "Interval must be an integer."
+                                },
+                                {
+                                    "range": [
+                                        60,
+                                        86400
+                                    ],
+                                    "type": "number",
+                                    "errorMsg": "Interval should be in the range of 60 to 86400 seconds."
+                                }
+                            ]
+                        },
+                        {
+                            "field": "index",
+                            "label": "Index",
+                            "type": "singleSelect",
+                            "defaultValue": "isilon",
+                            "options": {
+                                "endpointUrl": "data/indexes",
+                                "createSearchChoice": true,
+                                "denyList": "^_.*$"
+                            },
+                            "required": true,
+                            "validators": [
+                                {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 80,
+                                    "errorMsg": "Length of index name should be between 1 and 80."
+                                }
+                            ]
+                        },
+                        {
+                            "field": "global_account",
+                            "label": "Cluster Node",
+                            "help": "",
+                            "required": true,
+                            "type": "singleSelect",
+                            "options": {
+                                "referenceName": "account"
+                            }
+                        },
+                        {
+                            "field": "endpoint",
+                            "label": "Endpoint",
+                            "type": "text",
+                            "required": true,
+                            "validators": [
+                                {
+                                    "pattern": "^/platform/\\d+/",
+                                    "errorMsg": "Endpoint must start with '/platform/' followed by API version and other texts. ex: '/platform/3/statistics/summary/system'.",
+                                    "type": "regex"
+                                }
+                            ],
+                            "help": "Example: /platform/3/statistics/summary/system",
+                            "options": {
+                                "placeholder": "Enter the Endpoint here"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,515 @@
+{
+  "version": "1.0",
+  "date": "2023-04-27T07:36:17.133524605Z",
+  "hashAlgorithm": "SHA-256",
+  "app": {
+    "id": 2964,
+    "version": "1.10.10",
+    "files": [
+      {
+        "path": "bin/apply_qualys_tag_to_webapp.py",
+        "hash": "76c792afb20b0c4e286fad30c6a3831fb180da18ae20305344111febb9cbfbaa"
+      },
+      {
+        "path": "bin/cleanup.py",
+        "hash": "1185204a7c6c938489f1ea7330627343d25666439a4b2600ac034b04028ab4c8"
+      },
+      {
+        "path": "bin/common.py",
+        "hash": "ef2a787f44bcf77eceaca1473a918ca6d0af099ffc39439959e2a2f0e0c88fb9"
+      },
+      {
+        "path": "bin/get_file_hash.py",
+        "hash": "8e04317ec2ec82b47a97ee97f679ac025297ad68a6d13b03d30fcf7959e8ff6c"
+      },
+      {
+        "path": "bin/qualys.py",
+        "hash": "5852ff4a212d33f22a9880de37536f1733411ff01e5bbdaffaa069df883fbb8a"
+      },
+      {
+        "path": "bin/run.py",
+        "hash": "4622d0d6a490df7fae40cd68bd91e2d0e3350ce803bdba67a824b6e95be0551d"
+      },
+      {
+        "path": "bin/splunk_cluster/__init__.py",
+        "hash": "d9d1e7d06747dc0d3d304050bdaa64d284e4c0845e400147dfc443df47006f90"
+      },
+      {
+        "path": "bin/splunk_cluster/splunk_cluster.py",
+        "hash": "00d690d61946122aa096a0695b3070d18ce8c47e08104671ea879124b999b7af"
+      },
+      {
+        "path": "bin/splunk_cluster/xml_dom_parser.py",
+        "hash": "eb9363fb928c3f264d6ed0795fc027148a52423197127d80871b09ea6f12a89a"
+      },
+      {
+        "path": "bin/qualysModule/__init__.py",
+        "hash": "f30c8f6283d78917e206621d061ff264d0895668323e9e31de9298ca04ec7406"
+      },
+      {
+        "path": "bin/qualysModule/application_configuration.py",
+        "hash": "a4b8aca9a15b37312d61e226c4f416e48d6b4a2db3926575592fdb96e66e9a7b"
+      },
+      {
+        "path": "bin/qualysModule/qualys_log_populator.py",
+        "hash": "af78feebeee156b319b9449f9a6a929e8ce81ceaf66c9cdc2d951a6bc1ac70d6"
+      },
+      {
+        "path": "bin/qualysModule/lib/__init__.py",
+        "hash": "3f21c26532b520b02bde94b56c61718fb344d8a10e95c795dbfe4d79ce5dc9ca"
+      },
+      {
+        "path": "bin/qualysModule/lib/api/Client.py",
+        "hash": "108a6ce05345ca8487ade87162a933a37af3d899b7e5a1c32b6cc144d3e77add"
+      },
+      {
+        "path": "bin/qualysModule/lib/api/__init__.py",
+        "hash": "f2cee7986d3513f7fe0831d788db8e8b117a4f172f088346d3a7d51eab2bdb06"
+      },
+      {
+        "path": "bin/qualysModule/lib/api/jwt_client.py",
+        "hash": "225f97aefc3df5ca225fcb6383f15ace0f9e4c79662616cc98c5cfc77dbf9e8e"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/CSContainerFetchCoordinator.py",
+        "hash": "0bdd353bfabf2321c54e74e3a2427c722b5b9270c2c1e0e1f43f6829a7abcbd1"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/CSImageFetchCoordinator.py",
+        "hash": "9a2bc067a393645904a738d701a9ee37d51382a4e8c5559616b82f7d321ad0e4"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/DetectionFetchCoordinator.py",
+        "hash": "4a5965c7d8c26b28226ff45fe9b90fab5f1c8e036c2a850e43c6927919ab1787"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/FIMEventsFetchCoordinator.py",
+        "hash": "6ec484697914df5eb8d4d9f964905c003ea686b3968c9435135964eb022eff60"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/FIMIncidentsFetchCoordinator.py",
+        "hash": "cc4e19b778306b54612e65de9cd96637e7635a3c2bf804c5c5570e22e6fd66ea"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/PCRSPostureInfoFetchCoordinator.py",
+        "hash": "e893c67f35d9819e8a103adbb35c1fac4e2a571cc1e31c7b0862dafb9dc52c75"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/PostureInfoFetchCoordinator.py",
+        "hash": "5c62aa0ba7e641f2656d595032a1fee3782be38b2d3133ad0f23c2ead91c2aed"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/WASFindingsFetchCoordinator.py",
+        "hash": "109b3e35dfac673f3557e72be79e01433eea40c6b41d2291fdd6db257a3d5a1a"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/__init__.py",
+        "hash": "b41df538ae424b9b0cb444282e9f8183befaed5b9c0b91142f708390754aae6b"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/activityLogPopulator.py",
+        "hash": "dbbf99f6683afed2fe92dfe08a72e23f838ebe82603d98d3397e8fd020f12595"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/assethost.py",
+        "hash": "0b9ba07b5f76618abf1314d2b6c13fb222676b731724e2038a2a0c82225ac4cb"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/basepopulator.py",
+        "hash": "3d170529b1fc6acc6fa2c6ec03d881c7349b9d816540e797735d2c6bb6419f33"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/basepopulator_json.py",
+        "hash": "a62fad1530a4857d6986d150ce1cc9765287f3a93a46ac9d0ea703d41c29ddd4"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/cspopulator.py",
+        "hash": "ba8089847418a221b143344c97a5e9d012f7345a8e68ce828b50c756ecab13e8"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/detectionpopulator.py",
+        "hash": "483a7be7bc3e9cc9709d78f0839574f59c98b2540222b4489d65b921a47bb675"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/fimpopulator.py",
+        "hash": "bba0bd00487582a89dbab9c222f737eed9b0663120e4f44dd1c0e8035893a924"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/iocpopulator.py",
+        "hash": "e7dc0eaa68f7020f524c3cc337e772a36b3a4d117ab7b15a6336fe237ae8a8ee"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/kbpopulator.py",
+        "hash": "46456477e68e8959d1a90f59477c8040e274e67e7f1fffe005ea46659d126b4b"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/pcrspopulator.py",
+        "hash": "9d591287976db5e8e23aeb5d1b6dbf0d7bd0248c415983ca48bf7f59be9b2ce6"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/policypopulator.py",
+        "hash": "43285a9ab13c197e2921bf4ce477d1d10a881cf179fe4459c9d46ce6b9924798"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/semdetectionpopulator.py",
+        "hash": "46b61eaff3d51be93d69241110d9676055b0d2fbf07fd9772518b264a2639344"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/utils.py",
+        "hash": "1add4af81263f68f7a8b9ecafc7ea92bd5b463dc1f36a337d7865e07d646c101"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/webapp.py",
+        "hash": "9dea018d863cb9b9a1bb2694f21c450909c45cde0dd7a8dfff4ce7c3b3ccd580"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/qid_plugins/__init__.py",
+        "hash": "cd6ac7d4099e6cd897b6c75040334d54f9f89a56717ce28499a20850c50244ec"
+      },
+      {
+        "path": "bin/qualysModule/splunkpopulator/qid_plugins/qid_parsers.py",
+        "hash": "e5bcb30421839844fa18e64f1c4c6c499b698c4008c9427795669b9b9bbe5881"
+      },
+      {
+        "path": "README/alert_actions.conf.spec",
+        "hash": "88b08fed562f89e8a67bfe214a42c3a30fc50a6d00a4baf090e4ae8f308fc40d"
+      },
+      {
+        "path": "README/inputs.conf.spec",
+        "hash": "6edac3fb1481b01860c1070e16cbbba75cc4b5f385b15bdc3fdea2724bcf9bfc"
+      },
+      {
+        "path": "README/savedsearches.conf.spec",
+        "hash": "1d42a2bd9078e17875693c669591b49e3d52fa5eaa2b7205abcb0a0e9196c52e"
+      },
+      {
+        "path": "appserver/static/javascript/views/setup_view_qualysta.js",
+        "hash": "888b7c9ff39598a426fa55c07cee6c0636c4fd420968578fad4c8513df0ae005"
+      },
+      {
+        "path": "appserver/static/javascript/setup_page.js",
+        "hash": "c03bb6462606357ce3f1d7dfdd48987a7c69b46897d519b077148398c9081c32"
+      },
+      {
+        "path": "appserver/static/styles/setup_page.css",
+        "hash": "e7d0191ac27051afa034475a202bdf08ab106fb1c44d74eb2e9002284c727ca6"
+      },
+      {
+        "path": "appserver/static/appIcon.png",
+        "hash": "c5d3dd70c1d2b84e7be009a54cf7c63402e60a9aee8fbfaeaa964bcd13c2d980"
+      },
+      {
+        "path": "appserver/static/appIcon_2x.png",
+        "hash": "d5411a5aad07f6cbad314a4169b66824a2f2404e7037d50fc235c4103445a1e2"
+      },
+      {
+        "path": "bin/whl/croniter-0.3.31-py2.py3-none-any.whl",
+        "hash": "cfd0837246845d3f3eb463ae8790bfb7db6ac76743e8f31aacaf37830de7fb52"
+      },
+      {
+        "path": "bin/whl/defusedxml-0.7.1-py2.py3-none-any.whl",
+        "hash": "a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61"
+      },
+      {
+        "path": "bin/whl/python_dateutil-2.8.1-py2.py3-none-any.whl",
+        "hash": "75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"
+      },
+      {
+        "path": "bin/whl/six-1.15.0-py2.py3-none-any.whl",
+        "hash": "8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"
+      },
+      {
+        "path": "bin/whl/urllib3-1.25.11-py2.py3-none-any.whl",
+        "hash": "f5321fbe4bf3fefa0efd0bfe7fb14e90909eb62a48ccda331726b4319897dd5e"
+      },
+      {
+        "path": "config/readme.txt",
+        "hash": "ae19b0e59646b33a4619af5a88b0fe1cff0e1ad344aedcb60899825e0d620d7a"
+      },
+      {
+        "path": "default/data/ui/alerts/apply_qualys_tag_to_webapp.html",
+        "hash": "cd39465109cbe26bfd10427f6d772f24957a47ac74ab2b3ebfd0f6e12144d969"
+      },
+      {
+        "path": "default/data/ui/manager/data_inputs_qualys.xml",
+        "hash": "181a446fb3f26c0eaf6544bd16d306574d88b284017285ee5d2715671ffd7aba"
+      },
+      {
+        "path": "default/data/ui/views/TA-QualysCloudPlatform.xml",
+        "hash": "ca424ab16af8ea38e43801126e82debf308436eae3db1cd9d8a05b65081b984a"
+      },
+      {
+        "path": "default/alert_actions.conf",
+        "hash": "da3c9a453df5faa93e55957fc6656c800f68e3b9a358139aa854f4539187426d"
+      },
+      {
+        "path": "default/app.conf",
+        "hash": "2563cf1e5499c92998624a0280a90d67edcbed2f159508d2eeb2a34cde9c94a1"
+      },
+      {
+        "path": "default/correlationsearches.conf",
+        "hash": "826fbc62e77fbe28767ad524c660242f7dd0a3d33349b5c96748d45e0ab18934"
+      },
+      {
+        "path": "default/eventgen.conf",
+        "hash": "b53c54351aab4506e48fec1640bbad73c50666481d57fd3ebe5f2eacd1882750"
+      },
+      {
+        "path": "default/eventtypes.conf",
+        "hash": "9c62b4f1d181ab6afb626e1876e265a2bff11e468456802ddde9d6c76edc9e37"
+      },
+      {
+        "path": "default/fields.conf",
+        "hash": "a5811e31393c7a8304e12473cf631ca429004034874636170cef200f292849a9"
+      },
+      {
+        "path": "default/inputs.conf",
+        "hash": "42da9a8a8a0a6f4441c16009f3d7ed9ca365058fdca26ac4ee8b8eb2beb13ad3"
+      },
+      {
+        "path": "default/macros.conf",
+        "hash": "66600b4d167f0631b2d67cb0951181768e69711ddb649cfbb2b0583231832351"
+      },
+      {
+        "path": "default/props.conf",
+        "hash": "4c2ac9a027dc5924b46c4935df20688b83194bd1f76e5a4176faba13c62c4601"
+      },
+      {
+        "path": "default/qualys.conf",
+        "hash": "aed6d4c5b9c861e6e834c11c3356911371e0d340c074214493f27d9d8c56cfbf"
+      },
+      {
+        "path": "default/restmap.conf",
+        "hash": "1488593f7543fbe04b4b7a4b39e34527468701b415a4431e3755239ac780f024"
+      },
+      {
+        "path": "default/savedsearches.conf",
+        "hash": "fe052d5a61828fe8446610e84a876a2e9c1097aad15bf2b6a6a8b8212b5ef7f3"
+      },
+      {
+        "path": "default/tags.conf",
+        "hash": "7785420924d033edb609c9db5f304356fe8fc2de664290b5bd6fd2dea5a11b8e"
+      },
+      {
+        "path": "default/transforms.conf",
+        "hash": "5c5a14f42479b5b1e2161e42ab1bdff43ecc0803bbe33dbb9f29d14b81aa4514"
+      },
+      {
+        "path": "lib/splunklib/modularinput/__init__.py",
+        "hash": "6c7c88d29dc6b41a008db14211bb9489b1052b09c70f267364ec12e05bedd33b"
+      },
+      {
+        "path": "lib/splunklib/modularinput/argument.py",
+        "hash": "386603096d45c3b3ec3328317adc334c7d981a6d5f77312b657c5463207e58d5"
+      },
+      {
+        "path": "lib/splunklib/modularinput/event.py",
+        "hash": "c55fa7dfc338c4553c381def713feef1c965586068e411c658d6174dc7c93889"
+      },
+      {
+        "path": "lib/splunklib/modularinput/event_writer.py",
+        "hash": "775ddbcca70961ac0dd50f92da2b8744e976aa179a5408ae0935b6c0478a6991"
+      },
+      {
+        "path": "lib/splunklib/modularinput/input_definition.py",
+        "hash": "444fd09df04b5c0d8985d12c86f7255734c129ca6963f92d43494e0251943cd7"
+      },
+      {
+        "path": "lib/splunklib/modularinput/scheme.py",
+        "hash": "c25945b449d5f74318f4536b3d1dcea0885dcd55386e5685ece35a11c2f77a44"
+      },
+      {
+        "path": "lib/splunklib/modularinput/script.py",
+        "hash": "61933b50a205b8b924365765180b64f077dbc33675d6e7afd0883cbec315196a"
+      },
+      {
+        "path": "lib/splunklib/modularinput/utils.py",
+        "hash": "83436d75504c83787ccca21a0dfbad8a280043232959de9137ce6daa7a9470c6"
+      },
+      {
+        "path": "lib/splunklib/modularinput/validation_definition.py",
+        "hash": "a2b0f857f8589a9c6db87b2ffc685c3e785c183a079ca31253e2928539940b02"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/__init__.py",
+        "hash": "4499f53209862c3ea6abb43d5b50dc6b648b95cbbd4a349539e159c2f3cf1531"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/decorators.py",
+        "hash": "1114bc1cff0fb06578042bbd2a0b31902e942b0c080458c60d6aea887cb69b50"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/environment.py",
+        "hash": "997e76b662628010e782e22bcefccc1c5bbd5f2b039068ba58d9791ae50a293b"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/eventing_command.py",
+        "hash": "471cbcf2e07de71150d86ab853b7b8e51a1cfb31913355f6cdd7c821b44d87e2"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/external_search_command.py",
+        "hash": "9a5fbfe2a301671fccd0e62209ebc076945904b1bf8a1ee94d1b261256e7d9ad"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/generating_command.py",
+        "hash": "f77c701ed408454225c5d1b6ba126fc64ea89a9e1210b79f33cc2ab1f2a95cd1"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/internals.py",
+        "hash": "6a057ff3bee5c7186ee231eb38cbff2c4e3008cc49f1d72421e8d8cce7951b51"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/reporting_command.py",
+        "hash": "40537218ef844255b4d41c44130e5cec95a1e0801f866dbd4a500a8237edbb26"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/search_command.py",
+        "hash": "fe93e9ffd18967381075d0334e90126c30468ad12b8141f55dce2f57b19eb9e5"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/streaming_command.py",
+        "hash": "aa45695ec34a4125a84c4d592ca26f2bb68f14743274f163f533ffc7bc0b9ed7"
+      },
+      {
+        "path": "lib/splunklib/searchcommands/validators.py",
+        "hash": "817947d71f57af4057da04aa185e8cf663f99edad1027df1b0828ffc1c574fa9"
+      },
+      {
+        "path": "lib/splunklib/__init__.py",
+        "hash": "7851169f5bf1076279f4a30a20171a084822e7981c050efdb43374f184cd4607"
+      },
+      {
+        "path": "lib/splunklib/binding.py",
+        "hash": "ba2eb56335b4ccaa588d4add6aacb21ccfe686c86fc91687e7f9866ca2d8f337"
+      },
+      {
+        "path": "lib/splunklib/client.py",
+        "hash": "06e43801082ebaf3e7c87e2de76338ce364604e7f6067f138015c9f515f67ae9"
+      },
+      {
+        "path": "lib/splunklib/data.py",
+        "hash": "2d4c7006186b005851321c225447b0f890d81d00067285a7da58a56636475054"
+      },
+      {
+        "path": "lib/splunklib/ordereddict.py",
+        "hash": "b222ad43a7c540661416297cbe429ac06aac3a11e0cf859161b85bcf1c4cd15d"
+      },
+      {
+        "path": "lib/splunklib/results.py",
+        "hash": "6a6bdb1f77c2940c10c2f4e2d14b97bbde178c04fc9ac82217b4cae724451152"
+      },
+      {
+        "path": "lib/splunklib/six.py",
+        "hash": "43a5af1176750c6100480a370863422642afdad3f2f3191298af951c4f4f6080"
+      },
+      {
+        "path": "lib/__init__.py",
+        "hash": "327952ba0e782f1562120ad30ea15c8253583cbf73ca4aa6e7b6df336e880e3c"
+      },
+      {
+        "path": "lookups/qualys_kb.csv",
+        "hash": "dc2ca8b9c696d8f6ec9688351ca9ab747af0ae21eacc069c4a088f09e04d9343"
+      },
+      {
+        "path": "lookups/qualys_severity.csv",
+        "hash": "bd825d1bbf86455d0734414a3b9fe1e055bdc1da8d825c289be8fd3ff0166963"
+      },
+      {
+        "path": "metadata/default.meta",
+        "hash": "7a2d9f73e7f8e6df60848b9b1d8607e06ae3bfbf1b326881bd4ade80bc1d6602"
+      },
+      {
+        "path": "samples/host_detection.log",
+        "hash": "bd319ee405aab65cf00da7192c0a1b7427eb8257d68dfb0512d6820af0724aa7"
+      },
+      {
+        "path": "samples/policy_posture_info.2.log",
+        "hash": "38b6d921d7ca95e2c450e6b297eff2af59bb7a8601a91b22115023f58cd7c0fb"
+      },
+      {
+        "path": "samples/policy_posture_info.log",
+        "hash": "a8c708870114a717e74e7bd2475ace355c6ed0c2c7555e5d8cf3b15958cf0029"
+      },
+      {
+        "path": "samples/was_findings.log",
+        "hash": "91eb472a658bdaa9be046165593d3073622ce0336adc1c329c2c6fa2610f6d0a"
+      },
+      {
+        "path": "static/appIcon.png",
+        "hash": "df26eab0fbd71ac437eeaf227f32b54381772e693758ce2eb2c13db779e8a73c"
+      },
+      {
+        "path": "static/appIcon_2x.png",
+        "hash": "1103364f4939de86ed0ec3dee72e5850ae0fa054a153d6160a6132996c48ff4c"
+      },
+      {
+        "path": "static/application.css",
+        "hash": "80d23cfab75b98e7faf23d7109d3727c5d5c82bc40748cb6f16c36eb64f4f98b"
+      },
+      {
+        "path": "tmp/readme.txt",
+        "hash": "f4dd63d406b65f1d7abf7e63c5a0d259165847ee499a3e07977157485605befe"
+      },
+      {
+        "path": "Jenkinsfile",
+        "hash": "f3c59c6f7e67f65ca338eaf1ac43a9c11d9586477a971c5bf4626385c89f13a5"
+      },
+      {
+        "path": "README.md",
+        "hash": "2b4f1ae90be021af8962b5e9e6e93bc9f661286876caea017a966009c126b525"
+      },
+      {
+        "path": "license.txt",
+        "hash": "26e2e630b2065384e9e5de579fef06b6b1d7cb484fea9d283fc8e39397b163b3"
+      },
+      {
+        "path": "properties.yaml",
+        "hash": "7b90e934efe656e1177b0ccea812f497a5aaff9c18e000bf850777992eaa5c7f"
+      },
+      {
+        "path": "sonar-project.properties",
+        "hash": "cee07dec3178ba71466b0a64904d23dc02eadaede2853baad38058d902ed72eb"
+      },
+      {
+        "path": "VERSION.pkg",
+        "hash": "790f6375ef104b9bc99cb0af352bd793f8cbcf2422f14a903b2a0f5a62a602f9"
+      }
+    ]
+  },
+  "products": [
+    {
+      "platform": "splunk",
+      "product": "enterprise",
+      "versions": [
+        "7.3",
+        "8.0",
+        "8.1",
+        "8.2",
+        "9.0"
+      ],
+      "architectures": [
+        "x86_64"
+      ],
+      "operatingSystems": [
+        "linux"
+      ]
+    },
+    {
+      "platform": "splunk",
+      "product": "cloud",
+      "versions": [
+        "7.3",
+        "8.0",
+        "8.1",
+        "8.2",
+        "9.0"
+      ],
+      "architectures": [
+        "x86_64"
+      ],
+      "operatingSystems": [
+        "linux"
+      ]
+    }
+  ]
+}

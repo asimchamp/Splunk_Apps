@@ -1,0 +1,171 @@
+<dashboard>
+  <label>Alternatives to Transaction</label>
+  <row>
+    <html>
+      <h2>Background</h2>
+      <p>Transaction is an incredibly powerful command. You can do things with transaction that are either impossible or ridiculously difficult to replicate without. But that said, transaction is really slow, and a lot of the time you can get away without it. Consider the following options for avoiding Transaction.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Key Techniques:</h2>
+<p>This example leverages the following useful techniques:</p>
+	<ul>
+      <li>Stats by UID: Basically the same thing as transaction</li>
+		  <li>Eventstats: Non-destructive stats</li>
+      <li>Streamstats: incrementally walk through your rows, with the non-destructive power of stats.</li>
+      <li>Geostats: Not really relevant for a transaction alternative, but why not in a coverage of the stats?</li>
+      </ul>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>The Searches</h2>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h3>Transaction</h3>
+      <pre>
+        <![CDATA[sourcetype=cisco:esa | transaction mid icid dcid]]>      </pre>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <search>
+          <query>sourcetype=cisco:esa | transaction mid icid dcid</query>
+        </search>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>["host","source","sourcetype"]</fields>
+      </event>
+    </panel>
+  </row>
+  <row>
+    <html>
+      <h3>Stats by Unique ID</h3>
+      <pre>
+        <![CDATA[sourcetype=cisco:esa  | stats values(_raw) by mid]]>      </pre>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+sourcetype=cisco:esa  | stats values(_raw) by mid
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <html>
+      <h3>Eventstats</h3>
+      <pre>
+        <![CDATA[sourcetype=cisco:esa  | eventstats values(mid) as mid by icid | eventstats values(mid) as mid by dcid | stats values(_raw) by mid]]>      </pre>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+sourcetype=cisco:esa  | eventstats values(mid) as mid by icid | eventstats values(mid) as mid by dcid | stats values(_raw) by mid
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <html>
+      <h3>Streamstats</h3>
+      <pre>
+        <![CDATA[sourcetype=cisco:esa  | streamstats count as LogOrder | streamstats window=3 avg(eval(len(_raw))) as rolling_average_event_length_in_bytes | streamstats window=1 current=f values(eval(len(_raw))) as last_event_length_in_bytes| table _time LogOrder rolling* last* _raw]]>      </pre>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+sourcetype=cisco:esa  | streamstats count as LogOrder | streamstats window=3 avg(eval(len(_raw))) as rolling_average_event_length_in_bytes | streamstats window=1 current=f values(eval(len(_raw))) as last_event_length_in_bytes| table _time LogOrder rolling* last* _raw
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <html>
+      <h3>Geostats</h3>
+      <pre>
+        <![CDATA[sourcetype=cisco:esa  | rex max_match=100 "(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})" | fields ip | mvexpand ip | table ip | iplocation ip | where isnotnull(lat) | geostats count]]>      </pre>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+sourcetype=cisco:esa  | rex max_match=100 "(?<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})" | fields ip | mvexpand ip | table ip | iplocation ip | where isnotnull(lat) | geostats count
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <map>
+        <search>
+          <query>sourcetype=cisco:esa  | rex max_match=100 "(?&lt;ip&gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})" | fields ip | mvexpand ip | table ip | iplocation ip | where isnotnull(lat) | geostats count</query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+        <option name="mapping.choroplethLayer.colorBins">5</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.drilldown">all</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.panning">1</option>
+        <option name="mapping.map.scrollZoom">0</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.type">marker</option>
+      </map>
+    </panel>
+  </row>
+</dashboard>

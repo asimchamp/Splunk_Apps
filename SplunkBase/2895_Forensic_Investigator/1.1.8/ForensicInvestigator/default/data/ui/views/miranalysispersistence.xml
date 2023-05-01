@@ -1,0 +1,47 @@
+<form stylesheet="custom.css">
+  <label>Persistence - Analysis</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="hostname" searchWhenChanged="true">
+      <label>Host Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="PersistenceType" searchWhenChanged="true">
+      <label>Persistence Type</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="Extension" searchWhenChanged="true">
+      <label>File Extension</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="MD5" searchWhenChanged="true">
+      <label>File MD5</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | table host, PersistenceItem.PersistenceType, PersistenceItem.FileOwner, PersistenceItem.FileModified, PersistencePath, PersistenceItem.FilePath, PersistenceItem.FileItem.Username, PersistenceItem.FileItem.FileExtension, PersistenceItem.FileItem.Md5sum | rename PersistenceItem.PersistenceType as PersistenceType, PersistenceItem.FileOwner as PersistenceOwner, PersistenceItem.FileModified as PersistenceFileModified, PersistenceItem.FilePath as FilePath, PersistenceItem.FileItem.Username as FileOwner, PersistenceItem.FileItem.FileExtension as FileExtension, PersistenceItem.FileItem.Md5sum as FileMD5</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

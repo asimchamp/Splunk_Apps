@@ -1,0 +1,253 @@
+<form version="1.1" showsource="False" script="autodiscover.js, default_token.js" stylesheet="drilldownBkgd.css, css/common.css">
+  <label>User Activity by Volume</label>
+  <init>
+    <set token="user_tok"></set>
+    <set token="User">*</set>
+    <set token="q">*</set>
+    <set token="pn_tok"></set>
+  </init>
+  <search id="sankey_search">
+    <query>
+      <![CDATA[
+                    `nvm_flowdata_index` dh!="Unknown" liuid="$q$" | stats count by liuid dh | sort count asc | head 15
+                ]]>
+    </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  <search id="baseSearch">
+    <query>
+        `nvm_flowdata_index` $pn_tok$ $user_tok$ $ph_tok$ NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=softwareupdate AND pap!=nobody AND pap!=_mdnsreponder AND pap!=_lp AND pap!=_locationd AND pap!=root pap!=UpdateUser) | fields _time, udid, da, dp, pn, ppn, ibc. liuid, ibc, obc, dh, transport, user, sa,sp, iid  | eval dh = if(dh="Unknown", da, dh) | join udid [ | inputlookup unique_endpoints | search $vsn_tok$ ]   
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search id="destSearch">
+    <query>
+        `nvm_flowdata_index` $pn_tok$ $user_tok$ $ph_tok$ NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=softwareupdate AND pap!=nobody AND pap!=_mdnsreponder AND pap!=_lp AND pap!=_locationd AND pap!=root pap!=UpdateUser) | eval dh = if(dh="Unknown", da, dh) | table dh, liuid
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset submitButton="true">
+    <input type="time" token="time" searchWhenChanged="false">
+      <label>Time</label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="vsn_tok" searchWhenChanged="false">
+      <label>Device(s)</label>
+      <default>*</default>
+      <!-- Each value will be surrounded by the valuePrefix and valueSuffix -->
+      <valuePrefix>vsn="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>vsn</fieldForLabel>
+      <fieldForValue>vsn</fieldForValue>
+      <search>
+        <query>| inputlookup unique_endpoints | stats count by vsn</query>
+        <earliest>0</earliest>
+      </search>
+    </input>
+    <input type="multiselect" token="pn_tok" searchWhenChanged="false">
+      <label>Process(es)</label>
+      <!-- Each value will be surrounded by the valuePrefix and valueSuffix -->
+      <valuePrefix>pn="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>pn</fieldForLabel>
+      <fieldForValue>pn</fieldForValue>
+      <search>
+        <query>`nvm_flowdata_index` | stats count by pn</query>
+        <earliest>0</earliest>
+      </search>
+    </input>
+    <input type="multiselect" token="user_tok" searchWhenChanged="false">
+      <label>Users</label>
+      <!-- Each value will be surrounded by the valuePrefix and valueSuffix -->
+      <valuePrefix>user="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <!-- All the values and their valuePrefix and valueSuffix will be concatenated together with the delimiter between them -->
+      <delimiter> OR </delimiter>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>user</fieldForLabel>
+      <fieldForValue>user</fieldForValue>
+      <search>
+        <query>`nvm_flowdata_index` ph!="" | stats count by user</query>
+        <earliest>0</earliest>
+      </search>
+    </input>
+    <input type="text" token="ph_tok" searchWhenChanged="false">
+      <label>Process Hash</label>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel id="drilldown">
+      <title>Select a User to drilldown and obtain information on Destination Domains reached by the User</title>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Users by Flow Count</title>
+      <chart>
+        <search base="baseSearch" id="user_flows">
+          <query>| replace '' with "Unknown"| stats count(liuid) by liuid | sort count desc | head 15</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="User">$click.value$</set>
+          <eval token="tok_auth">mvindex(split('click.value', "\\\\"), 0)</eval>
+          <eval token="tok_princ">mvindex(split('click.value', "\\\\"), 1)</eval>
+          <eval token="q">replace('click.value', "\\\\", "\\\\")</eval>
+          <set token="Drilldown_source">"total_flows"</set>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top Users by In-Bytes</title>
+      <chart>
+        <search base="baseSearch" id="users_in_bytes">
+          <query>| replace '' with "Unknown"| regex pap!=".*\\\\x*" | stats sum(ibc) by liuid | rename sum(ibc) as in_bytes | sort in_bytes desc | head 15</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="User">$click.value$</set>
+          <eval token="tok_auth">mvindex(split('click.value', "\\"), 0)</eval>
+          <eval token="tok_princ">mvindex(split('click.value', "\\"), 1)</eval>
+          <eval token="q">replace('click.value', "\\\\", "*")</eval>
+          <set token="Drilldown_source">"inbytes"</set>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Top Users by Out-Bytes</title>
+      <chart>
+        <search base="baseSearch" id="user_out_bytes">
+          <query>| replace '' with "Unknown" | regex pap!=".*\\\\x*" | stats sum(obc) by liuid | rename sum(obc) as out_bytes | sort out_bytes desc | head 15</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="User">$click.value$</set>
+          <set token="Drilldown_source">"outbytes"</set>
+          <eval token="tok_auth">mvindex(split('click.value', "\\"), 0)</eval>
+          <eval token="tok_princ">mvindex(split('click.value', "\\"), 1)</eval>
+          <eval token="q">replace('click.value', "\\\\", "\\\\")</eval>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Destination Domains reached by User : $User$</title>
+      <chart id="DestinationDomains" depends="$User$">
+        <search base="destSearch" id="destinations_by_user">
+          <query>| search dh!="Unknown" liuid="$q$" | top 15 dh | rename dh AS "Destination Domains", count AS "Flows"</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel id="DestinationDomains_sankey" depends="$User$">
+      <html>
+                <div id="sankey" class="splunk-view" data-require="app/CiscoNVM/components/sankey/sankey" data-options="{                             &quot;managerid&quot;: &quot;sankey_search&quot;,                             &quot;height&quot;: 400                          }">
+                </div>
+            </html>
+    </panel>
+  </row>
+</form>

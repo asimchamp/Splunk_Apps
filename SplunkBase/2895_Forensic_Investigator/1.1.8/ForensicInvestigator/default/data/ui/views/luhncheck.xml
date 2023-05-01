@@ -1,0 +1,26 @@
+<form stylesheet="custom.css">
+  <label>Luhn Checker</label>
+  <searchTemplate>| script luhn __EXECUTE__ "$input$"</searchTemplate>
+      <description>Enter the suspected credit card number below.  Ex:4375154985979495</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>Number:</label>
+      <suffix/>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Result</title>
+        <searchPostProcess>table answer | rename answer as Answer</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

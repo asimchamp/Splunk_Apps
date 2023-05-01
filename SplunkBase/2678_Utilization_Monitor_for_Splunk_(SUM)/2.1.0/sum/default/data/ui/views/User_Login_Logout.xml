@@ -1,0 +1,134 @@
+<form>
+  <label>Search Head User Logins/Logouts</label>
+  <fieldset submitButton="false">
+    <input searchWhenChanged="true" token="timepicked" type="time">
+      <label>Time</label>
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input searchWhenChanged="true" token="host" type="dropdown">
+      <label>Splunk Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="host" fieldForValue="host">(index=_audit sourcetype=audittrail) OR (index=_internal sourcetype=splunk_web_service) | stats count by host | sort host</populatingSearch>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Unique Splunk Users Seen</title>
+        <search>
+          <query>index=_audit user!="splunk-system-user" user!="N/A" user=* host=$host$   NOT (action=log* info=fail*) | stats dc(user) as "Splunkers"</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="afterLabel">Splunkers</option>
+        <option name="linkView">search</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">auto</option>
+        <option name="underLabel">Between $timepicked.earliest$ and $timepicked.latest$</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <drilldown>
+          <set token="splunkers">$click.value$</set>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <table depends="$splunkers$">
+        <title>List of Active Splunk Users</title>
+        <search>
+          <query>index=_audit user!="splunk-system-user" user!="N/A" user=* host=$host$ NOT (action=log* info=fail*) | stats max(_time) as "Last Action" by user | rename user as Splunker | eval "Last Action"=strftime('Last Action', "%Y-%m-%d %H:%M:%S %z") |</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Login/Logout Events over Time</title>
+        <searchString>index=_audit sourcetype=audittrail user=* action=log* host=$host$  | rename info as status | replace succeeded with success in status | replace failed with failure in status | replace "login attempt" with login in action | stats count by action _time | append [search index=_internal sourcetype=splunk_web_service user=* action=log* | stats count by action _time] | timechart count by action | rename login as Logins, logout as Logouts</searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Login Events</title>
+        <search>
+          <query>index=_audit sourcetype=audittrail user=* action=log* host=$host$ | rex "info=(?&lt;info&gt;\w+)" | rename info as status | replace succeeded with success, failed with failure in status | replace "login attempt" with login in action |  stats count by user action status _time | join user [search index=_internal sourcetype=splunkd_ui_access NOT user="-" | stats first(clientip) as clientip by user] | eval action=action." ".status | table _time user clientip action | eval _time=strftime(_time, "%Y-%m-%d %H:%M:%S %z") | rename user as "User ID", clientip as "Client IP Address", action as Action, _time as Time</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <!-- old query <searchString>index=_audit sourcetype=audittrail user=* action=log* host=$host$ | rename info as status | replace succeeded with success in status | replace failed with failure in status | replace "login attempt" with login in action |  stats count by user action status _time | append [search index=_internal sourcetype=splunk_web_service user=* action=log* | stats count by user action status _time] | join user [search index=_internal sourcetype=splunk_web_service | stats first(clientip) as clientip by user] | eval Time=strftime(_time, "%Y-%m-%d %H:%M:%S %z")  | table Time user clientip action status | rename user as "User ID", clientip as "Client IP Address", action as Action, status as Status</searchString> -->
+        <!-- new query below 12/03/2015 -->
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Failed Login Attempts</title>
+        <!-- new query 12/03/2015 -->
+        <search>
+          <query>index=_internal sourcetype=splunkd log_level=ERROR component=UiAuth clientip=* user=* host=$host$ | eval action=action." ".status | table _time user clientip action reason | eval _time=strftime(_time, "%Y-%m-%d %H:%M:%S %z") | rename user as "User ID", clientip as "Client IP Address", action as Action, _time as Time, reason as Reason</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <!-- old query <searchString>host=$host$  (index=_audit sourcetype=audittrail) OR (index=_internal sourcetype=splunk_web_service) user=* action=login status=failure
+| rex "ERROR=(?&lt;Error&gt;.+)$"
+| eval Time=strftime(_time, "%m/%d/%Y %I:%M:%S %p") 
+| table Time clientip user action status Error
+| rename user as Username, action as Action, status as Status, clientip as "Client IP"</searchString>
+-->
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

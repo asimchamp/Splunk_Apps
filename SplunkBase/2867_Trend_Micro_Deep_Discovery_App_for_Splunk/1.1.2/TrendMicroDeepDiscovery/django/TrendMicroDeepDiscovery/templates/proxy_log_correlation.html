@@ -1,0 +1,310 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}Web Access Log Correlation{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+{% endblock css %}
+
+{% block content %}
+<div class="dashboard-body container-fluid main-section-body">
+    <div class="dashboard-header clearfix">
+      <h2>Web Access Log Correlation</h2>
+    </div>
+   <div class="dashboard-row dashboard-row1">
+  <!-- Row for the time range picker -->
+  <div class="dashboard-row">
+    <div class="dashboard-cell" style="width: 100%;">
+      <div class="dashboard-panel">
+        <div class="dashboard-element">
+          <div class="panel-body" style="padding: 1%;">
+	    <div style="display: inline; float: left;">
+	      <p>Period / Range:</p>
+	    </div>
+            <div style="display: inline; float: left;position: relative; left: 0.5%;">
+	      {% timerange id="timerange1"
+              managerid="main-search"
+              earliest_time="$earlyval$"|token_safe
+              latest_time="$lateval$"|token_safe %}
+	    </div>
+	    <div style="display: inline; float: left;left: 1%; position: relative;">
+	      <button class="btn btn-primary btn-lg" style="background: gray; border: none; box-shadow: inherit;" data-toggle="modal" data-target="#myModal">Exclusions</button>
+	    </div>
+          </div>
+          <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:none;">
+            <div class="modal-dialog">
+	      <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Exclusions</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="col-md-12">
+                    <div class="row">
+	   	      <div class="form-group" style="position:relative;left:5%;">
+	  	    	Host IP address:
+	  	    	{% multidropdown id="multidropdown1" managerid="sourceTypeSearch" valueField="hostIP" %}
+	  	    	C&C address:
+	  	    	{% multidropdown id="multidropdown2" managerid="sourceTypeSearch" valueField="CnCAddr" %}
+	  	      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="return apply();">Apply</button>
+                  </div>
+                </div>
+	      </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span style="VISIBILITY:hidden;display:none" id="dropdown1-text">None</span>
+  <span style="VISIBILITY:hidden;display:none" id="dropdown2-text">None</span>
+
+  <!-- Row for the chart -->
+  <div class="dashboard-row">
+    <div class="dashboard-cell" style="width: 20%;height: 250px;">
+      <div class="dashboard-panel" style="height:47%;">
+        <div class="dashboard-element" style="position: relative; top: 30%;">
+          <div class="panel-head">
+          </div>
+          <div class="panel-body">
+	    {% single id="hostcount-single" managerid="HostCount" afterLabel="hosts" %}
+	  </div>
+        </div>
+      </div>
+      <div class="dashboard-panel" style="height:48%;">
+        <div class="dashboard-element" style="position: relative; top: 30%;">
+          <div class="panel-head">
+          </div>
+          <div class="panel-body">
+	    {% single id="cnccount-single" managerid="CnCCount" afterLabel="C&C servers" %}
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="dashboard-cell" style="width: 80%;">
+      <div class="dashboard-panel">
+        <div class="dashboard-element">
+          <div class="panel-head">
+          </div>
+          <div class="panel-body">
+            <div id="mybarchart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row for the table viewer -->
+  <div class="dashboard-row">
+    <div class="dashboard-cell" style="width: 100%;">
+      <div class="dashboard-panel">
+        <div class="dashboard-element">
+          <div class="panel-head">
+	    <h3>Hosts with Possible C&amp;C Connections</h3>
+          </div>
+          <div class="panel-body">
+            <div id="myhoststable"></div>
+            <!-- {% table id="hosttable" managerid="HostTable" drilldown="row" %} -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row for the table viewer -->
+  <div class="dashboard-row">
+    <div class="dashboard-cell" style="width: 100%;">
+      <div class="dashboard-panel">
+        <div class="dashboard-element">
+          <div class="panel-head">
+	    <h3>C&amp;C Server Connection Events</h3>
+          </div>
+          <div class="panel-body">
+            <div id="mytable"></div>
+            <!-- {% table id="table1" managerid="search2" drilldown="none" %} -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content%}
+
+{% block managers %}
+{% searchmanager id="main-search"
+search='(tag=web OR tag=proxy) | match'|token_safe
+earliest_time="$earlyval$"|token_safe
+latest_time="$lateval$"|token_safe
+preview=True
+cache=True %}
+
+{% postprocessmanager id="sourceTypeSearch" 
+managerid="main-search" 
+search="| table _time, src, dest | rename src as hostIP, dest as CnCAddr | localfilter hostIP, CnCAddr" 
+%}
+
+{% postprocessmanager id="search1"
+managerid="main-search"
+search='| table _time, src, dest,CnC_source | rename src as hostIP, dest as CnCAddr | localfilter hostIP, CnCAddr | timechart count by CnC_source'
+%}
+
+{% postprocessmanager id="search2"
+managerid="main-search"
+search='| convert ctime(_time) as "Access Timestamp" | table "Access Timestamp", src, dest, port, CnC_source | rename src as hostIP, dest as CnCAddr | localfilter hostIP, CnCAddr  | rename  hostIP as "Host IP Address", CnCAddr as "C&C Server", CnC_source as "C&C Address Source", port as Port'
+%}
+
+{% postprocessmanager id="HostCount"
+managerid="main-search"
+search="| dedup src | stats count"
+%}
+
+{% postprocessmanager id="HostTable"
+managerid="main-search"
+search='| stats count(dest), distinct_count(dest) by src | rename src as "Compromised Host", count(dest) as "Callback Attempts", distinct_count(dest) as "C&C Servers"'
+%}
+
+{% postprocessmanager id="CnCCount"
+managerid="main-search"
+search="| dedup dest | stats count"
+%}
+
+{% endblock managers %}
+
+
+{% block js %}
+<script>
+  require.config({
+      waitSeconds: 60
+  })
+ var deps_1 = [
+      "splunkjs/mvc",
+      "splunkjs/ready!",
+      "underscore",
+      "jquery",
+  ];
+  var deps_2 = [
+      "splunkjs/mvc/utils",
+      "splunkjs/mvc/tokenutils",
+      "splunkjs/mvc/headerview",
+      "splunkjs/mvc/footerview",
+      "splunkjs/mvc/textinputview",
+      "splunkjs/mvc/searchmanager",
+      "splunkjs/mvc/chartview",
+      "splunkjs/mvc/tableview",
+      "splunkjs/mvc/savedsearchmanager",
+  ];
+  require(deps_1, function(mvc) {
+    require(deps_2, function(mvc) {
+    var ChartView = require("splunkjs/mvc/chartview");
+    var TableView = require("splunkjs/mvc/tableview");
+
+    mytable=new TableView({
+            id: "example-table",
+            managerid: "search2",
+            pageSize: 10,
+            wrap: true,
+            drilldown: "none",
+            el: $("#mytable")
+    }).render();
+
+    myhoststable=new TableView({
+            id: "my-hosts-table",
+            managerid: "HostTable",
+            drilldown: "row",
+            el: $("#myhoststable")
+    }).render();
+
+    // Instantiate components
+    barchart = new ChartView({
+            id: "ip-chart",
+            managerid: "search1",
+            type: "column",
+            "charting.chart.stackMode": "stacked", // Place complex property names within quotes
+            "charting.legend.placement": "bottom",
+            el: $("#mybarchart"),
+            "charting.axisTitleX.text": " ",
+            "charting.axisTitleY.text": "C&C connections",
+            //"charting.fieldColors": {"Virtual Analyzer": 0x4b9ae8, "Global C&C List": 0x62c15b},
+            "charting.axisX.enabled":false,
+            "drilldown": false
+    }).render();
+
+    // Hosts with Possible C&C Connections drill down to a new window
+    myhoststable.on("click", function(e) {
+    	    // Bypass the default behavior
+    	    e.preventDefault();
+    	    var query_str = '/app/TrendMicroDeepDiscovery/search?q=(tag=web OR tag=proxy) | match | search src="' + e.data['click.value'] + '"'
+			+ '&earliest=' + e.data['earliest'] + '&latest=' + e.data['latest'];
+   	    query_str = encodeURI(query_str);
+   	    var win = window.open(query_str, '_blank');
+  	}
+    );
+
+
+
+    var _ = require("underscore");
+    var multidropdown1 = mvc.Components.getInstance("multidropdown1");
+    var multidropdown2 = mvc.Components.getInstance("multidropdown2");
+
+    var selectionText1 = $("#dropdown1-text");
+    var selectionText2 = $("#dropdown2-text");
+
+    multidropdown1.on("change", function() {
+      console.log(multidropdown1.val())
+      selectionText1.text(multidropdown1.val().join(","));
+    });
+
+    multidropdown2.on("change", function() {
+      console.log(multidropdown2.val())
+      selectionText2.text(multidropdown2.val().join(","));
+    });
+
+    var hostIP = {{ hostIP|safe }};
+    var CnCAddr = {{ CnCAddr|safe }};
+
+    var groupChoices_hostIP = new Array(hostIP.length);
+    for (var i = 0; i < hostIP.length; i++) {
+      groupChoices_hostIP[i] = {label: hostIP[i], value: hostIP[i]};
+    }
+    multidropdown1.settings.set("choices", groupChoices_hostIP);
+    multidropdown1.val(hostIP);
+
+    var groupChoices_CnCAddr = new Array(CnCAddr.length);
+    for (var i = 0; i < CnCAddr.length; i++) {
+      groupChoices_CnCAddr[i] = {label: CnCAddr[i], value: CnCAddr[i]};
+    }
+    multidropdown2.settings.set("choices", groupChoices_CnCAddr);
+    multidropdown2.val(CnCAddr);
+
+   });
+  });
+
+  function apply() {
+    var selectionText1 = $("#dropdown1-text").text();
+    var selectionText2 = $("#dropdown2-text").text();
+    console.log(selectionText1);
+    console.log(selectionText2);
+    var localfilter = {'hostIP': selectionText1, 'CnCAddr': selectionText2};
+    console.log(localfilter);
+    $.ajax({
+      url: 'setFilter/',
+      type: 'POST',
+      data: JSON.stringify(localfilter),
+      success: function(json) {
+        if (confirm("Please click OK to run filter!") == true) {
+          location.reload();
+        }
+      }
+    });
+  }
+
+</script>
+{% endblock js %}

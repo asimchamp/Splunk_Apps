@@ -1,0 +1,72 @@
+<dashboard>
+  <label>Key Value Store Enhancements</label>
+  <row>
+    <panel>
+      <html>
+         <h2>App Key Value Store (KV store)</h2>
+        
+        <p>Highly scalable app data storage and retrieval capabilities for developers.</p>
+
+         <br/>
+        
+        <h3>Capabilities / Feature set</h3>
+
+        <p>With Splunk 6.3, App Key Value store has been enhanced to support:</p>
+
+       <ul>
+          
+          <li>Distributed search – Lookups can now be performed on remote indexers in large scale distributed search environments where data is retrieved from multiple search peers thereby improving scalability and efficiency.
+          </li>
+
+          <li>Automatic lookups are now supported.
+          </li>
+
+          <li>Ability to filter lookup data retrieved from a KV store lookup without having to use subsequent searches.
+          </li>
+
+          <li>Ability to match lookup data on Multivalue fields stored in KV store lookup. This allows the app developer to take advantage of storing data more efficiently and reduce duplication using Multivalue fields in lookups.
+          </li>
+
+      </ul>
+
+        <br/>
+
+        <h3>Distributed search</h3>
+
+        <p>In 6.3, for every collection that you define in KV store, you can decide whether or not to replicate the collection to the search peers for distributed lookups. Once you enable replication for the collection, the collection (and any subsequent changes), get automatically pushed to the 6.3 search peers. Searches that run lookups for these collections will then get distributed to the respective search peers, thereby reducing load on the search head tier.
+        </p>
+        
+        <br/>
+
+        <img src="/static/app/splunk_6_3_overview/images/key_value_store_1.png" style="margin-left:auto; margin-right:auto; width:350px"/>
+
+        <br/>
+
+        <h3>Lookup filtering capability</h3>
+
+        <p>Assume, you have a KV store lookup called “kvstore_hosts” which is an inventory of machines in my organization with fields - hostname, IP address and Location.  Now, let’s say that I want to only retrieve all hosts that are in the “EUROPE” Location. 
+        </p>
+
+        <br/>
+
+        <p>You can do this by using the search string - 
+        	<code>| inputlookup kvstore_hosts where Location=”Europe” </code>
+        </p>
+
+        <br/>
+
+        <p>The filter criteria can also be specified in transforms.conf as part of the lookup definition. Filter criteria supports the following operators 
+        	<b><![CDATA[ - =, !=, <, >, <=, >= as well as AND, OR and NOT ]]></b>
+        </p>
+
+        <br/>
+
+        <p>Previously, you would have to split up the search and instead run the search below which is not as efficient, especially on large lookups -  | inputlookup kvstore_hosts | search Europe
+        </p>
+                
+        <br/><br/>
+
+      </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,67 @@
+<form version="1.1">
+  <label>Keep-Alive Communication</label>
+  <fieldset autoRun="false" submitButton="true">
+      <input type="multiselect" token="Source" searchWhenChanged="false">
+      <label>Select tcpdump files:</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <search>
+        <query>index=* sourcetype=pcap:csv NOT source=*pcap2csv.sh NOT source=*pcap2csv.bat| rex field=source "SplunkForPCAP(\\\\|\/)PCAPcsv(\\\\|\/)(?&lt;source&gt;.*)"  |stats count by source</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <valuePrefix>source="*</valuePrefix>
+      <valueSuffix>*"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <default>SELECT TCPDUMP</default>
+    </input>
+    <input type="text" token="Span" searchWhenChanged="false">
+      <label>Enter the Timechart Span:</label>
+      <default>1m</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Number of Keep Alive's Sent</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ "[TCP Keep-Alive]" | stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="unit">Keep-Alive(s)</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Number of Keep Alive's Acknowledged</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ "[TCP Keep-Alive ACK]" | stats count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="unit">Keep-Alive ACK(s)</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Timechart Keep Alive Packets</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ "TCP Keep-Alive"  | rex "^[^\[\n]*\[(?P&lt;keep&gt;[^\]]+)" | timechart span=$Span$ count by keep</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

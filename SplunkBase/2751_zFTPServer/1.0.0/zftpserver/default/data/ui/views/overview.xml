@@ -1,0 +1,113 @@
+<dashboard>
+  <label>zFTPServer Overview</label>
+  <row>
+    <panel>
+      <title>File Transfers in the Past 30 Days</title>
+      <chart>
+        <search>
+          <query>sourcetype="zFTPLog-Downloads" | bucket _time span=1d  | stats count(zFTP_Download_File) by _time | rename count(zFTP_Download_File) as zFTP_Download_FileCount | appendcols [search sourcetype="zFTPLog-Uploads" | bucket _time span=1d  | stats count(zFTP_Upload_File) by _time | rename count(zFTP_Upload_File) as zFTP_Upload_FileCount] | eval zFTP_FileTotal=zFTP_Download_FileCount+zFTP_Upload_FileCount | join type=outer _time [search sourcetype="zFTPLog-Downloads" | bucket _time span=1d  | stats count(zFTP_Download_File) by _time | rename count(zFTP_Download_File) as zFTP_Download_FileCount | appendcols [search sourcetype="zFTPLog-Uploads" | bucket _time span=1d  | stats count(zFTP_Upload_File) by _time | rename count(zFTP_Upload_File) as zFTP_Upload_FileCount] | eval zFTP_FileTotal=zFTP_Download_FileCount+zFTP_Upload_FileCount | streamstats avg(zFTP_FileTotal) as zFTP_avgCount] | eval zFTP_DisplayTime=strftime(_time, "%b %d") | table zFTP_DisplayTime,zFTP_Download_FileCount,zFTP_Upload_FileCount,zFTP_avgCount | where zFTP_DisplayTime!="" | rename zFTP_Download_FileCount as Downloads, zFTP_Upload_FileCount as Uploads, zFTP_avgCount as "Running Average", DisplayTime as Date</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Date</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Count</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.overlayFields">"Running Average"</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Number of Uploads in the Past Hour</title>
+      <single>
+        <search ref="zFTP_Upload_Count"></search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Users Currently Logged In</title>
+      <table>
+        <search ref="zFTP_Report_CurrentlyLoggedIn"></search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Number of Downloads in the Past Hour</title>
+      <single>
+        <search ref="zFTP_Download_Count"></search>
+        <option name="drilldown">none</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Files Uploaded in the Past 30 Minutes</title>
+      <table>
+        <search ref="zFTP_Uploads"></search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Files Downloaded in the Past 30 Minutes</title>
+      <table>
+        <search ref="zFTP_Downloads"></search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

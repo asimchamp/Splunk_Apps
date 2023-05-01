@@ -1,0 +1,115 @@
+<form stylesheet="custom.css">
+  <label>ShimCache - Visualization</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="hostname" searchWhenChanged="true">
+      <label>Hostname</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="lastmod" searchWhenChanged="true">
+      <label>Last Modified</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="path" searchWhenChanged="true">
+      <label>Path</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="fileexecuted" searchWhenChanged="true">
+      <label>File Executed</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Path</title>
+        <search>
+          <query>eventtype=mirshimcache $wild$ Hostname=$hostname$ "Last Modified"=$lastmod$ Path=$path$ "File Executed"=$fileexecuted$ | table Hostname, "Last Modified", "Last Execution", Path, "File Size", "File Executed" | rare limit=0 Path</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Powershell Execution</title>
+        <search>
+          <query>eventtype=mirshimcache $wild$ Hostname=$hostname$ "Last Modified"=$lastmod$ Path=*powershell* "File Executed"=$fileexecuted$ | table Hostname, "Last Modified", Path, "File Executed"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>CMD Execution</title>
+        <search>
+          <query>eventtype=mirshimcache $wild$ Hostname=$hostname$ "Last Modified"=$lastmod$ Path=*cmd* "File Executed"=$fileexecuted$ | table Hostname, "Last Modified", Path, "File Executed"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>PSEXESVC.EXE</title>
+        <search>
+          <query>eventtype=mirshimcache $wild$ Hostname=$hostname$ "Last Modified"=$lastmod$ Path=*PSEXESVC* "File Executed"=$fileexecuted$ | table Hostname, "Last Modified", Path, "File Executed"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>.adm execution path</title>
+        <search>
+          <query>eventtype=mirshimcache $wild$ Hostname=$hostname$ "Last Modified"=$lastmod$ Path="*.adm*" "File Executed"=$fileexecuted$ | table Hostname, "Last Modified", Path, "File Executed"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

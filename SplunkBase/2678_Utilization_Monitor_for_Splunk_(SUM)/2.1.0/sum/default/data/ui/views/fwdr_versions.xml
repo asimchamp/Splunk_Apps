@@ -1,0 +1,68 @@
+<form>
+  <label>Splunk Forwarder Versions</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timepicked" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Splunk Forwarder Count by Version</title>
+      <chart>
+        <title>Click a bar to see the hosts</title>
+        <search>
+          <query>index=_internal source=*metrics.log* group=tcpin_connections os=* | eval os=os." ".arch | eval version=version." (".build.")" | stats latest(fwdType) AS forwarder_type latest(os) AS os latest(version) AS version by hostname | rename hostname as splunk_forwarder | stats count by version | sort -count</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">Forwarder Count</option>
+        <option name="charting.axisTitleX.text">Splunk Version (Build)</option>
+        <drilldown>
+          <set token="version">$click.value$</set>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table depends="$version$">
+        <title>Hosts Using Version $version$</title>
+        <search>
+          <query>index=_internal source=*metrics.log* group=tcpin_connections os=*  | eval os=os." ".arch | eval version=version." (".build.")" | search version="$version$" | stats latest(fwdType) AS forwarder_type latest(os) AS os latest(version) AS version by hostname | rename hostname as splunk_forwarder | replace uf with "Universal Forwarder", full with "Heavy Forwarder" in forwarder_type | rename splunk_forwarder as "Splunk Forwarder", forwarder_type as "Forwarder Type", os as "Operating System", version as Version</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">25</option>
+      </table>
+    </panel>
+  </row>
+</form>

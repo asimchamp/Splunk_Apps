@@ -1,0 +1,272 @@
+<form script="xsv_update_context.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Redefine Context</label>
+  <row>
+    <html>
+      <div class="moduleFrame">
+        <div class="moduleHeader">
+          <div class="moduleTitle">Context Details</div>
+          <div class="moduleActions">
+            <b class="actionMin" title="Collapse" style="display:none;"></b>
+            <b class="actionMax" title="Expand" style="display:block;"></b>
+          </div>
+        </div>
+
+        <div class="container-fluid moduleContent" style="display:none;">
+          <div class="row-fluid">
+            <div class="span4">
+              <div class="control-group">
+                <label>App Name: </label>
+                <input id="appNameTI" type="text" disabled="disabled"/>
+              </div>
+              <div class="control-group">
+                <label>Container Name: </label>
+                <input id="containerNameTI" type="text" disabled="disabled"/>
+              </div>
+              <div class="control-group">
+                <label>* Field (Context) Name: </label>
+                <input id="contextNameTI" type="text" disabled="disabled"/>
+              </div>
+              <div class="control-group">
+                <label>Class : </label>
+                <input id="classNameTI" type="text" disabled="disabled"/>
+              </div>
+              <div class="control-group">
+                <label>* Scope: </label>
+                <input id="scopeNameTI" type="text" disabled="disabled"/>
+              </div>
+              <div class="control-group">
+                <label>* Context Type: </label>
+                <input id="typeTI" type="text" disabled="disabled"/>
+              </div>
+            </div>
+
+            <div class="span4">
+              <div class="control-group">
+                <label>* Count: </label>
+                <input id="countTI" type="text" class="numbers-only"/>
+              </div>
+              <div id="domainAttributes" style="display:block;">
+                <div class="control-group">
+                  <label>* Domain Min: </label>
+                  <input id="domainMinTI" type="text" class="numbers-only"/>
+                </div>
+                <div class="control-group">
+                  <label>* Domain Max: </label>
+                  <input id="domainMaxTI" type="text" class="numbers-only"/>
+                </div>
+              </div>
+              <div id="averageCenteredAttributes" style="display:none;">
+                <div class="control-group">
+                  <label>* Average: </label>
+                  <input id="averageTI" type="text" class="numbers-only"/>
+                </div>
+              </div>
+              <div id="medianCenteredAttributes" style="display:none;">
+                <div class="control-group">
+                  <label>* Median: </label>
+                  <input id="medianTI" type="text" class="numbers-only"/>
+                </div>
+              </div>
+              <div id="averageAndMedianAttributes" style="display:none;">
+                <div class="control-group">
+                  <label>* Size: </label>
+                  <input id="sizeTI" type="text" class="numbers-only"/>
+                </div>
+                <div class="control-group">
+                  <label>* Width: </label>
+                  <input id="widthTI" type="text" class="numbers-only"/>
+                </div>
+              </div>
+            </div>
+  
+            <div class="span4">
+              <div class="control-group">
+                <label>Notes: </label>
+		<textarea rows="4" id="notesTA" style="width:80%;"></textarea>
+              </div>
+              <div class="control-group">
+                <label>Search: </label>
+		<textarea rows="4" id="searchTA" style="width:80%;"></textarea>
+              </div>
+              <div class="control-group">
+                <label>Unit of Measure: </label>
+                <input id="uomTI" type="text" />
+              </div>
+            </div>
+          </div>
+          <div class="row-fluid">
+              <div class="buttons-wrapper pull-right clearfix">
+                  <a id="resetContextButton" class="cancel-button btn pull-left" href="#" style="display: inline;margin-right:10px;">Reset</a>
+		  <a id="applyContextButton" class="save-button btn btn-primary pull-left" href="#" style="display: inline;">Apply</a>
+              </div>
+          </div>
+        </div>
+      </div>
+    </html>
+  </row>
+
+  <row>
+    <html>
+      <div id="loadingContextModal" class="modal fade" style="margin-top:50px;z-index: -9999; height:100px;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div id="loadingContextModalMessage" style="text-align:center;margin-top:30px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="addConceptModal" class="modal fade" style="margin-top:50px;z-index: -9999" data-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="addModalLabel">ADD CONCEPT</h4>
+            </div>
+            <div class="modal-body">
+              <div class="row-fluid">
+                <div class="control-group">
+                  <label>Concept Name: </label>
+                  <input id="newConceptNameTI" type="text" class="name-only" value="" />
+                </div>
+                <div class="control-group" style="display:none">
+                  <label>Shape: </label>
+                  <select id="newConceptShapeSelect">
+                    <option value="curvedecrease">Curve Decrease</option>
+                    <option value="curveincrease">Curve Increase</option>
+                    <option value="lineardecrease">Linear Decrease</option>
+                    <option value="linearincrease">Linear Increase</option>
+                    <option value="pi">PI</option>
+                    <option value="trapezoid">Trapezoid</option>
+                    <option value="strapezoid">S-Trapezoid</option>
+                    <option value="triangle">Triangle</option>
+                  </select>
+                </div>
+                <div class="control-group" style="display:block">
+                  <label id="newConceptErrorMessage" style="color:red;"></label>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button id="addConceptDialogButton" type="button" class="btn btn-primary">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="deleteConceptModal" class="modal fade" style="margin-top:50px;z-index: -9999" data-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="deleteModalLabel">DELETE CONCEPT</h4>
+            </div>
+            <div class="modal-body">
+              <div id="deleteConceptModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button id="deleteConceptDialogButton" type="button" class="btn btn-danger">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="updateContextModal" class="modal fade" style="margin-top:50px;z-index: -9999" data-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="updateContextModalLabel">WARNING</h4>
+            </div>
+            <div class="modal-body">
+              <div id="updateContextModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="areYouSureContextModal" class="modal fade" style="margin-top:50px;z-index: -9999" data-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="areYouSureContextModalLabel">WARNING</h4>
+            </div>
+            <div class="modal-body">
+              <div id="areYouSureContextModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button id="areYouSureCancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button id="areYouSureConfirm" type="button" class="btn btn-primary" data-dismiss="modal">Continue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="moduleFrame">
+        <div class="moduleHeader">
+          <div class="moduleTitle">Concept Details</div>
+          <div class="moduleActions">
+            <b class="actionMin" title="Collapse" style="display:block;"></b>
+            <b class="actionMax" title="Expand" style="display:none;"></b>
+          </div>
+        </div>
+        <div class="container-fluid moduleContent">
+          <div class="row-fluid">
+            <div>
+              <a id="addConceptButton" class="btn btn-primary pull-right" href="#" style="display: inline;margin-bottom:8px;">Add Concept</a>
+	    </div>
+	  </div>
+          <div class="row-fluid">
+            <div role="tabpanel">
+              <!-- Nav tabs -->
+	      <ul id="conceptTabs" class="nav nav-tabs" role="tablist"> </ul>
+
+               <!-- Tab panes -->
+               <div id="conceptPanes" class="tab-content"> </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </html>
+  </row>
+
+  <row>
+    <html>
+      <div class="moduleFrame">
+        <div class="moduleHeader">
+          <div class="moduleTitle">Chart</div>
+          <div class="moduleActions">
+            <b class="actionMin" title="Collapse" style="display:block;"></b>
+            <b class="actionMax" title="Expand" style="display:none;"></b>
+          </div>
+        </div>
+        <div class="moduleContent">
+	  <div id="contextChart"><svg style="height:100%;width:100%;"></svg></div>
+        </div>
+      </div>
+    </html>
+  </row>
+
+  <row>
+    <html>
+      <div class="moduleFrame">
+        <div class="moduleHeader">
+          <div class="moduleTitle">Table</div>
+          <div class="moduleActions">
+            <b class="actionMin" title="Collapse" style="display:none;"></b>
+            <b class="actionMax" title="Expand" style="display:block;"></b>
+          </div>
+        </div>
+        <div class="moduleContent" style="display:block;">
+          <div id="contextTable"></div>
+        </div>
+      </div>
+    </html>
+  </row>
+
+</form>

@@ -1,0 +1,27 @@
+<html><body><div><h1>Installing the Recorded Future App for Splunk on a Search Head Cluster</h1>
+
+<ol>
+<li>Download the package into <span class="rf-field">
+$SPLUNK_HOME/etc/shcluster/apps</span> on the 
+deployer of the Search Head Cluster.</li>
+<li>Unpack the package: 
+<span class="rf-field">tar zxvfp recorded-future_app_for_splunk_402.tgz</span></li>
+<li>Remove the package file: <span class="rf-field">
+rm recorded-future_app_for_splunk_402.tgz</span></li>
+<li>Push the new app to the Cluster nodes: 
+<span class="rf-field">splunk apply shcluster-bundle ...</span></li>
+<li>Connect to any Search Head Cluster node and ensure that the configuration
+is set with the correct <strong>API key</strong>.</li>
+</ol>
+
+<p>The Recorded Future App for Splunk will detect when running in a Search Head 
+Cluster to ensure that only one node, the captain, retrieves the Risk Lists 
+and the alerts.</p>
+
+<h1>Further Help</h1>
+
+<p>"Recorded Future App for Splunk" has been developed by Recorded Future.   </p>
+
+<p>Further information and support can be found on our Support web site:
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360003588753">support.recordedfuture.com</a> </p>
+</div></body></html>

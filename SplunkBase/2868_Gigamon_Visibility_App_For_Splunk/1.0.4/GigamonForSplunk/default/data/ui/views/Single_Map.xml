@@ -1,0 +1,145 @@
+<form script="cubism_wrap.js, dashboard.js, tabs.js, d3.v2.min.js" stylesheet="dashboard.css, tabs.js">
+  <label>Single Map</label>
+  <search id="base_stats">
+    <query>index=_internal | head 1</query>
+    <earliest>$time_range.earliest$</earliest>
+    <latest>$time_range.latest$</latest>
+  </search>
+  <search id="lookup_maps">
+    <query>|inputlookup giga_maps | search clusterId=$clusterId$ alias=$alias$</query>
+  </search>
+  <search id="base_statistics">
+    <query>`giga_service("stats")` clusterId=$clusterId$ context.map=$alias$ |table *</query>
+    <earliest>$time_range.earliest$</earliest>
+    <latest>$time_range.latest$</latest>
+  </search>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="dropdown" token="clusterId">
+      <label>Cluster/Node</label>
+      <search>
+        <query>|inputlookup giga_clusters | stats count by clusterId</query>
+      </search>
+      <fieldForLabel>clusterId</fieldForLabel>
+      <fieldForValue>clusterId</fieldForValue>
+    </input>
+    <input type="dropdown" token="alias" searchWhenChanged="true">
+      <label>Map</label>
+      <search>
+        <query>|inputlookup giga_maps | search clusterId=$clusterId$ | stats count by alias | fields - count</query>
+      </search>
+      <fieldForLabel>alias</fieldForLabel>
+      <fieldForValue>alias</fieldForValue>
+    </input>
+    <input type="time" token="time_range">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row id="tabs">
+    <panel>
+      <html>
+	      <ul id="tabs" class="nav nav-tabs">
+            <li class="active">
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="mapadmin,mapoptions">Administrative</a>
+                    </li>
+		    <li>
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="mappkts">Map Trends</a>
+          </li>
+		   </ul>
+	      </html>
+    </panel>
+  </row>
+  <row id="mapadmin">
+    <panel>
+      <single>
+        <title>Last Check</title>
+        <search base="lookup_maps">
+          <query>fields timestamp</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Map Attributes</title>
+        <search base="lookup_maps">
+          <query>fields type, subType,deviceIp,  clusterId |fields - _key| transpose | rename column as "Key" "row 1" as Value</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row id="mappkts">
+    <panel>
+      <chart>
+        <title>Packets</title>
+        <search base="base_statistics">
+          <query>search metric="map.packets" | timechart bins=100 avg(value) as Packets</query>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Time</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Octets</title>
+        <search base="base_statistics">
+          <query>search metric="map.octets" |timechart bins=100 avg(value) as Octets</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">1</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

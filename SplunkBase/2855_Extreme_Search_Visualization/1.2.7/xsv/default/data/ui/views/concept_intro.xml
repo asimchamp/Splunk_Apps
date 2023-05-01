@@ -1,0 +1,186 @@
+<dashboard stylesheet="xsv.css">
+  <label>Intro to Conceptual Search</label>
+  <row>
+    <html>
+        <span
+          class="head2">An Introduction to Conceptual Search</span>
+      <p></p><p>
+        <span
+          class="head3">Concepts and Contexts</span>
+      </p>
+      <p>As humans, we tend to think conceptually. A concept can be characterized by a semantic term
+        that represents it. Terms such as Tall, Short, Long, Early, Late, Fast, and Slow are
+        meaningful to us because they represent concepts that we understand based on our historical
+        experience. Let's think for a moment about the concept of <strong>tall</strong> as it
+        relates to people. We share a common notion of what <strong>tall</strong>  means, based upon
+        our shared experience. If someone tells us a person is <strong>tall</strong>, we have a good
+        understanding of what that means. </p>
+      <p>Let's consider some examples:</p> 
+      Is Kareem Abdul-Jabbar <strong>tall</strong>? Certainly. Do
+      you know exactly what his height is, in inches? Probably not, but we can all agree that he's
+        <strong>tall</strong>.<br /> 
+        Was Napoleon <strong>tall</strong>? No. In fact, he's become an
+      icon for an alternate concept: <strong>short</strong>.<br /> 
+      Actor Brad Garrett? He's quite
+        <strong>tall</strong>.
+      <br />Tom Cruise? By most measures, he is not <strong>tall</strong>.<br /> Osama bin Laden?
+      People agree that he was very <strong>tall</strong>.<br />
+      <p>Tall is not defined by some threshold parameter. Is someone who stands 6'8&quot; considered
+        tall? Sure. How 'bout someone 5'11&quot;? Also tall. And 5'10&quot;? We'd probably agree
+        that yes, 5'10&quot; is still considered tall. It may be less tall than Kareem, but still
+        tall.</p>
+      <p> The takeaway? There is no threshold parameter that determines <strong>tall</strong> vs not
+          <strong>tall</strong>. <strong>Tall</strong> is a <strong>Concept</strong>, not a
+        threshold value. This turns out to true of most all concepts, from characterizations of
+        height to network latency to sales performance to musical talent to public sentiment.</p>
+<p>
+<p><span class="xsv-inset">In the underlying cognitive computing engine that drives
+    Extreme Search, each <strong>Semantic Term</strong> or <strong>Concept</strong> is characterized by a mathematical <strong>Fuzzy
+      Set</strong>. Such a set consists of an array of groups of two numbers: the value of the field in question and the membership of that value in the <strong>Concept</strong>. </span></p>
+        <br />
+        In fact, we can graph a mathematical representation of the <strong>Concept</strong> of<em> tall</em>. The graph in <strong>Figure 1</strong> might be one definition of <em>tall</em>. Note that the X axis is Height, in inches, ranging from 48 inches
+        to 84 inches, a fair guess at the range of heights we'd see in a large sample of people. The
+        Y axis depicts the degree of membership in this <strong>Concept</strong>  of<em> tall</em>. In our depiction, a person who stands 60&quot; has zero membership
+        in the concept  of<em> tall</em>. Someone 84&quot; has a membership of 1, or 100%. In
+        this scenario, an 84&quot; person is &quot;more tall&quot; than a 72&quot; person. If we
+        were looking at the underlying fuzzy mathematics that represent our concept  of<em> tall</em>, we'd say that 84&quot; has 100% membership in the set<em> tall</em>, while 72&quot; has a bit under 50%.</p><br /><br />
+        <p
+        align="center"><img
+          src="/static/app/xsv/images/tall_set_600.png"
+          width="600"
+          height="330"
+          alt="tall" /><br /> Figure 1</p><br />
+      <p
+        align="left"> A question arises here. Most people would agree that, among a large sample of
+        people, we think of 72&quot; as quite tall. The notion that 72&quot; has less than 50%
+        membership in our <strong>Concept</strong> of<em> tall</em> doesn't seem quite right. That's OK. This
+        just means that the straight-line function we drew to represent our concept of <strong>tall</strong> is probably not a very accurate representation of the concept. We
+        can fix that. The graph in <strong>Figure 2</strong> is another definition of our <strong>Concept</strong> of<em> tall</em>. This one probably comes closer to an accurate representation of
+        what we think of, when we think of<em> tall</em>.</p><br />
+      <p
+        align="center">
+<img
+          src="/static/app/xsv/images/tall_set_s_600.png"
+          width="600"
+          height="330" /><br /> Figure 2</p><br />
+      <p><br />
+        <span
+          class="head3">Capturing Points of View: Contexts</span>
+      </p>
+      <p>When we're thinking about an idea like the <em>height</em> of people, we consider a
+        number of related <strong>Concepts</strong>. The <strong>Concepts</strong>
+        <em>tall</em> and <em>short</em> are two "conceptually coherent" terms that
+        describe <strong>Concepts</strong> relating to <em>height</em>. In Extreme Search, we call this  coherent
+        grouping of <strong>Concepts</strong> a <strong>Context</strong>. A <strong>Context</strong> characterizes a
+        particular view of the world based upon the meaning of the terms that define it. Such a <strong>Context</strong> can be seen in <strong>Figure 3</strong>.</p><br />
+      <p
+        align="center">
+<img
+          src="/static/app/xsv/images/height-s_600.png"
+          width="600"
+          height="330" /><br /> Figure 3 </p><br />
+      <p>The <strong>Context</strong>
+        <em>height</em> in <strong>Figure 3</strong> illustrates an important characteristic of <strong>Terms</strong> within a <strong>Context</strong>: that is, that terms or <strong>Concepts</strong> often overlap. It is very possible for a value under analysis to have membership in more
+        than one <strong> Concept</strong>. In our example here, a person can be somewhat tall and
+        somewhat short at the same time. This idea is true of most any <strong>Context</strong>
+        applying to most any knowledge domain. It embodies the way we, as humans, think of the world
+        and it is an extraordinarily powerful tenet of cognitive computing.</p>
+      <br />
+      <p
+        align="center">
+<img
+          src="/static/app/xsv/images/height_demo_600.png"
+          width="600"
+          height="330" /><br /> Figure 4 </p><br />
+      <p><strong>Figure 4</strong> illustrates another definition of the <strong>Context</strong>
+        <em>height</em>. This illustration is the display of a <strong>Context</strong> called
+          <em>height</em> which we've defined in Extreme Search for Splunk. Note that this
+          <strong>Context</strong> is comprised of five 
+        <tstrong>terms</tstrong>: <em>tiny, short,
+        typical, tall</em> and <em>gigantic</em>. There's nothing particularly special about these five names.
+        They simply have meaning to the author when describing the notion of <em>height</em>.
+        They're defined by the user and represent that user's perspective with regard to the height
+        of people.</p>
+      <p>In Extreme Search, we allow users to define <strong>Context</strong>s either with or without regard to a
+        particular data set. These <strong>Context</strong>s are saved in Extreme Search and can be used to analyze
+        subsequent data sets or the same data set in a various time ranges. A subject matter expert
+        might define a <strong>Context</strong> with which the staff of his company should analyze a particular
+        knowledge domain. For example, a network expert might define a <strong>Context</strong>
+        called <em>latency</em> that support is personnel or a monitoring system would use when
+        analyzing real time network performance. If the <strong>Context</strong> was generated using
+        baseline data, applying it in real time analysis would immediately identify anomalies,
+        without the need to learn baseline behavior. Scianta's concept-based cognitive computing
+        engine can quickly model baseline behavior without the need for more conventional
+        parametric machine learning.</p>
+      <p><em>So this is pretty interesting. What does it get us?</em></p>
+      <p><strong>Concepts</strong> and collections of them which we call
+          <strong>Contexts</strong> are critical components in concept-based cognitive computing.
+        They facilitate the ability to gain deep insight from your data by asking  
+          <em>qualitative</em>, rather than <em>quantitative</em> questions, and to ask those
+        questions in natural language.</p><br />
+      <span
+        class="head3">Conceptual Coherence</span>
+      <p>In our example of the linear (<strong>Figure 1</strong>) vs. S-shaped (<strong>Figure 2</strong>) definitions of the term <em>tall</em>, we noted that the shape of the membership function for a
+          <strong>term</strong> is significant. In fact, it is very important that the shape of the
+          <strong>term</strong> represent the linguistic meaning of the <strong>term</strong>. When
+        we say <strong>tall</strong>, the set of values that have membership in that
+          <strong>concept</strong> should make linguistic sense. In the same way that someone would
+        be confused if you called Kareem Abdul-Jabbar <strong>short</strong> and Napoleon
+          <strong>tall</strong>, they can be confused if we define concepts in Extreme Search
+        that don't make linguistic sense. It is also important that all  <strong>terms</strong>
+        defined in a <strong>Context</strong> be conceptually coherent – that they share the same
+        "universe of discourse". It would be confusing if one <strong>term</strong> dealt with
+          <em>Time</em> and another dealt with <em>Distance</em>.</p>
+      <br />
+      <p><span
+        class="head3">To Infinity... and Beyond</span></p>
+      <p>In our <em>height</em> example, above, we used a range of values for <em>height</em> from 48 inches to 84 inches. We assume that the range of 48 inches to 84 inches was our "universe of discourse" –  that is, the range of all possible values of <em>height</em> that we care about in our <strong>Context</strong> <em>height</em>. This may or may not be a valid assumption. What happens if we're suddenly faced with a value of 40 inches or 100 inches? What happens if our "universe of discourse" expands? It turns out that this happens often, and Extreme Search is designed to handle such a condition seamlessly. That's why the <strong>Concepts</strong> at either end of a <strong>Context</strong> are typically S-shaped. In Extreme Search, all <strong>Contexts</strong> extend infinitely in either direction along X and all <strong>Concepts</strong> are analyzed using the membership values they held at the end of the original "universe of discourse". A value of X that is below the <strong>Context's</strong> "universe of discourse" is assumed to have a membership of 1 in the low <strong>Concept</strong> (<em>tiny</em> in this case). So a value of 40 inches has a membership of 1 in <em>tiny</em>. Similarly, a value of X that is above the <strong>Context's</strong> "universe of discourse" is assumed to have a membership of 1 in the high <strong>Concept</strong>, <em>gigantic</em>. Likewise, a value of 40 inches continues to have the same membership (0) in other <strong>Concepts</strong> (<em>short, typical, tall</em> and <em>gigantic</em>) that those <strong>Concepts</strong> held at the end of the <strong>Context</strong>.  <strong> Figure 5</strong> illustrates this using our <strong>Context</strong> for <em>height</em>.</p>
+      <br />
+            <p
+        align="center">
+<img
+          src="/static/app/xsv/images/height_demo_ext_860.png"
+          width="860"
+          height="330" /><br /> Figure 5 </p><br />
+      
+<p><span
+        class="head3">Increasing Granularity: Context Classes</span></p>
+      <p>As we've learned, a collection of <strong>Concepts</strong> applied to a specific knowledge domain is called a <strong>Context</strong>. The notion of <em>tall</em> has a very different scale when applied in the context of the <em>height</em> of buildings than it does in the context of the <em>height</em> of people. This idea of <strong>Context</strong> allows us to explore the world in a very granular way. Extreme Search supports high granularity of the context in which knowledge is applied through a mechanism called <strong>Context Class</strong>. </p>
+      <p>Let's take another look at the familiar idea of <em>height</em> as it applies to people. In the <strong>Context</strong> <em>height</em>, we decided above to divide <em>height</em> into five <strong>Concepts</strong>: <em>tiny, short,
+      typical, tall and gigantic</em>. That allowed us to classify people by <em>height</em> in a way that's intuitive and well understood by most observers. If I say &quot;Show me the people who are   tall&quot;, you and I have a shared understanding of what that means. It turns out that there may be other classifications of people that might affect our notion of <em>height</em>. An obvious one is gender. The fact is, on balance, women tend to be &quot;less tall&quot; than men. That is, in a similar sized sampling of men and women, the distribution of the values of <em>height</em> tend to skew lower in women and higher in men. In numerical terms, the concept <em>tall</em> for men is different than the concept of <em>tall</em> for women. Another interesting classification might be occupation. The <strong>Concept</strong> of <em>tall</em> for basketball players is probably different than the <strong>Concept</strong> of <em>tall</em> for jockeys. </p>
+      <p>In Extreme Search we allow for this kind of granularity by allowing <strong>Context</strong>s to be classified by a secondary data field. In this case, gender. We might have a default class of <em>height</em> that is applied without regard to gender, as well as classes of <em>height</em> which are determined by a data field called <em>gender</em>. If we scale our <em>height</em> <strong>Context</strong> by looking at all people (the <em>default</em> class), males (the <em>male</em> class) and females (the <em>female</em> class), we're able to classify our data qualitatively, with meaningful granularity.</p>
+      <p><strong>Context Classes</strong> can be used to obtain important granularity in most any knowledge domain. A sales_revenue <strong>Context</strong> might be classified by a product_type field or a sales_region field, so the <strong>Concept</strong>  of <em>typical</em> sales_revenue accurately reflects the product type or sales region. It might be meaningful to classify the count of failed_logins  by user_role or host_type or hour_of_day. The risk scoring of a host might be classified by facility or zone or region.</p>
+      <p>The Splunk App for Enterprise Security makes good use of <strong>Context Classes</strong>. You can investigate this using the <a href="/app/xsv/xsv_explore_context">Context Explorer</a> dashboard in the Extreme Search Visualization app.</p>
+      <p>
+        <br />
+        <span
+        class="head3">Embracing Nuance: Hedges</span>
+      </p>
+      <p><bold>Concepts</bold> and <strong>Contexts</strong> are the basis of Conceptual
+        Search but they don't, on their own, support a very nuanced view of the world. A true
+        Cognitive Computing system, a system designed to "think" like we do, needs to understand
+        nuance.</p>
+      <p>Scianta Extreme Search for Splunk employs the notion of "hedges" to capture nuanced
+        variation to concepts. Hedges are linguistic modifiers, adjectives, that modify the
+        meaning of a concept. To learn more about <strong>hedges</strong> and other methods
+        employed by Extreme Search to embrace the nuance of human thought, click on Learn More About Hedges.</p>
+      <a class="btn btn-xtreme" href="hedges"> <span class="icon-play"></span> Learn More About Hedges </a> 
+<p></p><br />
+      <p align="center">
+        <span class="head5">Scianta Extreme Search Visualization for Splunk is part of the Scianta Analytics Cognitive
+          Computing Suite</span>
+        <br />
+        <a href="http://www.scianta.com/"
+          target="_blank">
+          <img alt="Scianta Analytics" src="/static/app/xsv/images/Scianta_Analytics_150.png" />
+        </a>
+      </p>
+      <br />
+      <p>VERSION: 20150823.6<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

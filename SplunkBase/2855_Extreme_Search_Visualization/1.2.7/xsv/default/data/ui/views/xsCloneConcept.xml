@@ -1,0 +1,113 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsCloneConcept</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsCloneConcept</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Conceptual Search</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Copies a concept from one context to another.</span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsCloneConcept oldconcept FROM oldcontext [IN oldContainer] [BY oldClass] [SCOPED oldScope] TO newConcept FROM newContext [IN newContainer] [BY newClass] [SCOPED newScope]</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">| xsCloneConcept late FROM ArrDelay IN MyArrDelay BY Monday SCOPED private TO late FROM ArrDelay IN MyArrDelay BY Tuesday SCOPED private</span>
+      </p>
+      <p>
+        <span class="explanation">Clones the concept 'late' from context 'ArrDelay' in container 'MyArrDelay' by class 'Monday' within scope 'private' to a context with the same name in the same container in the same scope; but, a different class called 'Tuesday'.</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext">oldconcept, oldContext, oldContainer, oldClass, oldScope, newConcept, newContext, newContainer, newClass, newScope </span>
+      </p>
+      <p>
+        <span class="para">newConcept</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new concept.</span>
+      </p>
+      <p>
+        <span class="para">newContainer</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new container the newcontext will be stored.</span>
+      </p>
+      <p>
+        <span class="para">newContext</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new context.</span>
+      </p>
+      <p>
+        <span class="para">newClass</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the new class.</span>
+      </p>
+      <p>
+        <span class="para">newScope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the new container is stored.</span>
+      </p>
+      <p>
+        <span class="para">oldConcept</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the existing Concept.</span>
+      </p>
+      <p>
+        <span class="para">oldContext</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the old context.</span>
+      </p>
+      <p>
+        <span class="para">oldContainer</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the old container where the old context is stored.</span>
+      </p>
+      <p>
+        <span class="para">oldClass</span>
+      </p>
+      <p>
+        <span class="explanation">The name of the old class.</span>
+      </p>
+      <p>
+        <span class="para">oldScope</span>
+      </p>
+      <p>
+        <span class="explanation">The scope (private, app, global) where the existing container is stored.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">The concept is cloned. See <a href="xsRenameConcept">xsRenameConcept</a> for details about renaming a concept. </span>
+      </p>
+<br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150816.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

@@ -1,0 +1,109 @@
+<form script="xsv_compare_concepts.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Compare Concepts</label>
+  <description>Enter the criteria and click the "Add" button for each concept you want to compare on the chart below. </description>
+  <row id="xsv_select_row">
+    <html>
+      <div class="row-fluid">
+        <div style="float:left;padding-right:20px;">
+          <label>* Scope:
+          </label>
+          <select id="scopeSelect">
+            <option value="public" selected="selected">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+        <div style="float:left;padding-right:20px;">
+          <label>* App:
+            <span class="xsv_populating xsv_app"> Populating...</span>
+          </label>
+          <select id="appSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Container Name:
+            <span class="xsv_populating xsv_container"> Populating...</span>
+          </label>
+          <select id="containerSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Field (Context) Name:
+            <span class="xsv_populating xsv_context"> Populating...</span>
+          </label>
+          <select id="contextSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>* Class Name:
+            <span class="xsv_populating xsv_class"> Populating...</span>
+          </label>
+          <select id="classSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;" >
+          <label>Hedge Name:
+            <span class="xsv_populating xsv_hedge"> Populating...</span>
+          </label>
+          <select id="hedgeSelect" multiple="multiple" style="width:220px;">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;padding-right:20px;">
+          <label>Concept Name:
+            <span class="xsv_populating xsv_concept"> Populating...</span>
+          </label>
+          <select id="conceptSelect">
+          </select>
+        </div>
+        <div class="control-group" style="float:left;">
+          <div class="buttons-wrapper clearfix" style="margin-top:20px;">
+            <a id="submitButton" class="btn btn-primary pull-right" href="#" style="display:inline;margin-bottom:10px;">Add</a>
+          </div>
+        </div>
+        <div id="contextAttributes"></div>
+        <div id="contextCompare"></div>
+      </div>
+    </html>
+  </row>
+
+  <row>
+    <html>
+      <div id="compareContextModal" class="modal fade" style="display:none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="compareContextModalLabel">WARNING</h4>
+            </div>
+            <div class="modal-body">
+              <div id="compareContextModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="chartModal" class="modal fade" style="display:none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="chartModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+              <div id="chartModalMessage">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button id="removeConcept" type="button" class="btn btn-default" >Remove From Chart</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="contextChartWrapper">
+        <div id="contextChart"><svg style="height:100%;width:100%"></svg></div>
+      </div>
+    </html>
+  </row>
+</form>

@@ -1,0 +1,45 @@
+<form stylesheet="dbir-0.4-16.css">
+  <label>DNS Explorer</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field2">
+      <label></label>
+      <default>
+        <earliest>-4h@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="src">
+      <label>Host</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="dest">
+      <label>DNS Server</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="query">
+      <label>DNS Query</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="answer">
+      <label>DNS Answer</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>DNS Query and Answers</title>
+        <search>
+          <query>| pivot Network_Resolution DNS count(DNS) AS "DNS Count" SPLITROW name AS Name SPLITROW reply_code AS "Reply Code" SPLITROW query AS Query SPLITROW answer AS Answer FILTER src is $src$ FILTER query is $query$ FILTER answer is $answer$ FILTER dest is $dest$ SORT 100 name ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field2.earliest$</earliest>
+          <latest>$field2.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

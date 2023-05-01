@@ -1,0 +1,107 @@
+<form stylesheet="css/recorded_future_alerts.css">
+  <label>Recorded Future Alerts</label>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="dropdown" token="mi_alerts" searchWhenChanged="true">
+      <label>Select an Alert config</label>
+      <default>*</default>
+      <search>
+        <query>
+            | rest splunk_server=local /servicesNS/nobody/TA_recordedfuture-cyber/configs/conf-recordedfuture_settings | regex title="alert://" | eval stanza=split(title, "://") | eval stanza=mvindex(stanza,1) | search enabled=1 | sort stanza | eval stanza2 = stanza | rex mode=sed field=stanza2 "s/ /%20/g"
+        </query>
+        <earliest>-30d</earliest>
+      </search>
+      <fieldForLabel>stanza</fieldForLabel>
+      <fieldForValue>stanza2</fieldForValue>
+    </input>
+  </fieldset>
+    <search id="core">
+        <query>
+            | rest splunk_server=local /services/TA_recordedfuture-cyber/download_alerts/$mi_alerts$
+        </query>
+    </search>
+   <row>
+    <panel>
+      <html>
+        <div class="help-link" style="float: right; text-align: right;">
+          <img src="/static/app/TA_recordedfuture-cyber/img/logo.svg" alt="Recorded Future, Inc logotype" style="height: 30px;"/><br/>
+          <a href="/app/TA_recordedfuture-cyber/recorded_future_help_alert_dashboards">Help</a>
+        </div>
+        <div>
+          <h1>
+            <span>Alerts Dashboard</span>
+          </h1>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Number of Alerts</title>
+      <single>
+        <search base="core">
+          <query>
+            | dedup id triggered
+            | stats count
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Counts by Rule</title>
+      <table>
+        <search base="core">
+          <query>
+            | dedup id triggered
+            | rename rule.name as "Alert rule name"
+            | stats count by "Alert rule name"
+            | sort - count
+          </query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">true</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Detailed Alert Information</title>
+      <table>
+        <search base="core">
+          <query>
+            | sort - triggered
+            | dedup id triggered
+            | eval "Alert triggered"=`to_time('triggered')`
+            | rename title TO "Alert title"
+            | rename review.status TO "Alert status"
+            | rename review.assignee TO "Alert assignee"
+            | rename rule.name TO "Alert rule name"
+            | table "Alert triggered", "Alert title", "Alert rule name", "Alert status", "Alert assignee", id</query>
+        </search>
+        <fields>"Alert triggered", "Alert title" "Alert rule name" "Alert status" "Alert assignee"</fields>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown target="_blank">
+          <link>
+            https://app.recordedfuture.com/live/sc/notification/?id=$row.id$
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

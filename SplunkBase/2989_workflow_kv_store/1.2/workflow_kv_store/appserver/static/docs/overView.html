@@ -1,0 +1,33 @@
+<h1>About Workflow kv Store App</h1>
+
+<p>This application will give you a general idea about the way to use kv store with Splunk.</p>
+<p>In order to explain how to work the workflow kv store app, i invit you to visit this link and read the tuto</p>
+<br/>
+<p><a href="dev.splunk.com/view/webframework-tutorials/SP-CAAAEZT">Tutorial Splunk for Kv store</a></p>
+
+
+<p>In this tutorial, they recommand to convert the dashboards to HTML but it's really necessary you can use XML dashboards</p>
+
+<p>So the workflow kv store contain only 3 dahsboards : </p>
+<ul>
+<li>Starter</li>
+<li>In progress</li>
+<li>Validation</li>
+</ul> 
+
+<p>The first one is "Starter" dashboard, it used to get or add new elements within data source</p>
+<p>I added an event click using JavaScript to select items and stored into another kv collection named editcollection.
+this collection is used by dashboard In progress.</p> 
+
+<p>the second one is "In progress" dashboard. He implement the content dashboard with "editcollection" lookup and 
+now you can add some description or any other input type just don't forget that on transform.conf.
+So now you can add action on selected items (send to validation dashboard, remove or cancel all selection). When you send to validation dashbord
+you can see what are added on validate table.</p>
+<p>Maybe somebody ask the question, what is the back table in this dashboard? "don't worry we will return after"</p>
+
+<p>Finally the last dashboard is validation. Here you can confirm selected items or not. You can use permission on dashboard to allow 
+for privileged persons like an Admin.</p>
+<p>If the any item should go back to edition statement you can use the button "back to edition" and now you have something with back table on 
+In progress dashboard.</p>
+
+<p>You can perform your item's status with color code or label. In this App i added this on Starter dashboard.</p>  

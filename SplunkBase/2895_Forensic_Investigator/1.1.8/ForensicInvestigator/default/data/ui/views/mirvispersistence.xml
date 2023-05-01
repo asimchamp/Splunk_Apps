@@ -1,0 +1,206 @@
+<form stylesheet="custom.css">
+  <label>Persistence - Visualization</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="hostname" searchWhenChanged="true">
+      <label>Host Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="PersistenceType" searchWhenChanged="true">
+      <label>Persistence Type</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="Extension" searchWhenChanged="true">
+      <label>File Extension</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="MD5" searchWhenChanged="true">
+      <label>File MD5</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Top Persistence Type</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | top limit=0 PersistenceItem.PersistenceType</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Persistence Owner</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | top limit=0 PersistenceItem.FileOwner</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Persistence Type</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.PersistenceType</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Persistence Owner</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.FileOwner</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top File Extension</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | top limit=0 PersistenceItem.FileItem.FileExtension</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top File Owner</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | top limit=0 PersistenceItem.FileItem.Username</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare File Extension</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.FileItem.FileExtension</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare File Owner</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.FileItem.Username</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Persistence Path</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistencePath</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare File Path</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.FileExtension=$Extension$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.FilePath</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare LinkFilePath (Link or exe in the user directory pointing to a file with an exe extension)</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ PersistenceItem.LinkFilePath="*users*" PersistenceItem.FileItem.FileExtension=exe host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.LinkFilePath</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare FilePath (exe file in the user directory)</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32scripting-persistence" $wild$ PersistenceItem.FilePath="*users*" PersistenceItem.FileItem.FileExtension=exe host=$hostname$ PersistenceItem.PersistenceType=$PersistenceType$ PersistenceItem.FileItem.Md5sum=$MD5$ | eval PersistencePath=coalesce('PersistenceItem.LinkFilePath', 'PersistenceItem.RegPath', 'PersistenceItem.ServicePath', 'PersistenceItem.serviceDLL') | rare limit=0 PersistenceItem.FilePath</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

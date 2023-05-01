@@ -1,0 +1,62 @@
+<form stylesheet="custom.css">
+  <label>Automater</label>
+  <searchTemplate>| script automater_wrapper __EXECUTE__ "$input$"</searchTemplate>
+  <description>Enter the hash below. Ex: 57f222d8fbe0e290b4bf8eaa994ac641</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>Hash:</label>
+      <suffix></suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>VT Hits</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="VT Detected"</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+        <option name="linkView">search</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>VT Misses</title>
+        <search base="global">
+          <query>table Result | transpose | eval vt_negatives=('row 4'-'row 3') | eval vt_negatives = coalesce(vt_negatives, "ALL") | table vt_negatives</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Engines</title>
+        <search base="global">
+          <query>table Result, Source | eval category=Result | where Source="VT Engines"</query>
+        </search>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Raw</title>
+        <searchPostProcess>table Target, Type, Source, Result</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

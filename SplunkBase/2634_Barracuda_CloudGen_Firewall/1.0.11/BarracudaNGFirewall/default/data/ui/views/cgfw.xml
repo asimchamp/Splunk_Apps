@@ -1,0 +1,154 @@
+<form version="1.1">
+  <label>Dashboard</label>
+  <description>Barracuda CloudGen Firewall Dashboard: Select a time range and host to begin.</description>
+  <fieldset submitButton="false">
+    <input type="time" token="timeRange" searchWhenChanged="true">
+      <label>Select a time:</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>Host:</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <search>
+        <query>sourcetype="fw_act" | fields host | dedup host | sort host</query>
+        <earliest>$timeRange.earliest$</earliest>
+        <latest>$timeRange.latest$</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel id="actionsummary">
+      <chart>
+        <title>Action Summary</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" fwaction!="Remove" fwaction!="ARP" fwaction!="Detect" | chart sum(count) by fwaction</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="trellis.enabled">0</option>
+      </chart>
+    </panel>
+    <panel id="rulesummary">
+      <chart>
+        <title>Rule Summary</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" rule="*" | chart sum(count) by rule</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+    <panel id="dropsummary">
+      <chart>
+        <title>Drop Summary</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" fwaction="Drop" | chart sum(count) by info</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="srcfilter" searchWhenChanged="true">
+        <label>Filter:</label>
+        <choice value="fwaction=&quot;*&quot;">All</choice>
+        <choice value="fwaction=&quot;Block&quot;">Blocked Only</choice>
+        <choice value="fwaction!=&quot;Block&quot; fwaction!=&quot;Drop&quot;">Allowed Only</choice>
+        <choice value="fwaction=&quot;Drop&quot;">Dropped Only</choice>
+        <initialValue>fwaction="*"</initialValue>
+      </input>
+      <table>
+        <title>Top 10 Source IP Addresses</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" $srcfilter$ fwaction!="Detect" fwaction!="ARP" fwaction!="Remove" | rename srcIP as "Source IP Address" | top limit=10 countfield="Hits" percentfield="Percentage" "Source IP Address" | eval Percentage=round(Percentage, 2) | table "Source IP Address", Hits, Percentage</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="dropdown" token="dstfilter" searchWhenChanged="true">
+        <label>Filter:</label>
+        <choice value="fwaction=&quot;*&quot;">All</choice>
+        <choice value="fwaction=&quot;Block&quot;">Blocked Only</choice>
+        <choice value="fwaction!=&quot;Block&quot; fwaction!=&quot;Drop&quot;">Allowed Only</choice>
+        <choice value="fwaction=&quot;Drop&quot;">Dropped Only</choice>
+        <initialValue>fwaction="*"</initialValue>
+      </input>
+      <table>
+        <title>Top 10 Destination IP Addresses</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" $dstfilter$ fwaction!="Detect" fwaction!="Remove" fwaction!="ARP" | rename dstIP as "Destination IP Address" | top limit=10 countfield="Hits" percentfield="Percentage" "Destination IP Address" | eval Percentage=round(Percentage, 2) | table "Destination IP Address", Hits, Percentage</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="dropdown" token="rulefilter" searchWhenChanged="true">
+        <label>Filter:</label>
+        <choice value="fwaction=&quot;*&quot;">All</choice>
+        <choice value="fwaction=&quot;Block&quot;">Blocked Only</choice>
+        <choice value="fwaction!=&quot;Block&quot; fwaction!=&quot;Drop&quot;">Allowed Only</choice>
+        <choice value="fwaction=&quot;Drop&quot;">Dropped Only</choice>
+        <initialValue>fwaction="*"</initialValue>
+      </input>
+      <table>
+        <title>Top 10 Rules</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" $rulefilter$ fwaction!="Detect" fwaction!="Remove" fwaction!="ARP" | rename rule as "Rule Name" | top limit=10 countfield="Hits" percentfield="Percentage" "Rule Name" | eval Percentage=round(Percentage, 2) | table "Rule Name", Hits, Percentage</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Action Details</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" fwaction!="Detect" fwaction!="Remove" fwaction!="ARP" | timechart sum(count) by fwaction</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Rule Details</title>
+        <search>
+          <query>host=$host$ sourcetype=fw_act type!="LIN" type!="LOUT" fwaction!="Detect" fwaction!="Remove" fwaction!="ARP" rule="*" | timechart sum(count) by rule</query>
+          <earliest>$timeRange.earliest$</earliest>
+          <latest>$timeRange.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">all</option>
+      </chart>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><dashboard>
+  <label>Table of Contents</label>
+  <row>
+    <table>
+      <title>The Project Gutenberg EBook of The Complete Works of William Shakespeare, by William Shakespeare - http://www.gutenberg.org/ebooks/100</title>
+      <search>
+        <query>index=shakespeare NOT &lt;&lt; NOT Gutenberg | reverse | transaction startswith="published=*" | sort + published | table published title</query>
+      </search>
+      <option name="count">10</option>
+      <option name="displayRowNumbers">false</option>
+      <drilldown>
+        <set token="title">$row.title$</set>
+        <option name="drilldown">cell</option>
+      </drilldown>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+    </table>
+  </row>
+  <row>
+    <event depends="$title$">
+      <title>$title$</title>
+      <searchString>index=shakespeare NOT &lt;&lt; NOT Gutenberg | reverse | transaction startswith="published=*" | search title="$title$"</searchString>
+    </event>
+  </row>
+</dashboard>

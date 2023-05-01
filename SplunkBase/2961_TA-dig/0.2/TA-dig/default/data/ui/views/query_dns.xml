@@ -1,0 +1,27 @@
+<form>
+  <label>Query DNS</label>
+  <fieldset submitButton="true">
+    <input type="text" token="zone">
+      <label>zone / domain</label>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      You may want to use the output in a lookup with value being the src_ip or dst_ip etc.
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| dig $zone$</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

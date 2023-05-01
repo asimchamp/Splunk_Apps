@@ -1,0 +1,111 @@
+<form stylesheet="dbir-0.4-16.css">
+  <label>Potentially Malicious Email Overview</label>
+  <description>Items with spamscore &gt; 0</description>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="subject" searchWhenChanged="true">
+      <label>Subject</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Top Spam</title>
+        <search>
+          <query>index=email spamscore&gt;0 NOT 401k NOT SUCCESS $subject$ | stats sparkline count by subject | sort -count | rename subject AS Subject, sparkline AS Sparkline, count AS Count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="Sparkline">
+          <option name="type">bar</option>
+          <option name="height">20px</option>
+          <option name="barColor">#999999</option>
+          <option name="barWidth">3px</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Harmful Email Categories</title>
+        <search>
+          <query>| pivot Email Email__Spam count(Email__Spam) AS "Email Spam Count" SPLITROW rule AS Rule FILTER rule doesNotContain spam FILTER rule doesNotContain clean FILTER subject is $subject$ TOP 100 count(Email__Spam) ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.chart">bar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Virii</title>
+        <search>
+          <query>index=email  virusname!=ignored $subject$| stats sparkline count by virusname | sort -count | rename virusname AS "Virus Name", sparkline AS Sparkline, count AS Count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="Sparkline">
+          <option name="type">bar</option>
+          <option name="height">20px</option>
+          <option name="barColor">#999999</option>
+          <option name="barWidth">3px</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Phishing Attempts w/Attachments</title>
+        <search>
+          <query>| pivot Email Email__Spam count(Email__Spam) AS "Email Spam Count" SPLITROW _time AS Time PERIOD auto SPLITROW src_user AS Sender SPLITROW file_name AS Attachment FILTER rule contains phish FILTER subject is $subject$ SORT 100 _time ROWSUMMARY 0 COLSUMMARY 0 NUMCOLS 0 SHOWOTHER 1</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

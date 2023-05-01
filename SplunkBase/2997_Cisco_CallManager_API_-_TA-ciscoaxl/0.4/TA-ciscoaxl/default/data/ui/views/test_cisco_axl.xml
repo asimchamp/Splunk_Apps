@@ -1,0 +1,42 @@
+<form>
+  <label>Test Cisco AXL</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="method" searchWhenChanged="true">
+      <search>
+        <query>| inputlookup ciscoaxl_methods</query>
+      </search>
+      <fieldForLabel>method</fieldForLabel>
+      <fieldForValue>method</fieldForValue>
+      <default>listPhone</default>
+      <initialValue>listPhone</initialValue>
+    </input>
+    <input type="text" token="searchcriteria">
+      <label>search criteria</label>
+      <default>name="%"</default>
+      <initialValue>name="%"</initialValue>
+    </input>
+    <input type="text" token="columns" searchWhenChanged="true">
+      <label>Return the following information fields</label>
+      <initialValue>name,description</initialValue>
+      <default>name,description</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>See https://developer.cisco.com/media/axl-schema-10-0/AXLSoap.html for information about the methods and their parameters etc.</title>
+      <table>
+        <title>Results of the query</title>
+        <search>
+          <query>| ciscoaxl $method$ $searchcriteria$ columns="$columns$" | table $columns$</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

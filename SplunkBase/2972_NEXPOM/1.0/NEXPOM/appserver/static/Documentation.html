@@ -1,0 +1,143 @@
+<html>
+
+<head>
+    
+<style type="text/css">
+    .first_box {
+        padding: 10px 10px 10px 10px ;
+        margin-bottom : 20px;
+    }
+    .box {
+        border-top: 2px solid;
+        border-color: #000;
+        padding: 10px 10px 10px 10px ;
+        margin-bottom : 20px;
+        }
+    .second_box {
+        display: inline-block;
+        min-width:400px;
+        width:100%;
+        padding: 10px 10px 10px 10px ;
+        margin-bottom : 20px;
+    }
+    .high_title {
+        font-size:20px;
+        font-weight:bold;
+    }
+    .middle_title {
+        font-size:13px;
+        font-weight:bold;
+    }
+	.b_text{
+		font-weight:bold;
+	}
+	
+</style>
+
+
+</head>
+
+<body>
+    <div class="first_box">
+        <div class="high_title">&lt;Screen Composition&gt;</div><br>
+        <p>
+		<div class="b_text">This page contains how to use NEXPOM app</div><br><br>
+        <div class="middle_title">1. Data Input</div>
+         You can input data from measuring equipments.<br><br>
+
+        <div class="middle_title">2. Inspection report</div>
+		There are report for basic process capability index.<br><br>
+
+        <div class="middle_title">3. Characteristic</div>
+         This dashboard show some graphs concerning defect rate in process<br><br>
+        </p>
+    </div>
+    
+
+
+    <div class="box">
+        <div class="high_title">&lt;Data Input&gt;</div>
+        
+        <div align=center><img border=0 width=800 src="/static/app/nexpom/Documentation_files/Data_input_img.png"></div>
+        <br><br>
+
+        <p>
+        <Br>
+		<div class="b_text">It must be done before to see Inspection Report and Characteristic Page.<br>
+
+        NEXPOM app provides ‘Cyl_Sample_data’ basically. They will automatically be updated when you install NEXPOM app.</div><br><br>
+
+        <div class="middle_title">1. Choose process data </div>
+         Data field must be separated from ‘,’ or ‘blank’.<br><br>
+
+        <div class="middle_title">2. File name &amp; Splunk source type for saving</div>
+         You can change file name. ‘Blank’ will be convert to ‘_’ <br><br>
+
+        <div class="middle_title">3. Imported file content</div>
+          It needs the value of uppertol, lowertol, nominal and planid to see screen at different page.<br><br>
+        <div class="middle_title">4.  Save file </div>
+        If you click this button, the content will be saved at inputs.conf &amp; props.conf.<br><br>
+        </p>
+    </div>
+    
+    <div class="box">
+        <h1> &lt;Inspection Report&gt; </h1>
+        <div align=center><img border=0 width=800 src="/static/app/nexpom/Documentation_files/Inspection_report_img.png"></div>
+        <br><br>
+        
+        <p>
+		<div class="b_text">You can check the process capability index to use Uppertol, Lowertol, Nominal, Actual value of data.<br>
+        1) Bbasic measuring index : Cp, Cpk, Pp, Ppk<br>
+        2) Management Chart  : X-chart &amp; MR-chart </div><br><br>
+        
+        <div class="middle_title">Note :</div>
+        1) You must choose Source type &amp; Plan ID <br>
+        2) In case of Select box, you can get the list by receiving the previous box value<br>
+         3) The Color of Cp, Cpk, Pp, Ppk will automatically be updated when the interval-valued changes. You might want to seek the ‘single value option’ if you’d like to change the interval-valued.<br><br>
+        
+        </p>
+
+    </div>
+    <div class="box">
+        <h1>&lt;Data Report&gt;</h1>
+        <div align=center><img border=0 width=800 src="/static/app/nexpom/Documentation_files/Data_report_img.png"></div>
+        <br><br>
+        
+        <p>
+        
+		<div class="b_text">This page contains all defect rate, the defect rate per time.<br>
+		Also you can be aware of  how far the measurement result is off the baseline.</div><br>
+        
+
+        <div class="middle_title">Note :</div>
+        1) You must choose Source type &amp; Plan ID <br>
+        2) In case of Select box, you can get the list by receiving the value of previous box<br><br><br>
+        
+        
+        <div class="second_box">
+            <img border=0 width=400 src="/static/app/nexpom/Documentation_files/Data_report_01.png" align=left vspace=0 hspace=30>
+            These show all defect rate and the defect rate per time of the measurement result.
+
+        </div>
+        <div class="second_box">
+            <img border=0 width=400 src="/static/app/nexpom/Documentation_files/Data_report_02.png" align=left vspace=0 hspace=30>
+		One is X-chart, and the other is  the rate chart out of the reference value.
+        </div>
+        <div class="second_box">
+            <img border=0 width=400 src="/static/app/nexpom/Documentation_files/Data_report_03.png" align=left vspace=0 hspace=30>
+            The list of measuement.<br>
+            You can check the each value of USL, LSL, NOMINAL and ACTUAL. Also it notice you result; OK or NG 
+
+        </div>
+
+        </p>
+        
+    </div>
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<form>
+  <label>Reload apps on forwarder</label>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="host" searchWhenChanged="false">
+      <label>choose forwarder host to inspect:</label>
+      <search>
+        <query>splunk_server=* index="_internal" |  eval host=lower(host) | table host | dedup host | sort host</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| forwarderquery server="$host$" api="/services/deployment/client/config/reload" method="POST" stanza="default" | spath input=xmlresults</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <event>
+        <search>
+          <query>index=_internal host="$host$" source="/opt/splunkforwarder/var/log/splunk/splunkd.log"</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>

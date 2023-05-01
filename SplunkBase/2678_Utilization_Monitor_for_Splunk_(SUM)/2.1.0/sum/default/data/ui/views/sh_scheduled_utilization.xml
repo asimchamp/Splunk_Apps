@@ -1,0 +1,93 @@
+<form>
+  <label>Search Head Scheduled Search Utilization</label>
+  <fieldset submitButton="false">
+    <input searchWhenChanged="true" token="timepicked" type="time">
+      <label>Time</label>
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input searchWhenChanged="true" token="app" type="dropdown">
+      <label>App</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="app" fieldForValue="app">index="_internal" source="*scheduler.log" run_time=* user="$user$" | stats count by app | sort app</populatingSearch>
+    </input>
+    <input searchWhenChanged="true" token="user" type="dropdown">
+      <label>User</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="user" fieldForValue="user">index="_internal" source="*scheduler.log" run_time=* app="$app$" | stats count by user | sort user</populatingSearch>
+    </input>
+      <input searchWhenChanged="true" token="host" type="dropdown">
+      <label>Splunk Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="host" fieldForValue="host">index="_internal" source="*scheduler.log" run_time=* app="$app$" | stats count by host | sort host</populatingSearch>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Total Run Time and Count of Scheduled Searches by App</title>
+        <searchString>index="_internal" source="*scheduler.log" run_time=* app="$app$" user="$user$" host=$host$ | stats count as Count, sum(run_time) AS TotalRunTimeSecs by app  | eval TotalRunTimeSecs=round(TotalRunTimeSecs,1) | eventstats sum(TotalRunTimeSecs) as GrandTotalRunTimeSecs | eval PercUtil=round(TotalRunTimeSecs/GrandTotalRunTimeSecs*100,2) | sort -TotalRunTimeSecs | fields - GrandTotalRunTimeSecs | rename app as App, Count as "Search Count", TotalRunTimeSecs as "Total Run Time (sec)", PercUtil as "% of Total Run Time"</searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Total Run Time and Count of Scheduled Searches by App, User, Scheduled Search Name</title>
+        <searchString>index="_internal" source="*scheduler.log" run_time=* app="$app$" user="$user$" host=$host$  | stats count as Count, sum(run_time) AS TotalRunTimeSecs by app savedsearch_name user | eval TotalRunTimeSecs=round(TotalRunTimeSecs,1) | eventstats sum(TotalRunTimeSecs) as GrandTotalRunTimeSecs | eval PercUtil=round(TotalRunTimeSecs/GrandTotalRunTimeSecs*100,2) | sort -TotalRunTimeSecs | fields - GrandTotalRunTimeSecs | rename app as App, user as User, savedsearch_name as "Saved Search Name", TotalRunTimeSecs as "Total Run Time (sec)", PercUtil as "% of Total Run Time"</searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Count of Scheduler Errors and Warnings</title>
+        <searchString>index="_internal" source="*scheduler.log" ERROR OR WARN NOT INFO  host=$host$  | rex ".{30}(?&lt;Msg&gt;.+)$"| rex field=savedsearch_id "(?&lt;user&gt;[^;]+);(?&lt;app&gt;[^;]+);(?&lt;savedsearch_name&gt;[^;]+)" | search app="$app$" user="$user$" | stats count by Msg user app savedsearch_name | sort -count | head 100 | rename Msg as "Error Message" count as Count, user as User, app as App, savedsearch_name as "Saved Search Name"</searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

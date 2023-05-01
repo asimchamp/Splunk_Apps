@@ -1,0 +1,216 @@
+<form version="1.1">
+  <label>Top Talker Overview</label>
+  <fieldset autoRun="false" submitButton="true">
+      <input type="multiselect" token="Source" searchWhenChanged="false">
+      <label>Select tcpdump files:</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <search>
+        <query>index=* sourcetype=pcap:csv NOT source=*pcap2csv.sh NOT source=*pcap2csv.bat| rex field=source "SplunkForPCAP(\\\\|\/)PCAPcsv(\\\\|\/)(?&lt;source&gt;.*)"  |stats count by source</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <valuePrefix>source="*</valuePrefix>
+      <valueSuffix>*"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <default>SELECT TCPDUMP</default>
+    </input>
+    <input type="text" token="Span" searchWhenChanged="false">
+      <label>Enter the Timechart Span:</label>
+      <default>1m</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Protocols (Packets)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | top protocol</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Conversation (Packets)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | eval conversation=src_ip+"-&gt;"+dst_ip |top conversation</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Sender (Packets)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | top src_ip</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Receiver (Packets)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | top dst_ip</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Ports (Packets)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | top dst_port</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top MAC (Packets)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | top eth_dst</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Protocols (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | timechart span=$Span$ sum(tcp_length) as "Sum TCP Length" by protocol</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Conversation (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | eval conversation=src_ip+"-&gt;"+dst_ip |timechart span=$Span$ sum(tcp_length) as "Sum TCP Length" by conversation</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Sender (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | timechart span=$Span$ sum(tcp_length) as "SumBytes" by src_ip</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Receiver (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | timechart span=$Span$ sum(tcp_length) as "SumBytes" by dst_ip</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Destination Ports (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | timechart span=$Span$ sum(tcp_length) as "SumBytes" by dst_port</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top VLAN's (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | timechart span=$Span$ sum(tcp_length) as "SumBytes" by vlan_id</query>
+        </search>
+        <earliest>0</earliest>
+        <latest></latest>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.fieldColors">{"count": 0x639BF1, "average":0xFF5A09}</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">250</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top MAC (Sum Bytes)</title>
+        <search>
+          <query>index=* sourcetype=pcap:csv $Source$ | timechart span=$Span$ sum(tcp_length) as "Sum TCP Length" by eth_dst</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+      </chart>
+    </panel>
+  </row>
+</form>

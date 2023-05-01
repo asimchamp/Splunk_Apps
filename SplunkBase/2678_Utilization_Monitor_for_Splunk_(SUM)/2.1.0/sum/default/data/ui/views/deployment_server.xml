@@ -1,0 +1,34 @@
+<form>
+  <label>Deployment Server</label>
+  <fieldset submitButton="false">
+    <input type="time" token="timepicked">
+      <label>Select Time:</label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <event>
+        <title>Top 100 DS App Deployment Errors</title>
+        <search>
+          <query>index=_internal sourcetype=splunkd record (New OR Updating) result=Fail | head 100</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+      </event>
+    </panel>
+  </row>
+</form>

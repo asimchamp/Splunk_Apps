@@ -1,0 +1,274 @@
+<form>
+  <label>Lifetime of Searches</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="multiselect" token="sh_clause">
+      <label>Search Head</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>| tstats `SearchActivitySummaries` count from `SA_SearchHistory` groupby Search_History.SearchHead | `SARename`</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>Search_History.SearchHead=</valuePrefix>
+      <delimiter> OR </delimiter>
+      <default>*</default>
+      <fieldForLabel>SearchHead</fieldForLabel>
+      <fieldForValue>SearchHead</fieldForValue>
+    </input>
+    <input type="dropdown" token="user_criteria" searchWhenChanged="true">
+      <label>Select Leader (Based on Org Chart)</label>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <populatingSearch earliest="$earliest$" latest="$latest$" fieldForLabel="MyName" fieldForValue="tstats_search_criteria">| inputlookup LDAPMgmtChain | makemv delim="|" ManagementChain_sAMAccountName | stats values(sAMAccountName) as user by ManagementChain_sAMAccountName | eval tstats_search_criteria="(user=" . mvjoin(user," OR user=") . ")" | lookup LDAPSearch sAMAccountName as ManagementChain_sAMAccountName OUTPUTNEW name | eval MyName=coalesce(name . " (" . ManagementChain_sAMAccountName . ")", ManagementChain_sAMAccountName) | sort MyName</populatingSearch>
+    </input>
+    <input type="dropdown" token="tagged_user_criteria" searchWhenChanged="true">
+      <label>Tagged Users</label>
+      <choice value="*">All Users</choice>
+      <searchString>
+        |inputlookup TaggedUsers | stats values(user) as user by category | eval search="(user=" . mvjoin(user, " OR user=") . ")" | stats values(category) as category by search | eval category=mvjoin(category," / ")
+      </searchString>
+      <fieldForLabel>category</fieldForLabel>
+      <fieldForValue>search</fieldForValue>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <html>
+      <h2>Description</h2>
+      <p>This report analyzes the timeframe that data is searched over. This is relevant for determining how to allocate faster disks to hot/warm. Some customers will have more than 99.9% of their time spent searching the last 4 hours, in which case it may not make sense to invest in spacious hot/warm disks. However, for some other customers, virtually all of their use cases will be over very long periods of time. </p>
+      <p> What the below report is measuring is the difference between the exec_time (when the search was run) and the earliest time of the search. Note that this isn't really a conclusive measure, particularly for organizations that have all time enabled by default, and doesn't factor in all manner of different components (sparsity of the search, location of bloom filters, etc.). Very importantly, if a company has five days of data in hot and a search runs over the past six days of data, this makes no accounting for the fact that most of the runtime is probably spent on hot/warm disks. (If you really need it, I have the search to analyze that.. but it takes almost literally forever, so I didn't include it -- email me).</p>
+        <p>Limitations notwithstanding, this can provide guidance for how people use your Splunk® environment. If you would like a comparison to other companies, export the below dataset and the Top Users dataset from the main page and email them to me, and I will provide you a comparison. (Why those two? Give me some data and I'll give you some! Feel free to exclude the usernames.)</p>
+    </html>
+  </row>
+  <row>
+      <table>
+        <title>Lifetime of Searches</title>
+        <searchString>
+          | tstats `SearchActivitySummaries` prestats=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;0 Search_History.search_et_diff&lt;= 960 
+| eval label="&lt;= 16min", order="01"
+
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;960 Search_History.search_et_diff&lt;= 3600 
+| eval label=coalesce(label, "16min &lt;= 1hr"), order=coalesce(order, "03")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;3600 Search_History.search_et_diff&lt;= 7200 
+| eval label=coalesce(label, "1hr &lt;= 2hrs"), order=coalesce(order, "04")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;7200 Search_History.search_et_diff&lt;= 10800 
+| eval label=coalesce(label, "2hrs &lt;= 3hrs"), order=coalesce(order, "05")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;10800 Search_History.search_et_diff&lt;= 14400 
+| eval label=coalesce(label, "3hrs &lt;= 4hrs"), order=coalesce(order, "06")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;14400 Search_History.search_et_diff&lt;= 18000 
+| eval label=coalesce(label, "4hrs &lt;= 5hrs"), order=coalesce(order, "07")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;18000 Search_History.search_et_diff&lt;= 21600 
+| eval label=coalesce(label, "5hrs &lt;= 6hrs"), order=coalesce(order, "08")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;21600 Search_History.search_et_diff&lt;= 25200 
+| eval label=coalesce(label, "6hrs &lt;= 7hrs"), order=coalesce(order, "09")
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;25200 Search_History.search_et_diff&lt;= 28800 
+| eval label=coalesce(label, "7hrs &lt;= 8hrs"), order=coalesce(order, 10)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;28800 Search_History.search_et_diff&lt;= 32400 
+| eval label=coalesce(label, "8hrs &lt;= 9hrs"), order=coalesce(order, 11)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;32400 Search_History.search_et_diff&lt;= 36000 
+| eval label=coalesce(label, "9hrs &lt;= 10hrs"), order=coalesce(order, 12)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;36000 Search_History.search_et_diff&lt;= 39600 
+| eval label=coalesce(label, "10hrs &lt;= 11hrs"), order=coalesce(order, 13)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;39600 Search_History.search_et_diff&lt;= 43200 
+| eval label=coalesce(label, "11hrs &lt;= 12hrs"), order=coalesce(order, 14)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;43200 Search_History.search_et_diff&lt;= 46800 
+| eval label=coalesce(label, "12hrs &lt;= 13hrs"), order=coalesce(order, 15)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;46800 Search_History.search_et_diff&lt;= 50400 
+| eval label=coalesce(label, "13hrs &lt;= 14hrs"), order=coalesce(order, 16)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;50400 Search_History.search_et_diff&lt;= 54000 
+| eval label=coalesce(label, "14hrs &lt;= 15hrs"), order=coalesce(order, 17)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;54000 Search_History.search_et_diff&lt;= 57600 
+| eval label=coalesce(label, "15hrs &lt;= 16hrs"), order=coalesce(order, 18)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;57600 Search_History.search_et_diff&lt;= 61200 
+| eval label=coalesce(label, "16hrs &lt;= 17hrs"), order=coalesce(order, 19)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;61200 Search_History.search_et_diff&lt;= 64800 
+| eval label=coalesce(label, "17hrs &lt;= 18hrs"), order=coalesce(order, 20)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;64800 Search_History.search_et_diff&lt;= 68400 
+| eval label=coalesce(label, "18hrs &lt;= 19hrs"), order=coalesce(order, 21)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;68400 Search_History.search_et_diff&lt;= 72000 
+| eval label=coalesce(label, "19hrs &lt;= 20hrs"), order=coalesce(order, 22)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;72000 Search_History.search_et_diff&lt;= 75600 
+| eval label=coalesce(label, "20hrs &lt;= 21hrs"), order=coalesce(order, 23)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;75600 Search_History.search_et_diff&lt;= 79200 
+| eval label=coalesce(label, "21hrs &lt;= 22hrs"), order=coalesce(order, 24)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;79200 Search_History.search_et_diff&lt;= 82800 
+| eval label=coalesce(label, "22hrs &lt;= 23hrs"), order=coalesce(order, 25)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;82800 Search_History.search_et_diff&lt;= 86400 
+| eval label=coalesce(label, "23hrs &lt;= 24hrs"), order=coalesce(order, 26)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;86400 Search_History.search_et_diff&lt;= 90000 
+| eval label=coalesce(label, "24hrs &lt;= 25hrs"), order=coalesce(order, 27)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;90000 Search_History.search_et_diff&lt;= 172800 
+| eval label=coalesce(label, "25hrs &lt;= 2days"), order=coalesce(order, 28)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;172800 Search_History.search_et_diff&lt;= 259200 
+| eval label=coalesce(label, "2days &lt;= 3days"), order=coalesce(order, 29)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;259200 Search_History.search_et_diff&lt;= 345600 
+| eval label=coalesce(label, "3days &lt;= 4days"), order=coalesce(order, 30)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;345600 Search_History.search_et_diff&lt;= 432000 
+| eval label=coalesce(label, "4days &lt;= 5days"), order=coalesce(order, 31)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;432000 Search_History.search_et_diff&lt;= 518400 
+| eval label=coalesce(label, "5days &lt;= 6days"), order=coalesce(order, 32)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;518400 Search_History.search_et_diff&lt;= 604800 
+| eval label=coalesce(label, "6days &lt;= 7days"), order=coalesce(order, 33)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;604800 Search_History.search_et_diff&lt;= 691200 
+| eval label=coalesce(label, "7days &lt;= 8days"), order=coalesce(order, 34)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;691200 Search_History.search_et_diff&lt;= 777600 
+| eval label=coalesce(label, "8days &lt;= 9days"), order=coalesce(order, 35)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;777600 Search_History.search_et_diff&lt;= 864000 
+| eval label=coalesce(label, "9days &lt;= 10days"), order=coalesce(order, 36)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;864000 Search_History.search_et_diff&lt;= 950400 
+| eval label=coalesce(label, "10days &lt;= 11days"), order=coalesce(order, 37)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;950400 Search_History.search_et_diff&lt;= 1036800 
+| eval label=coalesce(label, "11days &lt;= 12days"), order=coalesce(order, 38)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1036800 Search_History.search_et_diff&lt;= 1123200 
+| eval label=coalesce(label, "12days &lt;= 13days"), order=coalesce(order, 39)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1123200 Search_History.search_et_diff&lt;= 1209600 
+| eval label=coalesce(label, "13days &lt;= 14days"), order=coalesce(order, 40)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1209600 Search_History.search_et_diff&lt;= 1296000 
+| eval label=coalesce(label, "14days &lt;= 15days"), order=coalesce(order, 41)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1296000 Search_History.search_et_diff&lt;= 1382400 
+| eval label=coalesce(label, "15days &lt;= 16days"), order=coalesce(order, 42)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1382400 Search_History.search_et_diff&lt;= 1468800 
+| eval label=coalesce(label, "16days &lt;= 17days"), order=coalesce(order, 43)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1468800 Search_History.search_et_diff&lt;= 1555200 
+| eval label=coalesce(label, "17days &lt;= 18days"), order=coalesce(order, 44)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1555200 Search_History.search_et_diff&lt;= 1641600 
+| eval label=coalesce(label, "18days &lt;= 19days"), order=coalesce(order, 45)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1641600 Search_History.search_et_diff&lt;= 1728000 
+| eval label=coalesce(label, "19days &lt;= 20days"), order=coalesce(order, 46)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1728000 Search_History.search_et_diff&lt;= 1814400 
+| eval label=coalesce(label, "20days &lt;= 21days"), order=coalesce(order, 47)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1814400 Search_History.search_et_diff&lt;= 1900800 
+| eval label=coalesce(label, "21days &lt;= 22days"), order=coalesce(order, 48)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1900800 Search_History.search_et_diff&lt;= 1987200 
+| eval label=coalesce(label, "22days &lt;= 23days"), order=coalesce(order, 49)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;1987200 Search_History.search_et_diff&lt;= 2073600 
+| eval label=coalesce(label, "23days &lt;= 24days"), order=coalesce(order, 50)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2073600 Search_History.search_et_diff&lt;= 2160000 
+| eval label=coalesce(label, "24days &lt;= 25days"), order=coalesce(order, 51)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2160000 Search_History.search_et_diff&lt;= 2246400 
+| eval label=coalesce(label, "25days &lt;= 26days"), order=coalesce(order, 52)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2246400 Search_History.search_et_diff&lt;= 2332800 
+| eval label=coalesce(label, "26days &lt;= 27days"), order=coalesce(order, 53)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2332800 Search_History.search_et_diff&lt;= 2419200 
+| eval label=coalesce(label, "27days &lt;= 28days"), order=coalesce(order, 54)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2419200 Search_History.search_et_diff&lt;= 2505600 
+| eval label=coalesce(label, "28days &lt;= 29days"), order=coalesce(order, 55)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2505600 Search_History.search_et_diff&lt;= 2592000 
+| eval label=coalesce(label, "29days &lt;= 30days"), order=coalesce(order, 56)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2592000 Search_History.search_et_diff&lt;= 2678400 
+| eval label=coalesce(label, "30days &lt;= 31days"), order=coalesce(order, 57)
+ 
+| tstats `SearchActivitySummaries` prestats=t append=t count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt from `SA_SearchHistory` where $sh_clause$ $user_criteria$ $tagged_user_criteria$ (Search_History.searchtype=adhoc* OR Search_History.searchtype=scheduled* OR Search_History.searchtype=summarization* OR Search_History.searchtype=dashboard*) Search_History.search_et_diff&gt;2678400 
+| eval label=coalesce(label, "&gt;31 days"), order=coalesce(order, 58)
+
+| stats count dc(Search_History.user) as user avg(Search_History.result_count) as avg_result_count avg(Search_History.scan_count) as avg_scan_count median(Search_History.total_run_time) as median_total_run_time sum(Search_History.total_run_time) as total_trt by order, label
+| fields - order
+
+| eval "total_trt avg hrs per day"=round(total_trt/3600/30,1) | streamstats sum(total_trt) as Aggregated_Total_Run_Time | eventstats sum(total_trt) as max_trt max(Aggregated_Total_Run_Time) as Max_Ag  | eval PercentageOfTotalRuntime = round(total_trt/max_trt * 100,2) | eval AggregatePercentageOfTotalRuntime = round(Aggregated_Total_Run_Time/Max_Ag * 100,2) | foreach PercentageOfTotalRuntime AggregatePercentageOfTotalRuntime [fieldformat &lt;&lt;FIELD&gt;&gt; = &lt;&lt;FIELD&gt;&gt; . "%" ]| fields - Max_Ag max_trt
+	</searchString>
+          <earliestTime>$field1.earliest$</earliestTime>
+          <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">100</option>
+        <format type="color" field="AggregatePercentageOfTotalRuntime">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+  </row>
+  <row>
+      <chart>
+        <title>Change over Time (**Log Scale**)</title>
+        <searchString>
+          | tstats `SearchActivitySummaries` perc5(Search_History.search_et_diff) as perc5_et_diff perc25(Search_History.search_et_diff) as perc25_et_diff median(Search_History.search_et_diff) as median_et_diff perc75(Search_History.search_et_diff) as perc75_et_diff perc95(Search_History.search_et_diff) as perc95_et_diff from `SA_SearchHistory` by _time span=1d| timechart bins=1000 avg(*) as *
+        </searchString>
+          <earliestTime>$field1.earliest$</earliestTime>
+          <latestTime>$field1.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+  </row>
+</form>

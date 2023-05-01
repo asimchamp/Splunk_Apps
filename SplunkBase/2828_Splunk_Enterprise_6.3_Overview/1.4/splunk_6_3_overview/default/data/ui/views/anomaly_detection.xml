@@ -1,0 +1,197 @@
+<form>
+  <label>Anomaly Detection</label>
+  <description>New SPL command that offers histogram based approach for detecting anomalies. Also includes the capabilities of existing  anomalousvalue &amp; outlier SPL commands. Options include Histogram, Z-Score and IQR.</description>
+
+
+  <row>
+    <panel>
+      <single>
+        <title># of Vehicles</title>
+        <search>
+          <query>| inputlookup car_data.csv | stats dc(vehicleId) as count</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Avg Speed</title>
+        <search>
+          <query>| inputlookup car_data.csv | eval _time=strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%3N-%z") | search engineSpeed&gt;1250 AND speed&gt;10 |  timechart avg(speed)</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="trendInterval">-5m</option>
+        <option name="afterLabel">mph</option>
+        <option name="underLabel">Compared to last minute</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Avg RPMs</title>
+        <search>
+          <query>| inputlookup car_data.csv | eval _time=strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%3N-%z") | search engineSpeed&gt;1250 AND speed&gt;10 | timechart avg(engineSpeed) as RPMs</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,2000,4000,6000]</option>
+        <option name="trendInterval">-5m</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Compared to last 5 minutes</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Avg Coolant Temperature</title>
+        <search>
+          <query>| inputlookup car_data.csv | eval _time=strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%3N-%z") | search engineSpeed&gt;1250 AND speed&gt;10 | timechart avg(engineCoolantTemperature) as coolant_temp</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="rangeColors">["0x65a637","0xf7bc38","0xd93f3c"]</option>
+        <option name="rangeValues">[170,200]</option>
+        <option name="trendInterval">-4m</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+        <option name="afterLabel">Deg F</option>
+        <option name="underLabel">Compared to last 5 minutes</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Create Anomaly Summary using "... | anomalydetection method=histogram action=summary" over All Time</title>
+        <search>
+          <query>| inputlookup car_data.csv | anomalydetection method=histogram action=summary</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Anomalies Found using "... | anomalydetection method=histogram"</title>
+        <search>
+          <query>| inputlookup car_data.csv | anomalydetection</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">5</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="data_token">
+        <label>Select a Data Point to Chart</label>
+        <choice value="speed">Speed</choice>
+        <choice value="engineSpeed">RPMs</choice>
+        <choice value="engineCoolantTemperature">Coolant Temperature</choice>
+        <default>engineCoolantTemperature</default>
+        <initialValue>engineCoolantTemperature</initialValue>
+      </input>
+      <input type="dropdown" token="func_token">
+        <label>Select a Statistical Function</label>
+        <choice value="avg">Average</choice>
+        <choice value="min">Min</choice>
+        <choice value="max">Max</choice>
+        <choice value="stdev">Standard Deviation</choice>
+        <default>max</default>
+        <initialValue>max</initialValue>
+      </input>
+      <input type="dropdown" token="span_token" searchWhenChanged="true">
+        <label>Time Interval</label>
+        <choice value="10s">10s</choice>
+        <choice value="30s">30s</choice>
+        <choice value="1m">1m</choice>
+        <choice value="5m">5m</choice>
+        <default>30s</default>
+        <initialValue>30s</initialValue>
+      </input>
+      <chart>
+        <title>Timechart of Data Points</title>
+        <search>
+          <query>| inputlookup car_data.csv | eval _time=strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%3N-%z") | search engineSpeed&gt;1250 AND speed&gt;10 | timechart useother=f limit=0 span=$span_token$ $func_token$($data_token$) as coolant_temp by vehicleId</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">400px</option>
+        <option name="charting.chart.resultTruncationLimit">50000</option>
+      </chart>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,44 @@
+<dashboard>
+  <label>Stats and Eval -- Better Together</label>
+  <row>
+    <html>
+      <h2>Background</h2>
+      <p>A core workhorse of the Splunk computational capabilities, stats is fantastic. Eval is equally pwerful and useful... but did you know that they can be used together? The hell you say! But yes, it is true.</p>
+      <p>While there is more to cover there than is really possible, below, find a small set of examples enumerating some core capabilities that will enhance your ability to create correlation rules, or generally search better in Splunk. Note that eval is not available in tstats or pivot searches.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Key Techniques:</h2>
+<p>This example leverages the following useful techniques:</p>
+	<ul>
+      <li>Correlation across datasets: One dataset is not always enough for a correlation rule. Up that number.</li>
+      <li>Stats eval value filtering: The essential stats + eval, give you a count where field="value"</li>
+		<li>Stats eval match and searchmatch: If you need to find how many unique email addresses that match a particular regex, or you have a number of data types and need to count how many match a particular search string.. easy.</li>
+      <li>Stats eval if statements: Embedding if statements allow you to have incredible control over what you are counting, averaging, distinct counting, or etc. Return null to exclude values!</li>
+      <li>Stats eval with multiple conditionals: Remember that you can use multiple conditionals via AND OR or NOT</li>
+      <li>Stats eval case: Isn't eval incredibly powerful?</li>
+      </ul>
+    </html>
+  </row><!--
+  <row>
+    <html>
+      <h2>The Search</h2>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>
+            <![CDATA[
+index=_internal Need to create a search
+]]>
+          </query>
+          <earliest></earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>-->
+</dashboard>

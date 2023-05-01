@@ -1,0 +1,159 @@
+<form>
+  <label>Launchpad</label>
+  <description>Starting point for exploring automatic data.</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="radio" token="vehicle" searchWhenChanged="true">
+      <label>Select Vehicle:</label>
+      <search>
+        <query>`automatic_index` `automatic_vehicle_sourcetype`
+        | stats latest(display_name) AS display_name by host</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <fieldForLabel>display_name</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <prefix>host=</prefix>
+      <default>*</default>
+      <choice value="*">All</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Total Trips</title>
+        <search>
+          <query>$vehicle$ `automatic_index` `automatic_trip_sourcetype`
+          | stats count
+          | fieldformat count = tostring( count , "commas" )</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+      </single>
+      <single>
+        <title>Cumulative Driving Time</title>
+        <search>
+          <query>$vehicle$ `automatic_index` `automatic_trip_sourcetype`
+          | stats sum(duration_s) as metric
+          | eval metric = round( metric , 2 )
+          | fieldformat metric = tostring( metric , "duration" )</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+      </single>
+      <single>
+        <title>Total Distance Traveled (mi)</title>
+        <search>
+          <query>$vehicle$ `automatic_index`  `automatic_trip_sourcetype`
+          | stats sum(distance_mi) as distance
+          | eval distance = tostring( round( distance , 2 ) , "commas" )</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="numberPrecision">0.00</option>
+        <option name="unit">miles</option>
+      </single>
+      <single>
+        <title>Distance in Kessel Runs</title>
+        <search>
+          <query>$vehicle$ `automatic_index`  `automatic_trip_sourcetype`
+          | stats sum(distance_mi) as distance
+          | eval parsec = distance / (12 * ( 19.17  * 1000000000000) )
+          | fields + parsec</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="numberPrecision">0.0000</option>
+        <option name="underLabel">Millennium Falcon Kessel Runs</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Earliest Trip</title>
+        <search>
+          <query>| metadata `automatic_index` type=hosts
+          | search $vehicle$
+          | convert ctime(*ime)
+          | fields + firstTime</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+      </single>
+      <single>
+        <title>Latest Trip</title>
+        <search>
+          <query>| metadata `automatic_index` type=hosts
+          | search $vehicle$
+          | convert ctime(*ime)
+          | fields + lastTime</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Number of Trips</title>
+        <search>
+          <query>$vehicle$ `automatic_index` `automatic_trip_sourcetype`
+          | timechart count as trips</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>All Time Vehicle Invententory</title>
+      <table>
+        <search>
+          <query>`automatic_index` `automatic_vehicle_sourcetype` OR `automatic_trip_sourcetype`
+| fields host, created_at, display_name, fuel_grade, fuel_level_percent, make, model, submodel, updated_at, year, distance_mi, duration_s
+| stats sum(distance_mi) AS usage_distance_mi, values(*) AS * by host
+| table host, display_name, year, make, model, submodel, fuel_grade, fuel_level_percent, created_at, updated_at, usage_distance_mi
+| rename host AS ID, display_name AS Name, year AS Year, make AS Make, model AS Model, submodel AS Trim, fuel_grade AS "Fuel Grade", fuel_level_percent AS "Fuel Tank Fill Level", created_at AS "Connected Since", updated_at AS "Last Reported", usage_distance_mi AS "Cumulative Distance Traveled"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <refresh>10m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="totalsRow">false</option>
+        <format type="number" field="Cumulative Distance Traveled (miles)">
+          <option name="unit">miles</option>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,56 @@
+<dashboard>
+  <label>Subsearching Your Transactions to Performance</label>
+  <row>
+    <html>
+      <h2>Background</h2>
+      <p>Everyone who has talked to Ron Naken about SPL in a group setting for 5 minutes has spent 4 minutes hearing how transaction is terrible, but it's not always terrible, but it's terrible. And to some extent that's true. If you play with a transaction-able datasource, sourcetype=asa_syslog and try to get a table of the user, src and assigned_ip, you will find that transaction takes about 4.5 seconds while stats takes less.</p>
+      <p>Functionally, that is true. Transaction is slow. There are a few techniques that can help make it more performant though, for certain situations. Those are detailed below.</p>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Key Techniques for Transaction Performance</h2>
+      <ul><li>Use maxpause or maxspan: While these will definitely alter the functionality characteristics of transaction, it's easy to not think of them if you're looking at an ephemeral session. For example, if you were tracking a web session id, adding in a reasonable maxspan could dramatically improve your performance. In the below testing, adding a maxpause=8h (for a VPN use case) improved performance by 72% when we were looking for specific fields.</li>
+        <li>Subsearch that!: If you're looking for a specific transaction (such as looking for the VPN logs of a particular user, or a particular email), you can usually use search criteria, or a subsearch to control what gets sent to transaction. In below testing, adding in a subsearch for all traffic with that src (regardless of whether it listed the username or not) improved performance by 1200%.</li>
+        <li>Don't use Transaction: Naken says you can replace transaction with eventstats, streamstats, and/or stats. Probably don't want to do this in a POC, but a great option. </li>
+      </ul>
+    </html>
+  </row>
+  <row>
+    <html>
+      <h2>Performance Measures:</h2>
+<p>Here are several metrics from performance testing:</p>
+      <table>
+        <tr><td>Search</td><td>Events</td><td>Time Taken (seconds)</td></tr>
+<tr><td>sourcetype=asa_syslog  | transaction user </td><td>3046</td><td>4.463</td></tr>
+<tr><td>sourcetype=asa_syslog  | fields - _raw | fields user src _time assigned_ip| transaction user</td><td>3046</td><td>2.977</td></tr>
+<tr><td>sourcetype=asa_syslog  | transaction user | table user src _time assigned_ip</td><td>3046</td><td>2.807</td></tr>
+<tr><td>sourcetype=asa_syslog  | stats min(_time) as _time values(assigned_ip) by user src</td><td>3038</td><td>1.568</td></tr>
+<tr><td>sourcetype=asa_syslog  | transaction user maxpause=8h</td><td>7614</td><td>4.277</td></tr>
+<tr><td>sourcetype=asa_syslog  | transaction user maxpause=8h | table user src _time assigned_ip</td><td>7614</td><td>1.631</td></tr>
+<tr><td>sourcetype=asa_syslog | transaction user | search user=f87c5c8453 | table _time user src assigned_ip</td><td>1</td><td>2.439</td></tr>
+<tr><td>[search sourcetype=asa_syslog user=f87c5c8453 assigned to session | dedup src | table src ] sourcetype=asa_syslog | transaction user | search user=f87c5c8453 | table _time user src assigned_ip</td><td>1</td><td>0.204</td></tr>
+      </table>
+      <p> </p>
+      <p>Pay special attention to the last example. Often when I see people use transaction, they then proceed to search on those transactions. Using a subsearch to shorten your logs down allows transaction to run in a reasonable timeframe, while still maintaining that customer-friendly transaction experience.</p>
+    </html>
+  </row>
+  
+  <row>
+    <panel>
+      <table>
+        <title>Find the VPN data for user f87c5c8453</title>
+        <search>
+          <query>[search sourcetype=asa_syslog user=f87c5c8453 assigned to session | dedup src | table src ] sourcetype=asa_syslog | transaction user | search user=f87c5c8453 | table _time user src assigned_ip</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

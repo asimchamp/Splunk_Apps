@@ -1,0 +1,78 @@
+<panel>
+  <title>Wall-o-Shame: Longest Running Scheduled Searches</title>
+  <!--Add description-->
+  <html>
+    <p>This panel displays the longest running scheduled searches.</p>
+    <p>
+    Learn more about <a class="external text" target="_blank" href="https://docs.splunk.com/Documentation/Splunk/8.2.1/Search/Writebettersearches">search best practices</a> to shorten your search runtime.
+    </p>
+  </html>
+  <input type="time" token="shame_time">
+    <default>
+      <earliest>-7d@h</earliest>
+      <latest>now</latest>
+    </default>
+  </input>
+  <html depends="$welcome_popular_views$">
+      <h3>Sorry, there are no results because there are currently no scheduled searches.</h3>
+  </html>
+  <table rejects="$welcome_walloshame$">
+    <search>
+      <progress>
+            <condition match="$job.resultCount$ == 0">
+              <set token="welcome_walloshame">true</set>
+            </condition>
+            <condition>
+              <unset token="welcome_walloshame"/>
+            </condition>
+          </progress>
+      <query>( index=_internal sourcetype="scheduler" savedsearch_name=* run_time=* scheduled_time=* app=* user=* user!=nobody sid=* ) 
+OR ( ( index=sos OR index=os ) sourcetype="ps" ARGS="*search*" RSZ_KB=* id user )
+ | rex field=ARGS "search(_|\s)--id=(?&lt;sid&gt;[\_\-\w\.]+)(_|\s)--"
+ | rex field=ARGS "--user=(?&lt;user&gt;.+?)(_|\s)--" 
+ | stats
+    values(run_time) as run_time,
+    max(RSZ_KB) as RSZ_KB,
+    max(VSZ_KB) as VSZ_KB,
+    values(savedsearch_name) as savedsearch_name,
+    values(user) as user
+   by sid
+ | stats
+    sum(run_time) as sum_run_time,
+    max(run_time) as max_run_time,
+    max(RSZ_KB) as max_RSZ_KB
+   by savedsearch_name, user
+ | sort - max_run_time, max_RSZ_KB
+ | eval minute_threshold = 5
+ | where max_run_time>(60*minute_threshold) OR sum_run_time>(60*minute_threshold)
+ | join type=left user [
+  | rest /services/authentication/users
+  | fields + title, realname
+  | rename title as user ]
+ | eval max_run_time = tostring( max_run_time , "duration" )
+ | eval sum_run_time = tostring( sum_run_time , "duration" )
+ | eval max_RSZ_MB = round( max_RSZ_KB / pow( 1024 , 1 ), 2 )
+ | rename 
+    realname as Splunker,
+    savedsearch_name as "Saved Search/Report Name",
+    max_run_time as "Maximum Search Run Time",
+    sum_run_time as "Cumulative Search Run Time",
+    max_RSZ_MB AS "Peak Resident Memory Size (MB)"
+  | table Splunker, *Name, *Time, *Size*</query>
+    </search>
+    <earliest>$shame_time.earliest$</earliest>
+    <latest>$shame_time.latest$</latest>
+    <option name="wrap">true</option>
+    <option name="rowNumbers">true</option>
+    <option name="drilldown">row</option>
+    <option name="dataOverlayMode">none</option>
+    <option name="count">10</option>
+    <drilldown>
+      <link>
+        <![CDATA[
+			/manager/welcome/saved/searches?ns=-&pwnr=-&search=$row.Saved Search/Report Name$
+			]]>
+      </link>
+    </drilldown>
+  </table>
+</panel>

@@ -1,0 +1,107 @@
+<form stylesheet="custom.css">
+  <label>System Information - Analysis</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="hostname" searchWhenChanged="true">
+      <label>Host Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="MAC" searchWhenChanged="true">
+      <label>MAC Address</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="OS" searchWhenChanged="true">
+      <label>Operating System</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="domain" searchWhenChanged="true">
+      <label>Domain</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="OSbitness" searchWhenChanged="true">
+      <label>OS Bitness</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Machine Information</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ SystemInfoItem.hostname="$hostname$" SystemInfoItem.MAC="$MAC$" SystemInfoItem.OS="$OS$" SystemInfoItem.domain="$domain$" SystemInfoItem.OSbitness="$OSbitness$" | table SystemInfoItem.machine, SystemInfoItem.hostname, SystemInfoItem.date, SystemInfoItem.timezoneDST, SystemInfoItem.timezoneStandard, SystemInfoItem.processor, SystemInfoItem.procType, SystemInfoItem.MAC, SystemInfoItem.totalphysical, SystemInfoItem.availphysical, SystemInfoItem.drives, SystemInfoItem.uptime, SystemInfoItem.containmentState, SystemInfoItem.clockSkew, SystemInfoItem.stateAgentStatus | rename SystemInfoItem.machine AS "Machine Name", SystemInfoItem.hostname AS "Host Name", SystemInfoItem.date AS "System Date", SystemInfoItem.timezoneDST AS "Time Zone DST", SystemInfoItem.timezoneStandard AS "Time Zone Standard", SystemInfoItem.processor AS "Processor Identity", SystemInfoItem.procType AS "Processor Type", SystemInfoItem.MAC AS "Primary Network Adapter MAC", SystemInfoItem.totalphysical AS "Total Phys Memory", SystemInfoItem.availphysical AS "Total Avail Memory", SystemInfoItem.drives AS "Drives", SystemInfoItem.uptime AS "Uptime", SystemInfoItem.containmentState AS "Containment State", SystemInfoItem.clockSkew AS "Clock Skew", SystemInfoItem.stateAgentStatus AS "State Agent Status"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">15</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Operating System Information</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ SystemInfoItem.hostname="$hostname$" SystemInfoItem.MAC="$MAC$" SystemInfoItem.OS="$OS$" SystemInfoItem.domain="$domain$" SystemInfoItem.OSbitness="$OSbitness$" | table SystemInfoItem.OS, SystemInfoItem.productName, SystemInfoItem.patchLevel, SystemInfoItem.buildNumber, SystemInfoItem.productID, SystemInfoItem.directory, SystemInfoItem.installDate, SystemInfoItem.OSbitness | rename SystemInfoItem.OS as "Operating System", SystemInfoItem.productName AS "Product Name", SystemInfoItem.patchLevel AS "Patch Level", SystemInfoItem.buildNumber AS "OS Build", SystemInfoItem.productID AS "Product ID", SystemInfoItem.directory AS "System Directory", SystemInfoItem.installDate AS "Install Date", SystemInfoItem.OSbitness AS "OS Bitness"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">15</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>User Information</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ SystemInfoItem.hostname="$hostname$" SystemInfoItem.MAC="$MAC$" SystemInfoItem.OS="$OS$" SystemInfoItem.domain="$domain$" SystemInfoItem.OSbitness="$OSbitness$" | table SystemInfoItem.regOwner, SystemInfoItem.regOrganization, SystemInfoItem.domain, SystemInfoItem.user, SystemInfoItem.loggedOnUser | rename SystemInfoItem.regOwner AS "Registered Owner", SystemInfoItem.regOrganization AS "Registered Organization", SystemInfoItem.domain AS Domain, SystemInfoItem.user AS "Logged in User", SystemInfoItem.loggedOnUser AS "Logged on User"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">15</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>BIOS Information</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32system $wild$ SystemInfoItem.hostname="$hostname$" SystemInfoItem.MAC="$MAC$" SystemInfoItem.OS="$OS$" SystemInfoItem.domain="$domain$" SystemInfoItem.OSbitness="$OSbitness$" | table SystemInfoItem.biosInfo.biosDate, SystemInfoItem.biosInfo.biosVersion | rename SystemInfoItem.biosInfo.biosDate AS "BIOS Date String", SystemInfoItem.biosInfo.biosVerions AS "BIOS Version" | transpose</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">15</option>
+      </table>
+    </panel>
+  </row>
+</form>

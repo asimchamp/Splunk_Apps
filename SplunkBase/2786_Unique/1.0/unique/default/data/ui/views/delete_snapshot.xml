@@ -1,0 +1,40 @@
+<form>
+  <label>Delete Snapshots</label>
+  <fieldset submitButton="true" autoRun="false">
+      <input type="dropdown" token="snapshot" searchWhenChanged="false">
+        <label>Snapshot To Delete...</label>
+        <search>
+          <query>| zkread command="get_children" path="/unique/" | rename children: as snapshot | table snapshot</query>
+        </search>
+        <fieldForLabel>snapshot</fieldForLabel>
+        <fieldForValue>snapshot</fieldForValue>
+      </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table depends="$snapshot$">
+        <title>Existing Snapshots...</title>
+        <search>
+          <query>| zkread command="get_children" path="/unique/" | rename children: as snapshot | fields snapshot | table snapshot</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table depends="$snapshot$">
+        <title>Delete Snapshot</title>
+        <search>
+          <query>| zkwrite command="delR" path="/unique/$snapshot$"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

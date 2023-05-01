@@ -1,0 +1,679 @@
+{
+    "modelName": "Glasswall",
+    "displayName": "Glasswall",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 1,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "EmailLog",
+            "displayName": "EmailLog",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "Count_Of_Excel_Embedded_File_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Excel_Embedded_File_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Excel_Hyperlink_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Excel_Hyperlink_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Excel_Macro_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Excel_Macro_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Excel_Metadata_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Excel_Metadata_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PDF_Acroform_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PDF_Acroform_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PDF_Actions_URI_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PDF_Actions_URI_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PDF_Embedded_Files_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PDF_Embedded_Files_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PDF_JavaScript_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PDF_JavaScript_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PDF_Metadata_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PDF_Metadata_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PDF_Non_Conformant_Image_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PDF_Non_Conformant_Image_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PowerPoint_Embedded_File_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PowerPoint_Embedded_File_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PowerPoint_Hyperlink_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PowerPoint_Hyperlink_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PowerPoint_Macro_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PowerPoint_Macro_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_PowerPoint_Metadata_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_PowerPoint_Metadata_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Unknown_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Unknown_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Word_Embedded_File_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Word_Embedded_File_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Word_Hyperlink_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Word_Hyperlink_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Word_Macro_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Word_Macro_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_Of_Word_Metadata_Sanitisations",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_Of_Word_Metadata_Sanitisations",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_of_All_Sanitisation_Items",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_of_All_Sanitisation_Items",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_of_Issue_Items",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_of_Issue_Items",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Count_of_Remedy_Items",
+                    "owner": "EmailLog",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Count_of_Remedy_Items",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "FileExtension",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "FileExtension",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Filename",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Filename",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Outcome",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Outcome",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Source_Domain",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Source_Domain",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Transaction_date_and_time_at_agent",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Transaction_date_and_time_at_agent",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Transaction_destination",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Transaction_destination",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "Transaction_source",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "Transaction_source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "eventtype",
+                    "owner": "EmailLog",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "eventtype",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Product",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Product",
+                            "comment": "",
+                            "fieldSearch": "",
+                            "lookupOutputFieldName": "Product"
+                        },
+                        {
+                            "fieldName": "Structured",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Structured",
+                            "comment": "",
+                            "fieldSearch": "",
+                            "lookupOutputFieldName": "Structured"
+                        }
+                    ],
+                    "calculationType": "Lookup",
+                    "lookupName": "FileTypes",
+                    "comment": "",
+                    "lookupInputs": [
+                        {
+                            "inputField": "FileExtension",
+                            "lookupField": "FileExtension"
+                        }
+                    ],
+                    "owner": "EmailLog",
+                    "calculationID": "8bhknfg8p2o11yvi",
+                    "editable": true
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Word_Embedded_File_Sanitisation",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Word Embedded File Sanitisation",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "1tbjprx4gtgo80k9",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_Word_Embedded_File_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Word_Hyperlink_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Word Hyperlink Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "2xb1wzf4vwh4cxr",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_Word_Hyperlink_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Word_Macro_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Word Macro Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "g8ka3ugmak54gqfr",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_Word_Macro_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Excel_Macro_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Excel Macro Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "je4thvjarwdeipb9",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_Excel_Macro_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Excel_Hyperlink_Sanitisation",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Excel Hyperlink Sanitisation",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "kxtfp9e9afw29",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_Excel_Hyperlink_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Excel_Embedded_File_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Excel Embedded File Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "t0q86mxvo0f6r",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_Excel_Embedded_File_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "PowerPoint_Embedded_File_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "PowerPoint Embedded File Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "wjxakw40druj714i",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_PowerPoint_Embedded_File_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "PowerPoint_Hyperlink_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "PowerPoint Hyperlink Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "qvz8mbc8v583q5mi",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_PowerPoint_Hyperlink_Sanitisations >0,\"Y\",\"N\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "PowerPoint_Macro_Sanitisations",
+                            "owner": "EmailLog",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "PowerPoint Macro Sanitisations",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "kvi5teqvhztlc8fr",
+                    "owner": "EmailLog",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(Count_Of_PowerPoint_Macro_Sanitisations >0,\"Y\",\"N\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "sourcetype=\"GWExportCSV\"",
+                    "owner": "EmailLog"
+                }
+            ],
+            "lineage": "EmailLog"
+        }
+    ],
+    "objectNameList": [
+        "EmailLog"
+    ]
+}

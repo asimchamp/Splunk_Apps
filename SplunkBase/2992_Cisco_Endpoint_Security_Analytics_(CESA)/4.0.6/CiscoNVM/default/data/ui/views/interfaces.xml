@@ -1,0 +1,155 @@
+<form version="1.1" showsource="False" script="autodiscover.js, default_token.js" stylesheet="drilldownBkgd.css,css/common.css">
+  <label>Network Interfaces</label>
+  <fieldset submitButton="true">
+    <input type="time" token="time">
+      <label></label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <html>
+      <br/>
+    </html>
+    <input type="radio" token="period_tok">
+      <label>Aggregate By</label>
+      <choice value="NOTUSED1">Flows</choice>
+      <choice value="NOTUSED2">In-Bytes</choice>
+      <choice value="NOTUSED3">Out-Bytes</choice>
+      <default value="NOTUSED1">Flows</default>
+      <!-- set condition based on the label defined by <choice> -->
+      <!-- Within each condition, specify a custom label for display -->
+      <!-- Capture the selected value in the token, earliest_tok -->
+      <change>
+        <condition label="Flows">
+          <set token="agg_type">count(udid)</set>
+          <set token="unit">flows</set>
+        </condition>
+        <condition label="In-Bytes">
+          <set token="agg_type">sum(ibc)</set>
+          <set token="unit">in-bytes</set>
+        </condition>
+        <condition label="Out-Bytes">
+          <set token="agg_type">sum(obc)</set>
+          <set token="unit">out-bytes</set>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Traffic by Interface Type</title>
+      <chart>
+        <search>
+          <query>`nvm_ifdata_index` | join udid,iid [search `nvm_flowdata_index` NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=_softwareupdate AND pap!=nobody AND pap!=_mdnsresponder AND pap!=_lp AND pap!=_locationd AND pap!=root AND pap!=UpdatusUser)] | stats $agg_type$ AS $unit$ by it | lookup IfaceTypesLookup type as it OUTPUT text as it_text | top $unit$ by it_text</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="it">row.it</set>
+          <set token="Drilldown_source">"it"</set>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Traffic by SSID</title>
+      <chart>
+        <search>
+          <query>`nvm_ifdata_index` | join udid,iid [search `nvm_flowdata_index` NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=_softwareupdate AND pap!=nobody AND pap!=_mdnsresponder AND pap!=_lp AND pap!=_locationd AND pap!=root AND pap!=UpdatusUser)] | stats $agg_type$ by ssid | rename $agg_type$ as $unit$ | top $unit$ by ssid</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="ssid">$click.value$</set>
+          <set token="Drilldown_source">"ssid"</set>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Traffic by Network State</title>
+      <chart>
+        <search>
+          <query>`nvm_ifdata_index` | join udid,iid [search `nvm_flowdata_index` NOT pap=* OR (pap!=Administrator AND pap!=LOCAL AND pap!=SYSTEM AND pap!=_netbios AND pap!=NETWORK AND pap!=linuxuid_0 AND pap!=_softwareupdate AND pap!=nobody AND pap!=_mdnsresponder AND pap!=_lp AND pap!=_locationd AND pap!=root AND pap!=UpdatusUser)] | stats $agg_type$ by ist | rename $agg_type$ as $unit$ | top $unit$ by ist</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="ist">$click.value$</set>
+          <set token="Drilldown_source">"Network State"</set>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+</form>

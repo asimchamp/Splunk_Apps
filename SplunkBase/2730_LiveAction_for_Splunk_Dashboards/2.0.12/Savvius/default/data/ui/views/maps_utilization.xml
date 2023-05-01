@@ -1,0 +1,308 @@
+<form script="savvius.js" stylesheet="maps_utilization.css">
+  <label>Utilization Map</label>
+  <fieldset autorun="true" submitButton="false">
+    <!-- Global timer. Not token is necessary -->
+    <input type="time" searchWhenChanged="true">
+      <label>Date &amp; Time</label>
+      <default>
+        <earliest>-1h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="text" token="address" searchWhenChanged="true">
+      <label>Address</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>sourcetype=sv_nodes host="$source$" Address="$address$"
+            | eval Address=replace(Address, "IP-", "")
+            | eval Address=replace(Address, "IPv6-", "")
+            | eval Address=replace(Address, "IPX-", "")
+            | eval Address=replace(Address, "AT-", "")
+            | eval Address=replace(Address, "DEC-", "")
+            | stats dc(Address) as nodecount
+            | fieldformat nodecount=tostring(nodecount, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="underLabel">Nodes</option>
+        <option name="linkFields">result, underlabel</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                    statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$address$
+                ]]>
+          </link>
+        </drilldown>        
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_nodes host="$source$" Address="$address$"
+            | eval Address=replace(Address, "IP-", "")
+            | eval Address=replace(Address, "IPv6-", "")
+            | eval Address=replace(Address, "IPX-", "")
+            | eval Address=replace(Address, "AT-", "")
+            | eval Address=replace(Address, "DEC-", "")
+            | iplocation Address
+            | stats dc(Country) as countrycount
+            | fieldformat countrycount=tostring(countrycount, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Countries</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Average Network Utilization</title>
+        <search>
+          <query>sourcetype=sv_summaries host="$source$" Group="Network" Statistic="Average Utilization (bits/s)"
+            | eval mbps=(Bytes/1000000)
+            | timechart avg(mbps) as Mbps
+            | fieldformat Mbps=round(Mbps, 2)</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">300px</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                    ]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <map>
+        <title>World Map</title>
+        <search>
+          <query>sourcetype=sv_nodes host="$source$" Address="$address$"
+            | eval bytes='Bytes Received' + 'Bytes Sent'
+            | eval Address=replace(Address, "IP-", "")
+            | eval Address=replace(Address, "IPv6-", "")
+            | eval Address=replace(Address, "IPX-", "")
+            | eval Address=replace(Address, "AT-", "")
+            | eval Address=replace(Address, "DEC-", "")
+            | iplocation prefix=iploc_ allfields=true Address
+            | geostats latfield=iploc_lat longfield=iploc_lon sum(bytes) by Address globallimit=0</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="mapping.data.maxClusters">500</option>
+        <option name="mapping.markerLayer.markerMaxSize">20</option>
+        <option name="mapping.map.center">(5,20)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="height">300px</option>
+        <fields>["host","source","sourcetype"]</fields>
+        <option name="drilldown">all</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table1">
+        <title>Country List</title>
+        <search>
+          <query>sourcetype=sv_nodes host="$source$" Address="$address$"
+            | rename "Bytes Received" as br1
+            | rename "Bytes Sent" as bs1
+            | eval bytes=br1 + bs1
+            | rename "Packets Received" as pr1
+            | rename "Packets Sent" as ps1
+            | eval packets=pr1 + ps1
+            | eval Address=replace(Address, "IP-", "")
+            | eval Address=replace(Address, "IPv6-", "")
+            | eval Address=replace(Address, "IPX-", "")
+            | eval Address=replace(Address, "AT-", "")
+            | eval Address=replace(Address, "DEC-", "")
+            | iplocation Address
+            | stats sparkline(sum(bytes)) as "Byte Trend" sum(bs1) as "Bytes Sent" sum(br1) as "Bytes Received" sparkline(sum(packets)) as "Packet Trend" sum(ps1) as "Packets Sent" sum(pr1) as "Packets Received" dc(Address) as "Total Nodes" by Country
+            | fieldformat "Bytes Sent"=tostring('Bytes Sent', "commas")
+            | fieldformat "Bytes Received"=tostring('Bytes Received', "commas")
+            | fieldformat "Packets Sent"=tostring('Packets Sent', "commas")
+            | fieldformat "Packets Received"=tostring('Packets Received', "commas")
+            | fieldformat "Total Nodes"=tostring('Total Nodes', "commas")
+            | sort - "Total Nodes"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="rowNumbers">true</option>
+        <option name="drilldown">cell</option>
+        <drilldown>
+          <condition field="Byte Trend">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes Sent">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes Received">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packet Trend">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets Sent">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets Received">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table2">
+        <title>Node List</title>
+        <search>
+          <query>sourcetype=sv_nodes host="$source$" Address="$address$"
+            | rename "Bytes Received" as br1
+            | rename "Bytes Sent" as bs1
+            | eval bytes=br1 + bs1
+            | rename "Packets Received" as pr1
+            | rename "Packets Sent" as ps1
+            | eval packets=pr1 + ps1
+            | eval Address=replace(Address, "IP-", "")
+            | eval Address=replace(Address, "IPv6-", "")
+            | eval Address=replace(Address, "IPX-", "")
+            | eval Address=replace(Address, "AT-", "")
+            | eval Address=replace(Address, "DEC-", "")
+            | iplocation Address
+            | stats sparkline(sum(bytes)) as "Byte Trend" sum(bs1) as "Bytes Sent" sum(br1) as "Bytes Received" sparkline(sum(packets)) as "Packet Trend" sum(ps1) as "Packets Sent" sum(pr1) as "Packets Received" count as "Total Count" by Address Country City Region lat lon
+            | fieldformat "Bytes Sent"=tostring('Bytes Sent', "commas")
+            | fieldformat "Bytes Received"=tostring('Bytes Received', "commas")
+            | fieldformat "Packets Sent"=tostring('Packets Sent', "commas")
+            | fieldformat "Packets Received"=tostring('Packets Received', "commas")
+            | fieldformat "Total Count"=tostring('Total Count', "commas")
+            | rename lat as Latitude
+            | rename lon as Longitude
+            | sort - "Total Count"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="rowNumbers">true</option>
+        <option name="drilldown">cell</option>
+        <drilldown>
+          <condition field="Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+          <condition field="Byte Trend">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes Sent">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes Received">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packet Trend">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets Sent">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets Received">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

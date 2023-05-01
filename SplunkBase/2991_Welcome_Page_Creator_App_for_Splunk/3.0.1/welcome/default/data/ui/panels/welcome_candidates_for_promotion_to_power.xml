@@ -1,0 +1,56 @@
+<panel>
+      <title>Candidates for Role Promotion</title>
+      <input type="time" token="welcome_promotion_time" searchWhenChanged="true">
+        <label>Since:</label>
+        <default>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="multiselect" token="power_roles" searchWhenChanged="true">
+        <label>Ignoring users in roles:</label>
+        <search>
+          <query>| rest /services/authorization/roles
+            | stats count by title
+      </query>
+        </search>
+        <delimiter> AND </delimiter>
+        <fieldForLabel>title</fieldForLabel>
+        <fieldForValue>title</fieldForValue>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <valuePrefix>roles!="*</valuePrefix>
+        <valueSuffix>*"</valueSuffix>
+        <initialValue>power,admin</initialValue>
+      </input>
+      <html>
+    <p>This panel shows you candidates who have high engagement with Splunk that may be ready for increased role capabilities.</p>
+  </html>
+      <html depends="$welcome_promotion_to_power$">
+      <h3>Sorry, there are no results because none of the users meet this criteria. Try changing updating the time range or ignored Roles.</h3>
+  </html>
+      <table rejects="$welcome_promotion_to_power$">
+        <search id="power_users_search">
+          <query>index=_audit sourcetype=audittrail action=search search_id=* user=* 
+            [ | rest /services/authentication/users
+             | stats values(roles) AS roles by title
+             | search $power_roles$
+             | fields title
+             | rename title as user ]
+            | eval user = if(user="n/a", null(), user)
+            | stats values(user) as user by search_id
+            | stats count by user</query>
+          <earliest>$welcome_promotion_time.earliest$</earliest>
+          <latest>$welcome_promotion_time.latest$</latest>
+          <done>
+            <condition match="$job.resultCount$ == 0">
+              <set token="welcome_promotion_to_power">true</set>
+            </condition>
+            <condition>
+              <unset token="welcome_promotion_to_power"></unset>
+            </condition>
+          </done>
+        </search>
+        <fields>user</fields>
+      </table>
+    </panel>

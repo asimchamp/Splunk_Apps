@@ -1,0 +1,26 @@
+<form stylesheet="custom.css">
+  <label>Hash Identifier</label>
+  <searchTemplate>| script hash-identifier __EXECUTE__ "$input$"</searchTemplate>
+      <description>Input hash below.  Ex:31528563b79ec0bb2480959c88061942</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>Hash</label>
+      <suffix/>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Results</title>
+        <searchPostProcess>table "Possible Hashes"</searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

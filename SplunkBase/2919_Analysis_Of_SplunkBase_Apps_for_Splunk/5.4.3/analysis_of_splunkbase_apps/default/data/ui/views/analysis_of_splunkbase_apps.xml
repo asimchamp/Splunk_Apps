@@ -1,0 +1,1068 @@
+<form script="tooltip.js,tabs.js,custom_table_icons_inline.js" stylesheet="tooltip.css,alt.css,tabs.css" version="1.1">
+  <search id="formSearch">
+    <query>| inputlookup splunk_apps
+      | eval install_method_single=case('install_method_single'=="simple","Self Service", 'install_method_single'=="appmgmt_phase","Self Service", 'install_method_single'=="assisted","Needs Cloud Operations", 'install_method_single'=="rejected","Rejected / Unknown", 'install_method_single'=="unknown", "Rejected / Unknown" ) 
+      | eval install_method_distributed=case('install_method_distributed'=="simple","Self Service", 'install_method_distributed'=="appmgmt_phase","Self Service", 'install_method_distributed'=="assisted","Needs Cloud Operations", 'install_method_distributed'=="rejected","Rejected / Unknown", 'install_method_distributed'=="unknown","Rejected / Unknown" )
+      | rex field=download_count mode=sed "s/N\/A/0/"
+      | search title=$title$ created_by_display_name=$created_by_display_name$ description=$description$ $release_platform$ $type$ $release_content$ $categories$ $release_splunk_compatibility$ $release_product_compatibility$ $release_fedramp_validation$ $appinspect_passed$ $is_archived$ $install_method_single$ $install_method_distributed$
+      | sort title created_by_display_name description release_platform type categories download_count rating_average release_product_compatibility release_fedramp_validation install_method_single install_method_distributed appinspect_passed archive_status 
+      </query>
+    <earliest>0</earliest>
+    <latest>now</latest>
+  </search>
+  <search id="dashSearch" base="formSearch">
+    <query>
+    | rename title AS "App Name",release_content AS "App Content", created_by_display_name AS Author, description AS Description, download_count AS DLs, release_platform AS Platform, type AS Type, categories AS Category, created_time AS Released, release_splunk_compatibility AS Versions, updated_time AS "Last Update", release_product_compatibility AS Product, release_cim_compatibility AS "Release CIM Compatibility", rating_average AS "Rating Average", rating_count AS "Rating Count", release_title AS "App Version", install_method_distributed AS "Install Method Distributed", install_method_single AS "Install Method Single", license_name AS "License Name"
+    </query>
+  </search>
+  <search id="apiSearch">
+    <query>index=apps 
+      | bin _time span=4h
+    </query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <search id="audit">
+    <query>
+    | rest /services/apps/local/ 
+| search disabled=0 title!=alert_logevent title!=alert_webhook title!=introspection_generator_addon	title!=launcher title!=learned title!=appsbrowser title!=search title!=splunk_archiver title!=splunk_gdi title!=splunk_httpinput title!=splunk_instrumentation title!=splunk_internal_metrics title!=splunk_monitoring_console
+| rename title as appid 
+| join type=left appid 
+    [| inputlookup splunk_apps ] 
+| eval private_app = if(isnull(path), "true", "false") 
+| eval release_product_compatibility = if(isnull(release_product_compatibility), "unknown", release_product_compatibility) 
+| eval release_splunk_compatibility = if(isnull(release_splunk_compatibility), "unknown", release_splunk_compatibility) 
+| eval release_title = if(isnull(release_title), "unknown", release_title) 
+| eval releases_product_compatibility = if(isnull(releases_product_compatibility), "Private / Unknown", releases_product_compatibility)
+| eval version_default = if(match(release_title,version), "true", "false") 
+| eval sc_compatibility = if(match(release_product_compatibility,"Splunk Cloud"), "true", "false")
+| eval version_compatibility = if(match(release_splunk_compatibility,"8.0"), "true", "false")
+| eval upgrade_compatibility = if(version_compatibility=="true" AND sc_compatibility=="true", "true", "false")
+| eval upgrade_compatibility = if(private_app=="true", "Check w/AppInspect", upgrade_compatibility)
+| eval title = if(isnull(path), 'label', 'title') 
+| fillnull value=customer support
+| rename version AS "Installed Version", release_title AS "Splunkbase Version"
+    </query>
+  </search>
+  <label>Analysis of Splunkbase Apps</label>
+  <fieldset submitButton="true">
+    <html>
+      <br/>
+      <p style="color:#65a637;">Application Filters</p>
+    </html>
+    <input type="text" token="title" searchWhenChanged="true">
+      <label>App Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>"*</prefix>
+      <suffix>*"</suffix>
+    </input>
+    <input type="text" token="created_by_display_name" searchWhenChanged="true">
+      <label>Author</label>
+      <default>*</default>
+      <prefix>"*</prefix>
+      <suffix>*"</suffix>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="description" searchWhenChanged="true">
+      <label>Description</label>
+      <default>*</default>
+      <prefix>"*</prefix>
+      <suffix>*"</suffix>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="multiselect" token="release_platform" searchWhenChanged="false">
+      <label>Platform</label>
+      <search base="formSearch">
+        <query>stats count by release_platform | sort + release_platform | table release_platform</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>release_platform="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <fieldForLabel>release_platform</fieldForLabel>
+      <fieldForValue>release_platform</fieldForValue>
+    </input>
+    <input type="multiselect" token="type" searchWhenChanged="false">
+      <label>Type</label>
+      <search base="formSearch">
+        <query>dedup type | table type | sort - type</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>type="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <fieldForLabel>type</fieldForLabel>
+      <fieldForValue>type</fieldForValue>
+    </input>
+    <input type="multiselect" token="release_content" searchWhenChanged="false">
+      <label>App Contents</label>
+      <search base="formSearch">
+        <query>stats count by release_content | sort + release_content | table release_content</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>release_content="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+      <fieldForLabel>release_content</fieldForLabel>
+      <fieldForValue>release_content</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="multiselect" token="categories" searchWhenChanged="false">
+      <label>Category</label>
+      <search base="formSearch">
+        <query>stats count by categories | sort + categories | table categories</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>categories="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <fieldForLabel>categories</fieldForLabel>
+      <fieldForValue>categories</fieldForValue>
+    </input>
+    <input type="text" token="download_count" searchWhenChanged="true">
+      <label>DLs &gt;=</label>
+      <default>0</default>
+      <initialValue>0</initialValue>
+    </input>
+    <input type="text" token="rating_average" searchWhenChanged="true">
+      <label>Rating &gt;=</label>
+      <default>0</default>
+      <initialValue>0</initialValue>
+    </input>
+    <input type="multiselect" token="is_archived" searchWhenChanged="false">
+      <label>Archived?</label>
+      <search>
+        <query>| inputlookup splunk_apps | stats count by is_archived | sort - is_archived | fields is_archived</query>
+      </search>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>is_archived="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <fieldForLabel>is_archived</fieldForLabel>
+      <fieldForValue>is_archived</fieldForValue>
+      <default>false</default>
+      <initialValue>false</initialValue>
+    </input>
+    <html>
+      <br/>
+      <p style="color:#65a637;">Applies to Splunk Cloud Default Applications - See Audit tab for detailed <b>release</b> information</p>
+    </html>
+    <input type="multiselect" token="release_splunk_compatibility" searchWhenChanged="false">
+      <label>Splunk Versions</label>
+      <search base="formSearch">
+        <query>mvexpand release_splunk_compatibility | dedup release_splunk_compatibility | table release_splunk_compatibility | sort - release_splunk_compatibility</query>
+      </search>
+      <fieldForLabel>release_splunk_compatibility</fieldForLabel>
+      <fieldForValue>release_splunk_compatibility</fieldForValue>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>release_splunk_compatibility="</valuePrefix>
+      <delimiter> OR </delimiter>
+      <valueSuffix>"</valueSuffix>
+      <choice value="*">All</choice>
+    </input>
+    <input type="multiselect" token="release_product_compatibility" searchWhenChanged="false">
+      <label>Product Cert.</label>
+      <search base="formSearch">
+        <query>mvexpand release_product_compatibility | dedup release_product_compatibility | table release_product_compatibility | sort + release_product_compatibility
+| search release_product_compatibility!="Splunk Light"</query>
+      </search>
+      <fieldForLabel>release_product_compatibility</fieldForLabel>
+      <fieldForValue>release_product_compatibility</fieldForValue>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>release_product_compatibility="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> AND </delimiter>
+      <choice value="*">All</choice>
+    </input>
+    <input type="multiselect" token="release_fedramp_validation" searchWhenChanged="false">
+      <label>Fedramp Validation</label>
+      <search base="formSearch">
+        <query>| stats count by release_fedramp_validation  | sort + release_fedramp_validation | fields release_fedramp_validation</query>
+      </search>
+      <fieldForLabel>release_fedramp_validation</fieldForLabel>
+      <fieldForValue>release_fedramp_validation</fieldForValue>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>release_fedramp_validation="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> AND </delimiter>
+      <choice value="*">All</choice>
+    </input>
+    <input type="multiselect" token="install_method_single" searchWhenChanged="false">
+      <label>Splunk Cloud Installation Method (Single SH)</label>
+      <fieldForLabel>install_method_single</fieldForLabel>
+      <fieldForValue>install_method_single</fieldForValue>
+      <search base="formSearch">
+        <query>| stats count by install_method_single | fields install_method_single</query>
+      </search>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>install_method_single="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+    </input>
+    <input type="multiselect" token="install_method_distributed" searchWhenChanged="false">
+      <label>Splunk Cloud Installation Method (SHC)</label>
+      <fieldForLabel>install_method_distributed</fieldForLabel>
+      <fieldForValue>install_method_distributed</fieldForValue>
+      <search base="formSearch">
+        <query>| stats count by install_method_distributed | fields install_method_distributed</query>
+      </search>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>install_method_distributed="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+    </input>
+    <input type="multiselect" token="appinspect_passed" searchWhenChanged="false">
+      <label>Passed Appinspect</label>
+      <search>
+        <query>| inputlookup splunk_apps | stats count by appinspect_passed | sort - appinspect_passed | fields appinspect_passed</query>
+      </search>
+      <fieldForLabel>appinspect_passed</fieldForLabel>
+      <fieldForValue>appinspect_passed</fieldForValue>
+      <default>*</default>
+      <initialValue>*</initialValue>
+      <choice value="*">All</choice>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>appinspect_passed="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+    </input>
+    <html>
+      <p style="color:#65a637;">Use Submit Button For All Multi-Select Drop Downs</p>
+    </html>
+    <input type="dropdown" token="last_update" searchWhenChanged="true" depends="$justHideMe$">
+      <label>last_update</label>
+      <search>
+        <query>index=apps | head 1 | convert timeformat="%H:%M:%S on %m/%d/%Y" ctime(_time) AS last_update | table last_update</query>
+      </search>
+      <fieldForLabel>last_update</fieldForLabel>
+      <fieldForValue>last_update</fieldForValue>
+      <selectFirstChoice>true</selectFirstChoice>
+    </input>
+  </fieldset>
+  <row id="tabs">
+    <panel>
+      <html>
+        <ul id="tabs" class="nav nav-tabs">
+          <li class="active">
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="tab_search_1,tab_search_2,tab_search_3,tab_search_4,tab_search_5" data-token="control_token_search">Search</a>
+          </li>          
+          <li>
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="tab_stats_1,tab_stats_2,tab_stats_3,tab_stats_4,tab_stats_5" data-token="control_token_stats">Statistics</a>
+          </li>
+          <li>
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="tab_l_audit_1,tab_l_audit_2,tab_l_audit_3" data-token="control_token_audit">Local Audit</a>
+          </li>  
+          <li>
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="tab_api_1,tab_api_2,tab_api_3" data-token="control_token_api">Splunk API Monitoring</a>
+          </li>
+          <li>
+            <a href="#" class="toggle-tab" data-toggle="tab" data-elements="instructions" style="color:#FF0000;">App Instructions</a>
+          </li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+  <row id="tab_search_1">
+    <panel depends="$show_sheeeeiiiit$">
+      <title>Sheeeeiiiit!!!</title>
+      <html>
+        <iframe width="100%" height="400px" border="1" src="https://www.youtube.com/embed/NOU7MdkwyOk?autoplay=$autoplay$" frameborder="0" allow="autoplay;encrypted-media"/>
+      </html>
+    </panel>
+  </row>
+  <row id="tab_search_2">
+    <panel>
+      <single>
+        <title>Total Number of Apps Below</title>
+        <search base="formSearch">
+          <query>| $control_token_search$ stats count(uid)</query>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x65a637"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="trendInterval">auto</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row id="tab_search_3">
+    <panel>
+      <table id="tblToolTip">
+        <title>Click results to go to the App on SplunkBase or Open in Search to Export to .csv</title>
+        <search base="dashSearch">
+          <query>| $control_token_search$ eval DLs=tostring(DLs, "commas") 
+          | rename install_method_single AS "Installation Method (SH)" install_method_distributed AS "Installation Method (SHC)"
+| table "App Name", Author, Description, Platform, Type, "App Content", Category, DLs, Released,"Last Update", Versions, uid, Product, "Rating Average", "Installation Method (SH)" "Installation Method (SHC)"
+| rex field=Released "^(?&lt;yr&gt;.*)-(?&lt;mo&gt;.*)-(?&lt;dy&gt;.*)T" 
+| eval Released = mo + "-" + dy + "-" + yr 
+| rex field="Last Update" "^(?&lt;yr&gt;.*)-(?&lt;mo&gt;.*)-(?&lt;dy&gt;.*)T" 
+| eval "Last Update" = mo + "-" + dy + "-" + yr</query>
+          <progress>
+            <condition match="'result.App Name'==&quot;Jeff Champagne&quot;">
+              <set token="show_sheeeeiiiit">true</set>
+              <set token="autoplay">1</set>
+            </condition>
+            <condition match="'result.App Name'!=&quot;Jeff Champagne&quot;">
+              <unset token="show_sheeeeiiiit"></unset>
+              <set token="autoplay">0</set>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">50</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["App Name","uid","Author","Description","Platform","Type","App Content","Category","DLs","Released","Last Update","Versions","Product","Rating Average","Splunk Cloud Installation Method"]</fields>
+        <drilldown target="_blank">
+          <set token="uid">$row.uid$</set>
+          <link>https://splunkbase.splunk.com/app/$row.uid$/</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row id="tab_search_4">
+    <panel>
+      <html>
+        <p>Apps Data Last Updated at $last_update$</p>
+      </html>
+    </panel>
+  </row>
+  <row id="tab_stats_1">
+    <panel>
+      <title>Apps Stats</title>
+      <input type="link" token="needed">
+        <label></label>
+        <choice value="link1">Rate of New Applications</choice>
+        <choice value="link2">Total Count of New Applications</choice>
+        <choice value="link3">Total Count and Rate</choice>
+        <default>Rate of New Applications</default>
+        <change>
+          <condition value="link1">
+            <set token="showRate">true</set>
+            <unset token="showCount"></unset>
+            <unset token="showBoth"></unset>
+          </condition>
+          <condition value="link2">
+            <unset token="showRate"></unset>
+            <set token="showCount">true</set>
+            <unset token="showBoth"></unset>
+          </condition>
+          <condition value="link3">
+            <unset token="showRate"></unset>
+            <unset token="showCount"></unset>
+            <set token="showBoth">true</set>
+          </condition>
+        </change>
+      </input>
+      <chart depends="$showRate$">
+        <title>Rate of New Applications</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ eval _time=strptime(created_time,"%Y-%m-%dT%T+%:z") 
+    | timechart count AS Rate</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">0x00FF00</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <chart depends="$showCount$">
+        <title>Total Count of New Applications</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ eval _time=strptime(created_time,"%Y-%m-%dT%T+%:z")
+    | timechart count 
+    | accum count AS "Total Count" 
+    | fields - count</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">0x00FF00</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <chart depends="$showBoth$">
+        <title>Total Count and Rate</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ eval _time=strptime(created_time,"%Y-%m-%dT%T+%:z")
+    | timechart count AS Rate 
+    | accum Rate AS "Total Count"</query>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">0x00FF00</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="tab_stats_2">
+    <panel>
+      <table>
+        <title>Top 100 Downloaded Apps</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ sort - download_count, "App Name", Author, Type, Categories, platform, "App Contents", released 
+| eval download_count=if(isnull(download_count),"N/A",download_count) 
+| head 100 
+| eval download_count=tostring(download_count, "commas") 
+| table title, created_by_display_name, type, download_count, rating_average</query>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Contributing Authors</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ stats count(title) AS "App Count" by created_by_display_name
+| join created_by_display_name 
+    [| inputlookup splunk_apps 
+    | search title=$title$ created_by_display_name=$created_by_display_name$ description=$description$ $release_platform$ $type$ $release_content$ $categories$ $release_splunk_compatibility$ $release_product_compatibility$ $release_fedramp_validation$ $install_method_single$ $install_method_distributed$ $appinspect_passed$ $is_archived$
+    | stats sum(download_count) AS DLs, avg(rating_average) AS "Rating Average" by created_by_display_name 
+        ]
+        | sort - DLs
+| eval DLs=tostring(DLs, "commas") 
+| eval "Rating Average" = round('Rating Average',2)</query>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Categories</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 categories</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="tab_stats_3">
+    <panel>
+      <chart>
+        <title>Platforms</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 release_platform</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Type</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 type</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>App Contents</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 release_content</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>App Archive Status</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 archive_status</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="tab_stats_4">
+    <panel>
+      <chart>
+        <title>Access</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 access</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>License Name</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 license_name 
+| fields - percent 
+| rename count AS Count</query>
+        </search>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>CIM Compatibility</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 release_cim_compatibility</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Support Model</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ top limit=20 support</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="tab_stats_5">
+    <panel>
+      <table>
+        <title>Percentage of Splunk Cloud Certified Apps</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ stats count(uid) AS total 
+| appendcols 
+    [ inputlookup splunk_apps
+    | search title=$title$ created_by_display_name=$created_by_display_name$ description=$description$ $release_platform$ $type$ $release_content$ $categories$ $release_splunk_compatibility$  $release_fedramp_validation$ $appinspect_passed$ $is_archived$ $install_method_single$ $install_method_distributed$ release_product_compatibility="Splunk Cloud"
+    | stats count(uid) AS cloud_total]
+    | eval percent = round(cloud_total/total * 100,2) 
+| rename percent AS "Percent Cloud Certified", total AS "Active Apps on Splunkbase", cloud_total AS "Splunk Cloud Certified Apps" 
+| eval "Percent Splunk Cloud Certified" = 'Percent Cloud Certified' . " %"
+| table "Active Apps on Splunkbase" "Splunk Cloud Certified Apps" "Percent Splunk Cloud Certified"</query>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+    <panel>
+      <single>
+        <title>Number of Apps Updated in the Past Year * Double check</title>
+        <search base="formSearch">
+          <query>| $control_token_stats$ convert timeformat="%Y-%m-%dT%H:%M:%S%:z" mktime(releases_created_time)
+| eval last_update_time=now()-'releases_created_time'
+| where last_update_time &gt; 31557600
+| stats count(uid) AS "Total Current Apps"</query>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row id="tab_l_audit_1">
+    <panel>
+      <table>
+        <title>Installed Apps That Do Not Match The Latest Version on SplunkBase (Default Splunk Cloud Version)</title>
+        <search base="formSearch">
+          <query>| $control_token_audit$ join type=inner appid 
+    [| rest /services/apps/local/ 
+    | search disabled=0 
+    | rename title as appid 
+    | table *] 
+| rename title AS "App Name", version AS "Installed Version", release_title AS "Splunkbase Version" 
+| table "App Name" appid uid "Installed Version" "Splunkbase Version" splunk_server 
+| where 'Installed Version' != 'Splunkbase Version'</query>
+        </search>
+        <option name="count">50</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown target="_blank">
+          <set token="uid">$row.uid$</set>
+          <link>https://splunkbase.splunk.com/app/$row.uid$/</link>
+        </drilldown>
+      </table>
+      <html>
+        <br/>
+      </html>
+    </panel>
+  </row>
+  <row id="tab_l_audit_2">
+    <panel>
+      <input type="dropdown" token="releases_splunk_compatibility" searchWhenChanged="true">
+        <label>Splunk Version Compatibility</label>
+        <selectFirstChoice>true</selectFirstChoice>
+        <fieldForLabel>releases_splunk_compatibility</fieldForLabel>
+        <fieldForValue>releases_splunk_compatibility</fieldForValue>
+        <search base="formSearch">
+          <query>| search releases_splunk_compatibility!="Not Specified" 
+| stats count by releases_splunk_compatibility 
+| sort - releases_splunk_compatibility 
+| fields releases_splunk_compatibility</query>
+        </search>
+      </input>
+      <input type="checkbox" token="upgrade_compatibility" searchWhenChanged="true">
+        <label>Compatibility</label>
+        <choice value="false">Not Compatible</choice>
+        <choice value="true">Compatible</choice>
+        <choice value="Check w/AppInspect">Uknown</choice>
+        <search>
+          <query/>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <fieldForLabel>upgrade_compatibility</fieldForLabel>
+        <fieldForValue>upgrade_compatibility</fieldForValue>
+        <default>false,true,Check w/AppInspect</default>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <initialValue>false,true,Check w/AppInspect</initialValue>
+        <delimiter> OR </delimiter>
+        <valuePrefix>upgrade_compatibility="</valuePrefix>
+        <valueSuffix>"</valueSuffix>
+      </input>
+      <input type="multiselect" token="support" searchWhenChanged="true">
+        <label>Support Model</label>
+        <choice value="*">All</choice>
+        <default>*</default>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <initialValue>*</initialValue>
+        <valuePrefix>support="</valuePrefix>
+        <valueSuffix>"</valueSuffix>
+        <delimiter> OR </delimiter>
+        <fieldForLabel>support</fieldForLabel>
+        <fieldForValue>support</fieldForValue>
+        <search>
+          <query>| $control_token_audit$ inputlookup splunk_apps
+| stats count by support</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+      </input>
+      <input type="checkbox" token="private_app" searchWhenChanged="true">
+        <label>App Type</label>
+        <choice value="false">Splunkbase</choice>
+        <choice value="true">Private</choice>
+        <default>false,true</default>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <initialValue>false,true</initialValue>
+        <valuePrefix>private_app="</valuePrefix>
+        <valueSuffix>"</valueSuffix>
+        <delimiter> OR </delimiter>
+        <fieldForLabel>private_app</fieldForLabel>
+        <fieldForValue>private_app</fieldForValue>
+      </input>
+      <table>
+        <title>Currently Installed App Audit</title>
+        <search base="audit">
+          <query>
+| $control_token_audit$ search $support$ $private_app$ $upgrade_compatibility$ $release_product_compatibility$
+| table title "Installed Version" "Splunkbase Version" version_default sc_compatibility version_compatibility support private_app upgrade_compatibility
+| sort - private_app</query>
+        </search>
+        <option name="count">50</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Release Product Compatibility">
+          <colorPalette type="map">{"Splunk Enterprise":#DC4E41,"Splunk Cloud":#53A051}</colorPalette>
+        </format>
+        <format type="color" field="version_default">
+          <colorPalette type="map">{"false":#DC4E41}</colorPalette>
+        </format>
+        <format type="color" field="sc_compatibility">
+          <colorPalette type="map">{"false":#DC4E41}</colorPalette>
+        </format>
+        <format type="color" field="version_compatibility">
+          <colorPalette type="map">{"false":#DC4E41}</colorPalette>
+        </format>
+        <format type="color" field="upgrade_compatibility">
+          <colorPalette type="map">{"false":#DC4E41,"true":#53A051,"Check w/AppInspect":#F8BE34}</colorPalette>
+        </format>
+        <drilldown target="_blank">
+          <set token="uid">$row.uid$</set>
+          <link>https://splunkbase.splunk.com/app/$row.uid$/</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row id="tab_l_audit_3">
+    <panel>
+      <table>
+        <title>Path Forward to Splunk Cloud Compatibility</title>
+        <search base="audit">
+          <query>
+| $control_token_audit$ table appid title "Installed Version" "Splunkbase Version" version_default sc_compatibility version_compatibility release_product_compatibility support private_app release_splunk_compatibility upgrade_compatibility
+| sort - private_app
+| search upgrade_compatibility="false"
+
+| join appid type=left max=0
+    [search `app_index` 
+| head 10000 
+| dedup uid 
+| spath path=releases{} output=releases 
+| mvexpand releases 
+| rename releases as _raw 
+| fields _raw 
+| spath 
+| rename product_compatibility{} AS product_compatibility, splunk_compatibility{} AS splunk_compatibility title AS compatible_app_version
+| mvexpand splunk_compatibility 
+| mvexpand product_compatibility 
+| rex field=path "https://splunkbase.splunk.com/app/(?&lt;uid&gt;[\d]+)/" 
+| join type=left uid 
+    [| inputlookup splunk_apps 
+    | fields uid appid *] 
+| search product_compatibility="Splunk Cloud"
+    ]
+| eval splunk_compatibility = if(isnull(splunk_compatibility), "None Hosted on Splunkbase", splunk_compatibility) 
+| fillnull value=unknown uid product_compatibility compatible_app_version appinspect_passed fedramp_validation
+
+| table title uid splunk_compatibility product_compatibility compatible_app_version appinspect_passed fedramp_validation 
+| sort title</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="Visible">
+          <colorPalette type="map">{"0":#6DB7C6,"1":#A2CC3E}</colorPalette>
+        </format>
+        <format type="color" field="Check For Updates">
+          <colorPalette type="map">{"0":#D93F3C,"1":#A2CC3E}</colorPalette>
+        </format>
+        <format type="color" field="Compatibility">
+          <colorPalette type="map">{"OK":#A2CC3E,"Not Compatible":#D93F3C}</colorPalette>
+        </format>
+        <format type="color" field="Splunk Version Compatibility">
+          <colorPalette type="map">{"OK":#A2CC3E,"Not Compatible":#D93F3C}</colorPalette>
+        </format>
+        <format type="color" field="already_installed">
+          <colorPalette type="map">{"true":#53A051,"false":#DC4E41}</colorPalette>
+        </format>
+        <format type="color" field="splunk_compatibility">
+          <colorPalette type="map">{"None Hosted on Splunkbase":#DC4E41}</colorPalette>
+        </format>
+        <drilldown target="_blank">
+          <set token="uid">$row.uid$</set>
+          <link>https://splunkbase.splunk.com/app/$row.uid$/</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row id="tab_api_1">
+    <panel>
+      <input type="time" token="time">
+        <label>Time</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Number of Apps Today Versus Yesterday</title>
+        <search base="apiSearch">
+          <query>| $control_token_api$ stats count by _time</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>Total Number of Apps Over Time</title>
+        <search base="apiSearch">
+          <query>| $control_token_api$ stats count by _time</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="tab_api_2">
+    <panel>
+      <chart>
+        <title>Total Number of Apps Over Time</title>
+        <search base="apiSearch">
+          <query>| $control_token_api$ stats count by _time</query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="instructions">
+    <panel>
+      <html>
+        <br/>
+#### Installation steps<br/>
+<br/>
+To install and configure this app on your supported platform, follow these steps:<br/>
+<br/>
+<b>1. Index Settings</b>
+        <br/>
+Configure the following index within your environment, following your best practices:<br/>
+[apps]<br/>
+coldPath = $SPLUNK_DB/apps/colddb<br/>
+homePath = $SPLUNK_DB/apps/db<br/>
+thawedPath = $SPLUNK_DB/apps/thaweddb<br/>
+frozenTimePeriodInSecs = 604800<br/>
+<br/>
+<b>2. Data Collection</b>
+        <br/>
+Restart your Splunk Search Head to gather data right away.  Data gathering is scheduled to complete once every four hours.<br/>
+<br/>
+   * Note, for Splunk Cloud installations, this script needs to be installed on the Inputs Data Manager (IDM) by Cloud Operations.<br/>
+     This script is also packaged as part of TA-analysis_of_splunkbase_apps.<br/>
+        <br/>
+     If you are running Splunk v8.x or greater, the default script will work and is Python 3 compatable.  For users running any version before Splunk v8.x, you must manually configure Splunk to use the getSplunkAppsV1-py27.py script to collect data:<br/>
+     Settings -&gt; Data Inputs -&gt; Scripts -&gt; $SPLUNK_HOME/etc/apps/analysis_of_splunkbase_apps/bin/getSplunkAppsV1.py, disable.<br/>
+     Settings -&gt; Data Inputs -&gt; Scripts -&gt; $SPLUNK_HOME/etc/apps/analysis_of_splunkbase_apps/bin/getSplunkAppsV1.py, clone.<br/>
+     Enter $SPLUNK_HOME/etc/apps/analysis_of_splunkbase_apps/bin/getSplunkAppsV1-py27.py as the command.  Click save. <br/>
+<br/>
+<b>3. Update the KV Store</b>
+        <br/>
+Run the "Update Splunk Apps KV Store" scheduled search manually to update the KV store.  It will also update automatically every four hours.<br/>
+<br/>
+<b>4. Enjoy!</b>
+        <br/>
+<br/>
+      </html>
+    </panel>
+  </row>
+</form>

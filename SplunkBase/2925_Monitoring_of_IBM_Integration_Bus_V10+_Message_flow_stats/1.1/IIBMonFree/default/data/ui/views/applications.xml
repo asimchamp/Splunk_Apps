@@ -1,0 +1,55 @@
+<form refresh="60" >
+  <label>Messages by Application</label>
+  <description>Displays the number of messages by application.</description>
+
+   <searchTemplate>index=iibmonfreex $application$</searchTemplate>  
+   <fieldset autoRun="True">
+     <input type="dropdown" token="application">
+        <label>Select Message Flow Name</label>
+        <populatingSearch fieldForValue="ApplicationName" fieldForLabel="ApplicationName">
+           <![CDATA[index=iibmonfreex
+           | stats count by ApplicationName]]>
+        </populatingSearch>
+        <default>*</default>         
+     </input>
+         <!-- Add time range picker -->
+    <input type="time" searchWhenChanged="true">
+      <default>
+        <earliestTime>-2h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+   </fieldset>
+ 
+  <row>
+    <panel>
+      <title>Messages by Application</title>
+      <chart>
+        <search>
+          <query>index="IIBMonFreeX" ApplicationName=$application$ | timechart sum(TotalInputMessages) as NumberOfMessages by ApplicationName</query>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">minimal</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

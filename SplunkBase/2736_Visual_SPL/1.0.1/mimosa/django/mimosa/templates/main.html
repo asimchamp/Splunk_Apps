@@ -1,0 +1,47 @@
+{% extends "splunkdj:base_with_account_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}{{app_name}} Main Page{% endblock title %}
+
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/bower_components/codemirror/lib/codemirror.css" />
+  <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/bower_components/codemirror/theme/monokai.css" />
+  <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/css/main.css" />
+  <script type="text/javascript" src="{{STATIC_URL}}{{app_name}}/bower_components/mermaid/dist/mermaid.full.js"></script>
+{% endblock css %}
+
+
+{% block content %}
+<div class="row">
+  <div class="span6">
+      <textarea id="code" width="100%">
+      </textarea>
+      <p>
+        How to use the editor:<br/>
+        <ul>
+          <li>Just keep typing your search in the editor</li>
+          <li>The search could be a multi line search. Except for the first line, each line should start with the pipe '|'</li>
+          <li>Use a leading '#' in a line for expressing a comment</li>
+          <li>Click the pipeline node in diagram for intermediate results, switch to verbose mode if needed</li>
+          <li><span class="badge badge-info">Shift+Cmd+d</span>Toggle on/off command documentation for current line</li>
+          <li><span class="label label-inverse">NOTE</span>At present, please avoid generating very large result set for your first search command becuase it may make your Splunk server choked</li>
+        </ul>
+      </p>
+  </div>
+  <div class="span2">
+    <div id="pipeline-diagram"></div>
+  </div>
+  <div class="span10">
+    <div id="search-bar"></div>
+    <div id="search-controls"></div>
+    <div id="timeline"></div>
+    <div id="search-table"></div>
+  </div>
+</div>
+{% endblock content%}
+
+{% block js %}
+  <script type="text/javascript" src="{{STATIC_URL}}{{app_name}}/js/main.js"></script>
+{% endblock js %}

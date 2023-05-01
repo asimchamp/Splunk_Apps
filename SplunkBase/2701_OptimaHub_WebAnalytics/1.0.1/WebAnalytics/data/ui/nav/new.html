@@ -1,0 +1,36 @@
+<nav search_view="search" color="#222222">
+  <view name="home" default='true' />  
+  <view name="search" />
+  <view name="data_models" />
+  <view name="reports" />
+  <view name="alerts" />
+        <collection label="Audience">
+          <view name="overview"/>
+          <view name="geography"/>
+                  <collection label="Technology">
+                    <view name="technology"/>
+                    <a href="/dj/WebAnalytics/browserbreakdown/">Browser Breakdown</a>
+                    </collection>
+        </collection>  
+        
+        <collection label="Behaviour">
+          <view name="behaviour"/>
+          <a href="/dj/WebAnalytics/domain_flow/">Domain Flow</a>
+          <a href="/dj/WebAnalytics/site_section_flow/">Site Section Flow</a>
+          <a href="/dj/WebAnalytics/page_flow/">Page Flow</a>
+        </collection>  
+        
+        <collection label="Conversion">        
+          <view name="conversion_overview"/>
+          <a href="/app/WebAnalytics/conversion_funnel">Conversion Funnel</a>
+          <a href="/dj/WebAnalytics/goal_path_conversion_flow/">Conversion Flow</a>
+          <a href="/dj/WebAnalytics/goal_path_reverse_conversion_flow/">Reverse Conversion Flow</a>
+        </collection>  
+        
+        <collection label="Acquisition">        
+          <view name="acquisition"/>
+          <view name="channels"/>
+          <a href="/dj/WebAnalytics/campaign_flow/">Campaign Flow</a>
+        </collection>   
+        
+</nav>

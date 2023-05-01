@@ -1,0 +1,47 @@
+<form script="autodiscover.js">
+    <label>Boxplot</label>
+    <row>
+      <panel>
+        <html>
+          <h2>Boxplot and Scatterplot : <a href="http://archive.ics.uci.edu/ml/datasets/Census+Income">"Adult" Dataset </a> - 1994 Census.</h2>
+          <h3>Try changing the bottom UI selectors to change the visualization into a scatterplot. The chart shows a box and whisker plot of age, split by occupation. After that, its been split by Race.</h3>
+          <p id="info"></p>
+          <div id="boxplot_search" 
+          class="splunk-manager" 
+          data-require="splunkjs/mvc/searchmanager" 
+          data-options='{
+			"search": "|inputlookup census.csv",
+			"preview": true
+			}'>
+          </div>
+          <div id="boxplot" 
+          class="splunk-view" 
+          data-require="app/d3plus/components/boxplot/boxplot" 
+          data-options='{
+			"managerid": "boxplot_search",
+			"height": "800",
+			"width": "1000", 
+			"is_numeric": ["hours-per-week", "age"],
+			"levels": ["race"],
+			"x_data": "occupation",
+			"color_field": "hours-per-week",
+			"y_data": "age",
+			"aggs": {"age": "mean", "hours-per-week" : "deviation"},
+			"point_size": 8,
+			"tooltip_data": {"children": false},	
+			"ui": [{
+				"label": "Visualization Type",
+				"method" : "type",
+				"value" : ["scatter", "box"]
+				},
+				{
+				"label": "Color by standard deviation of hours per week, or average of age:",
+				"method": "color",
+				"value": ["hours-per-week", "age"]
+				}]
+			}'>
+          </div>
+        </html>
+      </panel>
+    </row>
+  </form>

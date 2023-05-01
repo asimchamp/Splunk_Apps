@@ -1,0 +1,136 @@
+<form>
+  <label>Link Switcher</label>
+  <row>
+    <panel>
+      <title>Top Sourcetypes</title>
+      <input type="link" token="time" searchWhenChanged="true">
+        <label></label>
+        <choice value="today">Today</choice>
+        <choice value="yesterday">Yesterday</choice>
+        <default>today</default>
+        <change>
+          <condition value="today">
+            <set token="time_selector.earliest">@d</set>
+            <set token="time_selector.latest">now</set>
+          </condition>
+          <condition value="yesterday">
+            <set token="time_selector.earliest">-d@d</set>
+            <set token="time_selector.latest">@d</set>
+          </condition>
+        </change>
+      </input>
+      <chart>
+        <search>
+          <query>index=_internal | top sourcetype</query>
+          <earliest>$time_selector.earliest$</earliest>
+          <latest>$time_selector.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+      <html>
+        <h3>Using link switcher as simple time picker</h3>
+
+        <p>A common use case for link switcher is for use as a simple time picker.  To support this, you also need to take advantage of the advanced options to set multiple tokens for each value selector in the link switcher.</p>
+
+        <br/>
+
+        <p>Configure the simple time picker as follows:</p>
+
+        <pre>
+          <![CDATA[
+      <input type="link" token="time" searchWhenChanged="true">
+        <label></label>
+        <choice value="today">Today</choice>
+        <choice value="yesterday">Yesterday</choice>
+        <default>today</default>
+        <change>
+          <condition value="today">
+            <set token="time_selector.earliest">@d</set>
+            <set token="time_selector.latest">now</set>
+          </condition>
+          <condition value="yesterday">
+            <set token="time_selector.earliest">-d@d</set>
+            <set token="time_selector.latest">@d</set>
+          </condition>
+        </change>
+      </input>
+          ]]>
+        </pre>
+      </html>
+    </panel>
+  </row>
+
+  <row>
+    <panel>
+      <title>Top Sourcetypes</title>
+
+      <input type="link" token="viz" searchWhenChanged="true">
+        <label></label>
+        <choice value="table">table</choice>
+        <choice value="chart">chart</choice>
+        <default>table</default>
+        <change>
+          <condition value="table">
+            <set token="table_visible">true</set>
+            <unset token="chart_visible"/>
+          </condition>
+          <condition value="chart">
+            <set token="chart_visible">true</set>
+            <unset token="table_visible"/>
+          </condition>
+        </change>
+      </input>
+
+      <chart depends="$chart_visible$">
+        <search>
+          <query>index=_internal | top sourcetype</query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+
+      <table depends="$table_visible$">
+        <search>
+          <query>index=_internal | top sourcetype</query>
+          <earliest>-60m@m</earliest>
+          <latest>now</latest>
+        </search>
+      </table>
+      <html>
+        <h3>Using link switcher as a viz type picker</h3>
+
+        <p>Another common use case for link switcher is use it to change the visualization.</p>
+
+        <br/>
+
+        <p>Configure the viz type link switcher:</p>
+
+        <pre>
+          <![CDATA[
+      <input type="link" token="viz" searchWhenChanged="true">
+        <label></label>
+        <choice value="table">table</choice>
+        <choice value="chart">chart</choice>
+        <default>table</default>
+        <change>
+          <condition value="table">
+            <set token="table_visible">true</set>
+            <unset token="chart_visible"/>
+          </condition>
+          <condition value="chart">
+            <set token="chart_visible">true</set>
+            <unset token="table_visible"/>
+          </condition>
+        </change>
+      </input>
+          ]]>
+        </pre>
+      </html>
+    </panel>
+  </row>
+
+
+</form>

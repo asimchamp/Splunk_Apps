@@ -1,0 +1,43 @@
+<form script="autodiscover.js" version="1.1">
+  <label>Conversations</label>
+  <search id="sankey_search">
+    <query>
+      <![CDATA[index=* sourcetype=pcap:csv $Source$  | $chart$]]>
+    </query>
+  </search>
+  <fieldset autoRun="false" submitButton="true">
+      <input type="multiselect" token="Source" searchWhenChanged="false">
+      <label>Select tcpdump files:</label>
+      <fieldForLabel>source</fieldForLabel>
+      <fieldForValue>source</fieldForValue>
+      <search>
+        <query>index=* sourcetype=pcap:csv NOT source=*pcap2csv.sh NOT source=*pcap2csv.bat| rex field=source "SplunkForPCAP(\\\\|\/)PCAPcsv(\\\\|\/)(?&lt;source&gt;.*)"  |stats count by source</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <valuePrefix>source="*</valuePrefix>
+      <valueSuffix>*"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <default>SELECT TCPDUMP</default>
+    </input>
+    <input type="dropdown" token="chart" searchWhenChanged="false">
+      <label>Select Statistic:</label>
+      <default>Conversations by Packets</default>
+      <choice value="stats count by src_ip dst_ip">Conversations by Packets</choice>
+      <choice value="stats sum(tcp_length) count by src_ip dst_ip">Conversations by SumBytes</choice>
+      <choice value="stats count by src_ip dst_port">Conversations by SourceIP-&gt;DestinationPort</choice>
+      <change>
+        <set token="title">$label$</set>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>$title$</title>
+      <html>
+                <div id="sankey" class="splunk-view" data-require="app/SplunkForPCAP/components/sankey/sankey" data-options="{                             &quot;managerid&quot;: &quot;sankey_search&quot;,                             &quot;height&quot;: 700                          }">
+                </div>
+            </html>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,27 @@
+<form>
+  <label>Real-time Search Activity</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+      <table>
+        <title>Clustered Real-time Search Activity</title>
+        <searchString>
+          | tstats `SearchActivitySummaries` max(_time) as _time max(Search_History.total_run_time) as trt max(Search_History.scan_count) as scan_count values(Search_History.actualsearch) as actualsearch values(Search_History.savedsearch_name) as savedsearch_name values(Search_History.user) as user values(Search_History.result_count) from `SA_SearchHistory` where Search_History.searchtype=realtime by Search_History.searchid | `SARename` | eval search = if(isnull(savedsearch_name) OR savedsearch_name="", actualsearch, "(" . savedsearch_name . ") --- " . actualsearch) | cluster labelonly=t field=search  | stats values(user) as "User(s)" count as "# of Runs" avg(trt) as "Avg Runtime" sum(trt) as "Total Runtime" avg(scan_count) as "Avg Scan Count"  first(search) as "Representative Search String" by cluster_label | fields - cluster_label  | sort - "Total Runtime" | foreach *Runtime Avg* [fieldformat &lt;&lt;FIELD&gt;&gt;=round(&lt;&lt;FIELD&gt;&gt;,2)]
+        </searchString>
+          <earliestTime>$field1.earliest$</earliestTime>
+          <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">20</option>
+      </table>
+  </row>
+</form>

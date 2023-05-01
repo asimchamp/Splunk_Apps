@@ -1,0 +1,71 @@
+<dashboard stylesheet="xsv.css">
+  <label>xsGetDistance</label>
+  <row>
+    <html>
+      <p>
+        <br />
+        <span class="head4">Command: </span>
+        <span class="cmd">xsGetDistance</span>
+      </p>
+      <p>
+        <span class="head4">Category: </span>
+        <span class="bodytext">Statistical Reasoning</span>
+      </p>
+      <p>
+        <span class="head4">Description: </span>
+        <span class="bodytext">Determine the distance in miles between two locations</span>
+      </p>
+      <p>
+        <span class="head4">Syntax: </span>
+        <span class="bodytext">xsGetDistance [FROM] (zipcode | lat lon | city region [country]) TO (zipcode | lat lon | city region [country])</span>
+      </p>
+      <p>
+        <br />
+        <span class="head4">Example: </span>
+        <span class="code">xsGetDistance FROM myZipcode TO yourZipcode</span>
+      </p>
+      <p>
+        <span class="explanation">Determines the distance (in miles) between the contents of the field 'myZipcode' and 'yourZipcode' using a zipcode->lat,lon mapping contained in the lookup table 'zipcodes.csv'</span>
+      </p>
+      <p>
+        <span class="head4">Parameters: </span>
+        <span class="bodytext">city region country, lat lon, zipcode</span>
+      </p>
+      <p>
+        <span class="para">city region country</span>
+      </p>
+      <p>
+        <span class="explanation">The fields containing the city, region (state) and (optionally) country</span>
+      </p>
+      <p>
+        <span class="para">lat lon</span>
+      </p>
+      <p>
+        <span class="explanation">The fields containing the latitude and longitude.</span>
+      </p>
+      <p>
+        <span class="para">zipcode</span>
+      </p>
+      <p>
+        <span class="explanation">The field containing the zipcode.</span>
+      </p>
+      <p>
+        <span class="head4">Result: </span>
+        <span class="bodytext">A field 'distance' is added to each event with the calculated distance.  If this is less than 0, there was no way to calculate the distance for that event.</span>
+      </p>
+<br /><br />
+      <a class="btn btn-xtreme" href="command_reference"> <span class="icon-play"></span> Return to Command Reference </a> 
+      <p><br /><br />
+        <span class="head4">Learn more: </span>
+        <span class="bodytext">
+          <a href="http://www.scianta.com/learn" target="_blank">Scianta Analytics Learning Center</a>
+        </span>
+      </p><br /><br />
+      <p>VERSION: 20150816.1<br />
+      Custom application development for Splunk by <a href="http://www.concanon.com/#services"
+          target="_blank"> Concanon LLC.</a><br />
+	Some portions of Extreme Search for Splunk are patented under US Patent 9,087,090.<br />
+Copyright 2015 Scianta Analytics LLC. All Rights Reserved.</p>
+    </html>
+  </row>
+</dashboard>

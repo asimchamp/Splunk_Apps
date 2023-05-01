@@ -1,0 +1,67 @@
+<form>
+  <label>Events of Interest</label>
+  <row>
+    <html>
+      <h2>This dashboard displays the following events of interest for Splunk Admins</h2>
+  <!--<br /> -->
+      <ol>
+        <li>Partition size issues where Splunk is installed – good for 5.x and 6.x; this will fire for forwarders if you want it to</li>
+        <li>Someone using the delete command</li>
+        <li>Failed local login</li>
+        <li>Issues with the deployment server typically due to an app name being misspelled in a stanza</li>
+        <li>User created/deleted</li>
+        <li>Splunk servers restarting</li>
+        <li>Roles being edited (note: if you just open a role it will fire but how often do you open roles?)</li>
+        <li>Splunk running as something other than ‘splunk’ (as in we don’t run Splunk as root)</li>
+        <li>Some other condition with the deployment server</li>
+        <li>Internal logs not being indexed – I think we’ve seen this fire from search heads when they aren’t able to talk with the indexers.</li>
+        <li>Indexing paused (usually for disk space issues)</li>
+        <li>PDF generation issues</li>
+        <li>Sendmail issues</li>
+        <li>Busted regular expressions dealing with field extraction (let us know if we’ve missed any events here)</li>
+        <li>License violation (if these happen they will occur just after midnight)</li>
+        <li>BucketMover issues (at least where the move was aborted – can someone confirm the regex relative to the appropriate event?)</li>
+      </ol>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <input type="time" token="timepicked" searchWhenChanged="true">
+        <label>Select Time Range:</label>
+        <default>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>sourcetype!=splunkd_remote_searches (index=_internal ("No space left on device" OR "There is not enough space on the disk" AND (host=*index* OR host=*search* OR host=*splunk*))) OR (index=_audit "| delete" NOT "index=*_audit") OR (index=_audit action="login attempt" info=failed sourcetype="audittrail") OR (index=_internal source=*splunkd.log component=serverclass warn NOT "machineTypes in app * is deprecated") OR (index=_audit action=edit_user (operation=create OR operation=remove)) OR (index=_internal "Splunkd starting" host=*index* OR host=*splunk* component=loader sourcetype=splunkd) OR (index=_audit action=edit_roles operation!=list) OR (index=es_servers sourcetype=ps COMMAND=*splunkd* USER!=splunk) OR (index=_internal source=*splunkd.log (component=application OR component=serverclass) log_level=warn OR log_level=error NOT "INFO Serverclass - Reloading application=osu_ocio_middleware_mobile_error_inputs from location='/opt/splunk/etc/deployment-apps'" NOT "INFO Serverclass - Reloading serverclass=ocio_mobile_error from repository='/opt/splunk/etc/deployment-apps'") OR (index=_internal sourcetype=splunkd WARN "skipped indexing of internal audit event will keep dropping events" ) OR (index=_internal indexing (paused OR stopped) sourcetype!=splunkd_ui_access sourcetype!=splunkd_access sourcetype!=splunk_web_access component!=HttpListener) OR (index=_internal error (pdf OR viz) NOT getBBox source="/opt/splunk/var/log/splunk/python.log") OR (index=_internal "error searchoperator:kv" TERM(Regex:)) OR (index=_internal sourcetype=splunkd log_level=WARN component=LMStackMgr "Indexing quota exceeded for this pool*" OR "This pool has exceeded its configured poolsize*") OR (index=_internal sourcetype=splunkd component=BucketMover message="aborting move*"index=_internal sourcetype=splunkd component=BucketMover message="aborting move*")  | eval Alert = case(action="edit_user" AND operation="create" , "User account created", action="edit_user" AND operation="remove", "User account deleted", match(_raw, "Unable to load application"), "Serverclass.conf issue", match(_raw, "delete"), "Delete used", action="login attempt" AND info="failed", "Failed local login", match(_raw,"No space left on device") OR match(_raw,"There is not enough space on the disk"), "No space on device", match(_raw,"Splunkd starting"), "Splunk restarted", action="edit_roles" AND operation="create", "Role created", action="edit_roles" AND operation="remove", "Role deleted", action="edit_roles" AND operation="edit", "Role edited" , sourcetype="ps" AND user!="splunk", "Splunk running as \"" .user."\"", match(Application,"cannot be loaded"), "Deployment Package Error", match(_raw,"skipped indexing of internal audit event will keep dropping events"), "Events Dropped", match(_raw,"You are low in disk space on partition"),"Indexing Paused", source= "/opt/splunk/var/log/splunk/python.log" AND match(_raw, "sendemail") AND NOT match(subject,"error") AND NOT match(subject,"warning") AND NOT match(subject, "alert"), "Email Delivery Issue",source= "/opt/splunk/var/log/splunk/python.log" AND (match(_raw, "PDF") OR match(_raw,"pdf")) AND NOT match(subject,"error") AND NOT match(subject,"warning") AND NOT match(subject, "alert"), "PDF Generation Issue",source= "/opt/splunk/var/log/splunk/python.log" AND match(_raw, "viz"), "Viz Error", match(_raw, "tarAndChksum"), "Checksum Error", match(_raw,"SearchOperator:kv.+for transform"), "Field Extraction Error", match(_raw,"Indexing quota") OR match(_raw,"pool has exceeded"), "License Violation", match(_raw,"BucketMover"), "Indexer Storage Issue", 1=1, "fix me" ) | eval Message = case(Alert="Role edited", "User: " .user. " Edited: " .object, Alert="User account deleted" OR Alert="Role deleted", "User: " .user. " Deleted: " .object, Alert="User account created" OR Alert="Role created", "User: " .user. " Created: " .object, Alert="Failed local login", "User: " .user, Alert="Delete used", "User: " .user. " Search: " .search, Alert="Serverclass.conf issue", message. " (Probably a spelling issue)", Alert="No space on device", "Diskspace or inodes issues", Alert="Splunk restarted", "Host: " .host , match(Alert, "Splunk running as"), "Splunk is not running as Splunk",Alert ="Deployment Package Error", Application, Alert="Events Dropped", "skipped indexing of internal audit event will keep dropping events until indexer congestion is remedied", Alert="Indexing Paused", "Low Disk Space on ".host, Alert="Email Delivery Issue" OR Alert="PDF Generation Issue" OR Alert="Viz Error", "Check the logs (index=_internal source=".source ." host=".host.")", Alert="Checksum Error", message, Alert="Field Extraction Error", message, Alert="License Violation", message, Alert="Indexer Storage Issue", message, 1=1, "fix me") | eval date_minute = if(len(date_minute)&gt;1, date_minute, "0".date_minute) | eval "Alert Time" = case(len(date_minute)&gt;0,date_hour.":".date_minute.":00", timestamp="none", "-", 1=1, "fixme") | stats count by "Alert Time" host Alert Message | stats sum(count) as Count by host Alert Message | rename host as "Splunk Server"</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Exec Processor Errors</title>
+        <search>
+          <query>index=_internal component=ExecProcessor sourcetype=splunkd | stats count by splunk_server log_level message | sort -count</query>
+          <earliest>$timepicked.earliest$</earliest>
+          <latest>$timepicked.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

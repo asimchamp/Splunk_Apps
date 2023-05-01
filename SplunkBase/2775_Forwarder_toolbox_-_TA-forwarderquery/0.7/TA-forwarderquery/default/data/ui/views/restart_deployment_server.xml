@@ -1,0 +1,50 @@
+<form>
+  <label>Restart Deployment Server</label>
+  <fieldset submitButton="true">
+    <input type="radio" token="host" searchWhenChanged="false">
+      <label>hostname of the deplyoment server</label>
+      <initialValue>chhs-ssys021</initialValue>
+      <fieldForLabel>splunk_server</fieldForLabel>
+      <fieldForValue>splunk_server</fieldForValue>
+      <search>
+        <query>| rest splunk_server=local / | dedup splunk_server</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>|forwarderquery server="$host$" api="/services/deployment/server/config/_reload" stanza="splunk_server" method="POST" | spath input=xmlresults | fields - xmlresults,_time,sourcetype,source | table feed.entry.updated,*</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Deployment Server Events</title>
+      <event>
+        <search>
+          <query>index=_internal host="$host$" source="/opt/splunk/var/log/splunk/splunkd.log" DeploymentServer OR SpecFiles component=DeploymentServer OR component=SpecFiles</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,54 @@
+<dashboard>
+  <label>Enhanced Map Controls</label>
+  <row>
+    <panel>
+      <html>
+         <h2>Enhanced Map Controls</h2>
+        
+         <p>Splunk 6.3 includes several usability enhancements to map controls, including:</p>
+
+         <ul>
+          <li>Zoom on Scroll</li>
+          <ul>
+            <li>Configure whether you want the use scroll behavior to be interpreted as zoom in/out on a given map.</li>
+            <li>Disabling this will allow users to freely scroll through the dashboard without effecting any of the visualizations.</li>
+            <li>Option is available in the UI format options as "Zoom on Scroll".</li>
+            <li>in Simple XML, use <code><![CDATA[<option name="mapping.map.scrollZoom">false</option>]]></code></li>
+            <li>Default is false (Note: this represents a change in the default behavior)</li>
+          </ul>
+         </ul>
+
+         <ul>
+          <li>Reset to Center</li>
+          <ul>
+            <li>Center reset option is now available directly below the zoom controls.</li>
+            <li>Enables users to reset the center point as configured in the dashboard options.</li>
+          </ul>
+         </ul>
+
+         <br/>
+      </html>
+
+      <map>
+        <title>Web Traffic</title>
+        <search>
+          <query>| inputlookup geomaps_data.csv | iplocation device_ip | geostats latfield=lat longfield=lon count by method</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+
+        <option name="mapping.seriesColors">[0x5379af,0x9ac23c,0xf7902b,0x956d95,0x6ab7c7,0xd85d3c,0xfac51c,0xdd86af]</option>
+     
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerMaxSize">60</option>
+        
+        <option name="mapping.map.center">(30.810646,-10.556976)</option>
+        <option name="mapping.map.zoom">2</option>
+        
+        <option name="mapping.map.scrollZoom">false</option>
+        
+      </map>
+    </panel>
+  </row>
+</dashboard>

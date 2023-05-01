@@ -1,0 +1,147 @@
+<form version="1.1">
+  <label>Smart Quotas</label>
+  <init>
+    <set token="time">-24h</set>
+  </init>
+  <search id="baseSearch">
+    <query>|`user_quota_details($cluster$,$time$)`</query>
+  </search>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="cluster">
+      <label>Cluster</label>
+      <fieldForLabel>Cluster_Name</fieldForLabel>
+      <fieldForValue>Cluster_Name</fieldForValue>
+      <selectFirstChoice>true</selectFirstChoice>
+      <search>
+        <query>| `cluster_list`</query>
+      </search>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+    <title>Total quotas</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.id | stats count</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+    <title>Directory</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.type | where 'quotas{}.type'="directory" | table count | appendpipe [stats count | where count=0]</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+    <title>User</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.type | where 'quotas{}.type'="user" | table count | appendpipe [stats count | where count=0]</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+    <title>Default-user</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.type | where 'quotas{}.type'="default-user" | table count | appendpipe [stats count | where count=0]</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+    <title>Group</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.type | where 'quotas{}.type'="group" | table count | appendpipe [stats count | where count=0]</query>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+    <title>Default-Group</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.type | where 'quotas{}.type'="default-group" | table count | appendpipe [stats count | where count=0]</query>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+    <title>Linked</title>
+      <single>
+        <search base="baseSearch">
+          <query>| head 1 | stats count by quotas{}.linked | where 'quotas{}.linked'="true" | table count | appendpipe [stats count | where count=0]</query>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="quota_type" searchWhenChanged="true">
+        <label>Type</label>
+        <fieldForLabel>Quota_Type</fieldForLabel>
+        <fieldForValue>Quota_Type</fieldForValue>
+        <search base="baseSearch">
+          <query>| stats count by quotas{}.type | table quotas{}.type | rename quotas{}.type as Quota_Type</query>
+        </search>
+        <change>
+          <condition label="group">
+            <set token="group_token"></set>
+          </condition>
+          <condition label="user">
+            <set token="group_token"></set>
+          </condition>
+          <condition>
+            <unset token="group_token"></unset>
+          </condition>
+        </change>
+        <prefix>"</prefix>
+        <suffix>"</suffix>
+        <choice value="*">All</choice>
+        <default>*</default>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="dropdown" token="exceeded">
+        <label>Exceeded</label>
+        <choice value="&quot;*&quot;">All</choice>
+        <choice value="&quot;true&quot;">Over limit</choice>
+        <choice value="&quot;false&quot;">Within limit</choice>
+        <default>"*"</default>
+        <initialValue>"*"</initialValue>
+      </input>
+      <input type="text" token="path">
+        <label>Path</label>
+        <prefix>%</prefix>
+        <suffix>%</suffix>
+        <default>%</default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>Quotas and Usage</title>
+      <table>
+        <search base="baseSearch">
+          <query>| head 1 | eval reduction_field_exist = coalesce('quotas{}.reduction_ratio', "False") | eval combined_field=case(reduction_field_exist!="False", mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip('quotas{}.type','quotas{}.path',"--"),'quotas{}.usage.applogical',"--"),'quotas{}.usage.fslogical',"--"),'quotas{}.usage.fsphysical',"--"),'quotas{}.efficiency_ratio',"--"),'quotas{}.thresholds.advisory',"--"),'quotas{}.thresholds.soft',"--"),'quotas{}.thresholds.hard',"--"),'quotas{}.thresholds.advisory_exceeded',"--"), 'quotas{}.thresholds_on', "--"), 'quotas{}.reduction_ratio', "--"), 1==1, mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip(mvzip('quotas{}.type','quotas{}.path',"--"),'quotas{}.usage.applogical',"--"),'quotas{}.usage.fslogical',"--"),'quotas{}.usage.fsphysical',"--"),'quotas{}.efficiency_ratio',"--"),'quotas{}.thresholds.advisory',"--"),'quotas{}.thresholds.soft',"--"),'quotas{}.thresholds.hard',"--"),'quotas{}.thresholds.advisory_exceeded',"--"), 'quotas{}.thresholds_on', "--")) | stats count by combined_field | table combined_field | eval splitted_value=split(combined_field,"--") | eval "Type"=mvindex(splitted_value,0), "Path"=mvindex(splitted_value,1), "App logical"=round(tonumber(mvindex(splitted_value,2))/1024,2), "FS logical"=round(tonumber(mvindex(splitted_value,3))/1024,2), "FS Physical"=round(tonumber(mvindex(splitted_value,4))/1024,2), Efficiency=round(tonumber(mvindex(splitted_value,5)),2), "Advisory limit"=tonumber(mvindex(splitted_value,6)), "Soft limit"=tonumber(mvindex(splitted_value,7)), "Hard limit"=tonumber(mvindex(splitted_value,8)), exceeded=mvindex(splitted_value,9), threshold_on=mvindex(splitted_value,10), Reduction=round(tonumber(mvindex(splitted_value,11)),2) | fillnull value="--" "FS Physical", Efficiency, "Advisory limit", "Soft limit", "Hard limit", Reduction | eval Usage = case(threshold_on=="fslogicalsize",'FS logical', threshold_on=="applogicalsize",'App logical', threshold_on=="physicalsize",'FS Physical')
+          | eval Usage = Usage." KiB" 
+          | eval "FS Physical" = 'FS Physical'." KiB"
+          | eval Efficiency = if(Efficiency!="--", Efficiency.":1", Efficiency) | eval Reduction = if(Reduction!="--", Reduction.":1", Reduction) | where like('Path',$path|s$) | search "Type"=$quota_type$ exceeded=$exceeded$ | table "Type", "Path", Usage, "FS Physical", Reduction, Efficiency, "Advisory limit", "Soft limit", "Hard limit"</query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+</form>

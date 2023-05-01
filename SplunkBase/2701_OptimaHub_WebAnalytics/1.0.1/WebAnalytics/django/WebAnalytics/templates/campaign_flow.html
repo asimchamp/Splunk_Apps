@@ -1,0 +1,153 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}Campaign Flow{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/WebAnalytics/common.css" />
+    <style>
+        #mypiechart {
+            height: 250px;
+        }
+
+        /*Page styles for the Toolkit charts*/
+        #mysankeychart, #mypcchart {
+            height: 500px;
+        }
+
+        #mysunburstchart {
+            height: 500px;
+        }
+
+        #timerange {
+            /* margin-top: 5px;
+            float: left; */
+        } 
+
+        .panel {
+            overflow: visible;
+        }
+
+        .panel-datalicious {
+            float: left;
+        } 
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="dashboard-body container-fluid main-section-body">
+
+    <!-- Search 1 -->
+    <div class="dashboard-row">
+        <div class="dashboard-header">
+            <h2>Campaign Flow</h2>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-body">
+                      <div class="panel-datalicious">
+                        <p>Domain:</p>
+                        <div id="mydropdown"></div>
+                      </div>
+                      <div class="panel-datalicious">
+                        <p>Time Range:</p>
+                        {% timerange id="timerange" 
+			   earliest_time="-4h@m"|token_safe
+			   latest_time="now"|token_safe %}
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-head">
+                        <h3>Campaign Flow</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="mysunburstchart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> 
+{% endblock content%}
+
+{% block managers %}
+    {% searchmanager id="dd-search" search="earliest=-24h@h `webanalytics_page_data` | rename event.meta.host as website | dedup website | table website | sort website"|token_safe
+    preview=True cache=True status_buckets=0 auto_finalize_ec=100000 autostart=True %}
+
+    {% searchmanager id="sunburstsearch1" 
+	search="`webanalytics_web_data` event.meta.host=$website$ session.origin.campaign.id{}.name=* session.origin.campaign.id{}.value=* | spath path=session.origin.campaign.id{}.name output=name | spath path=session.origin.campaign.id{}.value output=value | eval x=mvzip(name,value,\":\") | eval campaign=mvjoin(x, \"|\") | stats count by campaign event.meta.path"|token_safe
+	preview=True cache=True status_buckets=0 auto_finalize_ec=100000 autostart=True %}
+
+{% endblock managers %}
+
+{% block js %}    
+<script>
+    var deps = [
+        "splunkjs/ready!",
+        "splunkjs/mvc/searchmanager",
+        "splunkjs/mvc/dropdownview",
+        "splunkjs/mvc/chartview",
+        "splunkjs/mvc/timerangeview",
+
+        // Use this if the /components folder is copied to your app:
+        "jquery",
+        "WebAnalytics/components/sankey/sankey"
+
+    ];
+    require(deps, function(mvc) {
+        // Load individual components
+        var SearchManager = require("splunkjs/mvc/searchmanager");
+	var DropdownView = require("splunkjs/mvc/dropdownview");
+        var ChartView = require("splunkjs/mvc/chartview");
+        var TimeRangeView = require("splunkjs/mvc/timerangeview");
+
+        // If the /components folder is copied to your app:
+        var SunburstChart = require("WebAnalytics/components/sankey/sankey");
+
+        // Create search managers and views
+        var timerange1 = mvc.Components.getInstance("timerange");
+        var sunburstmysearch1 = mvc.Components.getInstance("sunburstsearch1");
+        var wsdropdown = mvc.Components.getInstance("dd-search");
+
+        timerange1.on("change", function() {
+            sunburstmysearch1.search.set(timerange1.val());
+        });
+
+        var mysbchart = new SunburstChart({
+            id: "example-chart-sb",
+            managerid: "sunburstsearch1",
+            el: $("#mysunburstchart")
+        }).render();
+
+	// Instantiate components
+        var mydropdown = new DropdownView({
+            id: "websites",
+            managerid: "dd-search",
+            value: mvc.tokenSafe("$website$"),
+	    labelField: "website",
+            valueField: "website",
+            el: $("#mydropdown")
+        }).render();
+
+	mydropdown.settings.set("mydropdown", mydropdown);
+
+    });
+</script>
+{% endblock js %}
+

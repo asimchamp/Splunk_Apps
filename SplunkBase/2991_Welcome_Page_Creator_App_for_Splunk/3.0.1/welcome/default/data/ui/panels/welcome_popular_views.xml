@@ -1,0 +1,42 @@
+<!-- Idea contributed by John Nguyen @jnguyen413 -->
+<panel>
+      <title>Most Popular Dashboards</title>
+      <html>
+    <p>Not sure where to start? Check out the most popular dashboards of this app listed below. Select one to navigate directly to it.</p>
+  </html>
+  <html depends="$welcome_popular_views$">
+      <h3>Sorry, there are no results because other users haven't been active enough in this app.</h3>
+  </html>
+      <table rejects="$welcome_popular_views$">
+        <search>
+          <query>index=_internal sourcetype=splunk_web_access source=*access.log uri_path=*/app/$env:app$/* file!=$env:page$
+( file!=*.* file!="search" file!="reports" file!="dashboards" file!="datasets" file!="edit" )
+ | top limit=20 file
+ | join file 
+ [ | rest /servicesNS/-/-/data/ui/views
+   | search isDashboard=1 isVisible=1
+   | rex field=eai:data "&lt;description&gt;(?&lt;description&gt;[^&lt;]+)&lt;\/description&gt;"
+   | fields title, label, description
+   | rename title AS file ]
+ | eval pretty_name = label . if( isnotnull( description ) , " (" . description . ")" , "" )
+ | fields pretty_name, file
+ | rename pretty_name AS "Dashboard (with description)"</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+           <progress>
+            <condition match="$job.resultCount$ == 0">
+              <set token="welcome_popular_views">true</set>
+            </condition>
+            <condition>
+              <unset token="welcome_popular_views"/>
+            </condition>
+          </progress>
+        </search>
+        <option name="rowNumbers">true</option>
+        <option name="count">5</option>
+        <fields>["Dashboard (with description)"]</fields>
+        <drilldown>
+          <link taget="_blank">$row.file$</link>
+        </drilldown>
+      </table>
+    </panel>

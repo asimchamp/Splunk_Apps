@@ -1,0 +1,278 @@
+<form>
+  <label>Volumes</label>
+  <row>
+    <panel>
+      <input type="dropdown" token="array" searchWhenChanged="true">
+        <label>Select Storage Array</label>
+        <search>
+          <query>sourcetype=nimble_snmp earliest=-1h | eval array=host | dedup array | table array</query>
+        </search>
+        <fieldForLabel>array</fieldForLabel>
+        <fieldForValue>array</fieldForValue>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <div style="text-align: center;">
+         <h3>Top Volumes for: $array$</h3>
+       </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>(sourcetype=nimble_rest AND source="nimble:rest:volumes_detail" AND host=$array$) OR (sourcetype=nimble_snmp AND host=$array$ source="snmp:volume*") earliest=-8h@h | eval name=coalesce(name,'3') | stats latest(vol_usage_compressed_bytes) as compressed_bytes, latest(vol_usage_uncompressed_bytes) as uncompressed_bytes latest(snap_usage_compressed_bytes4) as snap_compressed_bytes latest(snap_usage_populated_bytes) as snap_populated_bytes, latest(snap_usage_uncompressed_bytes) as snap_uncompressed_bytes by name | eval vol_usage=round((uncompressed_bytes/1024/1024/1024), 1) | eval snap_usage=round((snap_uncompressed_bytes/1024/1024/1024), 1) | eval usage=vol_usage+snap_usage | sort -usage | table name vol_usage snap_usage | head 5</query>
+          <earliest>-8h@h</earliest>
+		  <latest>now</latest>
+        </search>
+        <option name="height">200</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <drilldown>
+          <set token="volName">$click.value$</set>
+        </drilldown>
+        <option name="charting.axisTitleX.text">By Usage (GB)</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <search>
+          <query>(sourcetype=nimble_rest AND source="nimble:rest:volumes_detail" AND host=$array$) OR (sourcetype=nimble_snmp AND host=$array$ AND source="snmp:volume*") earliest=-8h@h | eval name=coalesce(name,'3') | stats earliest(12) as begin_time latest(12) as end_time earliest(13) as earliest_reads latest(13) as latest_reads earliest(34) as earliest_writes, latest(34) as latest_writes by name | eval duration = ((end_time-begin_time)/1000) | eval operations = (latest_reads+latest_writes) - (earliest_reads+earliest_writes) | eval reads = round((latest_reads - earliest_reads)/duration, 1) | eval writes = round((latest_writes - earliest_writes)/duration, 1) | eval iOPS = operations/(duration) | sort -iOPS | table name reads, writes | head 5</query>
+          <earliest>-8h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">200</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <drilldown>
+          <set token="volName">$click.value$</set>
+        </drilldown>
+        <option name="charting.axisTitleX.text">By IOPS (8hr)</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <search>
+          <query>(sourcetype=nimble_rest AND source="nimble:rest:volumes_detail" AND host=$array$) OR (sourcetype=nimble_snmp AND host=$array$ AND source="snmp:volume*") earliest=-8h@h | eval name=coalesce(name,'3') | stats earliest(12) as begin_time latest(12) as end_time earliest(17) as earliest_readbytes latest(17) as latest_readbytes earliest(36) as earliest_writebytes latest(36) as latest_writebytes by name | eval duration = ((end_time-begin_time)/1000) | eval bytes = (latest_readbytes+latest_writebytes) - (earliest_readbytes+earliest_writebytes) | eval read_mbps= round((latest_readbytes-earliest_readbytes)/(1024*1024*duration), 1) | eval write_mbps=round((latest_writebytes-earliest_writebytes)/(1024*1024*duration), 1) | eval MBps = bytes/(1024*1024*duration) | sort -MBps | table name, read_mbps, write_mbps | head 5</query>
+          <earliest>-8h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">200</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <drilldown>
+          <set token="volName">$click.value$</set>
+        </drilldown>
+        <option name="charting.axisTitleX.text">By MBps (8hr)</option>
+        <option name="mapping.choroplethLayer.colorBins">5</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xDB5800</option>
+        <option name="mapping.choroplethLayer.minimumColor">0x2F25BA</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.panning">1</option>
+        <option name="mapping.map.scrollZoom">0</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.type">choropleth</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+       <div style="text-align: center;">
+         <h3>Volume Summary for: $volName$</h3>
+       </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart depends="$volName$">
+        <search>
+          <query>sourcetype=nimble_snmp source="snmp:volume*" host=$array$ earliest=-8h@h | spath 3 | search 3="$volName$" | spath 14 | spath 35 | spath 13 | spath 34 | delta 13 as reads | delta 34 as writes | delta 14 as readLatency | delta 35 as writeLatency | eval readLatency=round((abs(readLatency)/abs(reads)/1000), 1) | eval writeLatency=round((abs(writeLatency)/abs(writes)/1000), 1) | table _time, readLatency, writeLatency</query>
+          <earliest>-8h@h</earliest>
+		  <latest>now</latest>
+        </search>
+        <option name="height">140</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Latency (ms) for $volName$</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart depends="$volName$">
+        <search>
+          <query>sourcetype=nimble_snmp source="snmp:volume*" host=$array$ earliest=-8h@h |  search 3="$volName$" |  delta 13 as reads | delta 34 as writes | delta _time as timeDelta | eval timeDelta=abs(timeDelta) | eval reads=round(abs(reads)/timeDelta, 1) | eval writes=round(abs(writes)/timeDelta, 1) | table _time, reads, writes</query>
+          <earliest>-8h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">140</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">IOPS for $volName$</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart depends="$volName$">
+        <search>
+          <query>sourcetype=nimble_snmp source="snmp:volume*" host=$array$ earliest=-8h@h |  search 3="$volName$" |  delta 17 as reads | delta 36 as writes | delta _time as timeDelta | eval timeDelta=abs(timeDelta) | eval readMBps=round(abs(reads)/(timeDelta*1024*1024), 1) | eval writeMBps=round(abs(writes)/(timeDelta*1024*1024), 1) | table _time, readMBps, writeMBps</query>
+          <earliest>-8h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="height">140</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleX.text">Throughput (MBps) for $volName$</option>
+      </chart>
+    </panel>
+  </row>
+  
+</form>

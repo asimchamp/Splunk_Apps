@@ -1,0 +1,148 @@
+<form version="1.1" stylesheet="cluster_inventory.css" script="cluster_inventory.js">
+  <label>Cluster Inventory</label>
+  <search id="baseSearch">
+    <query>|`disk_details($cluster$)`</query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-2h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="cluster" searchWhenChanged="true">
+      <label>Cluster</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <search>
+        <query>|`cluster_list`</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>Cluster_Name</fieldForLabel>
+      <fieldForValue>Cluster_Name</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+    <title>Node Details</title>
+      <table id="node_details">
+        <search>
+          <query>|`node_statistics($cluster$)`</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown target="Node Details">
+          <link>
+            <![CDATA[
+          isilon_node_details?form.cluster=$cluster$&form.node=Node$row.ID$&form.time.earliest=$time.earliest$&form.time.latest=$time.latest$
+      ]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>Hard Drive Details</title>
+      <table>
+        <search base="baseSearch">
+          <query>| lookup NodeDiskLookup Cluster_Name AS Cluster_Name Node_ID AS lnn Bay AS "stats.value" output "Disk Index" as "Disk Index" "Bay" AS "Bay" "Logical Number" AS "Logical Number" "Type" AS "Type" "Health" AS "Health" | lookup DiskHealthLookup Status AS Health output Health AS Status | stats latest(Logical Number)  AS "Logical Number" latest(Type) AS Type latest(Status) AS Status by lnn,"Disk Index",Bay | search Type != "ssd" AND Type != "unknown" AND Type !="null" |  rename lnn AS Node_ID</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+    <title>SSD Details</title>
+      <table>
+        <search base="baseSearch">
+          <query>| lookup NodeDiskLookup Cluster_Name AS Cluster_Name Node_ID AS lnn Bay AS "stats.value" output "Disk Index" as "Disk Index" "Bay" AS "Bay" "Logical Number" AS "Logical Number" "Type" AS "Type" "Health" AS "Health" | search Type = "ssd" | lookup DiskHealthLookup Status AS Health output Health AS Status | stats latest(Logical Number)  AS "Logical Number" latest(Type) AS Type latest(Status) AS Status by lnn,"Disk Index",Bay |  rename lnn AS Node_ID</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>Access Zones</title>
+      <table>
+        <search>
+          <query>|`access_zone_details($cluster$)`</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>Storage Tiers</title>
+      <table>
+        <search>
+          <query>| `storage_tiers_details($cluster$)`</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>Node Pools</title>
+      <table>
+        <search>
+          <query>|`node_pools_details($cluster$)`</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+    <title>License Details</title>
+      <table>
+        <search>
+          <query>|`license_details($cluster$)`</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

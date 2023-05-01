@@ -1,0 +1,96 @@
+<form>
+  <label>REST explorer</label>
+  <init>
+    <set token="path">/</set>
+    <set token="root">/</set>
+    <set token="prittypath">/</set>
+    <set token="parentpath">/</set>
+  </init>
+  <fieldset autoRun="false" submitButton="true">
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>host</label>
+      <search>
+        <query>| metadata type=hosts index=_internal</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <choice value="localhost">localhost</choice>
+    </input>
+    <input type="text" token="api" searchWhenChanged="true">
+      <label>path</label>
+      <initialValue>/</initialValue>
+    </input>
+    <input type="dropdown" token="stanza">
+      <label>Password set</label>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>| rest splunk_server=local /servicesNS/nobody/TA-forwarderquery/properties/forwarderquery/  | search title!=mystanza</query>
+      </search>
+      <initialValue>default</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        you are here: <b>$prittypath$</b> <!-- parent: $parentpath$ path: $path$ -->
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>API navigator - click to navigate to path</title>
+        <search>
+          <query>| gentimes start=-1 | eval api="/rpc" | eval nav="/rpc" | eval name="* jump back to rpc root"
+| append [ | gentimes start=-1 | eval api="/services" | eval nav="/services" | eval name="* jump back to services root"]
+| append [ | gentimes start=-1 | eval api="/servicesNS" | eval nav="/servicesNS" | eval name="* jump back to servicesNS root"]
+| append [ | gentimes start=-1 | eval api="/static" | eval nav="/static" | eval name="* jump back to static root"] 
+| append [ | gentimes start=-1  | eval api="$api$" | eval name="* jump one level up" | fields api,name ]| append [
+| gentimes start=-1 | eval alternate="$parentpath$" | eval name="$parentpath$  / (navigate one back) " | eval nav="&lt; $parentpath$" 
+]
+            | append [
+                |forwarderquery server="$host$" api="$api$" stanza="$stanza$" contenttype=json2 
+                | rename alternate AS api | eval nav=api
+            ]
+| table nav,name,api</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>["nav","name"]</fields>
+        <drilldown>
+          <!-- Use set to specify the new token to be created.
+                     Use any token from the page or from the click event to produce the value needed. -->
+          <set token="parentpath">$api$</set>
+          <set token="api">$row.api$</set>
+          <set token="form.api">$api$</set>
+          <set token="drilldownapi">$api$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$drilldownapi$">
+      <title>Detailed response</title>
+      <table>
+        <search>
+          <query>|forwarderquery server="$host$" api="$drilldownapi$" stanza="$stanza$" contenttype=json2</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">15</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

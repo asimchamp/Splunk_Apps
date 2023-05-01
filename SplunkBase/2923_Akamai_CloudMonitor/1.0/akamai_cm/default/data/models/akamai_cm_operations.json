@@ -1,0 +1,241 @@
+{
+    "modelName": "akamai_cm_operations",
+    "displayName": "akamai_cm_operations",
+    "description": "",
+    "objectSummary": {
+        "Event-Based": 1,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "cm",
+            "displayName": "cm",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "cp",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "cp",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "geo.lat",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "lat",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "geo.long",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "long",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "message.status",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "status",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "netPerf.cacheStatus",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "cached",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "netPerf.netOriginLatency",
+                    "owner": "cm",
+                    "type": "number",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "netOriginLatency",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "akadebug.forward-origin-ip",
+                    "owner": "cm",
+                    "type": "ipv4",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "originIP",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "message.sslVer",
+                    "owner": "cm",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "ssl_version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "uri_path",
+                            "owner": "cm",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "uri_path",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "dvs4qu662vtjra4i",
+                    "owner": "cm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "urldecode('message.reqPath')"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "waf",
+                            "owner": "cm",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "waf",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "igwlwfckci0be29",
+                    "owner": "cm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(isnotnull('waf.ver'),1,0)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "response",
+                            "owner": "cm",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "response",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "tecaewe01z6w29",
+                    "owner": "cm",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "if(status < 399, \"sucess\", \"failure\")"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "index=akamai_cm",
+                    "owner": "cm"
+                }
+            ],
+            "lineage": "cm"
+        }
+    ],
+    "objectNameList": [
+        "cm"
+    ]
+}

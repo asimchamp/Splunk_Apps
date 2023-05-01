@@ -1,0 +1,118 @@
+<form>
+  <label>All Detections</label>
+  <description/>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="intime" searchWhenChanged="true">
+      <label>Period / Range:</label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="inproto" searchWhenChanged="true">
+      <label>Protocol:</label>
+      <choice value="*">All</choice>
+      <choice value="AUTH">AUTH</choice>
+      <choice value="CIFS">CIFS</choice>
+      <choice value="DHCP">DHCP</choice>
+      <choice value="DNS Request">DNS Request</choice>
+      <choice value="DNS Response">DNS Response</choice>
+      <choice value="FTP">FTP</choice>
+      <choice value="HTTP">HTTP</choice>
+      <choice value="ICMP">ICMP</choice>
+      <choice value="IM">IM</choice>
+      <choice value="IMAP4">IMAP4</choice>
+      <choice value="IRC">IRC</choice>
+      <choice value="P2P">P2P</choice>
+      <choice value="POP3">POP3</choice>
+      <choice value="Remote Access">Remote Access</choice>
+      <choice value="SMTP">SMTP</choice>
+      <choice value="SQL">SQL</choice>
+      <choice value="STREAMING">STEAMING</choice>
+      <choice value="TCP">TCP</choice>
+      <choice value="TFTP">TFTP</choice>
+      <choice value="TUNNELING">TUNNELING</choice>
+      <choice value="UDP">UDP</choice>
+      <choice value="WEBMAIL">WEBMAIL</choice>
+      <choice value="OTHER">OTHER</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="insever" searchWhenChanged="true">
+      <label>Severity:</label>
+      <choice value="0">All</choice>
+      <choice value="8">High only</choice>
+      <choice value="6">High and Medium</choice>
+      <choice value="4">High, Medium, and Low</choice>
+      <default>0</default>
+    </input>
+    <input type="dropdown" token="in_att_phase" searchWhenChanged="true">
+      <label>Attack Phase:</label>
+      <choice value="*">All</choice>
+      <choice value="Intelligence Gathering">Intelligence Gathering</choice>
+      <choice value="Point of Entry">Point of Entry</choice>
+      <choice value="Command and Control Communication">Command and Control Communication</choice>
+      <choice value="Lateral Movement">Lateral Movement</choice>
+      <choice value="Asset and Data Discovery">Asset and Data Discovery</choice>
+      <choice value="Data Exfiltration">Data Exfiltration</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="optional_globalfilter" searchWhenChanged="true">
+      <label>Event:</label>
+      <choice value="|">All</choice>
+      <choice value="| globalfilter |">Filtered protocols and rules</choice>
+      <default>|</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <searchString>cef_severity&gt;=$insever$ appGroup="$inproto$" pAttackPhase="$in_att_phase$" $optional_globalfilter$ timechart count(_raw) by dvchost</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">20</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.seriesColors">[0x4b9ae8, 0x62c15b, 0xf4ca39, 0x3cbde8, 0xff9860]</option>
+        <option name="charting.axisTitleX.text">Detections Count per Deep Discovery Device over Time</option>
+        <option name="charting.axisTitleY.text">Detections per Deep Discovery Device</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <searchString>cef_severity&gt;=$insever$ appGroup="$inproto$" pAttackPhase="$in_att_phase$" cs4Label="Deep Discovery_SrcGroup" $optional_globalfilter$  
+lookup severity.csv cef_severity OUTPUT Severity | table _time, dvchost,src,shost,cs4, dst,dhost,cs9, app,Severity,ruleId,ruleName, pAttackPhase | rename dvchost as "Device", src as "Source IP", shost as "Source Host", cs4 as "Source Group", dst as "Destination IP", dhost as "Destination Host", cs9 as "Destination Group", app as Protocol, ruleId as "Rule ID", ruleName as "Rule Name", pAttackPhase as  "Attack Phase"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=cef_severity&gt;=$insever$ appGroup="$inproto$" pAttackPhase="$in_att_phase$" cs4Label="Deep Discovery_SrcGroup" _time=$click.value$</link>
+        </drilldown>
+        <option name="count">12</option>
+      </table>
+    </panel>
+  </row>
+</form>

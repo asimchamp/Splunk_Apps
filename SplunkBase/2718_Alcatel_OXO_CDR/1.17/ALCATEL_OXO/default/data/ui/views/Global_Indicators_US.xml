@@ -1,0 +1,296 @@
+<form>
+  <label>Overall Performance</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Epoch</label>
+      <default>
+        <earliest>@w1</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>% Lost Calls for Incoming Calls for the selected period -  Excluded calls with a call duration of 0 s and a ringing time of less than 2 s</title>
+        <search>
+          <query>`sourcelog`
+OXO_Direction="&lt;--"    OXO_Ring_Time!="00:00"  OXO_Ring_Time!="00:01"
+OXO_Ring_Time!="00:02"
+| stats count(eval(NOT match(OXO_Call_Duration, "00:00:00"))) AS call_good count(eval(match(OXO_Call_Duration, "00:00:00"))) AS call_lost
+| eval ratio_call_lost=(call_lost/(call_good+call_lost))*100
+| table ratio_call_lost</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeValues">[10,30,70,100]</option>
+        <option name="unit">% Lost Calls</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Number of Lost Calls for the selected period -  Excluded calls with a call duration of 0 s and a ringing time of less than 2 s</title>
+        <search>
+          <query>`sourcelog`
+OXO_Direction="&lt;--"
+OXO_Ring_Time!="00:00"  OXO_Ring_Time!="00:01"
+OXO_Ring_Time!="00:02"
+| stats count(eval(match(OXO_Call_Duration, "00:00:00"))) AS call_lost
+| table call_lost</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x6db7c6","0xf7bc38"]</option>
+        <option name="rangeValues">[10000]</option>
+        <option name="unit">Lost Calls</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Average Ring Time</title>
+        <search>
+          <query>`sourcelog` 
+OXO_Direction="&lt;--" 
+OXO_User_Charged!=A360
+OXO_User_Charged!=A379
+OXO_User_Charged!=A377
+| eval OXO_Unit=1
+| eval OXO_RT="00".":".OXO_Ring_Time
+| convert dur2sec(OXO_RT) AS OXO_Ring_Duration
+| stats sum(OXO_Ring_Duration) AS Total_Ring_Duration, sum(OXO_Unit) as OXO_Count
+| eval Average_Ring_Duration=Total_Ring_Duration/OXO_Count
+| table  Average_Ring_Duration</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x6db7c6","0x6db7c6"]</option>
+        <option name="rangeValues">[10000]</option>
+        <option name="unit">Second</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Calls Received and Outgoing Calls for the selected period</title>
+        <search>
+          <query>`sourcelog`
+(OXO_Direction="--&gt;" OR (OXO_Direction="&lt;--" "OXO_Ring_Time"!="00:00"  "OXO_Ring_Time"!="00:01") )
+| timechart count
+| rename count AS  " Number of Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Month's Days</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Number Calls Received and Outgoing Calls for the selected period</title>
+        <search>
+          <query>`sourcelog`
+(OXO_Direction="--&gt;" OR (OXO_Direction="&lt;--" "OXO_Ring_Time"!="00:00"  "OXO_Ring_Time"!="00:01") ) 
+| stats count | rename count AS  " Number of Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x6db7c6","0xf7bc38"]</option>
+        <option name="rangeValues">[100000]</option>
+        <option name="unit">Calls Received and Outgoing Calls</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Duration Calls Received and Outgoing Calls for the selected period</title>
+        <search>
+          <query>`sourcelog`  
+(OXO_Direction="--&gt;" OR OXO_Direction="&lt;--")
+OXO_Call_Duration!="00:00:00"
+OXO_User_Charged!=A360
+OXO_User_Charged!=A379
+OXO_User_Charged!=A377
+| `OXO_MACRO_Global_Duration`
+| rename OXO_Duration_Hour AS "Durée Totale d'Appels"
+| Table  "Durée Totale d'Appels"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>External Calls Received for the selected period</title>
+        <search>
+          <query>`sourcelog` OXO_Direction="&lt;--" "OXO_Ring_Time"!="00:00"  "OXO_Ring_Time"!="00:01"
+| timechart count
+| rename count  AS "Number of Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Month's Days</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Number of External Calls Received for the selected period</title>
+        <search>
+          <query>`sourcelog` OXO_Direction="&lt;--"  "OXO_Ring_Time"!="00:00"  "OXO_Ring_Time"!="00:01"
+| stats count
+| rename count AS  " Number Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x6db7c6","0xf7bc38"]</option>
+        <option name="rangeValues">[10000]</option>
+        <option name="unit">External Calls Received</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Duration Calls Received for the selected period</title>
+        <search>
+          <query>`sourcelog`  
+OXO_Direction="&lt;--"
+OXO_Call_Duration!="00:00:00"
+OXO_User_Charged!=A360
+OXO_User_Charged!=A379
+OXO_User_Charged!=A377
+| `OXO_MACRO_Global_Duration`
+| rename OXO_Duration_Hour AS "Total Duration Calls"
+| Table  "Total Duration Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Outgoing Calls for the Selected Period</title>
+        <search>
+          <query>`sourcelog` OXO_Direction="--&gt;"
+| timechart count
+| rename count AS "Number of Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Month's Days</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Number of Outgoing Calls for the Selected Period</title>
+        <search>
+          <query>`sourcelog` OXO_Direction="--&gt;"
+| stats count
+| rename count AS  " Number of Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="rangeColors">["0x6db7c6","0xd93f3c"]</option>
+        <option name="rangeValues">[10000]</option>
+        <option name="unit">Outgoing Calls</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Total Duration Outgoing Calls for the selected period</title>
+        <search>
+          <query>`sourcelog`  
+OXO_Direction="--&gt;"
+OXO_Call_Duration!="00:00:00"
+OXO_User_Charged!=A360
+OXO_User_Charged!=A379
+OXO_User_Charged!=A377
+| `OXO_MACRO_Global_Duration`
+| rename OXO_Duration_Hour AS "Total Duration Calls"
+| Table  "Total Duration Calls"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+      </single>
+    </panel>
+  </row>
+</form>

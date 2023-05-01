@@ -1,0 +1,84 @@
+<form showsource="false" stylesheet="general.css,table_cell_highlighting.css" script="autodiscover.js,table_cell_highlighting.js">
+  <label>Error Statistics Panel</label>
+  <description>Classification of Error Reports as per Android Version, Release, and Module</description>
+  <fieldset submitButton="false" autoRun="true"></fieldset>
+  <row>
+    <panel>
+      <title>Sunburst Sequence for Errors</title>
+      <html>
+      <div id="slider1" class="splunk-view" data-require="app/android_monitoring_dashboard/components/slidepanel/slidepanelgroup" data-options="{&quot;items&quot;: [&quot;panel1&quot;]}"/>
+      </html>
+      <html id="panel1">
+      <div id="sunburst-search" class="splunk-manager splunk-searchmanager" data-require="splunkjs/mvc/searchmanager" data-options="{                              &quot;app&quot;: &quot;android_monitoring_dashboard&quot;,                           &quot;search&quot;:  &quot;|inputcsv Statistics_sunburst.csv | table path count&quot;   }"/>
+      <div id="sunburst" class="splunk-view" data-require="app/android_monitoring_dashboard/components/sunburstchart/sunburst" data-options="{        &quot;managerid&quot;: &quot;sunburst-search&quot;,     &quot;pathField&quot;: &quot;path&quot;,           &quot;count&quot;: &quot;count&quot;,     &quot;height&quot;: 500   }"/>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="ANDROID_VERSION" searchWhenChanged="true">
+        <label>Android Version</label>
+        <search>
+          <query>|inputcsv Statistics_Panel_2 | TABLE "ANDROID VERSION" | rename "ANDROID VERSION" as Android_Version | DEDUP Android_Version</query>
+          <earliest>0</earliest>
+        </search>
+        <choice value="*">All</choice>
+        <fieldForLabel>Android_Version</fieldForLabel>
+        <fieldForValue>Android_Version</fieldForValue>
+        <default>*</default>
+      </input>
+      <input type="dropdown" token="Model" searchWhenChanged="true">
+        <label>Model No.</label>
+        <choice value="*">All</choice>
+        <search>
+          <query>|inputcsv Statistics_Panel_2 | rename "ANDROID VERSION" as AV, MODEL as Model_No | table Model_No AV | dedup Model_No | where AV="$ANDROID_VERSION$"</query>
+          <earliest>0</earliest>
+        </search>
+        <default>*</default>
+        <fieldForLabel>Model_No</fieldForLabel>
+        <fieldForValue>Model_No</fieldForValue>
+      </input>
+      <input type="dropdown" token="Release" searchWhenChanged="true">
+        <choice value="*">All</choice>
+        <search>
+          <query>| inputcsv Statistics_Panel_2 | rename "ANDROID VERSION" as AV, "RELEASE ID" as RID | table RID MODEL AV | dedup RID | where AV="$ANDROID_VERSION$" and MODEL="$Model$"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <default>*</default>
+        <fieldForLabel>RID</fieldForLabel>
+        <fieldForValue>RID</fieldForValue>
+      </input>
+      <table id="highlight1">
+        <search>
+          <query>| inputcsv Statistics_Panel_2  | search "ANDROID VERSION"="$ANDROID_VERSION$" MODEL="$Model$" "RELEASE ID"="$Release$"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">100</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,30 @@
+<script src="/dj/static/torque/leaflet.js"></script>
+<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v0.0.2/Leaflet.fullscreen.min.js'></script>
+<script src="/dj/static/torque/torque/dist/torque.full.uncompressed.js"></script>
+<{{tag}}
+ id="{{id}}"
+ class="splunk-{{component_type}} {{type}} {{classes}}"
+ style="{{style}}"
+ data-type="{{type}}"
+ data-component="{{component_type}}"
+ data-require="{{require_file}}"
+ data-options="{{options}}"></{{tag}}>
+
+<div id="torque_container">
+    <ul>
+        <li class="torque-container-time">
+            <p>Test</p>
+        </li>
+        <li class="torque-container-timeline">
+            <div id="torque_control"><span class="torque-pause"></span></div>
+            <div class="torque-timeline-inner">
+                <div class="torque-timeline-progress">
+                    <span></span>
+                </div>
+            </div>
+        </li>
+        <li class="torque-container-action">
+            <p class="torque-button-action"><a href="http://www.cartodb.com">Check out CartoDB </a></p>
+        </li>
+    </ul>
+</div>

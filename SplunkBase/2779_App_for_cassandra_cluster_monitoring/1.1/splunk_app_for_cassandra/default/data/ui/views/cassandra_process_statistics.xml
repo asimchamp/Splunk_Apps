@@ -1,0 +1,78 @@
+<form>
+  <label>Process Statistics</label>
+  <fieldset autorun="true" submitButton="false">
+<input type="time" searchWhenChanged="true">
+      <label>Select time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="node" searchWhenChanged="true">
+      <label>Select a Node</label>
+      
+      <default>*</default>
+      
+     <!-- Define the default value -->      
+      <choice value="*">All</choice>
+      
+     <!-- Define the choices with a populating search -->
+      <populatingSearch fieldForValue="HOSTADDR" fieldForLabel="node"  latest="now">
+        <![CDATA[index=cassandra_cache | dedup HOSTADDR|table HOSTADDR]]>
+      </populatingSearch>
+    </input>  
+  </fieldset>
+  <row>
+    <chart>
+      <title>Open Tasks</title>
+      <searchString>index="cassandra_process"  |eval non_completed=Active+Pending+Blocked | where non_completed &gt; 0 | timechart sum(Active) as Active, sum(Pending) as Pending, sum(Blocked) as Blocked by Pool_Name</searchString>
+      
+      <latestTime>now</latestTime>
+      <option name="charting.axisTitleX.visibility">visible</option>
+      <option name="charting.axisTitleY.visibility">visible</option>
+      <option name="charting.axisX.scale">linear</option>
+      <option name="charting.axisY.scale">linear</option>
+      <option name="charting.chart">column</option>
+      <option name="charting.chart.nullValueMode">gaps</option>
+      <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+      <option name="charting.chart.stackMode">default</option>
+      <option name="charting.chart.style">shiny</option>
+      <option name="charting.drilldown">all</option>
+      <option name="charting.layout.splitSeries">0</option>
+      <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+      <option name="charting.legend.placement">right</option>
+      <option name="charting.axisTitleX.text">Time</option>
+      <option name="charting.axisTitleY.text">Count of Tasks</option>
+      <option name="charting.axisLabelsY.majorUnit">1</option>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <title>Process Count by Host (latest snapshot)</title>
+      <searchName>Rpt_cass_kpi_poolpendingcount_by_host</searchName>
+      
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Pending Processes by Host &amp; Pool</title>
+      <searchName>Rpt_cass_kpi_curr_pendprocess_host_poolwise</searchName>
+      
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+  <row>
+    <table>
+      <title>Cassandra Processes Profile (by Pool across Cluster)</title>
+      <searchString>index="cassandra_process" | stats sum(Active) as Total_Active, sum(Pending) as Total_Pending, sum(Blocked) as Total_Blocked, sum(All_time_blocked) as Total_All_time_blocked, sum(Completed) as Total_Completed by Pool_Name | sort -Total_Active, -Total_Pending, -Total_Blocked, -Total_All_time_blocked, -Total_Completed</searchString>
+      
+      <latestTime>now</latestTime>
+      <option name="wrap">true</option>
+      <option name="rowNumbers">false</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="drilldown">row</option>
+      <option name="count">17</option>
+    </table>
+  </row>
+</form>

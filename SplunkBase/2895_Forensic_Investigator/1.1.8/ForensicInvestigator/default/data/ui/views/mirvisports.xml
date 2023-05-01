@@ -1,0 +1,179 @@
+<form stylesheet="custom.css">
+  <label>Ports - Visualization</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="host" searchWhenChanged="true">
+      <label>Host</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="process" searchWhenChanged="true">
+      <label>Process Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="pid" searchWhenChanged="true">
+      <label>PID</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="path" searchWhenChanged="true">
+      <label>Path</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="state" searchWhenChanged="true">
+      <label>State</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="localPort" searchWhenChanged="true">
+      <label>Local Port</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="remoteIP" searchWhenChanged="true">
+      <label>Remote IP</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Least common process name</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | rare limit=100 PortItem.process | eval percent = round(percent,2) | rename host AS Host, PortItem.process as Process, count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Least common path</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | rare limit=100 PortItem.path | eval percent = round(percent,2) | rename host AS Host, PortItem.path as Path, count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Most common remote IP</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | top limit=100 PortItem.remoteIP | eval percent = round(percent,2) | rename host AS Host, PortItem.remoteIP as "Remote IP", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Least common remote IP</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | rare limit=100 PortItem.remoteIP | eval percent = round(percent,2) | rename host AS Host, PortItem.remoteIP as "Remote IP", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Most common remote port</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | top limit=100 PortItem.remotePort | eval percent = round(percent,2) | rename host AS Host, PortItem.remotePort as "Remote Port", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Least common remote port</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | rare limit=100 PortItem.remotePort | eval percent = round(percent,2) | rename host AS Host, PortItem.remotePort as "Remote Port", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Most common local port</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | top limit=100 PortItem.localPort | eval percent = round(percent,2) | rename host AS Host, PortItem.localPort as "Local Port", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Least common local port</title>
+        <search>
+          <query>eventtype=mir sourcetype=w32ports $wild$ host=$host$ PortItem.process=$process$ PortItem.pid=$pid$ PortItem.path=$path$ PortItem.state=$state$ PortItem.localPort=$localPort$ PortItem.remoteIP=$remoteIP$  | rare limit=100 PortItem.localPort | eval percent = round(percent,2) | rename host AS Host, PortItem.localPort as "Local Port", count AS Count, percent AS Percent</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

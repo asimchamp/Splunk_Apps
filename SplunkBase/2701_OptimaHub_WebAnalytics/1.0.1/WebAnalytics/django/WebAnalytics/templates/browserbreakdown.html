@@ -1,0 +1,151 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}Browser Breakdown{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}splunkjs/css/dashboard.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{SPLUNKWEB_URL_PREFIX}}/static/app/WebAnalytics/common.css" /> 
+    <style>
+        #mypiechart {
+            height: 250px;
+        }
+
+        /*Page styles for the Toolkit charts*/
+        #mysankeychart, #mypcchart {
+            height: 250px;
+        }
+
+        #mysunburstchart {
+            height: 700px;
+        }
+
+        #timerange {
+            /* margin-top: 5px;
+            float: left; */
+        } 
+
+        .panel {
+            overflow: visible;
+        }
+
+        .panel-datalicious {
+            float: left;
+        } 
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="dashboard-body container-fluid main-section-body">
+
+    <!-- Search 1 -->
+    <div class="dashboard-row">
+        <div class="dashboard-header">
+            <h2>Browser Breakdown</h2>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-body">
+                      <div class="panel-datalicious">
+                        <p>Domain:</p>
+                        {% dropdown id="websites"
+                            managerid="dropdownsearch"
+                            valueField="event.meta.host"
+                            default="*"
+                            value="$website$"|token_safe %}
+                      </div>
+                      <div class="panel-datalicious">
+                        <p>Visitor Source:</p>
+                        {% dropdown id="visitors"
+                            managerid="dropdownsearch2"
+                            valueField="visitor"
+                            labelField="label"
+                            default="person.id.cookie.optimahub3rd"
+                            value="$visitor$"|token_safe %}
+                      </div>
+                      <div class="panel-datalicious">
+                        <p>Time Range:</p>
+                        {% timerange id="timerange" 
+			   earliest_time="-4h@m"|token_safe
+                           latest_time="now"|token_safe %}
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-cell" style="width: 100%;">
+            <div class="dashboard-panel">
+                <div class="dashboard-element">
+                    <div class="panel-head">
+                        <h3>Visitor Browser Breakdown</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="mysunburstchart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div> 
+{% endblock content%}
+
+{% block managers %}
+    {% searchmanager id="sunburstsearch1" search="`webanalytics_page_data` event.meta.host=$website$ | rename session.technology.useragent.system.name AS system | stats dc($visitor$) by session.technology.useragent.browser.name session.technology.useragent.browser.version system"|token_safe
+    preview=True cache=True status_buckets=0 auto_finalize_ec=100000 autostart=True %}
+
+    {% searchmanager id="dropdownsearch" search="`webanalytics_page_data` earliest=-24h@h | stats count by event.meta.host" cache=True preview=True %}
+        
+    {% searchmanager id="dropdownsearch2" search="| inputlookup visitor_source.csv" cache=True preview=True %}
+
+{% endblock managers %}
+
+{% block js %}    
+<script>
+    var deps = [
+        "splunkjs/ready!",
+        "splunkjs/mvc/searchmanager",
+        "splunkjs/mvc/chartview",
+        "splunkjs/mvc/timerangeview",
+
+        // Use this if the /components folder is copied to your app:
+        "jquery",
+        "WebAnalytics/components/sunburst/sunburst"
+
+    ];
+    require(deps, function(mvc) {
+        // Load individual components
+        var SearchManager = require("splunkjs/mvc/searchmanager");
+        var ChartView = require("splunkjs/mvc/chartview");
+        var TimeRangeView = require("splunkjs/mvc/timerangeview");
+
+        // If the /components folder is copied to your app:
+        var SunburstChart = require("WebAnalytics/components/sunburst/sunburst");
+
+        // Create search managers and views
+        var sunburstmysearch1 = mvc.Components.getInstance("sunburstsearch1");
+        var timerange1 = mvc.Components.getInstance("timerange");
+
+        timerange1.on("change", function() {
+            sunburstmysearch1.search.set(timerange1.val());
+        });
+
+        var mysbchart = new SunburstChart({
+            id: "example-chart-sb",
+            managerid: "sunburstsearch1",
+            el: $("#mysunburstchart")
+        }).render();
+
+    });
+</script>
+{% endblock js %}
+

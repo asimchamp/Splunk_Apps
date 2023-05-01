@@ -1,0 +1,144 @@
+<form stylesheet="custom.css">
+  <label>Tasks - Visualization</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Name</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.Name</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare VirtualPath</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.VirtualPath</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare Creator</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.Creator</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare AccountName</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.AccountName</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare ActionType</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.ActionList.Action.ActionType</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare MD5sum</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.ActionList.Action.ExecProgramMd5sum</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare ExecProgramPath</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.ActionList.Action.ExecProgramPath</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Rare ExecutionArguments</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.ActionList.Action.ExecArguments</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Rare Comments</title>
+        <search>
+          <query>eventtype=mir sourcetype="w32tasks" $wild$ | rare limit=0 TaskItem.Comment</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+      </table>
+    </panel>
+  </row>
+</form>

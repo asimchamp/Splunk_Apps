@@ -1,0 +1,181 @@
+<html><body><div><h1>Version 5.0</h1>
+
+<h2>What's new in 5.0</h2>
+
+<ul>
+<li>Removed the dependency on Splunk Add-on Builder.
+<ul>
+<li>Not using inputs.conf to comply with Splunk Cloud requirements.</li>
+<li>Removed almost all external dependencies.</li>
+</ul></li>
+<li>Refactored to only use REST API calls.</li>
+<li>New configuration page.</li>
+<li>Storing Risk List metadata in kvstore instead of index.</li>
+</ul>
+
+<h2>What has been removed in 5.0</h2>
+
+<ul>
+<li><strong>Alerts</strong> will no longer be indexed by default. Instead they are
+fetched when needed from the API. The old behavior can be recreated with
+a scheduled saved search if needed.</li>
+</ul>
+
+<h1>Upgrading from previous versions</h1>
+
+<p>The setup needs to be run after the upgrade. The API key (previously
+called token in our documentation) will not carry over from the old
+configuration. The same goes for proxy, custom risk lists, custom alerting rules
+and loglevel configurations.</p>
+
+<h2>Files that can be removed</h2>
+
+<p>The following files can be removed from the 'bin' folder, since they
+are not used anymore:</p>
+
+<pre>
+ta_recordedfuture_cyber  # The whole folder
+input_module_recorded_future_alerts.py
+global_checkbox_param.json
+recorded_future_alerts.py
+recorded_future_enrichment.py
+recorded_future_risk_list.py
+ta_recordedfuture_cyber_declare.py
+TA_recordedfuture_cyber_rh_recorded_future_alerts_metadata.py
+TA_recordedfuture_cyber_rh_recorded_future_alerts.py
+TA_recordedfuture_cyber_rh_recorded_future_risk_list.py
+TA_recordedfuture_cyber_rh_settings.py
+</pre>
+
+<h2>What's new in 4.0</h2>
+
+<ul>
+<li>Support for Recorded Future Fusion.
+<ul>
+<li>With Fusion it's possible to tune risklist according to
+requirements (ex ignore certain types of threats that aren't
+applicable).</li>
+<li>Any number of more targeted risklists can be added to the Splunk
+system to improve detection accuracy.</li>
+<li>Proprietary risk data can be applied to enhance risklists.</li>
+</ul></li>
+<li>New dashboards:
+<ul>
+<li>New enrichment dashboard for <strong>URL</strong> where more targetted (compared to
+the existing Domain enrichment dashboard) enrichment can be made.</li>
+<li>New enrichment dashboard for <strong>Malwares</strong>.</li>
+</ul></li>
+<li>New correlation dashboards:
+<ul>
+<li>New correlation dashboard for <strong>URLs</strong> which correlates full URLs
+rather than domains.</li>
+</ul></li>
+<li>New <strong>Splunk Explorer dashboard</strong>. This is a dashboard intended to
+assist customers to explore and discover the correct risklists,
+sourcetypes and fields for correlation scenarios.</li>
+<li>Support for monitoring <strong>Recorded Future alerts</strong> within the Splunk
+system. 
+<ul>
+<li>A new modular input can retrieve selected alerts and create events
+for the alerts.</li>
+<li>A new dashboard presents the alert status.</li>
+</ul></li>
+<li>New <strong>Global map</strong> dashboard shows where IPs detected using the IP
+risklist are located.</li>
+<li>Extensive app documentation is available within the app.</li>
+<li>A number of reports have been added to facilitate monitoring and
+troubleshooting of the app.</li>
+</ul>
+
+<p>Also see the <a href="/app/TA_recordedfuture-cyber/recorded_future_help_changelog">Changelog</a> for more details.</p>
+
+<h2>What has been removed in 4.0</h2>
+
+<ul>
+<li>The <strong>monitoring</strong> dashboards have been removed. This goal is better
+achieved through alerts in Recorded Future. Monitoring of these
+alerts can be setup.</li>
+</ul>
+
+<h1>Upgrading from previous versions</h1>
+
+<p>The setup needs to be run after the upgrade. The API key (previously
+called token in our documentation) will not carry over from the old
+configuration. The same goes for proxy and loglevel configurations.</p>
+
+<h2>Files that can be removed</h2>
+
+<p>The following files can be removed from the 'bin' folder, since they
+are not used anymore:</p>
+
+<pre>
+logger.py
+RFAPI.py
+rf_config_handler.py
+rf_entityquery.py
+rf_logger.py
+rf_risklist.py
+Utils\api_key.py
+Utils\app_env.py
+Utils\__init__.py
+Utils\rf_logger.py
+</pre>
+
+<h2>Migration of macros.conf</h2>
+
+<p>Users who have previously been using the <strong><code>rf_hits</code></strong> macro are encouraged
+to switch to the new macro rf_correlate. This macro takes two
+arguments:</p>
+
+<ul>
+<li>field - the field name that should be correlated (similar to
+rf_hits).</li>
+<li>risk_list - the risklist used to correlate. By adding this parameter
+it's possible to use the macro to correlate other types of events
+or to use custom risklists.</li>
+</ul>
+
+<p>There is one important difference between rf_hits and rf_correlate:
+rf_correlate performs a join rather than a lookup to correlate. The
+join statement only returns events that matches thus removing the need
+to filter (ex <code>| search Risk=*</code>).</p>
+
+<h3>Migration example:</h3>
+
+<p>Using <strong>rf_hits</strong>:</p>
+
+<pre><code>index=main sourcetype="netscreen:firewall" earliest=-24h 
+      | `rf_hits(dst)`
+      | search Risk=*
+      | sort -Risk
+</code></pre>
+
+<p>Using <strong>rf_correlate</strong>:</p>
+
+<pre><code>index=main sourcetype="netscreen:firewall" earliest=-24h 
+      | `rf_correlate(dst,rf_ip_risklist.csv)`
+      | sort -Risk
+</code></pre>
+
+<p>This example searches for all events during the last 24 hours where
+the _dst_ field correlates against the <em>rf_ip_risklist.cvs</em>
+risklist. Finally it sorts the matches acording to the <em>Risk</em> in
+descending order.</p>
+
+<h3>Depreciation warning</h3>
+
+<ul>
+<li>rf_hits is scheduled for depreciation.</li>
+</ul>
+
+<h2>transforms.conf</h2>
+
+<p>If local config changes have been made these need to be revised.</p>
+
+<ul>
+<li>The name of the risk lists have changed. Ex:
+<ul>
+<li><code>rf_ip_threatfeed.csv</code> is now called <code>rf_ip_risklist.csv</code></li>
+</ul></li>
+</ul>
+</div></body></html>

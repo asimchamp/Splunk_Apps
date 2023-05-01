@@ -1,0 +1,185 @@
+<form script="xsv_explore_context.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Context Explorer</label>
+  <row id="xsv_main_container">
+    <html>
+     <div class="explorer-category-container">
+       <div class="explorer-category apps">
+         <label class="explorer-category-label apps">Apps</label>
+         <select id="appActionSelect" class="explorer-category-select">
+            <option value="">Actions</option>
+            <option value="create">Create Context</option>
+         </select> 
+         <div class="explorer-category-description apps"></div>
+       </div>
+       <div class="explorer-category containers">
+         <label class="explorer-category-label containers">Containers</label>
+         <select id="containerActionSelect" class="explorer-category-select">
+            <option value="">Actions</option>
+            <option value="create">Create Context</option>
+         </select> 
+         <div class="explorer-category-description containers"></div>
+       </div>
+       <div class="explorer-category contexts">
+         <label class="explorer-category-label contexts">Contexts</label>
+         <select id="contextActionSelect" class="explorer-category-select">
+            <option value="">Actions</option>
+            <option value="clone">Clone Context</option>
+            <option value="create">Create Context</option>
+            <option value="overlay">Overlay Data</option>
+            <option value="redefine">Redefine Context</option>
+            <option value="searches">Search Manager</option>
+         </select> 
+         <div class="explorer-category-description contexts"></div>
+       </div>
+       <div class="explorer-category classes">
+         <label class="explorer-category-label classes">Classes</label>
+         <select id="classActionSelect" class="explorer-category-select">
+            <option value="">Actions</option>
+            <option value="clone">Clone Context</option>
+            <option value="filter">Filter Classes</option>
+            <option value="overlay">Overlay Data</option>
+            <option value="redefine">Redefine Context</option>
+         </select> 
+         <div class="explorer-category-description classes"></div>
+       </div>
+       <div class="explorer-category concepts">
+         <label class="explorer-category-label concepts">Concepts</label>
+         <select id="conceptActionSelect" class="explorer-category-select">
+            <option value="">Actions</option>
+            <option value="compare">Compare Concepts</option>
+            <option value="create">Create Concept</option>
+            <option value="delete">Delete Concept</option>
+         </select> 
+         <div class="explorer-category-description concepts"></div>
+       </div>
+     </div>
+     <div class="explorer-row-container">
+       <div class="explorer-row apps">
+         <div class="explorer-nav left apps">
+           <a class="" href="#">
+             <i class="icon-chevron-left"></i>
+           </a>
+         </div>
+         <div class="explorer-content">
+           <div class="loading-apps" style="display:block;">
+             Loading Apps . . .
+           </div>
+           <div class="owl-carousel apps" style="display:none;">
+            </div>
+         </div>
+         <div class="explorer-nav right apps">
+           <a class="" href="#">
+             <i class="icon-chevron-right"></i>
+           </a>
+         </div>
+       </div>
+       <div class="explorer-row containers">
+         <div class="explorer-nav left containers">
+           <a class="" href="#">
+             <i class="icon-chevron-left"></i>
+           </a>
+         </div>
+         <div class="explorer-content">
+           <div class="loading-containers" style="display:block;">
+             Loading Containers . . .
+           </div>
+           <div class="owl-carousel containers" style="display:none">
+           </div>
+         </div>
+         <div class="explorer-nav right containers">
+           <a class="" href="#">
+             <i class="icon-chevron-right"></i>
+           </a>
+         </div>
+       </div>
+       <div class="explorer-row contexts">
+         <div class="explorer-nav left contexts">
+           <a class="" href="#">
+             <i class="icon-chevron-left"></i>
+           </a>
+         </div>
+         <div class="explorer-content">
+           <div class="loading-contexts" style="display:block;">
+             Loading Contexts . . .
+           </div>
+           <div class="owl-carousel contexts" style="display:none">
+           </div>
+         </div>
+         <div class="explorer-nav right contexts">
+           <a class="" href="#">
+             <i class="icon-chevron-right"></i>
+           </a>
+         </div>
+       </div>
+       <div class="explorer-row classes">
+         <div class="explorer-nav left classes">
+           <a class="" href="#">
+             <i class="icon-chevron-left"></i>
+           </a>
+         </div>
+         <div class="explorer-content">
+           <div class="loading-classes" style="display:block;">
+             Loading Classes . . .
+           </div>
+           <div class="no-classes" style="display:none;">
+             No Classes Match Filter
+           </div>
+           <div class="owl-carousel classes" style="display:none">
+           </div>
+         </div>
+         <div class="explorer-nav right classes">
+           <a class="" href="#">
+             <i class="icon-chevron-right"></i>
+           </a>
+         </div>
+       </div>
+       <div class="explorer-row concepts">
+         <div class="loading-concepts" style="display:block;margin-left:-25px;">
+           Loading Concepts . . .
+         </div>
+         <div id="explorerChart" style="display:none"><svg style="width:100%;height:100%;"></svg></div>
+       </div>
+     </div>
+     <div id="contextdetail"></div>
+     <div id="loadingContextModal" class="modal fade" style="margin-top:140px;z-index: -999999999">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div id="loadingContextModalMessage"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="errorModal" class="modal fade" style="margin-top:100px;z-index:-9999;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div id="errorModalMessage"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="filterModal" class="modal fade" style="margin-top:100px;z-index:-9999;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">X</span></button>
+              <h4 class="modal-title" id="deleteModalLabel">FILTER</h4>
+            </div>
+            <div class="modal-body">
+              <div id="filterModalMessage"></div>
+              <input id="filterString" type="text" style="margin-top:10px;" placeHolder="Enter Search String"></input>
+            </div>
+            <div class="modal-footer">
+              <button id="cancelDialogButton" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button id="filterDialogButton" type="button" class="btn btn-primary">Filter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </html>
+  </row>
+</form>

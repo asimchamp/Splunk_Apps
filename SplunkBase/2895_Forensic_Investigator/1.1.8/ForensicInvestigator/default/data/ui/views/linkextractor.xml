@@ -1,0 +1,27 @@
+<form stylesheet="custom.css">
+  <label>Link Extractor</label>
+  <searchTemplate>| script link-extractor __EXECUTE__ "$input$"</searchTemplate>
+  <description>Enter the full URL or IP below - Ex: http://www.splunk.com</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>Full URL or IP:</label>
+      <suffix></suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search base="global">
+          <query>table Links</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>

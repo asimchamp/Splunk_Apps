@@ -1,0 +1,48 @@
+<dashboard>
+  <label>Overview</label>
+  <row>
+    <html>
+      <h1>Config Tracker &amp; Change Management</h1>
+      <p>This app is designed to help the Splunk admin tackle a couple different use cases.</p>
+      <ul>
+        <li>Track configuration changes related to Splunk content and operation (overarching)</li>
+        <li>Assist in tracking content created by general users</li>
+        <li>Keep multi member Splunk admin teams in sync on changes made</li>
+        <li>Provide a central view of content items regardless of which server it was created on</li>
+        <li>Generate a management level summary report on changes made</li>
+      </ul>
+      <p>Lofty goals indeed! Note that this app is not intended to replace a solid backup strategy and true version control/repository. That said Splunk is a unique platform that allows the admin to do some interesting things in this space.</p>
+      <DL>
+        <DT>The following configurations are covered:<br/></DT>
+        <DD>Apps - focused on permissions</DD>
+        <DD>Eventtypes</DD>
+        <DD>Indexes</DD>
+        <DD>Macros</DD>
+        <DD>Props</DD>
+        <DD>Roles</DD>
+        <DD>Saved Searches / Reports</DD>
+        <DD>Serverclass (Deployment Server)</DD>
+        <DD>Transforms</DD>
+        <DD>Users</DD>
+      </DL>  
+    </html>
+  </row>
+  <row>
+    <html>
+      <h1>Getting Started</h1>
+      <p>There are two components to this app - the searches which are run on each Search Head/Indexer and the visualizations that give you insight into your environment.</p>
+      <h3>Config Tracker TA</h3>
+      <p>You will find the config_tracker_TA located in the appserver/addons of this app. This will need to be installed on each of your Search Heads and Indexers. There are a series of scheduled searches that will bring back the local information related to apps, props, transforms, users, etc. By default these searches run at 11:30pm; adjust as desired.</p>
+      <h3>Config Tracker &amp; Change Management App</h3>
+      <p>This app comes with a number of dashboards designed to show the state of your environment relative to change. It is driven primarily through the use of macros which allow you to perform the same basic search on data that has different fields. While there are several these macros the following are what you check out next and adjust as needed.</p>
+      <ul>
+        <li><b>ct_config_index</b> = By default the scheduled searches from the TA dump the results into the _audit index. If you adjust that location in the TA then adjust this macro; all of the dashboard panels use it.</li>
+        <li><b>ct_report_period</b> = One of the primary uses of this app is to schedule the Change Overview dashboard for email delivery. Adjusting this macro will allow you to set the delivery schedule to whatever you would like and dashboard panels will automagically be adjusted. Out of the box it is set to the last 7 days.</li>
+        <li><b>ct_indexer_count</b></li>
+        <li><b>ct_indexer_names</b> = Both of these macros are used in the Config Sync dashboard which will show you if content is consistent across your Indexing tier. Update them according to the number of indexers you have and the naming convention you have used.</li>
+        <li><b>Change Investigation Dashboard</b> = While not a macro you will want to adjust the Host drop down menu options for "All Indexers" and "All Search Heads" in order to use these selections.</li>
+        
+      </ul>
+    </html>
+  </row>
+</dashboard>

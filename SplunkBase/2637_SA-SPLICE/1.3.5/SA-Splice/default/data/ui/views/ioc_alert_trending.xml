@@ -1,0 +1,81 @@
+<dashboard>
+  <label>IOC Alert Trending</label>
+  <description>Splunk Indicators of Compromise Engine</description>
+  <row>
+    <panel>
+      <chart>
+        <title>Number of Matching Indicators over time (last 7 days)</title>
+        <searchString>`iocs_detected_sum_index` | rename raw_ as _raw | rename info_search_time as _time| timechart span=1h count|eventstats avg(count) as "7 Day Average"</searchString>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Total Indicators Found (last 30 days)</title>
+        <searchString>`iocs_detected_sum_index`|fields indicator_id | stats count</searchString>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="underLabel">indicators have been found in your data</option>
+        <option name="linkView">search</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Detected Indicator Types (last 30 days)</title>
+        <searchString>`iocs_detected_sum_index` | eval "Indicator Type" = replace(marker, "^ioc_default_search_", "") | top "Indicator Type" percentfield=Percent countfield=Count| eval Percent=round(Percent,2)</searchString>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Affected Sourcetypes (last 30 days)</title>
+        <searchString>`iocs_detected_sum_index`| top orig_sourcetype | rename orig_sourcetype AS "Sourcetype" count AS "Count" percent AS "Percent" | eval Percent=round(Percent,2)</searchString>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top Matched Indicators (last 30 days)</title>
+        <searchString>`iocs_detected_sum_index` | eval indicator_id=if(indicator_id=="null", "None", indicator_id)| rename indicator_id as "Indicator ID" indicator_value as "Indicator" indicator_raw_id as "(splice indicator id)"|rename indicator_value_type as "Indicator Type"|stats count by "Indicator ID" "Indicator Type" "Indicator" "(splice indicator id)"| search count&gt;1 | sort -count | table "Indicator" "Indicator ID", "Indicator Type", "(splice indicator id)",  count</searchString>
+        <earliestTime>-30d@d</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

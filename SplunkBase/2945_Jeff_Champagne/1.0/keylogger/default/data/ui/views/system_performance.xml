@@ -1,0 +1,116 @@
+<form>
+  <label>System Performance</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>** Depends on Unix TA **</title>
+      <chart>
+        <title>Use Pan and Zoom to Select Time Ranges Used By The Table Below</title>
+        <search>
+          <query>`os_index` `memory_sourcetype` host=* | timechart avg(loadAvg1mi) AS "LOAD - 1 Min Ave" | appendcols [search index=os sourcetype=top host=* | timechart max(pctCPU) AS "CPU - Max%", max(memUsedPct)] | appendcols [search index=os sourcetype=vmstat host=* | timechart max(memUsedPct) AS "MEM - Max%"]</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">250px</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <selection>
+          <set token="selection.earliest">$start$</set>
+          <set token="selection.latest">$end$</set>
+        </selection>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+      </chart>
+      <html>
+        <p>Token Values:</p>
+        <code>New Selected Time Range: $selection.earliest$ - $selection.latest$</code>
+      </html>
+      <table>
+        <search>
+          <query>index=os sourcetype=top host=* | stats max(pctCPU) as pctCPU last(RES) as MEM last(cpuTIME) as cpuTIME by COMMAND, USER | fields COMMAND, USER, pctCPU, MEM, cpuTIME | sort - pctCPU MEM | rename pctCPU AS "% CPU", cpuTIME as "% CPU Time"</query>
+          <earliest>$selection.earliest$</earliest>
+          <latest>$selection.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Disk Space Alerting (Using fillnull to set a default)</title>
+        <search>
+          <query>index=* sourcetype=df  | fillnull value=11 MinPercentFreeSpace | table host, mount, MinPercentFreeSpace, PercentFreeSpace | dedup host, mount, MinPercentFreeSpace, PercentFreeSpace</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Disk Space Alerting Without Default value (Without fillnull)</title>
+        <search>
+          <query>index=* sourcetype=df  | table host, mount, MinPercentFreeSpace, PercentFreeSpace | dedup host, mount, PercentFreeSpace</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Disk Alerts (Using a lookup table for thresholds)</title>
+        <search>
+          <query>index=* sourcetype=df  | fillnull value=11 MinPercentFreeSpace | table host, mount, MinPercentFreeSpace, PercentFreeSpace | where MinPercentFreeSpace &lt; PercentFreeSpace | dedup mount,host</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

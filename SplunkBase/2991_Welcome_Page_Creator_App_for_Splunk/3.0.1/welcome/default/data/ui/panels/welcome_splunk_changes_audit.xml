@@ -1,0 +1,40 @@
+<panel>
+  <title>Splunk Changes Audit</title>
+  <!--Add description-->
+  <html>
+    <p>This panel shows when people have edited Knowledge Objects.</p>
+  </html>
+  <input type="time" token="welcome_audit_time_selector" searchWhenChanged="true">
+    <default>
+      <earliest>-24h@h</earliest>
+      <latest>now</latest>
+    </default>
+  </input>
+  <table depends="$panel_show$">
+    <search>
+      <query>index=_internal sourcetype=splunkd_access
+( method=POST OR method=DELETE )
+( user!=splunk-system-user user!=- )
+( uri_path=/servicesNS/* uri_path!="*/user-prefs/*" uri_path!="/servicesNS/*/*/*/jobs/*/control" uri_path!=/servicesNS/*/mobile_access* )
+ | replace "*/ui/views*" with "*/ui_views*", "*/props*" with "**", "*/distributed/peers*" with "*/distributed_peers*", "*/server/serverclasses*" with "*/server_class*" in uri_path
+ | where mvcount( split( uri_path , "/" ) ) &gt; 6
+ | eval activity = case( method=="POST" AND like( uri_path , "%/acl" ) , "Permissions Update", method=="POST" AND NOT like( uri_path , "%/acl" ) , "Edited" , method="DELETE" , "Deleted" )
+ | rex field=uri_path "/servicesNS(/[^\/]+){3}/(?&lt;object_type&gt;[^\/]+)/(?&lt;object_name&gt;[^\/]+)"
+ | eval object_name = urldecode( object_name )
+ | table _time, user, object_name, object_type, method, activity</query>
+      <earliest>$welcome_audit_time_selector.earliest$</earliest>
+      <latest>$welcome_audit_time_selector.latest$</latest>
+      <progress>
+        <condition match="'job.resultCount' &gt; 0">
+          <set token="panel_show">true</set>
+        </condition>
+        <condition>
+          <unset token="panel_show"></unset>
+        </condition>
+      </progress>
+    </search>
+  </table>
+  <html rejects="$panel_show$">
+        <h3>No changes during the selected time window.</h3>
+  </html>
+</panel>

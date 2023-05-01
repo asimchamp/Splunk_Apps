@@ -1,0 +1,117 @@
+<div class="wrapper">
+    <div class="left_menu">
+        <div id='cssmenu'>
+            <div class="logo_top" />
+            <ul id="patternsList" />
+            <ul class="bg">
+                <li>
+                    <a href='dbir_help'><span class="fontb"><span class="help_icon">
+                    <img class="lalign help" src="/static/app/DBIR_splunk_app/images/help.png" alt="">
+                    </span>Help</span></a>
+                </li>
+                <li>
+                    <a href='http://www.verizonenterprise.com/DBIR/2015/' target="blank">
+                    <span class="fontb"><span class="download_icon">
+                    <img class="lalign download" src="/static/app/DBIR_splunk_app/images/download.png" alt="">
+                    </span>Download DBIR</span></a>
+                </li>
+            </ul>
+            <div class="logo_bot" />
+        </div>
+    </div>
+    <div class="right_side">
+        <div class="top_section">
+            <div class="top_box">
+                <h3 class="top_title">DBIR BREACH PATTERNS</h3>
+                <div class="filter_indus">
+                    <ul>
+                        <li id="allIndustryList">
+                            <a class="noborder" href="#"><span class="filter_icon">
+                            <img class="lalign" src="/static/app/DBIR_splunk_app/images/filter.png" alt=""></span>
+                            <span id="all_industry_span" class="filter_title">All Industry</span></a>
+                            <ul class="fallback" id="industryList" />
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="section_one">
+                <p class="left_txt">The Verizon Data Breach Investigation Report (DBIR) has a number of recommendations to protect an enterprise.
+                    The nine patterns, first published in the 2014 Verizon Data Breach Investigations Report and later updated in the 2015 DBIR,
+                    provide unique breakdowns of security incidents into nine patterns which describe 92% and 96% of security incidents in 2013 and
+                    2014, respectively.</p>
+            </div>
+        </div>
+        <div class="right_chartslider">
+            <div id="da-slider" class="da-slider">
+                <div class="da-slide">
+                    <div class="da-img">
+                        <img src="/static/app/DBIR_splunk_app/images/2.jpg" alt="image02" />
+                    </div>
+                    <h2>Significant Threat Actions</h2>
+                        <p>
+                            Instead of hitting you with a list of all the threat actions seen this year, we thought we would pare it down to the big
+                            movers. Back in 2010, malware was all about the keylogger, and we saw very few examples of phishing or RAM-scraping
+                            malware being used. <br /> <br /> Fast forward to today, and RAM scraping has grown up in a big way. This type of malware was
+                            present in some of the most high-profile retail data breaches of the year, and several new families of RAM scrapers aimed
+                            at Point-of-Sale (POS) systems were discovered in 2014.
+                        </p>
+                </div>
+                <div class="da-slide">
+                    <div class="da-img">
+                        <img src="/static/app/DBIR_splunk_app/images/3.jpg" alt="image3" />
+                    </div>
+                    <h2>Incident Classification Frequency</h2>
+                    <p>
+                        While the breakdown of incidents by patterns points fingers like an evil monkey at the user, only looking at breaches shifts
+                        the blame in a different direction.  POS breaches jump up to the pole position, which shouldn't be too much
+                        of a shocker given the headlines of 2014.  Crimeware is still #2. The fact that Cyber-Espionage ranks higher than
+                        Insider Misuse and Web App Attacks is rather surprising.   It's hard to discern from the data if that's due to legitimate trends, 
+                        contributor foci, low-fidelity data, or a miax of all of the above (probably the latter).
+                    </p>
+                </div>
+                <div class="da-slide">
+                    <div class="da-img">
+                        <img src="/static/app/DBIR_splunk_app/images/4.jpg" alt="image4" />
+                    </div>
+                    <h2>Incident Patterns by Industry</h2>
+                    <p>
+                        Where as last year’s report asked "Do all organizations share similar threat profiles?", we now want to explore what we
+                        believe to be a much better question: <br /><br />"Which industries exhibit similar threat profiles?" <br /><br />Just as our nine patterns
+                        helped to simplify a complex issue last year, we believe that answering this question can help clarify the "so what?" question
+                        for different verticals.
+                    </p>
+                </div>
+                <div class="da-slide">
+                    <div class="da-img">
+                        <img src="/static/app/DBIR_splunk_app/images/1.png" alt="image01" />
+                    </div>
+                    <h2>
+<!--                        <h2>Frequency of incident classification patterns over time with confirmed data breaches</h2> -->
+                        <h2>Frequency Over Time</h2>
+                        <p>
+                            Showing this figure is risky because it may cause more confusion than valid conclusions, but what the heck – we 
+                            live on the edge. Although we’d like it to purely reflect changes in the external environment over the years, it more 
+                            realistically reflects changes to our data set caused by a rapidly expanding base of contributors. So take whatever 
+                            you can from the figure but don’t say we didn’t warn you about the dangers of building your five-year risk projections 
+                            around it. View it more like a puzzle that we’re piecing together over time. 
+                        </p>
+                    </h2>
+                </div>
+                <nav class="da-arrows">
+                    <span class="da-arrows-prev"></span> <span class="da-arrows-next"></span>
+                </nav>
+            </div>
+            <script type="text/javascript" src="/static/app/DBIR_splunk_app/jquery-1.7.1.min.js"></script>
+            <script type="text/javascript" src="/static/app/DBIR_splunk_app/jquery.cslider.js"></script>
+            <script type="text/javascript" src="/static/app/DBIR_splunk_app/modernizr.custom.28468.js"></script>
+            <script type="text/javascript">
+                $(function() {
+                    $('#da-slider').cslider();
+                    loadIndustryList();
+                    loadPatternsList(true);
+                    loadPercentages();
+                });
+            </script>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+<dashboard>
+  <label>Config Sync</label>
+  <row>
+    <html>
+      <p>This dashboard is designed to let you know if elements of your Indexing tier are in sync with each other. If you have more than one Search Head they are probably being used differently and having unique content. Accounting for all possible Search Head content is beyond the scope this app. However, if one or a few of your Indexers has content that you would essentially like to whitelist you can do that by updating the appropriate idx_&lt;config&gt;_accountedfor macro.</p>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Indexers: Indexes</title>
+        <searchString>`ct_config_index` sourcetype=stash search_name="Config_Tracker: Indexes" `indexer_names` | stats dc(host) as indexes values(host) as servers by `ct_fields_indexes` | eval Items = if(indexes=`indexer_count`,"All servers in sync", "Unique") | eval Items = if(Items="Unique" AND `idx_indexes_accountedfor`, "Accounted for", Items) | stats count by Items</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Indexers: Props</title>
+        <searchString>`ct_config_index` sourcetype=stash search_name="Config_Tracker: Props" `indexer_names` app!=learned | stats dc(host) as indexes values(host) as servers by `ct_fields_props` | eval Items = if(indexes=`indexer_count`,"All servers in sync", "Unique") | eval Items = if(Items="Unique" AND `idx_props_accountedfor`, "Accounted for", Items) | stats count by Items</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Indexers: Transforms</title>
+        <searchString>`ct_config_index` sourcetype=stash search_name="Config_Tracker: transforms" `indexer_names` app!=learned | stats dc(host) as indexes values(host) as servers by `ct_fields_transforms` | eval Items = if(indexes=`indexer_count`,"All servers in sync", "Unique") | eval Items = if(Items="Unique" AND `idx_transforms_accountedfor`, "Accounted for", Items) | stats count by Items</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Indexers: Eventtypes</title>
+        <searchString>`ct_config_index` sourcetype=stash search_name="Config_Tracker: Eventtypes" `indexer_names` | stats dc(host) as indexes values(host) as servers by `ct_fields_eventtypes` | eval Items = if(indexes=`indexer_count`,"All servers in sync", "Unique") | eval Items = if(Items="Unique" AND `idx_eventtypes_accountedfor`, "Accounted for", Items)| stats count by Items</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Indexers: Macros</title>
+        <searchString>`ct_config_index` sourcetype=stash search_name="Config_Tracker: Macros" `indexer_names` | stats dc(host) as indexes values(host) as servers by `ct_fields_macros` | eval Items = if(indexes=`indexer_count`,"All servers in sync", "Unique") | eval Items = if(Items="Unique" AND `idx_macros_accountedfor`, "Accounted for", Items)| stats count by Items</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </table>
+    </panel>
+  </row>
+</dashboard>

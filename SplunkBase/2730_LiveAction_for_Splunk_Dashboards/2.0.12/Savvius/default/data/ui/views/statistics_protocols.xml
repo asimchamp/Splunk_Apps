@@ -1,0 +1,204 @@
+<form script="savvius.js" stylesheet="statistics_protocols.css">
+  <label>Protocols</label>
+  <fieldset autorun="true" submitButton="false">
+    <!-- Global timer. Not token is necessary -->
+    <input type="time" searchWhenChanged="true">
+      <label>Date &amp; Time</label>
+      <default>
+        <earliest>-1h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="source" searchWhenChanged="true">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="text" token="protocol" searchWhenChanged="true">
+      <label>Protocol</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>sourcetype=sv_protocols host="$source$" Name="$protocol$"
+            | stats dc(Name) as protocolcount
+            | fieldformat protocolcount=tostring(protocolcount, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Protocols</option>
+        <option name="field">count</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Protocol Volume</title>
+        <search>
+          <query>sourcetype=sv_protocols host="$source$" Name="$protocol$"
+            | timechart dc(Name) as "Protocol Count"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisTitleY.text">Protocol Count</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">200px</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Protocols (Total Bytes)</title>
+        <search>
+          <query>sourcetype=sv_protocols host="$source$" Name="$protocol$"
+            | chart sum("Bytes") as "Total Bytes" by Name
+            | rename Name as Protocol
+            | sort -"Total Bytes"
+            | head 10</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">200px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Top Protocol Utilization</title>
+        <search>
+          <query>sourcetype=sv_protocols host="$source$" Name="$protocol$"
+            | timechart sum("Bytes") by Name limit=10 useother=f</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisTitleY.text">Total Bytes</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">200px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Protocol List</title>
+        <search>
+          <query>sourcetype=sv_protocols host="$source$" Name="$protocol$"
+            | eventstats sum(Bytes) as totalBytes
+            | eventstats sum(Packets) as totalPackets
+            | eventstats sum(Bytes) as protocolBytes by Name
+            | eventstats sum(Packets) as protocolPackets by Name
+            | eval percentBytes=round((protocolBytes/totalBytes)*100, 2)
+            | eval percentBytes=percentBytes + "%"
+            | eval percentPackets=round((protocolPackets/totalPackets)*100, 2)
+            | eval percentPackets=percentPackets + "%"
+            | eval Path=replace(Path, "//", "/")
+            | eval Megabits=(Bytes/125000)
+            | stats values(Path) as Path sparkline(avg(Megabits)) as "Average Network Utilization (Mb)" sum(Bytes) as Bytes values(percentBytes) as "Bytes %" sum(Packets) as Packets values(percentPackets) as "Packets %" by Name
+            | fieldformat Bytes=tostring(Bytes, "commas")
+            | fieldformat Packets=tostring(Packets, "commas")
+            | rename Name as Protocol
+            | sort - Bytes</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="Average Network Utilization (Mb)">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Bytes %">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+          <condition field="Packets %">
+            <link>
+              <![CDATA[
+                  overview_network?earliest=$earliest$&latest=$latest$&form.source=$source$
+                      ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

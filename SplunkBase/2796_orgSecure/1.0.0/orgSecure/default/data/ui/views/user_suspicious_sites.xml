@@ -1,0 +1,127 @@
+<form>
+  <label>Web Access - Suspicious Behaviour</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="analysis" searchWhenChanged="true">
+      <label>Select Period:</label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+      <div> <div style="color:#311b92">
+            <b>Obtain Insights on User Behaviour based on his Communication and Web Access Patterns.</b>
+          </div>
+        Select the Analysis Time Period to search actual data for Instances where user accesses Suspicious Web Sites or Job Hunting Portals frequently.  
+      </div>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Suspicious Sites Accessed - By User</title>
+        <search>
+          <query>index=orgsecure sourcetype=orgsecure:http  [inputlookup  SuspiciousDomain.csv | fields domain | rename domain AS cs_uri_authority]    | table _time user url cs_uri_authority | bucket _time span=1d as day | stats count(url) AS AccessCount by user cs_uri_authority day |  eval day=strftime(day,"%Y/%m/%d") |  stats sum(AccessCount) AS AccessCount  by user    | rename  AccessCount AS "Count of Access"  user AS "User"</query>
+          <earliest>$analysis.earliest$</earliest>
+          <latest>$analysis.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Suspicious Sites Accessed - Details</title>
+        <search>
+          <query>index=orgsecure sourcetype=orgsecure:http  [inputlookup  SuspiciousDomain.csv | fields domain | rename domain AS cs_uri_authority]    | table _time user url cs_uri_authority | bucket _time span=1d as day | stats count(url) AS AccessCount by user cs_uri_authority day |  eval day=strftime(day,"%Y/%m/%d") | rename cs_uri_authority AS "Domain Accessed" AccessCount AS "Count of Access" day AS "Accessed On" user AS "User"</query>
+          <earliest>$analysis.earliest$</earliest>
+          <latest>$analysis.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Job Sites Accessed - By User</title>
+        <search>
+          <query>index=orgsecure sourcetype=orgsecure:http  [inputlookup  JobDomain.csv | fields domain | rename domain AS cs_uri_authority]    | table _time user url cs_uri_authority | bucket _time span=1d as day | stats count(url) AS AccessCount by user cs_uri_authority day |  eval day=strftime(day,"%Y/%m/%d") |  stats sum(AccessCount) AS AccessCount  by user    | rename  AccessCount AS "Count of Access"  user AS "User"</query>
+          <earliest>$analysis.earliest$</earliest>
+          <latest>$analysis.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+      </chart>
+    </panel>
+    <panel>
+      <table>
+        <title>Job Sites Accessed - Details</title>
+        <search>
+          <query>index=orgsecure sourcetype=orgsecure:http  [inputlookup  JobDomain.csv | fields domain | rename domain AS cs_uri_authority]    | table _time user url cs_uri_authority | bucket _time span=1d as day | stats count(url) AS AccessCount by user cs_uri_authority day |  eval day=strftime(day,"%Y/%m/%d") | rename cs_uri_authority AS "Domain Accessed" AccessCount AS "Count of Access" day AS "Accessed On" user AS "User"</query>
+          <earliest>$analysis.earliest$</earliest>
+          <latest>$analysis.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

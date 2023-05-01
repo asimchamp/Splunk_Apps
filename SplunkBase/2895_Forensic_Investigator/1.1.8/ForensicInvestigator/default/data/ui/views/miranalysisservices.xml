@@ -1,0 +1,68 @@
+<form stylesheet="custom.css">
+  <label>Services - Analysis</label>
+  <fieldset autoRun="true">
+    <input type="time" token="time1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="wild" searchWhenChanged="true">
+      <label>Wildcard Search</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="host" searchWhenChanged="true">
+      <label>Host</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="status" searchWhenChanged="true">
+      <label>Service Status</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="startedas" searchWhenChanged="true">
+      <label>User Started As</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="name" searchWhenChanged="true">
+      <label>Service Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="descriptivename" searchWhenChanged="true">
+      <label>Descriptive Name</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="path" searchWhenChanged="true">
+      <label>Path</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="arguments" searchWhenChanged="true">
+      <label>Arguments</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="text" token="description" searchWhenChanged="true">
+      <label>Description</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <label>miranalysisservices</label>
+  <row>
+    <panel>
+      <table id="customWidthDesc">
+        <search>
+          <query>eventtype=mir sourcetype=w32services $wild$ host=$host$ ServiceItem.status=$status$ ServiceItem.startedAs=$startedas$ ServiceItem.name=$name$ ServiceItem.descriptiveName=$descriptivename$ ServiceItem.path=$path$ ServiceItem.arguments=$arguments$ ServiceItem.description=$description$ | table host, ServiceItem.mode, ServiceItem.type, ServiceItem.status, ServiceItem{@created}, ServiceItem.startedAs, ServiceItem.name, ServiceItem.descriptiveName, ServiceItem.path, ServiceItem.arguments, ServiceItem.description | rename ServiceItem.description as Description</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

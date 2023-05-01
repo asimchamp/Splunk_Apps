@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<!-- container with gray background -->
+<div class=" container-fluid background-color">
+        <div class="col-6 mx-auto">
+            <div class="col-center card-background">
+                <div style="margin-left: 24px; margin-right: 24px;">
+                    <div class="col box-padding">
+                    </div>
+                    <form id="form" action="#">
+                        <div class="row-12 save-section">
+                            <div class="feedback-dialog" id="feedback">
+                                <span><i class="material-icons material-green">check_circle</i> <span id="feedback-text"></span></span>
+                            </div>
+                            <button type="submit" class="rf-save-btn" id="save-btn" value="Save">Save</button>
+                        </div>
+
+                        <div class="row-fluid">
+                            <span class="config-title">Configuration</span>
+                        </div>
+                        <div class="row-fluid" style="margin-left:17px;">
+                            <span class="content-text">Recorded Future App for Splunk </span>
+                            <span class="rf-link"><a href="/app/TA_recordedfuture-cyber/recorded_future_help_setup" target="_blank">Recorded Future Support <i class="material-icons md-13">open_in_new</i></a></span>
+                        </div>
+
+
+                        <!-- tabs menu -->
+                        <div class="col-12">
+                            <div class="row tab-border">
+                                <div class=" col-9 tab-menu" style="padding-left: 0;">
+                                    <ul>
+                                        <li class="nav" id="nav-setup">Setup</li>
+                                        <li class="nav" id="nav-risk">Risk Lists</li>
+                                        <li class="nav" id="nav-alert">Alerting Rules</li>
+                                    </ul>
+                                </div>
+                                <span class="help-text required-text">*Required fields</span>
+                            </div>
+                        </div>
+
+
+                        <!-- Setup view-->
+                        <div class="settings-container" id="setup-view">
+                            <!-- API Section -->
+                            <div class="col" style="padding-top:16px;">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <span class="section-title cursor">Recorded Future API </span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- API drop down-->
+                            <div class="col" id="api-settings-dropdown">
+                                <div class="row row-spacing">
+                                    <div class="col-3"><label class="rf-labels" for="api-token">API Token*</label></div>
+                                    <div class="col-9"><input class="rf-input wide-input" type="password" id="api-token" value="api_token"></div>
+                                    <div class="col" style="margin-left: 25%;"> <a href="https://app.recordedfuture.com" target="_blank" class="rf-link" style="display: flex; align-items: center;">Sign In to Recorded Future and generate API Token  <i class="material-icons md-13 rf-icon-link-color">open_in_new</i></a></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-3"><label class="rf-labels" for="api-url-input">API URL*</label></div>
+                                    <div class="col-9">
+                                        <input class="rf-input wide-input rf-input-prefilled" type="text" id="api-url-input" pattern="https.*" disabled>
+                                        <span class="rf-link" id="edit-api-url">Edit</span>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-3"><label class="rf-labels" id="ssl-icon">SSL Verification <i class="material-icons material-gray" title="Consider disabling SSL verification if it fails due to a proxy or firewall setup">help </i></label></div>
+                                        <div class="row-8 toggle-container">
+                                            <div class="rf-switch">
+                                                <label class="rf-switch__switch" style="max-width: 80px;" for="ssl-toggle">
+                                                    <input class="rf-switch__checkbox ssl-checkbox"
+                                                           type="checkbox"
+                                                           id="ssl-toggle">
+                                                    <div class="rf-switch__slider"></div>
+                                                </label>
+                                            </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!--Proxy section -->
+                            <div class="col">
+                                <div class="row" style="padding: 16px 0 24px 0; border-top: 1px solid #ccc;">
+                                    <div class="col-3">
+                                        <span class="section-title">Proxy </span>
+                                    </div>
+                                    <!-- proxy toggle-->
+                                    <div class="row-8 toggle-container">
+                                        <div class="rf-switch">
+                                            <label class="rf-switch__switch" style="max-width: 80px;" for="rf-accordion-proxy">
+                                                <input class="rf-switch__checkbox proxy-checkbox"
+                                                       type="checkbox"
+                                                       id="rf-accordion-proxy">
+                                                <div class="rf-switch__slider"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- end toggle -->
+                                </div>
+                            </div>
+                            <!--Proxy drop down -->
+                            <div class="col" id="proxy-settings-dropdown" style="padding-bottom: 8px; border-bottom: 1px solid #ccc;">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <span class="rf-labels">Host*</span>
+                                        </div>
+                                        <div class="col-9">
+                                            <input class="rf-input wide-input" id="proxy-host" type="text" value="" pattern="[a-z A-Z 0-9 \.\[.*?\]:-]*">
+                                        </div>
+                                    </div>
+
+                                <div class="row">
+                                    <div class="col-3">
+                                        <span class="rf-labels">Port*</span>
+                                    </div>
+                                    <div class="col-9">
+                                        <input class="rf-input wide-input" id="proxy-port" type="text" value="">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-3"><span class="rf-labels">Username</span></div>
+                                    <div class="col-9"><input class="rf-input wide-input" id="proxy-username" type="text">
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-3"><span class="rf-labels">Password</span></div>
+                                    <div class="col-9"><input class="rf-input wide-input" id="proxy-password" type="password">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Log level section-->
+                            <div class="col">
+                                <div class="row" style="padding: 24px 0 8px 0;">
+                                    <div class="col-6">
+                                        <span class="section-title">Logging</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Log level-->
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col-3"><span class="rf-labels">Log level</span></div>
+                                    <div class="col-9">
+                                        <div class="radio-btn-group">
+                                            <ul style="text-decoration: none; list-style: none; margin-left:0;">
+                                                <li>
+                                                    <input class="radio-input" name="level" id="info"
+                                                           type="radio"
+                                                           value="INFO">
+                                                    <label class="radio-input" for="info">Info</label>
+                                                </li>
+                                                <li>
+                                                    <input class="radio-input" name="level" id="debug"
+                                                           type="radio"
+                                                           value="DEBUG">
+                                                    <label class="radio-label" for="debug">Debug</label>
+                                                </li>
+                                                <li>
+                                                    <input class="radio-input" name="level" id="warning"
+                                                           type="radio"
+                                                           value="WARNING">
+                                                    <label class="radio-input" for="warning">Warning</label>
+                                                </li>
+                                                <li>
+                                                    <input class="radio-input" name="level" id="error"
+                                                           type="radio"
+                                                           value="ERROR">
+                                                    <label class="radio-input" for="error">Error</label>
+                                                </li>
+                                                <li>
+                                                    <input class="radio-input" name="level" id="critical"
+                                                           type="radio"
+                                                           value="CRITICAL">
+                                                    <label class="radio-input" for="critical">Critical</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!---Risk List View -->
+                        <div class= settings-container" id="risk-view">
+                            <div class="col-12" style="cursor: pointer; padding-left:0;">
+                                <div class="rf-link-action" id="add-risk">
+                                    <i class="material-icons">add</i>
+                                    <span>Add Risk List</span>
+                                </div>
+                            </div>
+                            <div class="row-10" id="new-rule-container"></div>
+                           <div class="risk-list"></div>
+                        </div>
+
+                        <!--- Alert View -->
+                        <div class="settings-container" id="alert-view">
+                            <div class="settings-container">
+
+                                <div class="row-12 rf-link">
+                                    <span class="rf-link-action" id="subscribe-alerts-link">
+                                        <i class="material-icons">add</i>
+                                        Add Alerting Rule
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col" id="subscribe-container">
+                                <div class=" alert-dialog hidden">
+                                    <ul id="metadata-list"></ul>
+                                </div>
+                                <div id="new-alert-container"></div>
+                            </div>
+                            <div class="col-12">
+                                <div class="col-12 alert-list" style="padding:0;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+</body>
+</html>

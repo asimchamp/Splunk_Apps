@@ -1,0 +1,127 @@
+<form>
+  <label>Comapaction info</label>
+  <fieldset autorun="true" >
+<input type="time" searchWhenChanged="true">
+      <label>Select time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="node" searchWhenChanged="true">
+      <label>Select a Node</label>
+      
+      <default>*</default>
+      
+     <!-- Define the default value -->      
+      <choice value="*">All</choice>
+      
+     <!-- Define the choices with a populating search -->
+      <populatingSearch fieldForValue="HOSTADDR" fieldForLabel="node" latest="now">
+        <![CDATA[index=cassandra_metrics | dedup HOSTADDR|table HOSTADDR]]>
+      </populatingSearch>
+    </input>  
+    <input type="text" token="keyspace">
+      <label>Keyspace name</label>
+      <default>*</default>
+    </input>
+    <input type="text" token="columnfamily">
+      <label>Columnfamily name</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Comapaction history</title>
+        <searchString>index=cassandra_metrics HOSTADDR=$node$ sourcetype=cassandra_COMPACTIONHISTORY keyspace_name=$keyspace$ columnfamily_name=$columnfamily$|dedup id|table HOSTADDR id keyspace_name columnfamily_name  compacted_at bytes_in bytes_out rows_merged|rename HOSTADDR AS Node</searchString>
+        <latestTime>now</latestTime>
+        <option name="showPager">true</option>
+        <option name="count">10</option>
+        
+      </table>
+    </panel>
+  </row>
+<row>
+    <panel>
+      <table>
+        <title>Comapaction status</title>
+        <searchString>index=* index=cassandra_metrics sourcetype=cassandra_COMPACTIONSTATUS|dedup table|table  compaction_type table completed total progress|rename completed as "completed(In bytes)"|rename total as "total(In bytes)"</searchString>
+        <earliestTime>rt-10m</earliestTime>
+        <latestTime>rtnow</latestTime>
+      </table>
+    </panel>
+</row>
+  <row>
+    <panel>
+   <input type="time" searchWhenChanged="true">
+      <label>Select time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input> 
+    
+      
+      <chart>
+       <title>Status of tables wrt Time </title> 
+        <searchString>index=cassandra_metrics sourcetype=cassandra_COMPACTIONSTATUS|timechart span=10m avg(completed) as completed  avg(total) as total by table</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+     <row>
+      <panel>
+        <input type="time" searchWhenChanged="true">
+      <label>Select time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input> 
+      <chart>
+        <title>Status of Compaction Type wrt to time</title>
+        <searchString>index=cassandra_metrics sourcetype=cassandra_COMPACTIONSTATUS|timechart span=10m avg(completed) as completed  avg(total) as total by compaction_type</searchString>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

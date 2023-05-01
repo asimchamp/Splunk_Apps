@@ -1,0 +1,39 @@
+<dashboard>
+  <label>Volume Collections</label>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>sourcetype=nimble_rest source="nimble:rest:volume_collections_detail" | stats latest(host) as Array, latest(pol_owner_name) AS Owner, latest(app_sync) as "App Sync" by name | rename name as Name | fields Name, Array, Owner, "App Sync" | sort Array</query>
+          <earliest>-4h@m</earliest>
+          <latest>now</latest>
+        </search>
+        <drilldown>
+          <set token="volCollName">$click.value$</set>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Members of VolColl $volCollName$</title>
+        <search>
+          <query>source="nimble:rest:volumes_detail" volcoll_name = $volCollName$ |  eval dataGB=round(vol_usage_compressed_bytes/1024/1024/1024, 1) | eval compression=round((vol_usage_uncompressed_bytes+snap_usage_uncompressed_bytes)/(vol_usage_compressed_bytes+snap_usage_compressed_bytes), 1) |  eval snapGB=round(snap_usage_compressed_bytes/1024/1024/1024, 1) | stats latest(host) as Array, latest(clone) as Clone, latest(read_only) As "Read Only", latest(dataGB) as "Data (GB)", latest(snapGB) as "Snap (GB)", latest(compression) as "Compression (X)", latest(num_connections) as Connections by name | rename name as Name | eval Clone=if(Clone == true, "Yes", "No") | eval "Read Only"=if("Read Only" == true, "Yes", "No")  | sort Array</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,132 @@
+<dashboard stylesheet="css/recorded_future_correlation.css"
+	   script="js/evidence.js">
+  <label>Recorded Future Domain Log Correlation</label>
+  <!-- Original search using real data
+  <search id="core">
+    <query>
+      index=main sourcetype=isc:bind:query earliest=-24h
+      | eval Time=strftime(_time,"%m/%d/%y %I:%M:%S:%p")
+      | eval Name=query 
+      | join Name [|inputlookup rf_domain_risklist.csv | table * ]
+      | search Risk=*
+      | sort -Risk
+    </query>
+  </search>
+  -->
+  <search id="core">
+    <query>
+      | rest splunk_server=local /services/TA_recordedfuture-cyber/sample_data type=domain
+      | sort -Risk
+    </query>
+  </search>
+  <row>
+    <html>
+      <div class="help-link" style="float: right; text-align: right;">
+        <img src="/static/app/TA_recordedfuture-cyber/img/logo.svg" alt="Recorded Future, Inc logotype" style="height: 30px;"/><br/>
+        <a href="/app/TA_recordedfuture-cyber/recorded_future_help_correlation_dashboards" target="_blank">Help</a>
+      </div>
+      <div>
+        <h1>
+          This dashboard displays correlated domains with Recorded Future's Domain Risk List.
+        </h1>
+      </div>
+    </html>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <title>Summary</title>
+        <search base="core">
+          <query>
+            | stats dc(Name) as count
+            | fields count
+            | rangemap field=count low=0-0 evelated=1-1 default=severe
+          </query>
+        </search>
+        <option name="underLabel">High Risk Domains</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <table>
+        <title>Top Domain Rule Hits</title>
+        <search base="core">
+          <query>
+            | eval Rule=spath(EvidenceDetails,"EvidenceDetails{}.Rule")
+            | eval EvidenceString=spath(EvidenceDetails,"EvidenceDetails{}.EvidenceString")
+            | sort -Risk
+            | top Rule limit=20 showperc=false
+          </query>
+        </search>
+        <option name="totalsRow">true</option>
+        <option name="wrap">false</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel id="topcount">
+      <table>
+        <title>Top Domain Counts</title>
+        <search base="core">
+          <query>
+            | eval Rule=spath(EvidenceDetails,"{}.rule")
+            | eval EvidenceString=spath(EvidenceDetails,"{}.evidenceString")
+            | sort -Risk 
+            | rename Name as Domain
+            | top Domain limit=20 showperc=false
+          </query>
+        </search>
+        <option name="refresh.display">progressbar</option>
+        <option name="totalsRow">true</option>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <condition field="Domain">
+            <link target="_blank">/app/TA_recordedfuture-cyber/search?q=search%20index%3D*%20$row.Domain$</link>
+          </condition>
+          <condition>
+            <link target="_blank">/app/TA_recordedfuture-cyber/recorded_future_domain_enrichment?form.name=$row.Domain$</link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="etable">
+        <title>High Risk Domains</title>
+        <search base="core">
+          <query>
+            | eventstats Count BY Name
+            | dedup Name
+            | `format_evidence`
+            | sort -Risk
+            | eval Risk = round(Risk,0)
+            | rename RiskString AS Rules
+            | rename Name TO Domain
+            | table Risk, Domain, Count, Rules, Evidence
+          </query>
+        </search>
+        <drilldown>
+          <condition field="Domain">
+            <link target="_blank">/app/TA_recordedfuture-cyber/search?q=search%20index%3D*%20$row.Domain$</link>
+          </condition>
+          <condition>
+            <link target="_blank">/app/TA_recordedfuture-cyber/recorded_future_domain_enrichment?form.name=$row.Domain$</link>
+          </condition>
+        </drilldown>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="count">10</option>
+        <format type="color" field="Risk">
+          <colorPalette type="list">
+            ["0x777777","0xffce00","0xcf0a2c"]
+          </colorPalette>
+          <scale type="threshold">
+            30,71,100
+          </scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</dashboard>

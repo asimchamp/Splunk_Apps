@@ -1,0 +1,56 @@
+<form>
+  <label>Miscellaneous CyberFacts Examples (CSV data)</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="dropdown" token="index_tok">
+      <label>Select an index</label>
+      <default>swl_sample_cyberfacts</default>
+      <choice value="swl_sample_cyberfacts">swl_sample_cyberfacts</choice>
+      <choice value="swl_cyberfacts">swl_cyberfacts</choice>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Recent CVE software</title>
+      <table>
+        <search>
+          <query>index=$index_tok$ sourcetype=*cyberfact_csv cyberfact_source_type=CVE  tag_super_type=Target | stats list(tag_description) as effected_software</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Recent DarkWeb Actors</title>
+      <table>
+        <search>
+          <query>index=$index_tok$ sourcetype=*cyberfact_csv data_feed_ids="-101" tag_super_type=Actor | stats list(tag_description) as actors</query>
+          <earliest>0</earliest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Recent cyber-related legal actions</title>
+      <table>
+        <search>
+          <query>index=$index_tok$ sourcetype=sample_cyberfact_csv cyberfact_type="Legal Actions" | top industry_target_description, cyberfact_source | fields - count, percent</query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

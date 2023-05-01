@@ -1,0 +1,166 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% load demoview %}
+
+{% block title %}Aerospike SearchManager{% endblock title %}
+
+{% block css %}
+
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/dashboard-simple-bootstrap.min.css" />
+
+    <link rel="stylesheet" type="text/css" href="/dj/static/aerospike_app_for_splunk/style.css" />
+    <style>
+        @font-face
+         {
+             font-family: "Titillium Web";
+             font-style: normal;
+             font-weight: 400;
+             src: local("Titillium Web"), local("TitilliumWeb-Regular"), url("http://fonts.gstatic.com/s/titilliumweb/v4/7XUFZ5tgS-tD6QamInJTcZSnX671uNZIV63UdXh3Mg0.woff2") format("woff2");
+         }
+         body
+        {
+            font-family:'Titillium Web';
+        }
+        a
+        {
+            color:#6E6E6E;
+        }
+        a:hover
+        {
+            color:#6E6E6E;
+        }
+        a:active
+        {
+            color:#6E6E6E;
+        }
+        a:visited
+        {
+            color:#6E6E6E;
+        }
+        a:link
+        {
+            color:#6E6E6E;
+        }
+        .show_stat
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:hover
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:active
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:visited
+        {
+            color:#FAFAFA;
+        }
+        .show_stat:link
+        {
+            color:#FAFAFA;
+        }
+
+    </style>
+{% endblock css %}
+
+{% block content %}
+<div class="menu" style="width:100%;height:40px;padding:0;margin:0;overflow: hidden;">
+  <div class="mn2">
+      <a class="show_stat underline" href="/dj/aerospike_app_for_splunk/historic">Home</a>
+  </div>
+  <div class="mn2">
+      <a class="show_stat" href="/dj/aerospike_app_for_splunk/statistics">Statistics</a>
+  </div>
+    <div class="mn5">
+        <a class="show_stat" href="/dj/aerospike_app_for_splunk/searchManager">Search</a>
+    </div>
+    <div class="mn4">
+        <a class="show_stat" href="/app/aerospike_app_for_splunk/alerts">Alert</a>
+    </div>
+
+    <div class="mn6">
+        <a class="show_stat" href="/app/aerospike_app_for_splunk/dashboards">Dashboards</a>
+    </div>
+    <div class="mn7">
+        <a class="show_stat" href="/dj/aerospike_app_for_splunk/setup">Setup</a>
+    </div>
+    <div class="mn2" style="float:right;margin:0px;margin-right:5px;margin-top:3px;">
+      <span style="font-size:20px;color:#FFF" >Aerospike</span>
+    </div>
+
+</div>
+
+    </br>
+    <div class="dashboard-header clearfix">
+        <h2 style="color : #050505;text-shadow: 1px 1px #aaa">Aerospike Search Manager</h2>
+        
+    </div>
+    </br>
+
+    {% searchbar id="searchbar1" managerid="search1" %}
+    {% searchcontrols id="searchcontrols1" managerid="search1" %}
+
+    {% timeline id="timeline1" managerid="search1" %}
+    {% table id="table1" managerid="search1" %}
+</div>
+{% endblock content %}
+
+{% block managers %}
+    {% searchmanager id="search1"
+        search="sourcetype = \"*\" "
+        preview=True
+        required_field_list="*" status_buckets=300 %}
+
+        {% searchmanager
+            id="search_alert"
+            search="index=\"_audit\" action=\"alert_fired\" ss_app=\"splunk_app_for_aerospike\" | dedup ss_name | stats count"
+            earliest_time="rt-5m"
+            latest_time="rt"
+            cache=True
+        %}
+
+        {% searchmanager
+            id="search_alertinfo"
+             search="index=\"_audit\" action=\"alert_fired\" ss_app=\"splunk_app_for_aerospike\" | dedup ss_name|rename ss_name as Alert_Name | eval severity = case(severity == \"1\", \"Info\", severity == \"2\", \"Low\", severity == \"3\", \"Medium\", severity == \"4\", \"High\", severity == \"5\", \"Critical\")|table severity Alert_Name"
+            earliest_time="rt-5m"
+            latest_time="rt"
+            cache=True
+        %}
+
+{% endblock managers %}
+
+{% block js %}
+    <script>
+        var deps = [
+            "splunkjs/ready!"
+        ];
+        require(deps, function(mvc) {
+            // Get instances of the views and search manager created using tags
+            var mytimeline = splunkjs.mvc.Components.getInstance("timeline1");
+            var mysearchbar = splunkjs.mvc.Components.getInstance("searchbar1");
+            var mysearch = splunkjs.mvc.Components.getInstance("search1");
+             var myjobstatus = splunkjs.mvc.Components.getInstance("jobstatus1");
+            // Update the search manager when the timeline changes
+            mytimeline.on("change", function() {
+                mysearch.settings.set(mytimeline.val());
+            });
+
+            // Update the search manager when the query in the searchbar changes
+            mysearchbar.on("change", function() {
+                mysearch.settings.unset("search");
+                mysearch.settings.set("search", mysearchbar.val());
+            });
+
+            // Update the search manager when the timerange in the searchbar changes
+            mysearchbar.timerange.on("change", function() {
+                mysearch.settings.set(mysearchbar.timerange.val());
+            });
+        });
+    </script>
+{% endblock js %}

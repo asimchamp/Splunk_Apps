@@ -1,0 +1,333 @@
+<form version="1.1">
+  <label>Meta Woot! License Volume Usage</label>
+  <description>Displays total license volume usage, with filtering by sourcetype and index.</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time Range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="indexer" searchWhenChanged="true">
+      <label>Splunk Indexer</label>
+      <search>
+        <query>| inputlookup meta_woot_server_guid | rename splunk_server as host | fields host | sort - host</query>
+        <earliest>0</earliest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+      <choice value="*">All</choice>
+      <default>*</default>
+      <suffix>*</suffix>
+    </input>
+    <input type="dropdown" token="index" searchWhenChanged="true">
+      <label>Index</label>
+      <search>
+        <query>| inputlookup meta_woot | dedup index | fields index | sort index</query>
+      </search>
+      <fieldForLabel>index</fieldForLabel>
+      <fieldForValue>index</fieldForValue>
+      <choice value="*">All</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="sourcetype">
+      <label>Sourcetype</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>| inputlookup meta_woot where index=$index$ | dedup sourcetype | fields sourcetype | sort sourcetype</query>
+      </search>
+      <fieldForLabel>sourcetype</fieldForLabel>
+      <fieldForValue>sourcetype</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="text" token="host">
+      <label>Host</label>
+      <default>*</default>
+    </input>
+    <input type="checkbox" token="cost" searchWhenChanged="true">
+      <label></label>
+      <choice value="Cost">Show License Cost</choice>
+      <delimiter> </delimiter>
+      <change>
+        <condition value="Cost">
+          <set token="license_cost">license_cost</set>
+          <set token="hide_cost_panel"></set>
+        </condition>
+        <condition value="*">
+          <set token="license_cost"></set>
+          <unset token="hide_cost_panel"></unset>
+        </condition>
+      </change>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$) (License_Usage.h=$host$)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="colorBy">trend</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">inverse</option>
+        <option name="trendDisplayMode">percent</option>
+        <option name="trendInterval">-24h</option>
+        <option name="underLabel">License Usage (Gb)</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel depends="$hide_cost_panel$">
+      <single>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.h=$host$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$)
+| eval license_cost=round((totalGB*`meta_woot_license_cost_per_gb`),2) | fields license_cost</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">License Cost</option>
+        <option name="unitPosition">before</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| tstats dc("License_Usage.idx") from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$) (License_Usage.h=$host$)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="underLabel">Total Indexes</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| tstats dc("License_Usage.st") from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$) (License_Usage.h=$host$)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="underLabel">Total Sourcetypes</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <search>
+          <query>| tstats dc("License_Usage.h") from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$) (License_Usage.h=$host$)</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+        <option name="underLabel">Total Hosts</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top Indexes</title>
+      <html>
+        <p>Displays the license volume per index for the selected time range.</p>
+      </html>
+      <table>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$)  (License_Usage.h=$host$) groupby "License_Usage.idx" | eval license_cost=round((totalGB*`meta_woot_license_cost_per_gb`),2) | eval totalGB=round(totalGB,2) | rename License_Usage.idx as Index | sort - totalGB | head 10 | fields Index totalGB $license_cost$</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Top Sourcetypes</title>
+      <html>
+        <p>Displays the license volume per sourcetype for the selected time range.</p>
+      </html>
+      <table>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$)  (License_Usage.h=$host$) groupby "License_Usage.st" | eval license_cost=round((totalGB*`meta_woot_license_cost_per_gb`),2) | eval totalGB=round(totalGB,2) | rename License_Usage.st as Sourcetype | sort - totalGB | head 10 | fields Sourcetype totalGB $license_cost$</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Top Hosts</title>
+      <html>
+        <p>Displays the license volume per host for the selected time range. Note: This may be inaccurate at scale, as Splunk suppresses (i.e. nulls) host in the license log.</p>
+      </html>
+      <table>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$indexer$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$)  (License_Usage.h=$host$) groupby "License_Usage.h" | eval license_cost=round((totalGB*`meta_woot_license_cost_per_gb`),2) | eval totalGB=round(totalGB,2) | rename License_Usage.h as Host | sort - totalGB | head 10 | fields Host totalGB $license_cost$</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Volume by Splunk Indexer</title>
+      <html>
+        <p>Displays the license volume per Splunk indexer for the selected time range. This is helpful to determine if some of your indexers are indexing a lot more data than others.</p>
+      </html>
+      <chart>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage) (License_Usage.indexer=$host$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$) (License_Usage.h=$host$) groupby "License_Usage.indexer" 
+| rename License_Usage.indexer as "Splunk Indexer" 
+| eval totalGB=round(totalGB,3)
+| sort "Splunk Indexer"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Daily License Usage</title>
+      <input type="time" token="time2" searchWhenChanged="true">
+        <label>Time Range</label>
+        <default>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <input type="dropdown" token="span" searchWhenChanged="true">
+        <label>Span</label>
+        <choice value="1d">1 Day</choice>
+        <choice value="12h">12 Hours</choice>
+        <choice value="3h">3 Hours</choice>
+        <choice value="1h">1 Hour</choice>
+        <choice value="30m">30 Mins</choice>
+        <default>1d</default>
+      </input>
+      <html>
+        <p>Displays the license volume per day for the selected time range.This is helpful to track license trends over time.</p>
+      </html>
+      <chart>
+        <search>
+          <query>| tstats sum("License_Usage.gb") AS "totalGB" from datamodel=Meta_Woot_License_Usage where (nodename = License_Usage)(License_Usage.indexer=$host$) (License_Usage.idx=$index$) (License_Usage.st=$sourcetype$) (License_Usage.h=$host$) groupby _time span=$span$ 
+| eval totalGB=round(totalGB,3)
+| convert timeformat="%Y-%m-%d" ctime(_time)</query>
+          <earliest>$time2.earliest$</earliest>
+          <latest>$time2.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+</form>

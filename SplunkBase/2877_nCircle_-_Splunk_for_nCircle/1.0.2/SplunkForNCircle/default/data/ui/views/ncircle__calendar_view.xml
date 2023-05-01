@@ -1,0 +1,30 @@
+<form stylesheet="calendar.css" script="autodiscover.js">
+  <label>nCircle - Calendar View (Last 180 days)</label>
+  <row>
+    <html>
+            <h2>Scans by Day</h2>
+            <div id="calSearch" 
+				class="splunk-manager" 
+				data-require="splunkjs/mvc/searchmanager" 
+				data-options='{                     
+					"search": "earliest=-180d latest=now `vuln_index` `vuln_splunk_server` `vuln_sourcetype` source=*getActiveScans.py | rename scanProfile.profile.scanProfile.constraints.scanFrequency.byMonth.@daysOfMonth as day | dedup scanProfile.name, day, timestamp | eval y=strftime(timestamp, \"%Y\") | eval m=strftime(timestamp, \"%m\") | eval day = m + \"/\" + day  + \"/\" + y | dedup day, scanProfile.name | table day, network.name",
+					"cancelOnUnload": true,                     
+					"preview": true                  
+				}'>
+            </div>
+            
+             <div id="eventCalendar" 
+				class="splunk-view" 
+				data-require="app/SplunkForNCircle/components/eventcalendar/eventcalendar" 
+				data-options='{                     
+					"managerid": "calSearch",                     
+					"valueField": "network.name",                     
+					"dateField": "day",                    
+					"destFormField": "tkNetworkName",
+					"linkUrl": "ncircle__job_scheduled"                   
+				}'>
+            </div>
+             
+        </html>
+  </row>
+</form>

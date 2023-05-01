@@ -1,0 +1,83 @@
+<form version="1.1">
+  <label>FS Audit Logs Search Facility</label>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time</label>
+      <default>
+        <earliest>-2h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="cluster_name" searchWhenChanged="true">
+      <label>Cluster</label>
+      <selectFirstChoice>true</selectFirstChoice>
+      <search>
+        <query>`isilon_index` sourcetype="emc:isilon:syslog" audit_protocol | dedup Cluster_Name | table Cluster_Name</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>Cluster_Name</fieldForLabel>
+      <fieldForValue>Cluster_Name</fieldForValue>
+    </input>
+    <input type="dropdown" token="name" searchWhenChanged="true">
+      <label>User</label>
+      <choice value="*">All</choice>
+      <choice value="N/A">None</choice>
+      <search>
+        <query>| inputlookup "dell_isilon_username" | eval key=_key | rename key as unique_key_field | eval username = (username + " (" + host + ")") | table username unique_key_field</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>username</fieldForLabel>
+      <fieldForValue>unique_key_field</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="action" searchWhenChanged="true">
+      <label>Event Action</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>`isilon_index` sourcetype="emc:isilon:syslog" audit_protocol Cluster_Name=$cluster_name$ | dedup event_action | table event_action</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>event_action</fieldForLabel>
+      <fieldForValue>event_action</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="result" searchWhenChanged="true">
+      <label>Event Result</label>
+      <choice value="*">All</choice>
+      <search>
+        <query>`isilon_index` sourcetype="emc:isilon:syslog" event_result=* audit_protocol Cluster_Name=$cluster_name$ | dedup event_result | table event_result</query>
+        <earliest>$time.earliest$</earliest>
+        <latest>$time.latest$</latest>
+      </search>
+      <fieldForLabel>event_result</fieldForLabel>
+      <fieldForValue>event_result</fieldForValue>
+      <initialValue>*</initialValue>
+      <default>*</default>
+    </input>
+    <input type="text" token="path" searchWhenChanged="true">
+      <label>Path of the file to search</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+    <title>Most recent events</title>
+      <table>
+        <search>
+          <query>`isilon_index` sourcetype="emc:isilon:syslog" audit_protocol Cluster_Name=$cluster_name$ event_action="$action$" file_path="$path$" event_result="$result$" | fillnull value="N/A" uid | eval host_to_pass = case($name|s$=="*", "", $name|s$=="N/A", "", 1==1, mvindex(split($name|s$,"||"),0)), uid_to_pass = case($name|s$=="*", "", $name|s$=="N/A", "N/A", 1==1,  mvindex(split($name|s$,"||"),1)) | where like(host, "%".'host_to_pass'."%") AND like(uid, "%".'uid_to_pass'."%") | eval Time=strftime(_time,"%Y-%m-%d %H:%M:%S") | lookup "dell_isilon_username" uid host OUTPUTNEW username | fillnull value="N/A" username | table Time Cluster_Name username event_action event_result file_path client_ip | rename username as "User" event_action as "Action Taken" event_result as "Result of action" file_path as "File Name" client_ip as "Source IP Address" Cluster_Name as "Cluster"</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">cell</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">20</option>
+      </table>
+    </panel>
+  </row>
+</form>

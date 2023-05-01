@@ -1,0 +1,49 @@
+<dashboard>
+  <label>About</label>
+  <row>
+    <panel>
+      <html>
+        <h1>Disclaimer and App Information</h1>
+        <p>This app is not an official app by Kepware. Contact the Author: <a href="https://sg.linkedin.com/in/limshengyang">Steve Lim</a> for any information or questions.</p>
+        <h2> Application Examples </h2>
+        <ul>
+          <li>Remote Monitoring of Asset: An example dashboard for remote monitoring of a machine</li>
+          <li>SPC Report:  An example of performing SPC data analytics using the formulas</li>
+          <li>Historical Analytics: An example of how historical data and real time data can be used for various visualizations.</li>
+          <li>Failure Analysis: Using the system _Error Tag, data of when the machine went offline and recovered can be and analyzed</li>
+        </ul>
+        <h2>Tooks</h2>
+        <ul>
+          <li>Data Summary : An overview of the data that are being forwarded</li>
+          <li>Trend Viewer: For trending a Tag</li>
+          <li>Data Exporter: Search and export your data in CSV or PDF</li>
+        </ul>
+        <div>
+        </div>
+      </html>
+    </panel>
+    <panel>
+      <html>
+          <h1>Objects added via this App</h1>
+            <ul>
+              <li>
+            <strong>Sourcetype:</strong>OPC with <strong>source:</strong>TCP:51112</li>
+              <li>
+            <strong>Channel:</strong> Channel being the channel name in the Kepware Configuration. In Kepware, the Channel is usually considered as the protocol of communication pathway.</li>
+              <li>
+            <strong>Device:</strong> Device refers to the device created under the channel in Kepware. This is usually the actual device that is connected.</li>
+              <li>
+            <strong>Tag:</strong> Tags are similar to variables in computing. In Kepware, Tags point to the memory space where the required data is located in the device.</li>
+              <li>
+            <strong>TagName:</strong> The complete Tag alias in OPC. Channel.Device.Tag</li>
+              <li>
+            <strong>QualityNum:</strong> Numeric Equivalent of OPC Quality. Bad = 0; Good = 192</li>
+            </ul>
+        <div style="text-align: center">
+        	<img src="../../static/app/kepware/images/ChannelDeviceTag.png" width="400"/>
+        	<figcaption>A view of Kepware's Layout.</figcaption>
+        </div>
+    	</html>
+    </panel>
+  </row>
+</dashboard>

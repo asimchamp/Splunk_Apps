@@ -1,0 +1,788 @@
+<form script="xsv_create_wizard.js" stylesheet="xsv.css" hideEdit="true">
+  <label>Context Wizard</label>
+  <row>
+    <html>
+      <div class="xsv-main-section-body">
+        <div class="main-container">
+          <div class="progress-container" style="display:none">
+            <h2 class="section-title addDataTitle" style="width:130px;"></h2>
+            <div id="wizard-placeholder">
+              <div class="control shared-controls-stepwizardcontrol step-wizard">
+                <div id="stepApp" class="step-container first active">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      App
+                    </span>
+                  </div>
+                </div>
+                <div id="stepName" class="step-container">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Name
+                    </span>
+                  </div>
+                </div>
+                <div id="stepMethod" class="step-container">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Method
+                    </span>
+                  </div>
+                </div>
+                <div id="stepType" class="step-container">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Type
+                    </span>
+                  </div>
+                </div>
+                <div id="stepConcepts" class="step-container">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Concepts
+                    </span>
+                  </div>
+                </div>
+                <div id="stepClass" class="step-container">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Class
+                    </span>
+                  </div>
+                </div>
+                <div id="stepRange" class="step-container">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Range
+                    </span>
+                  </div>
+                </div>
+                <div id="stepDone" class="step-container last">
+                  <div class="step-indicator" >
+                    <div class="connector left">
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div class="circle"></div>
+                    <div class="connector right">
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="step-label" >
+                      Done
+                    </span>
+                  </div>
+                </div>
+                <div class="nav-buttons">
+                  <a id="prevButton" class="btn previous-button" href="#">
+                    <i class="icon-chevron-left"></i>
+                    <span class="button-text"></span>
+                  </a>
+                  <a id="nextButton" class="btn btn-primary next-button" href="#">
+                    <span class="button-text">Next </span>
+                    <i class="icon-chevron-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="xsv-view-container">
+            <div id="app-view-container" style="display:block;">
+              <h1>Select Application</h1>
+              <label>Select the application where you want to create this context.<span id="app-error-msg" class="xsv-error-message"></span></label>
+              <div id="app-list-panel">
+                <div class="explorer-row apps">
+                  <div class="explorer-nav left apps">
+                    <a class="" href="#">
+                      <i class="icon-chevron-left"></i>
+                    </a>
+                  </div>
+                  <div class="explorer-content">
+                    <div class="loading-apps" style="display:block;">
+                         Loading Apps . . .
+                     </div>
+                    <div class="owl-carousel apps" style="display:none;">
+                     </div>
+                  </div>
+                  <div class="explorer-nav right apps">
+                    <a class="" href="#">
+                      <i class="icon-chevron-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <label>Select the checkbox below if you want the context to have a <i>Private</i> scope (i.e., only accessable to you).</label>
+	      <input id="privateCB" type="checkbox" name="privateCB" value="true" aria-label="..." style="margin-bottom:8px;" >
+                <span style="margin-left:10px;">Private Scope</span>
+              </input>
+              <br/><br/>
+              <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                <h1>FAQ</h1>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What do I need to select an Application for a context?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    Contexts are another kind of Splunk knowledge objects. Splunk knowledge objects live in applications.
+                  </div>
+                </div>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is a <i>Private</i> context?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    A private context is a knowledge object that is only available to a specific user in a specific application.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="name-view-container" style="display:none;">
+              <h1>Select Names</h1>
+              <label>Specify the container, context name, description, and unit of measure.<span id="name-error-msg" class="xsv-error-message"></span></label>
+              <div class="control-group wizard-box" style="height:180px;">
+                <div class="inner-wizard-box">
+                  <label>* Container Name:
+                    <span class="xsv_populating xsv_container"> Populating...</span>
+                  </label>
+                  <select id="containerSelect" style="display:block;">
+                     <option value="">New Container</option>
+                  </select>
+                  <input id="containerNameTI" type="text" class="name-only"/>
+                </div>
+              </div>
+              <div class="control-group wizard-box" style="height:180px;">
+                <div class="inner-wizard-box">
+                  <label>* Field (Context) Name:
+                    <span class="xsv_populating xsv_context"> Populating...</span>
+                  </label>
+                  <select id="contextSelect" style="display:block;">
+                     <option value="">New Context</option>
+                  </select>
+                  <input id="contextNameTI" type="text" class="name-only"/>
+                </div>
+              </div>
+              <div class="control-group wizard-box last" style="height:180px;">
+                <div class="inner-wizard-box">
+                  <label>* Description: </label>
+                  <textarea rows="4" id="notesTA" style="width:205px;"></textarea>
+                  <label>* Unit of Measure: </label>
+                  <input id="uomTI" type="text" />
+                </div>
+              </div>
+              <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                <h1>FAQ</h1>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is a container?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    A container is the actual file the context will be stored. Multiple contexts can be stored in a single container. A container lives in the "lookups" directory of an application.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="concepts-view-container" style="display:none;">
+              <h1>Select Concepts</h1>
+              <div class="concept-select-view">
+                <label>Select from a list of predefined concept configuration or select <i>Create Custom</i><span id="concept-select-error-msg" class="xsv-error-message"></span></label>
+                <div class="concept-selections">
+                  <div id="customConcepts" class="concept-item">
+                    <div class="concept-labels">
+                      <label class="title custom-concepts">Create</label>
+                      <label class="title">Custom</label>
+                    </div>
+                    <img src="/static/app/xsv/images/custom_concepts.png" width="225px"/>
+                  </div>
+                  <div id="fiveConcepts" class="concept-item">
+                    <div class="concept-labels">
+                      <label class="title">Five Concepts</label>
+                      <label>minimal</label>
+                      <label>low</label>
+                      <label>medium</label>
+                      <label>high</label>
+                      <label>extreme</label>
+                    </div>
+                    <img src="/static/app/xsv/images/five_concepts.png" width="225px"/>
+                  </div>
+                  <div id="fourConcepts" class="concept-item">
+                    <div class="concept-labels">
+                      <label class="title">Four Concepts</label>
+                      <label>low</label>
+                      <label>medium</label>
+                      <label>high</label>
+                      <label>extreme</label>
+                    </div>
+                    <img src="/static/app/xsv/images/four_concepts.png" width="225px"/>
+                  </div>
+                  <div id="threeConcepts" class="concept-item">
+                    <div class="concept-labels">
+                      <label class="title">Three Concepts</label>
+                      <label>low</label>
+                      <label>medium</label>
+                      <label>high</label>
+                    </div>
+                    <img src="/static/app/xsv/images/three_concepts.png" width="225px"/>
+                  </div>
+                  <div id="twoConcepts" class="concept-item">
+                    <div class="concept-labels">
+                      <label class="title">Two Concepts</label>
+                      <label>low</label>
+                      <label>high</label>
+                    </div>
+                    <img src="/static/app/xsv/images/two_concepts.png" width="225px"/>
+                  </div>
+                  <div id="anomalyConcepts" class="concept-item" style="display:none;">
+                    <div class="concept-labels">
+                      <label class="title">Three Concepts</label>
+                      <label>anomalous</label>
+                      <label>normal</label>
+                      <label>anomalous</label>
+                    </div>
+                    <img src="/static/app/xsv/images/anomaly_concepts.png" width="225px"/>
+                  </div>
+                </div>
+                <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                  <h1>FAQ</h1>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        What are predefined concept configurations?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      For conveniance, several predefined concept configurations are provided using common concept names. Images are provided for these configuration to illustrate how the concepts would be distributed across the context.
+                  </div>
+                  </div>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        When would I need to create a custom concept configuration?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      If you would like to use a different number of concepts and/or different concept names, then you would create a custom concept to fit your needs.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="concept-custom-view" style="display:none">
+                <label>Specify the number of concepts you want created and click <i>Go</i>. 
+                  <a id="cancelCustomConceptsButton" href="#">Click here</a> to return to selection of predefined concept configurations.<span id="concept-custom-error-msg" class="xsv-error-message"></span></label>
+                <label>Number of Concepts:</label>
+                <div class="input-append">
+                  <select id="numberOfConcepts">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                  <button id="conceptGoButton" class="btn btn-default" type="button">Go</button>
+                </div>
+              </div>
+              <div class="concept-detail-view" style="display:none">
+                <label>Update the concept names and shapes to meet your requirements.
+                  <a id="cancelDetailConceptsButton" href="#">Click here</a> to return to selection of predefined concept configurations.</label>
+                <table style="display:inline-block;vertical-align:top;">
+                  <thead>
+                    <tr>
+                      <th>Concept Name</th>
+                      <th>Concept Shape</th>
+                    </tr>
+                  </thead>
+                  <tbody id="conceptRows">
+                  </tbody>
+                </table>
+                <div id="conceptChart" style="height:205px;width:calc(100% - 500px);display:inline-block;"><svg style="width:100%;height:100%;"></svg></div>
+                <!--
+                <div class="control-group wizard-box" style="height:150px;">
+                  <div class="inner-wizard-box">
+                    <div class="control-group">
+                      <label>* Concept Name: </label>
+                      <div class="input-append">
+                        <input id="newConceptTI" type="text" class="form-control" placeholder="Enter Concept Name"></input>
+                        <button class="btn btn-default" type="button">Add</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="control-group wizard-box last">
+                  <div class="inner-wizard-box">
+                    <div class="control-group">
+                      <label>Concept List: </label>
+                      <div style="min-height:120px;border: 1px solid #CCC; padding: 2px 5px;width:220px;">
+                        <ul id="conceptListUL" class="concept-list"></ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                -->
+                <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                  <h1>FAQ</h1>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        Is the order of concepts important?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      Yes. Concepts will be distributed across the context in the order they are presented in the list. 
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="method-view-container" style="display:none;">
+              <h1>Select Creation Method</h1>
+              <label>Select the method for creating the context.  A user can enter values (User Defined) or specify a search (Data Driven) to derive the range of values the context and it's contexts apply.</label>
+              <div class="control-group wizard-box last">
+                <div class="inner-wizard-box" style="margin-left:20px;">
+                  <label>* Context Creation Method: </label>
+                  <input type="radio" name="methodRadio" value="userDefined" style="margin: 5px;" checked="checked"/> User Defined<br/>
+                  <input type="radio" name="methodRadio" value="dataDefined" style="margin: 5px;"/> Data Driven <br/>
+                  <input type="radio" name="methodRadio" value="crossoverDriven" style="margin: 5px;" /> Crossover Driven <br/>
+                  <input type="radio" name="methodRadio" value="anomalyDriven" style="margin: 5px;" /> Anomaly Driven <br/>
+                </div>
+              </div>
+              <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                <h1>FAQ</h1>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is <i>User Defined</i> context creation?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    The user specifies all of the values necessary to create a context.
+                  </div>
+                </div>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is <i>Data Driven</i> context creation?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    The user specifies a search that will generate the values necessary to create a context.
+                  </div>
+                </div>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is <i>Crossover Driven</i> context creation?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    The user specifies the crossover points (boundaries) between concepts in a context. A crossover point is the point where membersip in the intersecting concepts is equal (0.5).
+                  </div>
+                </div>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is <i>Anomaly Driven</i> context creation?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                      The user specifies the crossover points (boundaries) where data becomes more anomalous than normal, or more normal than anomalous.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="type-view-container" style="display:none;">
+              <h1>Select Context Type</h1>
+              <label>Select the type of the context.</label>
+              <div class="control-group wizard-box last">
+                <div class="inner-wizard-box" style="margin-left:20px;">
+                  <label>* Context Type: </label>
+                  <input id="domain" type="radio" name="typeRadio" value="domain" style="margin: 5px;" checked="checked"/> Domain<br/>
+                  <input id="average-centered" type="radio" name="typeRadio" value="average_centered" style="margin: 5px;"/> Average Centered<br/>
+                  <input id="median-centered" type="radio" name="typeRadio" value="median_centered" style="margin: 5px;" /> Median Centered<br/>
+                </div>
+              </div>
+              <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                <h1>FAQ</h1>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is a domain context type?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    When creating a domain context, minimum and maximum values are used to specify the range of the context.
+                  </div>
+                </div>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is an average centered context type?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    An averaged centered context centers the context at the average value of the data.
+                  </div>
+                </div>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What is a median centered context type?
+                    </span>
+                  </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                    A median centered context centers the context at the median value of the data.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="range-view-container" style="display:none;">
+              <h1>Context Range</h1>
+              <div id="userDefined" style="display:block;">
+                <label>You selected <i>User Defined</i> context creation method. Enter the range parameters for the specified <i><span id="selectedType"></span></i> context type.<span id="range-userdefined-error-msg" class="xsv-error-message"></span></label>
+                <div class="control-group wizard-box last">
+                  <div class="inner-wizard-box" style="margin-left:20px;">
+                    <div id="domainAttributes" style="display:block;">
+                      <div class="control-group">
+                        <label>* Domain Min: </label>
+                        <input id="domainMinTI" type="text" class="numbers-only"/>
+                      </div>
+                      <div class="control-group">
+                        <label>* Domain Max: </label>
+                        <input id="domainMaxTI" type="text" class="numbers-only"/>
+                      </div>
+                    </div>
+                    <div id="averageCenteredAttributes" style="display:none;">
+                      <div class="control-group">
+                        <label>* Average: </label>
+                        <input id="averageTI" type="text" class="numbers-only"/>
+                      </div>
+                    </div>
+                    <div id="medianCenteredAttributes" style="display:none;">
+                      <div class="control-group">
+                        <label>* Median: </label>
+                        <input id="medianTI" type="text" class="numbers-only"/>
+                      </div>
+                    </div>
+                    <div id="averageAndMedianAttributes" style="display:none;">
+                      <div class="control-group">
+                        <label>* Size: </label>
+                        <input id="sizeTI" type="text" class="numbers-only"/>
+                      </div>
+                      <div class="control-group">
+                        <label>* Width: </label>
+                        <input id="widthTI" type="text" class="numbers-only"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                  <h1>FAQ</h1>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        What are the min and max parameters for a domain context?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      In a “domain" context, the context range is from the min to the max values and the individual concepts will be distributed evenly across that domain.  If the method for creating the context is “User Defined”, then the user must specify these values; otherwise the min and max values will be determined from the data in a search.
+                    </div>
+                  </div>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        What are the average, size and width paramters for an average centered context?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      In an “average centered" context, the context will be centered on the average. The width and size parameters determine the context range and the individual concept sizes will be scaled across that range. The width parameter corresponds to standard deviation and the size parameter is a multiplier.  If the method for creating the context is not “User Defined”, then these parameters are derived from the data in a search. The product of these two parameters determine the context range.
+                    </div>
+                  </div>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        What are the median, size, and width paramters for a median centered context?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      In a “Median Centered” context, the context will be centered on the median. The width and size parameters determine the context range and the individual concept sizes will be scaled across that range. The width parameter corresponds to standard deviation and the size parameter is a multiplier.  If the method for creating the context is not “User Defined”, then these parameters are derived from the data in a search. The product of these two parameters determine the context range.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="dataDefined" style="display:none;">
+                <label>You selected <i>Data Driven</i> context creation method. Enter a search command to obtain data and a statics command to generate range parameters for the selected <i><span id="selectedType"></span></i> context type.<span id="range-datadefined-error-msg" class="xsv-error-message"></span></label>
+                <div class="control-group wizard-box">
+                  <div class="inner-wizard-box">
+                    <div class="control-group">
+                      <label>* Search Command: </label>
+                      <textarea rows="4" id="searchTA" style="width:250px;display:block;margin-top:10px;"></textarea>
+                    </div>
+                    <div class="control-group">
+	              <input id="statsCB" type="checkbox" name="statsCB" value="true" aria-label="..." style="margin-bottom:8px;" >
+                        <span style="margin-left:10px;">Apply Stats Command using Field: <input id="fieldTI" type="text" style="display:block;"/></span>
+                      </input>
+                    </div>
+                  </div>
+                </div>
+                <div class="control-group wizard-box">
+                  <div class="inner-wizard-box">
+                    <div id="statsDefined" style="display:none;">
+                      <div class="control-group">
+                        <label>* Stats Command: </label>
+                        <textarea rows="4" id="statsTA" style="display:block;margin-top:10px;height:130px;width:250px;"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="control-group wizard-box last">
+                  <div class="inner-wizard-box">
+                    <div>
+                      <div id="timeRange" style="display:inline-block;margin-right:10px;vertical-align:top;">
+                      </div>
+                      <div class="buttons-wrapper clearfix" style="display:inline-block !important;padding:0px 80px 20px 0px;vertical-align:top;">
+                        <a id="validateSearchButton" class="create-button btn btn-primary pull-left" href="#" style="display:inline-block;">Validate Search</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                  <h1>FAQ</h1>
+                  <div class="xsv-faq-group">
+                    <div class="xsv-faq-header">
+                      <i class="icon-accordion-toggle icon-chevron-right"></i>
+                      <span class="xsv-faq-question">
+                        How are the search and stats commands used?
+                      </span>
+                    </div>
+                    <div class="xsv-faq-body" style="display:none;">
+                      When the method for creating the context is not “user Defined”, the parameters avg, median, count, min, and max parameters are derived from the data in a search.  These parameters are used in determine the range of a context and the concepts sizes will be scaled across that range.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="class-view-container" style="display:none;">
+              <h1>Class View</h1>
+              <label>Select zero or more fields that have a range of values that can be used to specify alternative membership for a concept within a context.</label>
+              <div class="control-group wizard-box" style="height:150px;">
+                <div class="inner-wizard-box">
+                  <label>Class Name: </label>
+                  <div class="input-append">
+                    <input id="newClassTI" type="text" class="form-control name-only" placeholder="Enter Class Name"/>
+                    <button id="addNewClassButton" class="btn btn-default" type="button">Add</button>
+                  </div>
+                  <div class="buttons-wrapper btn-group clearfix" style="display:block;margin-top:20px;">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-top:-10px;">
+                      Add Periodicity <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                      <li><a id="date_wday_link" href="#">date_wday</a></li>
+                      <li><a id="date_hour_link" href="#">date_hour</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="control-group wizard-box last">
+                <div class="inner-wizard-box">
+                  <label>Class List:</label>
+                  <div style="min-height:120px;border: 1px solid #CCC; padding: 2px 5px;width:220px;">
+                    <ul id="classListUL" class="concept-list"></ul>
+                  </div>
+                </div>
+              </div>
+              <div class="xsv-faq" style="width:100%;margin-left: -20px;margin-bottom:-20px;max-width:none;">
+                <h1>FAQ</h1>
+                <div class="xsv-faq-group">
+                  <div class="xsv-faq-header">
+                    <i class="icon-accordion-toggle icon-chevron-right"></i>
+                    <span class="xsv-faq-question">
+                      What are classes?
+                    </span>
+                  </div>
+                  <div class="xsv-faq-body" style="display:none;">
+                    Classes represent different groups of events. Class Names are the fields whose values are used to divide events into different groups.  For example, if you wish to group events based on day of the week and hour of the day, set the class to "date_wday, date_hour".  This will group events based on the values of the day of the week and the hour of the day.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="done-view-container" style="display:none;">
+              <div id="review-inprogress-panel" style="margin-left:auto;margin-right:auto;width:700px;">
+                <h1 id="inprogress-message" style="height:400px;">Creating Context . . .</h1>
+              </div>
+              <div id="review-success-panel" style="margin-left:auto;margin-right:auto;width:700px;display:none">
+                <h1>Context has been created successfully!</h1>
+                <div id="explorerChart" style="margin-left:-100px;height:325px;width:650px;"><svg style="height:100%;width:100%;"></svg></div>
+              </div>
+              <div id="review-failure-panel" style="display:none;margin-left:auto;margin-right:auto;width:850px;">
+                <h1>Failure Creating Context!</h1>
+                <div id="review-failure-messages">
+                  <p>The context was not created successfully. Please check the following and try again.</p>
+                  <ul>
+                    <li> Verify the Search Command you entered returns events. </li>
+                    <li> Verify the Stats Command you entered returns stats. </li>
+                    <li> Verify the returned events contain the field you specified for the context name. </li>
+                    <li> If you specified any class (field) names to create different context based on its values, then verify the returned events contain the field(s) you specified. </li>
+                  </ul>
+                </div>
+              </div>
+              <div id="review-search-panel" style="display:none;margin-left:auto;margin-right:auto;width:700px;">
+                <h1>Would you like to create the following saved searches?</h1>
+                <div style="margin-bottom:20px;">
+                  <h3>Create Context Saved Search</h3>
+                  <div class="control-group">
+                    <label>* Name: </label>
+                    <input id="createSearchNameTI" type="text" style="width:450px;"/>
+                  </div>
+                  <div class="control-group">
+                    <label>* Search: </label>
+                    <textarea rows="4" id="createSearchTA" style="margin-top:10px;height:130px;width:450px;"></textarea>
+                  </div>
+                  <div class="control-group">
+                    <button id="createSavedSearchButton" class="btn btn-default" type="button" style="display:inline-block;">Create Saved Search</button>
+                    <span id="createSavedSearchMessage" class="xsv-success-message"></span>
+                    <span id="createSavedSearchError" class="xsv-error-message"></span>
+                  </div>
+                </div>
+                <div style="margin-bottom:20px;">
+                  <h3>Update Context Saved Search</h3>
+                  <div class="control-group">
+                    <label>* Name: </label>
+                    <input id="updateSearchNameTI" type="text" style="width:450px;"/>
+                  </div>
+                  <div class="control-group">
+                    <label>* Search: </label>
+                    <textarea rows="4" id="updateSearchTA" style="margin-top:10px; height:130px;width:450px;display:inline-block;"></textarea>
+                  </div>
+                  <div class="control-group">
+                    <button id="updateSavedSearchButton" class="btn btn-default" type="button" style="display:inline-block;">Create Saved Search</button>
+                    <span id="updateSavedSearchMessage" class="xsv-success-message"></span>
+                    <span id="updateSavedSearchError" class="xsv-error-message"></span>
+                  </div>
+                </div>
+              </div>
+              <div id="contextData"></div>
+              <div id="contextAttributes"></div>
+              <div id="conceptShape"></div>
+              <div id="createSearchResponse"></div>
+              <div id="updateSearchResponse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="loadingContextModal" class="modal fade" style="margin-top:240px;z-index: -9999">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div id="loadingContextModalMessage"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </html>
+  </row>
+</form>

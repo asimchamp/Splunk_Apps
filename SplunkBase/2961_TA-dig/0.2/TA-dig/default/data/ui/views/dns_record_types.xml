@@ -1,0 +1,45 @@
+<form>
+  <label>DNS Record types</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="searchfield" searchWhenChanged="true">
+      <label>Filter by</label>
+      <default>Code</default>
+      <search>
+        <query>|inputlookup dnsrecordtypes max=1 | transpose</query>
+      </search>
+      <fieldForLabel>column</fieldForLabel>
+      <fieldForValue>column</fieldForValue>
+    </input>
+    <input type="text" token="filtervalue" searchWhenChanged="true">
+      <default>*</default>
+    </input>
+    <input type="multiselect" token="fieldlist" searchWhenChanged="true">
+      <label>Select fields to show</label>
+      <search>
+        <query>|inputlookup dnsrecordtypes max=1 | transpose</query>
+      </search>
+      <fieldForLabel>column</fieldForLabel>
+      <fieldForValue>column</fieldForValue>
+      <default>Code,Defining RFC,Description,Function,Number</default>
+      <delimiter>,</delimiter>
+      <valuePrefix>"</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>|inputlookup dnsrecordtypes | search $searchfield$=$filtervalue$ | table $fieldlist$</query>
+          <earliest>@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">30</option>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,847 @@
+<form stylesheet="css/recorded_future_enrich.css">
+  <label>Recorded Future URL Enrichment</label>
+  <description></description>
+  <search id="core">
+    <query>
+      <![CDATA[
+      | localop
+      | rest splunk_server=local /services/TA_recordedfuture-cyber/lookup_url/PARAM param="$name$" fields="analystNotes,counts,entity,metrics,relatedEntities,risk,sightings,timestamps"
+      | `unpack_metrics`
+      | rex field=risk.riskString ".*/(?<rulesMax>.+)"
+      | rename rulesMax TO risk.rulesMax
+      | spath input=timestamps 
+      | eval FirstSeen=strftime(strptime('timestamps.firstSeen', "%Y-%m-%dT%H:%M:%S.%NZ"), "%b %d, %Y") 
+      | eval LastSeen=strftime(strptime('timestamps.lastSeen', "%Y-%m-%dT%H:%M:%S.%NZ"), "%b %d, %Y")
+      ]]>
+    </query>
+    <done>
+      <condition match=" 'job.resultCount' != 0">
+        <set token="TotalHits">$result.metrics.totalHits$</set>
+        <set token="FirstSeen">$result.FirstSeen$</set>
+        <set token="LastSeen">$result.LastSeen$</set>
+        <set token="Criticality">$result.risk.criticalityLabel$</set>
+        <set token="IntelCard">$result.intelCard$</set>
+        <set token="IntelCardLink">inline</set>
+        <set token="RiskRules">$result.risk.rules$</set>
+        <set token="RiskRulesMax">$result.risk.rulesMax$</set>
+        <set token="Risk">$result.risk.score$</set>
+      </condition>
+      <condition>
+        <set token="TotalHits">...</set>
+        <set token="FirstSeen">...</set>
+        <set token="LastSeen">...</set>
+        <set token="Criticality">...</set>
+        <set token="IntelCard">...</set>
+        <set token="IntelCardLink">none</set>
+        <set token="RiskRules">...</set>
+        <set token="RiskRulesMax">...</set>
+        <set token="Risk">...</set>
+      </condition>
+    </done>
+  </search>
+  <init>
+    <set token="TotalHits">...</set>
+    <set token="FirstSeen">...</set>
+    <set token="LastSeen">...</set>
+    <set token="Criticality">...</set>
+    <set token="IntelCard">...</set>
+    <set token="IntelCardLink">none</set>
+    <set token="RiskRules">...</set>
+    <set token="RiskRulesMax">...</set>
+    <set token="Risk">...</set>
+  </init>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="text" token="name" searchWhenChanged="true">
+      <label>Enter URL</label>
+      <default>https://sites.google.com/site/unblockingnotice/</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <div class="help-link" style="float: right; text-align: right;">
+          <img src="/static/app/TA_recordedfuture-cyber/img/logo.svg" alt="Recorded Future, Inc logotype" style="height: 30px;"/><br/>
+          <a href="/app/TA_recordedfuture-cyber/recorded_future_help_enrichment_dashboards">Help</a>
+        </div>
+        <div>
+          <h1>
+            <span class="highlight">$name$</span>
+            <span class="category"> - URL</span>
+          </h1>
+        </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel id="summary">
+      <title>Summary</title>
+      <html>
+        <span class="highlight">$TotalHits$</span> References to this entity<br/>
+        Criticality is <span class="highlight">$Criticality$</span><br/>
+        Risk Score <span class="highlight">$Risk$</span><br/>
+        <span class="highlight">$RiskRules$</span> of <span class="highlight">$RiskRulesMax$</span> Risk Rules Triggered<br/>
+        First Reference Collected on <span class="highlight">$FirstSeen$</span><br/>
+        Latest Reference Collected on <span class="highlight">$LastSeen$</span><br/>
+        <b><a href="https://app.recordedfuture.com/live/sc/entity/url:$name$"
+	      target="_blank"
+	      style="display: $IntelCardLink$;">Open Intelligence Card</a></b>
+      </html>
+    </panel>
+    <panel>
+      <chart>
+        <search base="core">
+          <query>
+            | fields risk.score
+          </query>
+        </search>
+        <option name="charting.chart">radialGauge</option>
+        <option name="charting.chart.rangeValues">[0,30,70,100]</option>
+        <option name="charting.chart.style">minimal</option>
+        <option name="charting.gaugeColors">["0x777777","0xffce00","0xcf0a2c"]</option>
+        <option name="refresh.time.visible">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_analystNotes$" id="insikt">
+      <title>Threat Research Insikt Group</title>
+      <table>
+        <search base="core">
+          <query>
+            | spath input=analystNotes path="data{}*" output=tmpAnalystNotes 
+            | fields tmpAnalystNotes 
+            | mvexpand tmpAnalystNotes 
+            | eval Published=strftime(strptime(spath(tmpAnalystNotes, "attributes.published"), "%Y-%m-%dT%H:%M:%S.%NZ"), "%b %d, %Y") 
+            | eval Title=spath(tmpAnalystNotes,"attributes.title") 
+            | eval Type=spath(tmpAnalystNotes,"attributes.topic.name") 
+            | eval Text=spath(tmpAnalystNotes,"attributes.text") 
+            | table Type, Title, Text, Published
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_analystNotes">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_analystNotes"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel id="riskrules">
+      <title>Triggered Risk Rules</title>
+      <table>
+        <search base="core">
+          <query>
+            | fields risk.evidenceDetails
+            | spath input=risk.evidenceDetails path="data{}*" output=EvidenceDetails
+            | fields EvidenceDetails 
+            | mvexpand EvidenceDetails 
+            | eval Rule=spath(EvidenceDetails,"rule") 
+            | eval EvidenceString=spath(EvidenceDetails,"evidenceString") 
+            | eval Criticality=spath(EvidenceDetails,"criticality") 
+            | sort -Criticality 
+            | rename EvidenceString as "Evidence for Rule" 
+            | table Criticality, Rule, "Evidence for Rule"
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <format type="color" field="Criticality">
+          <colorPalette type="map">{
+              "1":#CCCCCC,
+              "2":#FFCE00,
+              "3":#FF6B00,
+              "4":#CF0A2C,
+              "5":#CF0A2C,
+              "6":#CF0A2C
+            }
+          </colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row id="relatedEntities">
+    <panel depends="$panel_attacker$" id="relatedattacker">
+      <table>
+        <title>Related Attacker</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedAttacker)`
+            | sort -count, name
+            | rename name as Attacker
+            | rename count as References
+            | rename type as Type
+            | table Attacker, Type, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_attacker">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_attacker"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>Attacker, Type, References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_target$" id="relatedtarget">
+      <table>
+        <title>Related Target</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedTarget)`
+            | sort -count, name
+            | rename name as Target
+            | rename count as References
+            | rename type as Type
+            | table Target, Type, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_target">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_target"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>Target, Type, References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <option name="showPager">true</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_actor$" id="relatedactor">
+      <table>
+        <title>Related Actors</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedThreatActor)`
+            | sort -count, name
+            | rename type as Type
+            | rename name as Name
+            | rename count as References
+            | table Name, Type, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_actor">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_actor"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>Name, Type, References</fields>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_malware$" id="relatedmalware">
+      <table>
+        <title>Related Malware</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedMalware)`
+            | sort -count, name
+            | rename name as Malware
+            | rename count as References
+            | table Malware, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_malware">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_malware"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>Malware, References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>/app/TA_recordedfuture-cyber/recorded_future_malware_enrichment?form.name=$row.Malware$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_vuln$" id="relatedvulnerabilities">
+      <table>
+        <title>Related Vulnerbilities</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedCyberVulnerability)`
+            | sort -count, name
+            | rename name as Vulnerability
+            | rename count as References
+            | table Vulnerability, References
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_vuln">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_vuln"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown target="_blank">
+          <link>/app/TA_recordedfuture-cyber/recorded_future_vuln_enrichment?form.name=$row.Vulnerability$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_ip$" id="relatedip">
+      <table>
+        <title>Related IP Addresses</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedIpAddress)`
+            | sort -count, name
+            | rename name as "IP Address"
+            | rename count as References
+            | table "IP Address", References
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_ip">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_ip"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>/app/TA_recordedfuture-cyber/recorded_future_ip_enrichment?form.name=$row.IP Address$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_domain$" id="relateddomain">
+      <table>
+        <title>Related Domains</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedInternetDomainName)`
+            | sort -count, name
+            | rename name as Domain
+            | rename count as References
+            | table Domain, References
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_domain">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_domain"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown target="_blank">
+          <link>/app/TA_recordedfuture-cyber/recorded_future_domain_enrichment?form.name=$row.Domain$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_prod$" id="relatedproduct">
+      <table>
+        <title>Related Products</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedProduct)`
+            | sort -count, name
+            | rename name as Product
+            | rename count as References
+            | table Product, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_prod">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_prod"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>Product, References</fields>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_count$" id="relatedcountry">
+      <table>
+        <title>Related Countries</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedCountries)`
+            | sort -count, name
+            | rename name as Country
+            | rename count as References
+            | table Country, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_count">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_count"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>Country, References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_hash$" id="relatedhash">
+      <table>
+        <title>Related Hashes</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(Hash)`
+            | sort -count, name
+            | rename name as Hash
+            | rename count as References
+            | table Hash, References
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_hash">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_hash"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>/app/TA_recordedfuture-cyber/recorded_future_hash_enrichment?form.name=$row.Hash$</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_tech$" id="relatedtech">
+      <table>
+        <title>Related Technologies</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedTechnology)`
+            | sort -count, name
+            | rename name as Technology
+            | rename count as References
+            | table Technology, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_tech">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_tech"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>Technology, References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_email$" id="relatedemail">
+      <table>
+        <title>Related E-Mail Addresses</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedEmailAddress)`
+            | sort -count, name
+            | rename name as Address
+            | rename count as References
+            | table Address, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_email">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_email"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>Address, References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_attackv$" id="relatedattackv">
+      <table>
+        <title>Related Attack Vectors</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedAttackVector)`
+            | sort -count, name
+            | rename name as "Attack Vector"
+            | rename count as References
+            | table "Attack Vector", References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_attackv">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_attackv"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>"Attack Vector", References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_malcat$" id="relatedmalcat">
+      <table>
+        <title>Related Malware Categories</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedMalwareCategory)`
+            | sort -count, name
+            | rename name as "Malware Category"
+            | rename count as References
+            | table "Malware Category", References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_malcat">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_malcat"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>"Malware Category", References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_oper$" id="relatedoperation">
+      <table>
+        <title>Related Operations</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedOperations)`
+            | sort -count, name
+            | rename name as Operation
+            | rename count as References
+            | table Operation, References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_oper">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_oper"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <fields>Operation, References</fields>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.entity.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel depends="$panel_company$" id="relatedcompany">
+      <table>
+        <title>Related Company</title>
+        <search base="core">
+          <query>
+            | `unpack_relatedEntities(RelatedCompany)`
+            | sort -count, name
+            | rename name as "Company"
+            | rename count as References
+            | table "Company", References, id
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_company">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_company"></unset>
+            </condition>
+          </progress>
+        </search>
+        <fields>"Company", References</fields>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+        <drilldown target="_blank">
+          <link>
+            <![CDATA[https://app.recordedfuture.com/live/sc/entity/$row.id$]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_rcount$">
+      <title>Total Reference Count</title>
+      <chart>
+        <search base="core">
+          <query>
+            | localop
+            | fields Counts 
+            | eval Counts=spath(Counts,"Counts{}") 
+            | mvexpand Counts 
+            | rename Counts as _raw 
+            | spath 
+            | eval _time=strptime(date,"%Y-%m-%d") 
+            | sort _time 
+            | timechart sum(count)
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_rcount">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_rcount"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">References</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">References</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.seriesColors">["0x0071ce"]</option>
+        <option name="refresh.time.visible">0</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_rref$">
+      <title>Total Reference Count</title>
+      <table>
+        <title>Recent References</title>
+        <search base="core">
+          <query>
+            | localop
+            | fields Sightings 
+            | eval Sightings=spath(Sightings,"Sightings{}")| mvexpand Sightings 
+            | rename Sightings as _raw 
+            | spath 
+            | where type!="first"
+            | fieldformat published=strftime(strptime(published,"%F"), "%a %b %d, %Y") 
+            | rename source as Source 
+            | rename published as Published 
+            | rename title as Title 
+            | rename fragment as Fragment 
+            | rename type as Type 
+            | rename url as URL 
+            | table Type, Published, Source, Title, Fragment, URL
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_rref">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_rref"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.time.visible">0</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row id="references">
+    <panel depends="$panel_fref$">
+      <table>
+        <title>First Reference</title>
+        <search base="core">
+          <query>
+            | localop 
+            | fields Sightings 
+            | eval Sightings=spath(Sightings,"Sightings{}")
+            | mvexpand Sightings 
+            | rename Sightings as _raw 
+            | spath 
+            | where type="first" 
+            | fieldformat published=strftime(strptime(published,"%F"), "%a %b %d, %Y") 
+            | rename source as Source 
+            | rename published as Published 
+            | rename title as Title 
+            | rename fragment as Fragment 
+            | rename type as Type 
+            | rename url as URL 
+            | table Type, Published, Source, Title, Fragment, URL
+          </query>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_fref">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_fref"></unset>
+            </condition>
+          </progress>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">none</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="refresh.time.visible">false</option>
+      </table>
+    </panel>
+  </row>
+</form>

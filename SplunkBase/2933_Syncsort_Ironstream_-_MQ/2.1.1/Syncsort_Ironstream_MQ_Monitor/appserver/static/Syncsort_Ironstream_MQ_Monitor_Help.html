@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Roboto, Droid, Helvetica Neue, Helvetica, Arial, sans-serif;
+        }
+
+        .ironstream-help-main-table {
+            margin: 20px;
+            border-spacing: 0;
+        }
+
+        .ironstream-help-main-table th {
+            padding: 10px 5px;
+            text-align: left;
+            background-color: #1e83bb;
+            color: #fff;
+        }
+
+        .ironstream-help-main-table td {
+            padding: 10px 5px;
+        }
+
+        .ironstream-help-main-table tr:nth-child(even) {
+            background: #d8d8d8;
+        }
+
+        .ironstream-help-main-table tr:nth-child(odd) {
+            background: #FFF
+        }
+    </style>
+    <title></title>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <h2>Syncsort Ironstream MQ Monitor</h2>
+    <h3>Mainframe Data Source: SMF 116 Records</h3>
+    
+    <p>The Syncsort Ironstream MQ Monitor application allows 
+	for the monitoring of WebSphere MQ queue information
+	to assist with supporting critical business services. It provides 
+	insight into key performance metrics to determine if business 
+	services are being met or impacted. Multiple inputs allow users 
+	to identify issues at a high level, and drill down for more granular 
+	visibility into connection, base queue, and queue information. </p>
+	
+	<p>WebSphere MQ accounting data is written as SMF 116 records.
+	This application uses the SMF 116 Subtype 1 record, which provides
+	accounting data for each task at thread and queue level.</p>
+ 
+    <p>The following SMF 116 Subtype 1 record fields are used within this dashboard:</p>
+   
+
+    <table class="ironstream-help-main-table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Explanation</th>
+                </th>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td>BASEAME</td>
+                <td>Object base name
+                </td>
+            </tr>
+            <tr>
+                <td>CLOSETIME</td>
+                <td>Last MQ close time</td>
+            </tr>   
+			 <tr>
+                <td>GETCT</td>
+                <td>Total CPU time for MQ gets
+                </td>
+            </tr>
+			 <tr>
+                <td>GETET</td>
+                <td>Total elapsed time for MQ gets
+                </td>
+            </tr>
+			 <tr>
+                <td>GETN</td>
+                <td>Number of MQ get calls
+                </td>
+            </tr>
+			 <tr>
+                <td>MAXQDPTH</td>
+                <td>Maximum encountered queue depth</td>
+            </tr>
+			<tr>
+                <td>OBJNAME</td>
+                <td>Object name </td>
+            </tr>
+			 <tr>
+                <td>OPENTIME</td>
+                <td>First MQ open time</td>
+            </tr>
+			<tr>
+                <td>PUTCT</td>
+                <td>Total CPU time for MQ puts
+                </td>
+            </tr>
+			 <tr>
+                <td>PUTET</td>
+                <td>Total elapsed time for MQ puts
+                </td>
+            </tr>
+			 <tr>
+                <td>PUTN</td>
+                <td>Number of MQ put calls passed directly to waiting getter
+                </td>
+            </tr>
+			  <tr>
+                <td>WTIDCCN</td>
+                <td>Connection name</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

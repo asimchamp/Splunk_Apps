@@ -1,0 +1,140 @@
+.bundles {
+  font: 300 36px "Helvetica Neue";
+ /* margin: 80px 160px 80px 160px;*/
+  overflow: hidden;
+  position: relative;
+  display:block;
+  margin: auto;
+}
+
+.bundles a:link,.bundles a:visited {
+  color: #777;
+  text-decoration: none;
+}
+
+.bundles a:hover {
+  color: #666;
+}
+
+.bundles blockquote {
+  margin: 0;
+}
+
+.bundles blockquote:before {
+  content: "“";
+  position: absolute;
+  left: -.4em;
+}
+
+.bundles blockquote:after {
+  content: "”";
+  position: absolute;
+}
+
+.bundles > ul {
+  margin: 0;
+  padding: 0;
+}
+
+.bundles h1 {
+  font-size: 64px;
+}
+
+.bundles h1, .bundles h2, .bundles h3 {
+  font-weight: inherit;
+  margin: 0;
+}
+
+.bundles h2, .bundles h3 {
+  text-align: right;
+  font-size: inherit;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.bundles h2 {
+  font-size: 24px;
+  position: absolute;
+}
+
+.bundles h3 {
+  bottom: -20px;
+  font-size: 18px;
+}
+
+.bundles .invert {
+  background: #1f1f1f;
+  color: #dcdccc;
+}
+
+.bundles .invert h2, .bundles .invert h3 {
+  color: #7f9f7f;
+}
+
+.bundles .string, .bundles .regexp {
+  color: #f39;
+}
+
+.bundles .keyword {
+  color: #00c;
+}
+
+.bundles .comment {
+  color: #777;
+  font-style: oblique;
+}
+
+.bundles .number {
+  color: #369;
+}
+
+.bundles .class, .bundles .special {
+  color: #1181B8;
+}
+
+.bundles > svg {
+  position: absolute;
+  top: -80px;
+}
+
+.bundles path.arc {
+  cursor: move;
+  fill: #fff;
+}
+
+.bundles .node {
+  font-size: 10px;
+}
+
+.bundles .node:hover {
+  fill: #1f77b4;
+}
+
+.bundles .link {
+  fill: none;
+  stroke: #1f77b4;
+  stroke-opacity: .4;
+  pointer-events: none;
+}
+
+.bundles .link.source, .bundles .link.target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.bundles .node.target {
+  fill: #d62728 !important;
+}
+
+.bundles .link.source {
+  stroke: #d62728;
+}
+
+.bundles .node.source {
+  fill: #2ca02c;
+}
+
+.bundles .link.target {
+  stroke: #2ca02c;
+}

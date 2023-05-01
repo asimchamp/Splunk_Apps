@@ -1,0 +1,101 @@
+<html><body><div><h1>Correlation Dashboards</h1>
+
+<p>The Correlation Dashboards display correlations between events and Recorded
+Future Risk Lists. The Risk List used for the correlation depend on which type
+of Correlation Dashboard is chosen. By default only the events of the last 
+24 hours are used. </p>
+
+<p>The Correlation Dashboards need to be configured to ensure that the events used 
+contain the correct type of entity, for instance that the IP address Risk
+List is matched to events that contain IP addresses. </p>
+
+<p>The correlation dashboards contain four elements:</p>
+
+<ul>
+<li><span class="rf-field">Summary</span> shows the number of entities which were
+found to match one or more events.</li>
+<li>"Top Rule Hits" shows the rules which are triggered by these entities.</li>
+<li>"Top Counts" displays the the entities with the number of events they were
+matched to.</li>
+<li>"High Risk" contains matching entities with the risk information.</li>
+</ul>
+
+<h2>Dashboard Sections</h2>
+
+<h3>Summary</h3>
+
+<p><span class="rf-field">Summary</span> displays the number of the events for 
+which a match was found in the Risk List.</p>
+
+<h3>Top Rule Hits</h3>
+
+<p>Section "Top Rule Hits" contains a list of all Recorded Future Rules that have 
+been triggered by the matching entities and is sorted by the number of entities 
+that have triggered the rule.</p>
+
+<h3>Top Counts</h3>
+
+<p>Section "Top Counts" lists all the entities were matched to the events and the
+list is sorted by the number of events that the entity was matched
+to. Click on an entity to bring up its corresponding Enrichment Dashboard in a 
+new window.</p>
+
+<h3>High Risk</h3>
+
+<p>This is a table with the matched entities listed in descending Risk order. The 
+Risk column is ordered and color coded according to the risk score. </p>
+
+<table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Risk</td>
+  <td>The risk score assigned to the entity by Recorded Future</td>
+</tr>
+<tr>
+  <td>Entity</td>
+  <td>The matched entity</td>
+</tr>
+<tr>
+  <td>Count</td>
+  <td>The number of events matched to the entity</td>
+</tr>
+<tr>
+  <td>Rules</td>
+  <td>The number of Recorded Future rules triggered for the entity out of the total number of rules set up for this type of entity by Recorded Future.</td>
+</tr>
+<tr>
+  <td>Evidence</td>
+  <td>Each of the triggered rules is listed in descending criticality. The criticality is signalled by a color coded dot at the start of the line. The rule is written in bold followed by the details in regular text.</td>
+</tr>
+</tbody>
+</table>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/rf_help_correlation_dashboards_matched_entities.png" alt="Row with a matching entity"></p>
+
+<p>Further information can be obtained by two drill down options:</p>
+
+<ul>
+<li>Click on the entity, such as the IP address or the Domain, to open a new
+Search window looking for events involving the entity.</li>
+<li>Click on any other part of the line to open the Enrichment Dashboard for the
+entity.</li>
+</ul>
+
+<h2>Configuration</h2>
+
+<p>Information on how to configure the Correlation Dashboards can be found under 
+<span class="rf-field">Help &#8594; Adapt and tune &#8594; Adapt dashboards</span>.</p>
+
+<h1>Further Help</h1>
+
+<p>"Recorded Future App for Splunk" has been developed by Recorded Future. </p>
+
+<p>Further information and support can be found on our Support web site:
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360003588753">support.recordedfuture.com</a> </p>
+</div></body></html>

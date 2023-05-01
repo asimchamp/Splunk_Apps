@@ -1,0 +1,208 @@
+<form version="1.1">
+  <label>Cluster Performance</label>
+  <search id="baseSearch">
+    <query>| `get_xtremio_index` sourcetype=emc:xtremio:rest component=clusters  content.name="$cluster$"|`get_cluster_performance_parameters` </query>
+    <earliest>$earliest$</earliest>
+    <latest>$latest$</latest>
+  </search>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" searchWhenChanged="false">
+      <default>
+        <earliest>-4h@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="cluster" searchWhenChanged="false">
+      <label>Cluster</label>
+      <search>
+        <query>| inputlookup XtremIOClusterNameLookup |  table "Cluster Name"</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForLabel>Cluster Name</fieldForLabel>
+      <fieldForValue>Cluster Name</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Read Bandwidth history(MB/s)</title>
+      <chart>
+        <search base="baseSearch">
+          <query>| timechart span=10m  limit=0 useother=f  avg(rd-bw-1kb) AS 1kb avg(rd-bw-128kb) AS 128kb avg(rd-bw-16kb) AS 16kb avg(rd-bw) AS "Read" avg(rd-bw-1mb) AS 1mb avg(rd-bw-256kb) AS 256kb avg(rd-bw-2kb) AS 2kb avg(rd-bw-32kb) AS 32kb avg(rd-bw-4kb) AS 4kb avg(rd-bw-512b) AS 512b avg(rd-bw-512kb) AS 512kb avg(rd-bw-64kb) AS 64kb avg(rd-bw-8kb) AS 8kb  avg(rd-bw-gt1mb) AS ">1mb"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.axisTitleY.text">Bandwidth</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Write Bandwidth history(MB/s)</title>
+      <chart>
+        <search base="baseSearch">
+          <query>| timechart span=10m   limit=0 useother=f avg(wr-bw-1kb) AS 1kb avg(wr-bw-128kb) AS 128kb avg(wr-bw-16kb) AS 16kb avg(wr-bw) AS "Write" avg(wr-bw-1mb) AS 1mb avg(wr-bw-256kb) AS 256kb avg(wr-bw-2kb) AS 2kb avg(wr-bw-32kb) AS 32kb avg(wr-bw-4kb) AS 4kb avg(wr-bw-512b) AS 512b avg(wr-bw-512kb) AS 512kb avg(wr-bw-64kb) AS 64kb avg(wr-bw-8kb) AS 8kb avg(wr-bw-gt1mb) AS ">1mb"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.axisTitleY.text">Bandwidth</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Read IOPS history</title>
+      <chart>
+        <search base="baseSearch">
+          <query>| timechart span=5m  limit=0 useother=f avg(rd-iops-1kb) AS 1kb avg(rd-iops-128kb) AS 128kb avg(rd-iops-16kb) AS 16kb avg(rd-iops) AS "Read" avg(rd-iops-1mb) AS 1mb avg(rd-iops-256kb) AS 256kb avg(rd-iops-2kb) AS 2kb avg(rd-iops-32kb) AS 32kb avg(rd-iops-4kb) AS 4kb avg(rd-iops-512b) AS 512b avg(rd-iops-512kb) AS 512kb avg(rd-iops-64kb) AS 64kb avg(rd-iops-8kb) AS 8kb avg(rd-iops-gt1mb) AS ">1mb"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.axisTitleY.text">IOPS</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Write IOPS history</title>
+      <chart>
+        <search base="baseSearch">
+          <query>| timechart span=10m  limit=0 useother=f avg(wr-iops-1kb) AS 1kb avg(wr-iops-128kb) AS 128kb avg(wr-iops-16kb) AS 16kb avg(wr-iops)  AS "Write" avg(wr-iops-1mb) AS 1mb avg(wr-iops-256kb) AS 256kb avg(wr-iops-2kb) AS 2kb avg(wr-iops-32kb) AS 32kb avg(wr-iops-4kb) AS 4kb avg(wr-iops-512b) AS 512b avg(wr-iops-512kb) AS 512kb avg(wr-iops-64kb) AS 64kb avg(wr-iops-8kb) AS 8kb  avg(wr-iops-gt1mb) AS ">1mb"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.axisTitleY.text">IOPS</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Read Latency history(µs)</title>
+      <chart>
+        <search base="baseSearch">
+          <query>| timechart span=10m  limit=0 useother=f avg(rd-latency-1kb) AS 1kb avg(rd-latency-128kb) AS 128kb avg(rd-latency-16kb) AS 16kb avg(rd-latency) AS "Read" avg(rd-latency-1mb) AS 1mb avg(rd-latency-256kb) AS 256kb avg(rd-latency-2kb) AS 2kb avg(rd-latency-32kb) AS 32kb avg(rd-latency-4kb) AS 4kb avg(rd-latency-512b) AS 512b avg(rd-latency-512kb) AS 512kb avg(rd-latency-64kb) AS 64kb avg(rd-latency-8kb) AS 8kb avg(rd-latency-gt1mb) AS ">1mb"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.axisTitleY.text">Latency</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Write Latency history(µs)</title>
+      <chart>
+        <search base="baseSearch">
+          <query>| timechart span=10m  limit=0 useother=f avg(wr-latency-1kb) AS 1kb avg(wr-latency-128kb) AS 128kb avg(wr-latency-16kb) AS 16kb avg(wr-latency) AS "Write" avg(wr-latency-1mb) AS 1mb avg(wr-latency-256kb) AS 256kb avg(wr-latency-2kb) AS 2kb avg(wr-latency-32kb) AS 32kb avg(wr-latency-4kb) AS 4kb avg(wr-latency-512b) AS 512b avg(wr-latency-512kb) AS 512kb avg(wr-latency-64kb) AS 64kb avg(wr-latency-8kb) AS 8kb avg(wr-latency-gt1mb) AS ">1m"</query>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.axisTitleY.text">Latency</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

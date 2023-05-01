@@ -1,0 +1,726 @@
+{% extends "splunkdj:base_with_app_bar.html" %}
+
+{% load splunkmvc %}
+
+{% block title %}Sourcetypes Settings - Add {% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}{{app_name}}/custom.css" />
+<style>
+    .main-area {
+        margin: 0px auto;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        padding: 10px;
+        width: 600px;
+    }
+
+    input[type='text'] {
+        width: 585px;
+        margin-bottom: 2px;
+    }
+
+    select {
+        width: 600px;
+    }
+
+    label {
+        margin-top: 10px;
+    }
+
+    h3 {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #85d6ff;
+    }
+
+    .buttonbar {
+        margin-top: 20px;
+    }
+
+    div.errors li {
+        color: #ff8080;
+    }
+
+    hr.separator {
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .radios {
+        clear: both;
+        width: 100%;
+        float: left;
+        margin-bottom: 5px;
+    }
+
+        .radios ul {
+            list-style: none;
+        }
+
+    #popup_dialog {
+        width: 100%;
+        height: 100%;
+        background-color: #000000;
+        opacity: 0.5;
+        position: absolute;
+        display: none;
+        top: 65px;
+        padding-bottom: 100px;
+    }
+
+    .popup_dialog {
+        position: fixed;
+        top: 200px;
+        left: 41%;
+        background-color: #eee;
+        border: 1px solid #bfbfbf;
+        border-radius: 3px;
+        box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.2);
+        white-space: normal;
+        z-index: 1060;
+        padding: 15px;
+        text-align: center;
+        display: none;
+    }
+
+    #btn_saveOK {
+        visibility: hidden;
+    }
+</style>
+
+
+{% endblock css %}
+
+{% block content %}
+
+<div>
+    <div class="main-area">
+        <form class="splunkdj-setup-form" method="post" action="" onsubmit="" id="add_sourcetype_form">
+            {% csrf_token %}
+            <h2>SourceTypes Settings - Add</h2>
+            <p>Enter the information below, then click <strong>Save</strong> to continue.</p>
+
+			<div>
+                <label>Type</label>
+                <select id="type">
+                    <option value="0">ISC Bind Logs</option>
+                    <option value="1">Microsoft DNS Logs</option>
+                    <option value="2">Custom DNS Logs</option>
+                    <option value="3">Proxy Logs</option>
+                </select>
+            </div>
+			
+			<hr class="separator">
+			
+            <div id="sourcetype_binddns_div">
+                <label>{{ form.sourcetype_bind.label }}</label>
+                {{ form.sourcetype_bind }}
+                {% if form.sourcetype_bind.errors %}
+                <div class="errors">
+                    {% for e in form.sourcetype_bind.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div id="sourcetype_msdns_div" style="display: none;">
+                <label>{{ form.sourcetype_msdns.label }}</label>
+                {{ form.sourcetype_msdns }}
+                {% if form.sourcetype_msdns.errors %}
+                <div class="errors">
+                    {% for e in form.sourcetype_msdns.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div id="sourcetype_customdns_div" style="display: none;">
+                <label>{{ form.sourcetype_custom.label}}</label>
+                {{ form.sourcetype_custom}}
+                {% if form.sourcetype_custom.errors %}
+                <div class="errors">
+                    {% for e in form.sourcetype_custom.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div id="sourcetype_proxy_div" style="display: none;">
+                <label>{{ form.sourcetype_proxy.label }}</label>
+                {{ form.sourcetype_proxy }}
+                {% if form.sourcetype_proxy.errors %}
+                <div class="errors">
+                    {% for e in form.sourcetype_proxy.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            
+			
+			
+			
+            <hr class="separator">
+            <div id="dns_index_div">
+                <label>{{ form.index.label }}</label>
+                {{ form.index }}
+                {% if form.index.errors %}
+                <div class="errors">
+                    {% for e in form.index.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div id="proxy_index_div" style="display: none;">
+                <label>{{ form.proxy_index.label }}</label>
+                {{ form.proxy_index }}
+                {% if form.proxy_index.errors %}
+                <div class="errors">
+                    {% for e in form.proxy_index.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+                <hr class="separator">
+
+            <div id="customdns_data_div" style="display: none;">
+                <p>
+                    It-Tude for Splunk can monitor any custom DNS log data format. If your current Splunk setup
+                    already extracts DNS type, fully qualified domain names (FQDN) and originating IP addresses from your DNS query
+                    log data, please fill the fields below.
+                </p>
+
+                <div style="margin-top: 10px">
+                    My DNS data is normalized to the Common Information Model.
+                    <a class="external" href="http://docs.splunk.com/Documentation/CIM/4.1.0/User/NetworkResolutionDNS" target="_blank">See details</a>
+                    <div style="float: left; margin-right: 5px; margin-top: -3px">
+                        {{ form.custom_field_cim_compliant }}
+                    </div>
+                </div>
+
+
+                <label>{{ form.custom_field_dnstype.label}}</label>
+                {{ form.custom_field_dnstype}}
+                {% if form.custom_field_dnstype.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_dnstype.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_fqdn.label}}</label>
+                {{ form.custom_field_fqdn}}
+                {% if form.custom_field_fqdn.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_fqdn.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_srcip.label}}</label>
+                {{ form.custom_field_srcip}}
+                {% if form.custom_field_srcip.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_srcip.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div id="proxy_data_div" style="display: none;">
+                <p>
+                    It-Tude for Splunk can monitor any custom Proxy log data format. Please fill the fields below.
+                </p>
+
+                <div class="radios">
+                    {{ form.custom_proxy_cim_compliant }}
+                </div>
+
+                <label>{{ form.custom_field_proxy_c_ip.label}}</label>
+                {{ form.custom_field_proxy_c_ip}}
+                {% if form.custom_field_proxy_c_ip.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_c_ip.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+                
+                <label>{{ form.custom_field_proxy_cs_user.label}}</label>
+                {{ form.custom_field_proxy_cs_user}}
+                {% if form.custom_field_proxy_cs_user.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_cs_user.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_proxy_cs_uri.label}}</label>
+                {{ form.custom_field_proxy_cs_uri}}
+                {% if form.custom_field_proxy_cs_uri.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_cs_uri.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_proxy_referer.label}}</label>
+                {{ form.custom_field_proxy_referer}}
+                {% if form.custom_field_proxy_referer.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_referer.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_proxy_user_agent.label}}</label>
+                {{ form.custom_field_proxy_user_agent}}
+                {% if form.custom_field_proxy_user_agent.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_user_agent.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_proxy_cs_bytes.label}}</label>
+                {{ form.custom_field_proxy_cs_bytes}}
+                {% if form.custom_field_proxy_cs_bytes.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_cs_bytes.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_proxy_sc_status.label}}</label>
+                {{ form.custom_field_proxy_sc_status}}
+                {% if form.custom_field_proxy_sc_status.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_sc_status.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+
+                <label>{{ form.custom_field_proxy_sc_bytes.label}}</label>
+                {{ form.custom_field_proxy_sc_bytes}}
+                {% if form.custom_field_proxy_sc_bytes.errors %}
+                <div class="errors">
+                    {% for e in form.custom_field_proxy_sc_bytes.errors %}<li>{{ e }}</li>{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="buttonbar">
+                <input id="btn_save" class="btn btn-primary" type="button" value="Save" />
+                {% if configured %}
+                <a class="btn" href="{% url 'it_tude:logs_settings' %}">Cancel</a>
+                {% endif %}
+                <input id="btn_saveOK" class="btn btn-primary" type="submit" value="Save" />
+            </div>
+
+        </form>
+        <div class="popup_dialog">
+            <label class="control-label">Splunk must be restarted for changes to take effect.</label>
+            <br />
+            <a href="#" id="popup_dialog_ok" class="btn btn-primary submit-button">OK</a>
+        </div>
+    </div>
+    <div id="popup_dialog"></div>
+</div>
+
+{% endblock content%}
+
+{% block js %}
+<script>
+  var old_dnstype_val = "";
+  var old_fqdn_val = "";
+  var old_srcip_val = "";
+
+  var old_proxy_cim_compliant_val = "";
+  var old_proxy_c_ip_val = "";
+  var old_proxy_cs_user_val = "";
+  var old_proxy_cs_uri_val = "";
+  var old_proxy_referer_val = "";
+  var old_proxy_user_agent_val = "";
+  var old_proxy_cs_bytes_val = "";
+  var old_proxy_sc_status_val = "";
+  var old_proxy_sc_bytes_val = "";
+
+  function custom_cim_checked(is_checked) {
+    var custom_dnstype = $("#id_custom_field_dnstype");
+    var custom_fqdn = $("#id_custom_field_fqdn");
+    var custom_srcip = $("#id_custom_field_srcip");
+
+    if (is_checked) {
+      old_dnstype_val = custom_dnstype.val();
+      custom_dnstype.attr("readonly", true);
+      custom_dnstype.val("query_type");
+
+      old_fqdn_val = custom_fqdn.val();
+      custom_fqdn.attr("readonly", true);
+      custom_fqdn.val("dest_host");
+
+      old_srcip_val = custom_srcip.val();
+      custom_srcip.attr("readonly", true);
+      custom_srcip.val("src_ip");
+    } else {
+      custom_dnstype.removeAttr("readonly");
+      custom_dnstype.val(old_dnstype_val);
+
+      custom_fqdn.removeAttr("readonly");
+      custom_fqdn.val(old_fqdn_val);
+
+      custom_srcip.removeAttr("readonly");
+      custom_srcip.val(old_srcip_val);
+    }
+  }
+
+  function custom_proxy_cim_checked(old_value, new_value) {
+      var custom_field_proxy_c_ip = $("#id_custom_field_proxy_c_ip");
+      var custom_field_proxy_cs_user = $("#id_custom_field_proxy_cs_user");
+      var custom_field_proxy_cs_uri = $("#id_custom_field_proxy_cs_uri");
+      var custom_field_proxy_referer = $("#id_custom_field_proxy_referer");
+      var custom_field_proxy_user_agent = $("#id_custom_field_proxy_user_agent");
+      var custom_field_proxy_cs_bytes = $("#id_custom_field_proxy_cs_bytes");
+      var custom_field_proxy_sc_status = $("#id_custom_field_proxy_sc_status");
+      var custom_field_proxy_sc_bytes = $("#id_custom_field_proxy_sc_bytes");
+
+      if (old_value == "2") {
+          old_proxy_c_ip_val = custom_field_proxy_c_ip.val();
+          old_proxy_cs_user_val = custom_field_proxy_cs_user.val();
+          old_proxy_cs_uri_val = custom_field_proxy_cs_uri.val();
+          old_proxy_referer_val = custom_field_proxy_referer.val();
+          old_proxy_user_agent_val = custom_field_proxy_user_agent.val();
+          old_proxy_cs_bytes_val = custom_field_proxy_cs_bytes.val();
+          old_proxy_sc_status_val = custom_field_proxy_sc_status.val();
+          old_proxy_sc_bytes_val = custom_field_proxy_sc_bytes.val();
+      }
+      switch (new_value) {
+          case "0":
+              custom_field_proxy_c_ip.attr("readonly", true);
+              custom_field_proxy_c_ip.val("src");
+
+              custom_field_proxy_cs_user.attr("readonly", true);
+              custom_field_proxy_cs_user.val("user");
+
+              custom_field_proxy_cs_uri.attr("readonly", true);
+              custom_field_proxy_cs_uri.val("query");
+
+              custom_field_proxy_referer.attr("readonly", true);
+              custom_field_proxy_referer.val("http_referer");
+
+              custom_field_proxy_user_agent.attr("readonly", true);
+              custom_field_proxy_user_agent.val("http_user_agent");
+
+              custom_field_proxy_cs_bytes.attr("readonly", true);
+              custom_field_proxy_cs_bytes.val("bytes_in");
+
+              custom_field_proxy_sc_status.attr("readonly", true);
+              custom_field_proxy_sc_status.val("status");
+
+              custom_field_proxy_sc_bytes.attr("readonly", true);
+              custom_field_proxy_sc_bytes.val("bytes_out");
+
+              break;
+          case "1":
+              custom_field_proxy_c_ip.attr("readonly", true);
+              custom_field_proxy_c_ip.val("c_ip");
+
+              custom_field_proxy_cs_user.attr("readonly", true);
+              custom_field_proxy_cs_user.val("cs_username");
+
+              custom_field_proxy_cs_uri.attr("readonly", true);
+              custom_field_proxy_cs_uri.val("cs_uri");
+
+              custom_field_proxy_referer.attr("readonly", true);
+              custom_field_proxy_referer.val("cs_Referer");
+
+              custom_field_proxy_user_agent.attr("readonly", true);
+              custom_field_proxy_user_agent.val("cs_User_Agent");
+
+              custom_field_proxy_cs_bytes.attr("readonly", true);
+              custom_field_proxy_cs_bytes.val("cs_bytes");
+
+              custom_field_proxy_sc_status.attr("readonly", true);
+              custom_field_proxy_sc_status.val("sc_status");
+
+              custom_field_proxy_sc_bytes.attr("readonly", true);
+              custom_field_proxy_sc_bytes.val("sc_bytes");
+
+              break;
+          case "2":
+              custom_field_proxy_c_ip.removeAttr("readonly");
+              custom_field_proxy_c_ip.val(old_proxy_c_ip_val);
+
+              custom_field_proxy_cs_user.removeAttr("readonly");
+              custom_field_proxy_cs_user.val(old_proxy_cs_user_val);
+
+              custom_field_proxy_cs_uri.removeAttr("readonly");
+              custom_field_proxy_cs_uri.val(old_proxy_cs_uri_val);
+
+              custom_field_proxy_referer.removeAttr("readonly");
+              custom_field_proxy_referer.val(old_proxy_referer_val);
+
+              custom_field_proxy_user_agent.removeAttr("readonly");
+              custom_field_proxy_user_agent.val(old_proxy_user_agent_val);
+
+              custom_field_proxy_cs_bytes.removeAttr("readonly");
+              custom_field_proxy_cs_bytes.val(old_proxy_cs_bytes_val);
+
+              custom_field_proxy_sc_status.removeAttr("readonly");
+              custom_field_proxy_sc_status.val(old_proxy_sc_status_val);
+
+              custom_field_proxy_sc_bytes.removeAttr("readonly");
+              custom_field_proxy_sc_bytes.val(old_proxy_sc_bytes_val);
+
+              break;
+      }
+
+  }
+
+
+  var deps = [
+      "splunkjs/ready!",
+  ];
+
+  require(deps, function (mvc) {
+    var cim_compliant = $("#id_custom_field_cim_compliant");
+    cim_compliant.click(function() {
+      custom_cim_checked(cim_compliant.is(":checked"));
+    });
+    if (cim_compliant.is(":checked")) {
+      custom_cim_checked(true);
+    }
+
+    var proxy_cim_compliant = $(".RadioSelect");
+    old_proxy_cim_compliant_val = $(".RadioSelect:checked").val();
+
+    old_proxy_c_ip_val = $("#id_custom_field_proxy_c_ip").val();
+    old_proxy_cs_user_val = $("#id_custom_field_proxy_cs_user").val();
+    old_proxy_cs_uri_val = $("#id_custom_field_proxy_cs_uri").val();
+    old_proxy_referer_val = $("#id_custom_field_proxy_referer").val();
+    old_proxy_user_agent_val = $("#id_custom_field_proxy_user_agent").val();
+    old_proxy_cs_bytes_val = $("#id_custom_field_proxy_cs_bytes").val();
+    old_proxy_sc_status_val = $("#id_custom_field_proxy_sc_status").val();
+    old_proxy_sc_bytes_val = $("#id_custom_field_proxy_sc_bytes").val();
+
+
+    proxy_cim_compliant.change(function () {
+        custom_proxy_cim_checked(old_proxy_cim_compliant_val, $(this).val())
+        old_proxy_cim_compliant_val = $(this).val();
+    });
+    if (old_proxy_c_ip_val.trim() == "" && old_proxy_cs_user_val.trim() == "" && old_proxy_cs_uri_val.trim() == ""
+        && old_proxy_referer_val.trim() == "" && old_proxy_user_agent_val.trim() == "" && old_proxy_cs_bytes_val.trim() == ""
+        && old_proxy_sc_status_val.trim() == "" && old_proxy_sc_bytes_val.trim() == "") {
+        $("#id_custom_proxy_cim_compliant_2").attr("checked", "checked");
+    }
+    else {
+        if (old_proxy_cim_compliant_val != "2") {
+            custom_proxy_cim_checked(old_proxy_cim_compliant_val, old_proxy_cim_compliant_val)
+        }
+    }
+    $("#popup_dialog_ok").click(function () {
+        show_popup(false);
+    });
+
+    $("#id_sourcetype_bind").change(function () { typeSourcetype(this) });
+    $("#id_sourcetype_msdns").change(function () { typeSourcetype(this) });
+    $("#id_sourcetype_custom").change(function () { typeSourcetype(this) });
+    $("#id_sourcetype_proxy").change(function () { typeSourcetype(this) });
+    $("#id_index").change(function () { indexChange(this) });
+    $("#id_proxy_index").change(function () { indexChange(this) });
+
+    $("#btn_save").click(function () {
+        if (isFormValid()) {
+            clearForm($('#type option:selected').val());
+            show_popup(true);
+        }
+        else {
+            alert("Please, enter all necesary data.\nCheck that sourcetype not contains * charcater.")
+        }
+    });
+
+    function isFormValid() {
+        switch ($('#type option:selected').val()) {
+            case "0":
+                return ($("#id_sourcetype_bind").val() != "" && $("#id_sourcetype_bind").val().indexOf('*') == -1);
+                break;
+            case "1":
+                return ($("#id_sourcetype_msdns").val() != "" && $("#id_sourcetype_msdns").val().indexOf('*') == -1);
+                break;
+            case "2":
+                return ($("#id_sourcetype_custom").val() != ""  && $("#id_sourcetype_custom").val().indexOf('*') == -1
+						&& $("#id_custom_field_dnstype").val() != ""
+                        && $("#id_custom_field_fqdn").val() != "" && $("#id_custom_field_srcip").val() != "");
+                break;
+            case "3":
+                return ($("#id_sourcetype_proxy").val() != "" && $("#id_sourcetype_proxy").val().indexOf('*') == -1
+						&& $("#id_custom_field_proxy_c_ip").val() != ""
+                        && $("#id_custom_field_proxy_cs_user").val() != "" && $("#id_custom_field_proxy_cs_uri").val() != ""
+                        && $("#id_custom_field_proxy_referer").val() != "" && $("#id_custom_field_proxy_user_agent").val() != ""
+                        && $("#id_custom_field_proxy_cs_bytes").val() != "" && $("#id_custom_field_proxy_sc_status").val() != ""
+                        && $("#id_custom_field_proxy_sc_bytes").val() != "" );
+                break;
+        }
+        return false;
+    }
+
+    function show_hide_proxy_section(show) {
+        if (show) {
+            $('#proxy_data_div').show();
+        }
+        else {
+            $('#proxy_data_div').hide();
+        }
+    }
+    function show_hide_custom_dns_section(show) {
+        if (show) {
+            $('#customdns_data_div').show();
+        }
+        else {
+            $('#customdns_data_div').hide();
+        }
+    }
+    function show_index_field(field) {
+        if (field == 'dns') {
+            $('#proxy_index_div').hide();
+            $('#dns_index_div').show();
+        }
+        else {
+            $('#dns_index_div').hide();
+            $('#proxy_index_div').show();
+        }
+    }
+    function show_selected_soucetype_name_field(option) {
+        $('#sourcetype_binddns_div').hide();
+        $('#sourcetype_msdns_div').hide();
+        $('#sourcetype_customdns_div').hide();
+        $('#sourcetype_proxy_div').hide();
+        switch (option) {
+            case "0": $('#sourcetype_binddns_div').show();
+                break;
+            case "1": $('#sourcetype_msdns_div').show();
+                break;
+            case "2": $('#sourcetype_customdns_div').show();
+                break;
+            case "3": $('#sourcetype_proxy_div').show();
+                break;
+        }
+    }
+    show_selected_soucetype_name_field("0");
+    show_hide_proxy_section(false);
+    show_index_field('dns');
+    show_hide_custom_dns_section(false);
+    $('#type').change(function () {
+        show_selected_soucetype_name_field($("option:selected", this).val());
+        switch ($("option:selected", this).val()) {
+            case "0": show_hide_proxy_section(false);
+                    show_index_field('dns');
+                    show_hide_custom_dns_section(false);
+                    break;
+            case "1": show_hide_proxy_section(false);
+                    show_index_field('dns');
+                    show_hide_custom_dns_section(false);
+                    break;
+            case "2": show_hide_proxy_section(false);
+                    show_index_field('dns');
+                    show_hide_custom_dns_section(true);
+                    break;
+            case "3": show_hide_custom_dns_section(false);
+                    show_index_field('proxy');
+                    show_hide_proxy_section(true);
+                    break;
+        }
+        //clearForm();
+    });
+    clearForm("-1");
+
+    function typeSourcetype(anInput) {
+        var _text = $(anInput).val();
+        $("#id_sourcetype_bind").val(_text);
+        $("#id_sourcetype_msdns").val(_text);
+        $("#id_sourcetype_custom").val(_text);
+        $("#id_sourcetype_proxy").val(_text);
+    }
+    function indexChange(anInput) {
+        var _index = ($(anInput).find('option:selected')).val();
+        $("#id_index").val(_index);
+        $("#id_proxy_index").val(_index);
+    }
+    function clearForm(anOptionSelected) {
+        switch (anOptionSelected) {
+            case ("-1"):
+                $("#id_sourcetype_bind").val("");
+                $("#id_sourcetype_msdns").val("");
+                $("#id_sourcetype_custom").val("");
+                $("#id_custom_field_cim_compliant").removeAttr("checked");
+                $("#id_custom_field_dnstype").val("");
+                $("#id_custom_field_fqdn").val("");
+                $("#id_custom_field_srcip").val("");
+                $("#id_sourcetype_proxy").val("");
+                $("#id_custom_proxy_cim_compliant_2").attr('checked', true);
+                $("#id_custom_field_proxy_c_ip").val("");
+                $("#id_custom_field_proxy_cs_user").val("");
+                $("#id_custom_field_proxy_cs_uri").val("");
+                $("#id_custom_field_proxy_referer").val("");
+                $("#id_custom_field_proxy_user_agent").val("");
+                $("#id_custom_field_proxy_cs_bytes").val("");
+                $("#id_custom_field_proxy_sc_status").val("");
+                $("#id_custom_field_proxy_sc_bytes").val("");
+                break;
+            case ("0"):
+                $("#id_sourcetype_msdns").val("");
+                $("#id_sourcetype_custom").val("");
+                $("#id_custom_field_cim_compliant").removeAttr("checked");
+                $("#id_custom_field_dnstype").val("");
+                $("#id_custom_field_fqdn").val("");
+                $("#id_custom_field_srcip").val("");
+                $("#id_sourcetype_proxy").val("");
+                $("#id_custom_proxy_cim_compliant_2").attr('checked', true);
+                $("#id_custom_field_proxy_c_ip").val("");
+                $("#id_custom_field_proxy_cs_user").val("");
+                $("#id_custom_field_proxy_cs_uri").val("");
+                $("#id_custom_field_proxy_referer").val("");
+                $("#id_custom_field_proxy_user_agent").val("");
+                $("#id_custom_field_proxy_cs_bytes").val("");
+                $("#id_custom_field_proxy_sc_status").val("");
+                $("#id_custom_field_proxy_sc_bytes").val("");
+                break;
+            case ("1"):
+                $("#id_sourcetype_bind").val("");
+                $("#id_sourcetype_custom").val("");
+                $("#id_custom_field_cim_compliant").removeAttr("checked");
+                $("#id_custom_field_dnstype").val("");
+                $("#id_custom_field_fqdn").val("");
+                $("#id_custom_field_srcip").val("");
+                $("#id_sourcetype_proxy").val("");
+                $("#id_custom_proxy_cim_compliant_2").attr('checked', true);
+                $("#id_custom_field_proxy_c_ip").val("");
+                $("#id_custom_field_proxy_cs_user").val("");
+                $("#id_custom_field_proxy_cs_uri").val("");
+                $("#id_custom_field_proxy_referer").val("");
+                $("#id_custom_field_proxy_user_agent").val("");
+                $("#id_custom_field_proxy_cs_bytes").val("");
+                $("#id_custom_field_proxy_sc_status").val("");
+                $("#id_custom_field_proxy_sc_bytes").val("");
+                break;
+            case ("2"):
+                $("#id_sourcetype_bind").val("");
+                $("#id_sourcetype_msdns").val("");
+                $("#id_sourcetype_proxy").val("");
+                $("#id_custom_proxy_cim_compliant_2").attr('checked', true);
+                $("#id_custom_field_proxy_c_ip").val("");
+                $("#id_custom_field_proxy_cs_user").val("");
+                $("#id_custom_field_proxy_cs_uri").val("");
+                $("#id_custom_field_proxy_referer").val("");
+                $("#id_custom_field_proxy_user_agent").val("");
+                $("#id_custom_field_proxy_cs_bytes").val("");
+                $("#id_custom_field_proxy_sc_status").val("");
+                $("#id_custom_field_proxy_sc_bytes").val("");
+                break;
+            case ("3"):
+                $("#id_sourcetype_bind").val("");
+                $("#id_sourcetype_msdns").val("");
+                $("#id_sourcetype_custom").val("");
+                $("#id_custom_field_cim_compliant").removeAttr("checked");
+                $("#id_custom_field_dnstype").val("");
+                $("#id_custom_field_fqdn").val("");
+                $("#id_custom_field_srcip").val("");
+                break;
+        }
+    }
+
+  });
+
+  function show_popup(show) {
+      if (show) {
+          $("#popup_dialog").show();
+          $(".popup_dialog").show();
+          $("#popup_dialog").css('height', $(".main-area").css("height"));
+      } else {
+          $("#popup_dialog").hide();
+          $(".popup_dialog").hide();
+          $("#btn_saveOK").trigger('click');
+      }
+  }
+</script>
+{% endblock js %}

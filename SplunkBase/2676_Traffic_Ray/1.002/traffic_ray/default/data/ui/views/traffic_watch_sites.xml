@@ -1,0 +1,365 @@
+<form stylesheet="tr.css" script="tr.js">
+  <label>Traffic Watch: Hosted Websites</label>
+  <fieldset submitButton="true">
+    <input type="time" token="token_time" searchWhenChanged="true">
+      <label>Select date range:</label>
+      <default>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="token_raw_keyword_query" searchWhenChanged="true">
+      <label>Raw query (ex: ip=1.2.3.4 OR page=/login):</label>
+      <default></default>
+    </input>
+    <input type="checkbox" token="token_use_other" searchWhenChanged="true">
+      <label>TimeChart option:</label>
+      <choice value="useother=0">Show only top hitters</choice>
+      <default></default>
+    </input>
+    <input type="checkbox" token="token_exclude_special_content_query" searchWhenChanged="true">
+      <label>Filter Special Content:</label>
+      <choice value="`exclude_static_content(page)`">Exclude static (img,css,js,...)</choice>
+      <choice value="`exclude_bots(ua)`">Exclude robots and crawlers</choice>
+      <default></default>
+    </input>
+    <input type="multiselect" token="field_status_codes_query" searchWhenChanged="false">
+      <label>HTTP Status codes:</label>
+      <choice value="*">Include All</choice>
+      <search base="base_query">
+        <query>dedup status | table status</query>
+      </search>
+      <fieldForLabel>status</fieldForLabel>
+      <fieldForValue>status</fieldForValue>
+      <default>*</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>status="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+    </input>
+    <input type="multiselect" token="field_include_sites_query" searchWhenChanged="false">
+      <label>Include sites:</label>
+      <choice value="*">Include All</choice>
+      <search base="base_query">
+        <query>dedup site | table site</query>
+      </search>
+      <fieldForLabel>site</fieldForLabel>
+      <fieldForValue>site</fieldForValue>
+      <default>*</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>site="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+    </input>
+    <input type="multiselect" token="field_exclude_sites_query" searchWhenChanged="false">
+      <label>Exclude sites:</label>
+      <choice value="1NVAL1D51T3ZZ">Exclude None</choice>
+      <search base="base_query">
+        <query>dedup site | table site</query>
+      </search>
+      <fieldForLabel>site</fieldForLabel>
+      <fieldForValue>site</fieldForValue>
+      <default>1NVAL1D51T3ZZ</default>
+      <prefix>(</prefix>
+      <suffix>)</suffix>
+      <valuePrefix>site!="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> AND </delimiter>
+    </input>
+  </fieldset>
+  <search id="base_query">
+    <query>
+      <![CDATA[
+index=apache_* sourcetype=access_combined*
+$token_raw_keyword_query$ $field_include_sites_query$ $field_exclude_sites_query$ $field_status_codes_query$
+$token_exclude_special_content_query$
+| dedup _time, ip, page, method, ua
+| `iplocationex(ip)`
+| fields + *
+]]>
+    </query>
+    <earliest>$token_time.earliest$</earliest>
+    <latest>$token_time.latest$</latest>
+  </search>
+  <row>
+    <panel>
+      <html>
+        <p style="">
+          <a style="color:#FF7070;background-color:#000;border-radius:6px;border:1px solid #808080;margin: 2px 0;padding:1px 8px;float:left;font-weight:normal;font-size:100%;margin-right:10px;" href="/app/traffic_ray/traffic_watch_sites">Reset Dashboard</a>
+          <a style="color:#FF7070;background-color:#000;border-radius:6px;border:1px solid #808080;margin: 2px 0;padding:1px 8px;float:left;font-weight:normal;font-size:100%;" href="/app/traffic_ray/traffic_watch_sites?form.token_time.earliest=rt-15m&amp;form.token_time.latest=rtnow&amp;form.token_show_results_num_query=">Reset To <span style="color:#FFFF70;">Real-time</span></a>
+        </p>
+        <p style="margin:0;height:2px;clear:both;"></p>
+        <p style="border-top:1px solid #444;margin:0;height:2px;clear:both;"></p>
+        <p style="">
+          <a style="color:#3D92DB;background-color:#000;border-radius:6px;border:1px solid #808080;margin: 2px 0;padding:1px 8px;float:left;font-weight:normal;font-size:100%;" href="/app/traffic_ray/traffic_watch_ip_addresses">Go to: <b>IPs</b></a>
+        </p>
+      </html>
+      <single>
+        <title></title>
+        <search base="base_query">
+          <query>
+            <![CDATA[
+            stats count
+            | eval count=tostring(count, "commas")
+            ]]>
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Hits (Events)</option>
+      </single>
+      <single>
+        <title></title>
+        <search base="base_query">
+          <query>
+            <![CDATA[
+            stats sum(outbytes) as bandwidth
+            | eval bandwidth=tostring(round(((bandwidth/1024)/1024),2))
+			]]>
+          </query>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Total Bandwidth (MB)</option>
+      </single>
+    </panel>
+    <panel>
+      <chart>
+        <title>Traffic Trends: Top 20 hitters by Website</title>
+        <search base="base_query">
+          <query>
+            <![CDATA[
+timechart sum(outbytes) as timeslice_bandwidth_per_site, count by site limit=20 $token_use_other$
+| eval total_timeslice_bandwidth=0
+| foreach timeslice_bandwidth* [eval total_timeslice_bandwidth=total_timeslice_bandwidth + if (len('<<FIELD>>')>0, '<<FIELD>>', 0)]
+| fields + count*, total*
+| rename total_timeslice_bandwidth AS "Bandwidth", "count: *" AS *
+| table _time, "Bandwidth", *
+            ]]>
+          </query>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">true</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.legend.masterLegend">null</option>
+        <option name="height">250px</option>
+        <option name="charting.chart.overlayFields">Bandwidth</option>
+        <option name="charting.fieldColors">{"Bandwidth":0x3D92DB}</option>
+        <option name="charting.axisTitleY2.text">Bandwidth (bytes)</option>
+        <option name="charting.axisTitleY.text">Hits</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Traffic Activity Summary per Hosted Website</title>
+      <input type="multiselect" token="field_show_sites_query" searchWhenChanged="true">
+        <label>Show Sites:</label>
+        <choice value="*">Show All</choice>
+        <search base="base_query">
+          <query>dedup site | table site</query>
+        </search>
+        <fieldForLabel>site</fieldForLabel>
+        <fieldForValue>site</fieldForValue>
+        <default>*</default>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <valuePrefix>site="</valuePrefix>
+        <valueSuffix>"</valueSuffix>
+        <delimiter> OR </delimiter>
+      </input>
+      <input type="multiselect" token="field_hide_sites_query" searchWhenChanged="true">
+        <label>Hide Sites:</label>
+        <choice value="INVALIDSITEZ1">Hide None</choice>
+        <search base="base_query">
+          <query>dedup site | table site</query>
+        </search>
+        <fieldForLabel>site</fieldForLabel>
+        <fieldForValue>site</fieldForValue>
+        <default>INVALIDSITEZ1</default>
+        <prefix>(</prefix>
+        <suffix>)</suffix>
+        <valuePrefix>site!=</valuePrefix>
+        <valueSuffix></valueSuffix>
+        <delimiter> AND </delimiter>
+      </input>
+      <input type="dropdown" token="token_site_trend_resolution">
+        <label>Zoom Into Trend</label>
+        <choice value="">Auto Zoom</choice>
+        <choice value=",10s">10 Seconds</choice>
+        <choice value=",15s">15 Seconds</choice>
+        <choice value=",20s">20 Seconds</choice>
+        <choice value=",30s">30 Seconds</choice>
+        <choice value=",1m">1 Minute</choice>
+        <choice value=",2m">2 Minutes</choice>
+        <choice value=",3m">3 Minutes</choice>
+        <choice value=",5m">5 Minutes</choice>
+        <choice value=",10m">10 Minutes</choice>
+        <choice value=",15m">15 Minutes</choice>
+        <choice value=",20m">20 Minutes</choice>
+        <choice value=",30m">30 Minutes</choice>
+        <choice value=",1h">1 Hour</choice>
+        <choice value=",2h">2 Hour</choice>
+        <choice value=",4h">4 Hour</choice>
+        <default></default>
+      </input>
+      <table id="table_summary_data">
+        <search base="base_query">
+          <query>
+            <![CDATA[
+search $field_show_sites_query$ $field_hide_sites_query$
+| eval site_page_method=page+" ["+method+"]"
+| eventstats c as count_total by site
+| eventstats c as count_page  by site, site_page_method
+| eval count_page_pct=round((count_page*100)/count_total, 1)
+| eval count_page_pct=if(count_page_pct=0, 0.1, count_page_pct)
+| eval sorter=100-count_page_pct | eval sorter="["+if(sorter<10, "0"+sorter, sorter) + "]"
+| eval page_show=sorter+count_page+" hits = "+count_page_pct+"%: "+site_page_method
+| stats c,
+    sum(outbytes) as bandwidth_total,
+    sparkline(c$token_site_trend_resolution$) as sparkline_site,
+    sparkline(sum(outbytes)$token_site_trend_resolution$) as sparkline_bw,
+    values(page_show) as Pages
+  by site
+| sort -c
+| eval Pages=mvindex(Pages, 0, 1)
+| rex mode=sed field=Pages "s/^\[[\d\.]+\]//g"
+| eval top_pages=mvjoin(Pages, ", ")
+| table site, c, sparkline_site, bandwidth_total, sparkline_bw, top_pages
+| rename
+    site AS Site,
+    c AS Hits,
+    sparkline_site AS "Activity Trends and Patterns per Site"
+    sparkline_bw AS "Bandwidth Trends per Site"
+    bandwidth_total AS "Bandwidth",
+    top_pages AS "Top 2 pages/methods"
+            ]]>
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">20</option>
+        <format type="sparkline" field="Activity Trends and Patterns per Site">
+          <option name="type">bar</option>
+          <option name="height">16px</option>
+          <option name="barColor">#36DB04</option>
+          <option name="colorMap">
+            <option name="0">#555555</option>
+            <option name="1:2">#46D41D</option>
+            <option name="3:5">#F8F228</option>
+            <option name="6:9">#F9B235</option>
+            <option name="10:14">#F04327</option>
+            <option name="15:">#EE0000</option>
+          </option>
+          <option name="barWidth">5px</option>
+        </format>
+        <format type="sparkline" field="Bandwidth Trends per Site">
+          <option name="type">bar</option>
+          <option name="height">16px</option>
+          <option name="barColor">#36DB04</option>
+          <option name="colorMap">
+            <option name="0">#555555</option>
+            <option name="1:99999">#3D92DB</option>
+            <option name="100000:299999">#3D92DB</option>
+            <option name="300000:599999">#F8F228</option>
+            <option name="600000:999999">#F9B235</option>
+            <option name="1000000:1499999">#F04327</option>
+            <option name="1500000:">#EE0000</option>
+          </option>
+          <option name="barWidth">2px</option>
+        </format>
+        <option name="drilldown">row</option>
+        <drilldown>
+          <set token="drilldown_site">$row.Site$</set>
+          <unset token="drilldown_ip"></unset>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="checkbox" token="token_summarize_pages" searchWhenChanged="true">
+        <label>Web pages summary:</label>
+        <choice value=' | eval page="Any" '>Summarize Web pages</choice>
+        <default></default>
+      </input>
+      <html depends="$drilldown_site$">
+        <h2>Sources of Traffic by IP Address/Referer for Website: <span class="drilldown-value">$drilldown_site$</span>
+        </h2>
+      </html>
+      <table depends="$drilldown_site$" id="table_drilldown_site1">
+        <search base="base_query">
+          <query>
+            <![CDATA[
+search site=$drilldown_site$
+| dedup ip sortby + _time
+| where len(referer)>1
+| eval site_tld = replace(site, ".*?([^\.]+\.[^\.]+)$", "\1")
+| eval referer_tld = replace(referer, ".*?://[^/]*?([^\./]+\.[^\./]+)(/.*|$)", "\1")
+| where referer_tld!=site_tld
+| eventstats c as Count by referer, page
+| dedup referer, page
+| eval country_region=Country+if(len(Region)>0, "/"+Region, "")+if(len(City)>0, "/"+City, "")
+| table ip, country_region, Count, referer, page, ua
+| rename ip AS "IP of last visit", country_region AS "Country/Region", ua AS "Browser User Agent", referer AS "First referer"
+| sort - Count
+            ]]>
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">none</option>
+      </table>
+      <html depends="$drilldown_site$">
+        <h2>Activity summary by IP Address/Web page for Website: <span class="drilldown-value">$drilldown_site$</span>
+        </h2>
+      </html>
+      <table depends="$drilldown_site$" id="table_drilldown_site2">
+        <search base="base_query">
+          <query>
+            <![CDATA[
+search site=$drilldown_site$
+$token_summarize_pages$
+| eventstats sum(outbytes) as page_bandwidth_total by ip, page, method, status
+| top ip, page, method, status, page_bandwidth_total limit=0
+| eval page_bandwidth_perpage = round(page_bandwidth_total/count, 2)
+| eval percent = tostring(round(percent, 2)) + " %"
+| eval subpage=urldecode(replace(page, ".*?/([^/]+?)(/?)$", "\1\2")) | eval subpage=replace(subpage, "([^/]+).*", "\1")
+| eval method_show="[ "+method+" ]"
+| table count, percent, page_bandwidth_total, page_bandwidth_perpage, ip, page, method_show, status, subpage
+| rename page_bandwidth_total AS "Bandwidth(total)",
+  page_bandwidth_perpage AS "Avg. Bandwidth(per page)",
+  ip AS IP,
+  page AS "page (full URL)",
+  method_show AS "Method",
+  status AS "HTTP Status",
+  subpage AS "page (last fragment)"
+            ]]>
+          </query>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>

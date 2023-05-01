@@ -1,0 +1,65 @@
+<form>
+  <label>Search Head Utilization by App/View</label>
+  <fieldset submitButton="false">
+    <input searchWhenChanged="true" token="timepicked" type="time">
+      <label>Time</label>
+      <default>
+        <earliestTime>-60m@m</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+<input searchWhenChanged="true" token="host" type="dropdown">
+      <label>Splunk Server</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="host" fieldForValue="host">index=_internal source=*web_access.log* | stats count by host | sort host</populatingSearch>
+    </input>
+<input searchWhenChanged="true" token="app" type="dropdown">
+      <label>App</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <earliestTime>$timepicked.earliest$</earliestTime>
+      <latestTime>$timepicked.latest$</latestTime>
+      <populatingSearch fieldForLabel="app" fieldForValue="app">| rest /servicesNS/-/-/data/ui/views | table eai:acl.app title label eai:acl.owner updated | rename eai:acl.app as app | fields app | dedup app | table app | sort app</populatingSearch>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>App Popularity Determined by Number of Views</title>
+        <searchString>
+          <![CDATA[index=_internal source=*web_access.log* "GET /*/app/" host=$host$ | rex "GET /[^/]+/app/(?<app>[^/ ?]+)/(?<view>[^/ ?]+) " | search app=$app$  | stats count as "Number of Views" by app | rename app as App
+          ]]>
+          </searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>App Popularity Determined by Number of Unique Users</title>
+        <searchString>
+          <![CDATA[index=_internal source=*web_access.log* "GET /*/app/" host=$host$  | rex "GET /[^/]+/app/(?<app>[^/ ?]+)/(?<view>[^/ ?]+) " | search app=$app$  | stats dc(user) as "Unique Visitors" by app | rename app as App
+          ]]>
+          </searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Popular Views by App, Unique Visitors, Owner, Last Updated, and Last Visited</title>
+        <searchString>
+          <![CDATA[index=_internal source=*web_access.log* "GET /*/app/" host=$host$  | rex "GET /[^/]+/app/(?<app>[^/ ?]+)/(?<view>[^/ ?]+) " | search app=$app$ view=* | stats dc(user) as "Unique Visitors", first(_time) as LastVisited by app, view | eval LastVisited=strftime(LastVisited, "%Y-%m-%dT%H:%M:%S%z") | sort -"Unique Visitors" | join view [| rest /servicesNS/-/-/data/ui/views | table eai:acl.app title label eai:acl.owner updated | rename eai:acl.app as app, eai:acl.owner as owner, title as view | search app=$app$] | rename app as App, view as "View Name", label as "View Label", owner as Owner, updated as "Last Updated", LastVisited as "Last Visited" | table "Unique Visitors", App, "View Name", "View Label", "Owner", "Last Updated", "Last Visited"
+          ]]>
+          </searchString>
+        <earliestTime>$timepicked.earliest$</earliestTime>
+        <latestTime>$timepicked.latest$</latestTime>
+      </table>
+    </panel>
+  </row>
+</form>

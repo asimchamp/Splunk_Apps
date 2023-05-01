@@ -1,0 +1,27 @@
+<nav search_view="search" stylesheet="custom.css">
+ <!-- defaults, we won't be needing these:
+ <view name="search" default='true' />
+  <view name="data_models" />
+  <view name="reports" />
+  <view name="alerts" />
+  <view name="dashboards" /> -->
+<!-- Start of License Utilization Drop-down Menu -->
+  
+  <view name="incapsula__map" default='true'/>
+  <view name="incapsula_main_view_traffic_logs" default='true'/>
+   
+ <collection label="Incapsula Overview">
+   <view name="Incapsula_Main_Dash"/>
+   <view name="incapsula_overview_dashboard__traffic"/>
+   <view name="Incapsula_Main_High"/>
+ </collection>
+  
+  <collection label="Investigation Dashboards">
+    <view name="INV_Incapsula_Free_Search"/>
+	<view name="INV_Incapsula_By_Name"/>
+	<view name="INV_Incapsula_By_IP"/>
+ </collection>
+
+  <view name="search" stylesheet="custom.css"/>
+  
+</nav>

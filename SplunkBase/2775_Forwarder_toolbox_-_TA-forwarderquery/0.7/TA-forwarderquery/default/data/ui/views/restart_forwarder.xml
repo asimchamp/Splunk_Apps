@@ -1,0 +1,26 @@
+<form>
+  <label>Restart Forwarder</label>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="host" searchWhenChanged="false">
+      <label>choose forwarder host to inspect:</label>
+      <search>
+        <query>splunk_server=* index="_internal" |  eval host=lower(host) | table host | dedup host | sort host</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>|forwarderquery server="$host$" api="/services/server/control/restart" stanza="default" method="POST"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>

@@ -1,0 +1,2534 @@
+{
+    "modelName": "Web_Analytics_Data_Model",
+    "displayName": "Optimahub WebAnalytics Data Model",
+    "description": "The Optimahub WebAnalytics Data Model contains core fields to drive insights into customer web behaviour",
+    "objectSummary": {
+        "Event-Based": 6,
+        "Transaction-Based": 0,
+        "Search-Based": 0
+    },
+    "objects": [
+        {
+            "objectName": "All_Web_Traffic",
+            "displayName": "All Web Activity",
+            "parentName": "BaseEvent",
+            "fields": [
+                {
+                    "fieldName": "session.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.cookie.optimahub3rd",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.cookie.optimahub3rd",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.meta.path",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.path",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.city",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.country",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.country",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.region",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.region",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.coordinates",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.coordinates",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.category",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.category",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.step",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.step",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.device",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.device",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.browser.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.browser.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.visible",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.screen.visible",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.full",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.screen.full",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.email.default.hashed",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.email.default.hashed",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.parameter.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.parameter.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.query",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.query",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.type",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.type",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "personsegmentsname",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "personsegmentsname",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "dmab7b74q2gldi",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "spath(_raw,\"person.segments{}.name\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "personsegmentsvalue",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "personsegmentsvalue",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "nw68hcempnidx6r",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "spath(_raw,\"person.segments{}.value\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "personsegments_mvzip",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "personsegments_mvzip",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "d2mqqm4pfd97wrk9",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "mvzip(personsegmentsname,personsegmentsvalue)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "newvsrepeat_mvfilter",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "newvsrepeat_mvfilter",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "rkshgbxnefjemi",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "mvfilter(match(personsegments_mvzip, \"^new vs repeat,\"))"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "newvsrepeat_split",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "newvsrepeat_split",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "r04q8n432a603sor",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "split(newvsrepeat_mvfilter, \",\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "newvsrepeat",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "newvsrepeat",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "dfebnofkxb4bzkt9",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "mvindex(newvsrepeat_split,-1)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "language_mvfilter",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "language_mvfilter",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "gz9r0pmc90e8kt9",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "mvfilter(match(personsegments_mvzip, \"^language,\"))"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "language_split",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "language_split",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "2tyjst7d0ekoi529",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "split(language_mvfilter, \",\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "language_upper",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "language_upper",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "1swwsdcuuhctmx6r",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "mvindex(language_split,-1)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "language",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "language",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "0v32676wn91wcdi",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "lower(language_upper)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "system",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "system",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "igr011glghbk2o6r",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "spath(_raw,\"session.technology.useragent.system.name\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "devicetype",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "devicetype",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "y73ufddgkyq77gb9",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "case(system like \"%Phone%\",\"Mobile\",system like \"%iOS%\",\"Mobile\",system like \"%Android%\",\"Mobile\",system like \"%BlackBerry%\", \"Mobile\", 1=1,\"Desktop\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "eventtype_rename",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": true,
+                            "editable": true,
+                            "displayName": "eventtype_rename",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "r4hkb9x4jmdkj4i",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "spath(_raw,\"event.type\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "eventtype",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "eventtype",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "calculationID": "gkj04qmsx3ymbo6r",
+                    "owner": "All_Web_Traffic",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Eval",
+                    "expression": "replace(eventtype_rename,\"(\\|)\",\"_\")"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "Email_Address",
+                            "owner": "All_Web_Traffic",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "Email_Address",
+                            "comment": "",
+                            "fieldSearch": "",
+                            "lookupOutputFieldName": "Email_Address"
+                        }
+                    ],
+                    "calculationType": "Lookup",
+                    "lookupName": "crmlookup",
+                    "comment": "",
+                    "lookupInputs": [
+                        {
+                            "inputField": "person.id.email.default.hashed",
+                            "lookupField": "person.id.email.default.hashed"
+                        }
+                    ],
+                    "owner": "All_Web_Traffic",
+                    "calculationID": "9binfarck75sif6r",
+                    "editable": true
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "source=webanalytics*",
+                    "owner": "All_Web_Traffic"
+                }
+            ],
+            "lineage": "All_Web_Traffic"
+        },
+        {
+            "objectName": "Audience_And_Behaviour",
+            "displayName": "Audience And Behaviour",
+            "parentName": "All_Web_Traffic",
+            "fields": [
+                {
+                    "fieldName": "session.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.id",
+                    "comment": "",
+                    "fieldSearch": "session.id=*"
+                },
+                {
+                    "fieldName": "event.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.host",
+                    "comment": "",
+                    "fieldSearch": "event.meta.host=*"
+                },
+                {
+                    "fieldName": "person.id.cookie.optimahub3rd",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.cookie.optimahub3rd",
+                    "comment": "",
+                    "fieldSearch": "person.id.cookie.optimahub3rd=*"
+                },
+                {
+                    "fieldName": "event.meta.path",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.path",
+                    "comment": "",
+                    "fieldSearch": "event.meta.path=*"
+                },
+                {
+                    "fieldName": "event.location.city",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.country",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.country",
+                    "comment": "",
+                    "fieldSearch": "event.location.country=*"
+                },
+                {
+                    "fieldName": "event.location.region",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.region",
+                    "comment": "",
+                    "fieldSearch": "event.location.region=*"
+                },
+                {
+                    "fieldName": "event.location.coordinates",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.coordinates",
+                    "comment": "",
+                    "fieldSearch": "event.location.coordinates=*"
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.category",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.category",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.step",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.step",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.device",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.device",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.browser.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.browser.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.visible",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.screen.visible",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.full",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.screen.full",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.email.default.hashed",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.email.default.hashed",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.parameter.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.parameter.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.query",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.query",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.type",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.type",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "event.type=\"page|view\" OR event.type=\"page|event\"",
+                    "owner": "All_Web_Traffic.Audience_And_Behaviour"
+                }
+            ],
+            "lineage": "All_Web_Traffic.Audience_And_Behaviour"
+        },
+        {
+            "objectName": "Conversion",
+            "displayName": "Conversion",
+            "parentName": "All_Web_Traffic",
+            "fields": [
+                {
+                    "fieldName": "session.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.id",
+                    "comment": "",
+                    "fieldSearch": "session.id=*"
+                },
+                {
+                    "fieldName": "event.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.host",
+                    "comment": "",
+                    "fieldSearch": "event.meta.host=*"
+                },
+                {
+                    "fieldName": "person.id.cookie.optimahub3rd",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.cookie.optimahub3rd",
+                    "comment": "",
+                    "fieldSearch": "person.id.cookie.optimahub3rd=*"
+                },
+                {
+                    "fieldName": "event.meta.path",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.path",
+                    "comment": "",
+                    "fieldSearch": "event.meta.path=*"
+                },
+                {
+                    "fieldName": "event.location.city",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.country",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.country",
+                    "comment": "",
+                    "fieldSearch": "event.location.country=*"
+                },
+                {
+                    "fieldName": "event.location.region",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.region",
+                    "comment": "",
+                    "fieldSearch": "event.location.region=*"
+                },
+                {
+                    "fieldName": "event.location.coordinates",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.coordinates",
+                    "comment": "",
+                    "fieldSearch": "event.location.coordinates=*"
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.category",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.category",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.step",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.step",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.device",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.device",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.browser.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.browser.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.visible",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.screen.visible",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.full",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.screen.full",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.email.default.hashed",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.email.default.hashed",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.parameter.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.parameter.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.query",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.query",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.type",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.type",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "event.type=\"page|view|goal\" OR event.type=\"page|event|goal\"",
+                    "owner": "All_Web_Traffic.Conversion"
+                }
+            ],
+            "lineage": "All_Web_Traffic.Conversion"
+        },
+        {
+            "objectName": "Technology",
+            "displayName": "Technology",
+            "parentName": "Audience_And_Behaviour",
+            "fields": [
+                {
+                    "fieldName": "session.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.id",
+                    "comment": "",
+                    "fieldSearch": "session.id=*"
+                },
+                {
+                    "fieldName": "event.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.host",
+                    "comment": "",
+                    "fieldSearch": "event.meta.host=*"
+                },
+                {
+                    "fieldName": "person.id.cookie.optimahub3rd",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.cookie.optimahub3rd",
+                    "comment": "",
+                    "fieldSearch": "person.id.cookie.optimahub3rd=*"
+                },
+                {
+                    "fieldName": "event.meta.path",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.meta.path",
+                    "comment": "",
+                    "fieldSearch": "event.meta.path=*"
+                },
+                {
+                    "fieldName": "event.location.city",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.country",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.country",
+                    "comment": "",
+                    "fieldSearch": "event.location.country=*"
+                },
+                {
+                    "fieldName": "event.location.region",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.region",
+                    "comment": "",
+                    "fieldSearch": "event.location.region=*"
+                },
+                {
+                    "fieldName": "event.location.coordinates",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.coordinates",
+                    "comment": "",
+                    "fieldSearch": "event.location.coordinates=*"
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.category",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.category",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.step",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.step",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.device",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.device",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.browser.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.browser.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.visible",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.screen.visible",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.full",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.technology.screen.full",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.email.default.hashed",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.email.default.hashed",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.parameter.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.origin.meta.parameter.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.query",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.origin.meta.query",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.type",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.type",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "",
+                    "owner": "All_Web_Traffic.Audience_And_Behaviour.Technology"
+                }
+            ],
+            "lineage": "All_Web_Traffic.Audience_And_Behaviour.Technology"
+        },
+        {
+            "objectName": "Geography",
+            "displayName": "Geography",
+            "parentName": "Audience_And_Behaviour",
+            "fields": [
+                {
+                    "fieldName": "session.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.id",
+                    "comment": "",
+                    "fieldSearch": "session.id=*"
+                },
+                {
+                    "fieldName": "event.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.host",
+                    "comment": "",
+                    "fieldSearch": "event.meta.host=*"
+                },
+                {
+                    "fieldName": "person.id.cookie.optimahub3rd",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.cookie.optimahub3rd",
+                    "comment": "",
+                    "fieldSearch": "person.id.cookie.optimahub3rd=*"
+                },
+                {
+                    "fieldName": "event.meta.path",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.meta.path",
+                    "comment": "",
+                    "fieldSearch": "event.meta.path=*"
+                },
+                {
+                    "fieldName": "event.location.city",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.country",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.country",
+                    "comment": "",
+                    "fieldSearch": "event.location.country=*"
+                },
+                {
+                    "fieldName": "event.location.region",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.region",
+                    "comment": "",
+                    "fieldSearch": "event.location.region=*"
+                },
+                {
+                    "fieldName": "event.location.coordinates",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.location.coordinates",
+                    "comment": "",
+                    "fieldSearch": "event.location.coordinates=*"
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.category",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.category",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.step",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.goal.step",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.device",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.device",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.browser.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.browser.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.visible",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.screen.visible",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.full",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.screen.full",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.email.default.hashed",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.email.default.hashed",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.parameter.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.parameter.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.query",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.query",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.type",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.type",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [],
+            "constraints": [
+                {
+                    "search": "",
+                    "owner": "All_Web_Traffic.Audience_And_Behaviour.Geography"
+                }
+            ],
+            "lineage": "All_Web_Traffic.Audience_And_Behaviour.Geography"
+        },
+        {
+            "objectName": "Acquisition",
+            "displayName": "Acquisition",
+            "parentName": "All_Web_Traffic",
+            "fields": [
+                {
+                    "fieldName": "session.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "session.id",
+                    "comment": "",
+                    "fieldSearch": "session.id=*"
+                },
+                {
+                    "fieldName": "event.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.meta.host",
+                    "comment": "",
+                    "fieldSearch": "event.meta.host=*"
+                },
+                {
+                    "fieldName": "person.id.cookie.optimahub3rd",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.cookie.optimahub3rd",
+                    "comment": "",
+                    "fieldSearch": "person.id.cookie.optimahub3rd=*"
+                },
+                {
+                    "fieldName": "event.meta.path",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.meta.path",
+                    "comment": "",
+                    "fieldSearch": "event.meta.path=*"
+                },
+                {
+                    "fieldName": "event.location.city",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.city",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.location.country",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.country",
+                    "comment": "",
+                    "fieldSearch": "event.location.country=*"
+                },
+                {
+                    "fieldName": "event.location.region",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.region",
+                    "comment": "",
+                    "fieldSearch": "event.location.region=*"
+                },
+                {
+                    "fieldName": "event.location.coordinates",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": true,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "event.location.coordinates",
+                    "comment": "",
+                    "fieldSearch": "event.location.coordinates=*"
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.category",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.category",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.goal.step",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.goal.step",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.id",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.id",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.system.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.system.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.device",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.device",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.useragent.browser.version",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.useragent.browser.version",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.visible",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.screen.visible",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "session.technology.screen.full",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "session.technology.screen.full",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "person.id.email.default.hashed",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "person.id.email.default.hashed",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.parameter.name",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.parameter.name",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.host",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.origin.meta.query",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.origin.meta.query",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "event.type",
+                    "owner": "All_Web_Traffic",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "event.type",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "_time",
+                    "owner": "BaseEvent",
+                    "type": "timestamp",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": false,
+                    "editable": true,
+                    "displayName": "_time",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "host",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "host",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "source",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "source",
+                    "comment": "",
+                    "fieldSearch": ""
+                },
+                {
+                    "fieldName": "sourcetype",
+                    "owner": "BaseEvent",
+                    "type": "string",
+                    "required": false,
+                    "multivalue": false,
+                    "hidden": true,
+                    "editable": true,
+                    "displayName": "sourcetype",
+                    "comment": "",
+                    "fieldSearch": ""
+                }
+            ],
+            "calculations": [
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "query",
+                            "owner": "All_Web_Traffic.Acquisition",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "query",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "inputField": "event.origin.meta.query",
+                    "calculationID": "g1we3n81ev1jor",
+                    "owner": "All_Web_Traffic.Acquisition",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Rex",
+                    "expression": "utm_medium=(?<query>[^&]*)&"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "domain_tld",
+                            "owner": "All_Web_Traffic.Acquisition",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "domain_tld",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "inputField": "event.origin.meta.host",
+                    "calculationID": "jz8pvl1x9h8semi",
+                    "owner": "All_Web_Traffic.Acquisition",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Rex",
+                    "expression": "(?<domain_tld>\\w+\\.\\w{2,3}$)"
+                },
+                {
+                    "outputFields": [
+                        {
+                            "fieldName": "domain_name",
+                            "owner": "All_Web_Traffic.Acquisition",
+                            "type": "string",
+                            "required": false,
+                            "multivalue": false,
+                            "hidden": false,
+                            "editable": true,
+                            "displayName": "domain_name",
+                            "comment": "",
+                            "fieldSearch": ""
+                        }
+                    ],
+                    "inputField": "event.origin.meta.host",
+                    "calculationID": "wr0tjpgz5kjiqkt9",
+                    "owner": "All_Web_Traffic.Acquisition",
+                    "editable": true,
+                    "comment": "",
+                    "calculationType": "Rex",
+                    "expression": "\\w*?\\.?(?<domain_name>\\w+)\\.((\\w{2}|\\w{3})\\.)?(\\w{2}|\\w{3})$"
+                }
+            ],
+            "constraints": [
+                {
+                    "search": "",
+                    "owner": "All_Web_Traffic.Acquisition"
+                }
+            ],
+            "lineage": "All_Web_Traffic.Acquisition"
+        }
+    ],
+    "objectNameList": [
+        "All_Web_Traffic",
+        "Audience_And_Behaviour",
+        "Conversion",
+        "Technology",
+        "Geography",
+        "Acquisition"
+    ]
+}

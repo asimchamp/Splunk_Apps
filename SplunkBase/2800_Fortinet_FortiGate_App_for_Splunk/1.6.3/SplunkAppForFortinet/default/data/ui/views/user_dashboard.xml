@@ -1,0 +1,219 @@
+<form version="1.1">
+  <label>Authentication Dashboard</label>
+  <description></description>
+  <fieldset autoRun="true" submitButton="true">
+    <input type="time" searchWhenChanged="true" token="time_token">
+      <label></label>
+      <default>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="devname">
+      <label>Device</label>
+      <choice value="*">ANY</choice>
+      <default>*</default>
+      <prefix>log.devname="</prefix>
+      <suffix>"</suffix>
+      <search>
+        <query>|`_ftnt_dropdown(log.system_event.user, log.devname)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+    </input>
+    <input type="dropdown" token="vdom">
+      <label>Virtual Domain</label>
+      <prefix>log.vd="</prefix>
+      <suffix>"</suffix>
+      <choice value="*">ANY</choice>
+      <search>
+        <query>| `_ftnt_dropdown(log.system_event.user, log.vd)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="user">
+      <label>User</label>
+      <choice value="*">ANY</choice>
+      <default>*</default>
+      <prefix>log.user="</prefix>
+      <suffix>"</suffix>
+      <search>
+        <query>|`_ftnt_dropdown(log.system_event.user, log.user)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+    </input>
+    <input type="dropdown" token="status">
+      <label>Status</label>
+      <choice value="*">ANY</choice>
+      <search>
+        <query>| `_ftnt_dropdown(log.system_event.user, log.system_event.user.vendor_status)`</query>
+        <earliest>$time_token.earliest$</earliest>
+        <latest>$time_token.latest$</latest>
+      </search>
+      <fieldForLabel>field_with_count</fieldForLabel>
+      <fieldForValue>field</fieldForValue>
+      <prefix>log.system_event.user.vendor_status="</prefix>
+      <suffix>"</suffix>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Authentication Request Overview</title>
+      <chart>
+        <search>
+          <query>| tstats summariesonly=true count FROM datamodel="ftnt_fos" WHERE nodename="log.system_event.user"  $devname$ $vdom$ $user$ $status$ GROUPBY log.user | sort -count | head 20</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <fields>[]</fields>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                /app/SplunkAppForFortinet/search?q=| datamodel "ftnt_fos" "user" search | search (log.user="$click.value$" $devname$ $vdom$)&earliest=$time_token.earliest$&latest=$time_token.latest$
+			]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <title>Authentication Request Over Time</title>
+      <chart>
+        <search>
+          <query>| tstats summariesonly=true count FROM datamodel="ftnt_fos" WHERE nodename="log.system_event.user"  $devname$ $vdom$ $user$ $status$  GROUPBY _time log.system_event.user.vendor_status | timechart values(count) by log.system_event.user.vendor_status</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="rowNumbers">false</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="wrap">true</option>
+        <option name="dataOverlayMode">none</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                /app/SplunkAppForFortinet/search?q=| datamodel "ftnt_fos" "user" search | search (log.system_event.user.vendor_status="$click.name2$" $devname$ $vdom$)&earliest=$time_token.earliest$&latest=$time_token.latest$
+			]]>
+          </link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Latest Events</title>
+      <table>
+        <search>
+          <query>| tstats summariesonly=true max(_time) as NTime  count FROM datamodel=ftnt_fos where nodename="log.system_event.user" $devname$ $vdom$ $user$ $status$  GROUPBY _time log.system_event.user.time log.devname log.vd  log.user  log.vendor_action log.system_event.user.vendor_status log.msg |  rename log.devname AS Devname, log.vd AS Virtual_Domain,  log.user AS User, log.vendor_action AS Action, log.system_event.user.vendor_status AS Status, log.msg AS Message | convert ctime(NTime) as Time  | sort -_time | table Time Devname Virtual_Domain  User Action Status Message</query>
+          <earliest>$time_token.earliest$</earliest>
+          <latest>$time_token.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="drilldown">none</option>
+        <option name="count">10</option>
+        <drilldown>
+          <link>
+            <![CDATA[
+                /app/SplunkAppForFortinet/search?q=| datamodel "ftnt_fos" "user" search | search (log.user="$row.user$" log.devname="$row.devname$" log.vd="$row.vd$")&earliest=$time_token.earliest$&latest=$time_token.latest$
+			]]>
+          </link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

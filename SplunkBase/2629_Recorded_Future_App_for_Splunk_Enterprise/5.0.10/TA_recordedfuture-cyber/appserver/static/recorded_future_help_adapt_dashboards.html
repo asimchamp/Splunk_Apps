@@ -1,0 +1,94 @@
+<html><body><div><h1>Dashboard Modifications</h1>
+
+<p>Some of the Recorded Future Dashboard, such as the Correlation Dashboard, can 
+easily be modified. It is recommended to make the modifications to a clone of 
+an existing dashboard and leaving the the default Dashboards unchanged. </p>
+
+<p>The most common reason for modifications is to use different data for the 
+correlation search so it is described in detail below.</p>
+
+<h2>Cloning a Dashboard</h2>
+
+<p>Click <span class="rf-field">...</span> in the upper right corner and select 
+<span class="rf-field">Clone</span> to clone the current dashboard.</p>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/recorded_future_clone_dashboard.png" alt="Clone menu"></p>
+
+<p>Enter the new title and name of the dashboard. </p>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/recorded_future_clone_dashboard_2.png" alt="Clone dashboard"></p>
+
+<p>If option <span class="rf-field">Private</span> is chosen, the new dashboard 
+is only accessible by the current user. Click on <span class="rf-field">Clone 
+Dashboard</span> followed by <span class="rf-field">View</span> to see the new 
+dashboard. Click <span class="rf-field">Edit</span> to add your modifications.</p>
+
+<h2>Customizing</h2>
+
+<p>Click <span class="rf-field">Source</span> button to show the source <br>
+<a href="https://en.wikipedia.org/wiki/XML">XML</a> for the dashboard. Note the following 
+three fields, <span class="rf-field">sourcetype</span>, 
+<span class="rf-field">Name</span> and <span class="rf-field">risklist</span>, 
+highlighted in the image below:</p>
+
+<p><img src="/static/app/TA_recordedfuture-cyber/img/recorded_future_clone_dashboard_3.png" alt="Sourcetype and lookup table"></p>
+
+<ul>
+<li><span class="rf-field">sourcetype</span> selects the source type of the logs 
+that are stored on the Splunk server.</li>
+<li><span class="rf-field">Name</span> specifies the name of the field to be 
+used for correlating data. The screenshot shows a dashboard using the 'dst' 
+field which usually contains the destination IP Address in the log.</li>
+<li><span class="rf-field">inputlookup</span> specifies the name of the lookup 
+table to correlate the data to, usually a Risk List configured in the 
+inputs section of the Recorded Future App for Splunk.</li>
+</ul>
+
+<p>In this example it is set to "ip_risklist.csv". </p>
+
+<p><a href="/app/TA_recordedfuture-cyber/recorded_future_explorer">Splunk Explorer Dashboard</a>.
+is an easy way to test different alternatives to correlate Splunk events data 
+with Risk Lists.</p>
+
+<h2>Data Structure</h2>
+
+<p>The IP Risk List has the following format </p>
+
+<pre>
+Name,Risk,RiskString,EvidenceDetails
+46.18.32.101,66.0,2/47,"{""EvidenceDetails"":[{""Timestamp"":""2016-11-02T16:26:00.000Z"",
+""Criticality"":1,""Rule"":""Historical Multicategory Blacklist"",""CriticalityLabel"":"
+"Unusual"",""EvidenceString"":""1 sighting on 1 source: hpHosts Latest Additions. Most 
+recent link (Nov 2, 2016): hxxp://hosts-file.net/?s=doggytalk.be"",""MitigationString"":""""},
+{""Timestamp"":""2018-04-15T12:34:28.869Z"",""Criticality"":3,""Rule"":""Phishing Host"",
+""CriticalityLabel"":""Malicious"",""EvidenceString"":""1 sighting on 1 source: PhishTank: 
+Phishing Reports (verified phish). IP Address reported as host of 1 active phishing 
+URL: hxxp://letiz.be/uploads/bnz.html."",""MitigationString"":""""}]}"
+</pre>
+
+<p>The format is a standard <a href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> 
+and the field used for correlations is called 'Name', which is the same for 
+all default Recorded Future Risk Lists. </p>
+
+<p>Assuming the event source type has the name 'dest' instead of 'dst' for the 
+field containing IP addresses, the line '<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Eval">eval</a> 
+Name=dst' needs to be updated to '<a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/Eval">eval</a> 
+Name=dest' to reflect this. Further changes may be needed if the custom Risk
+List uses a different name for the field used for the correlation so all
+the subsearches in the dashboard also need to be modified to use the new field
+name.</p>
+
+<h2>Finding Modified Dashboards</h2>
+
+<p>Dashboards are displayed under <span class="rf-field">Other &#8594; Dashboards
+</span>. The view shows all dashboards for all add-ons in Splunk, but it can 
+be limited to show only dashboards related to the Recorded Future App by 
+clicking <span class="rf-field">This App's</span>. </p>
+
+<h1>Further Help</h1>
+
+<p>"Recorded Future App for Splunk" has been developed by Recorded Future. </p>
+
+<p>Further information and support can be found on our Support web site:
+<a href="https://support.recordedfuture.com/hc/en-us/articles/360003588753">support.recordedfuture.com</a> </p>
+</div></body></html>

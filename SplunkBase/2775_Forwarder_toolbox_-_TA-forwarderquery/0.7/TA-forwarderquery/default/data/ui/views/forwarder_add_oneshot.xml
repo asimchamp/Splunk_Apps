@@ -1,0 +1,73 @@
+<form>
+  <label>Forwarder Add Oneshot</label>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="host" searchWhenChanged="true">
+      <label>choose forwarder host:</label>
+      <search>
+        <query>splunk_server=* index="_internal" |  eval host=lower(host) | table host | dedup host | sort host</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>host</fieldForLabel>
+      <fieldForValue>host</fieldForValue>
+    </input>
+    <input type="dropdown" token="index">
+      <label>Chose Index</label>
+      <search>
+        <query>| rest /services/data/indexes | dedup title</query>
+        <earliest>-15m</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+    </input>
+    <input type="dropdown" token="sourcetype">
+      <label>Choose sourcetype</label>
+      <search>
+        <query>| rest /services/saved/sourcetypes | fields title | dedup title</query>
+      </search>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+    </input>
+    <input type="text" token="path" searchWhenChanged="false">
+      <label>Type full path of file</label>
+    </input>
+  </fieldset>
+  <!-- /services/data/inputs/oneshot?index%3D$index$&sourcetype%3D$sourcetype&name%3D$path$ -->
+  <row>
+    <panel>
+      <table>
+        <title>Outcome</title>
+        <search>
+          <query>|forwarderquery server="$host$" api="/services/data/inputs/oneshot" stanza="default" method="POST" data="{'name':'$path$','index':'$index$','sourcetype':'$sourcetype$'}"
+| spath input=xmlresults 
+| fields - xmlresults</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Log of host</title>
+        <search>
+          <query>index=_internal host=$host$</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">undefined</option>
+        <option name="rowNumbers">undefined</option>
+        <option name="drilldown">row</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

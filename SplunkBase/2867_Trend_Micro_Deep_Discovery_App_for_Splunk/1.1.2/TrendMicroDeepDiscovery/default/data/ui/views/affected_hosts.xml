@@ -1,0 +1,114 @@
+<form>
+  <label>Affected Hosts and Recipients</label>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true" token="intime">
+      <label>Period / Range:</label>
+      <default>
+        <earliestTime>-7d@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="optional_globalfilter" searchWhenChanged="true">
+      <label>Event:</label>
+      <choice value="|">All</choice>
+      <choice value="| globalfilter |">Filtered protocols and rules</choice>
+      <default>|</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+	<div style="font-size: 150%; ">Compromised Hosts</div>
+      </html>
+      <table>
+        <title>Hosts with malicious activities</title>
+        <searchString>cef_severity&gt;=8 appGroup!=SMTP appGroup!=IMAP4 appGroup!=POP3 appGroup!=WEBMAIL  pAttackPhase!=NULL | eval cmpHost=if(interestedIp=src, shost, dhost) $optional_globalfilter$  chart  count(eval(pAttackPhase="Point of Entry")) as "Point of Entry",   count(eval(pAttackPhase="Command and Control Communication")) as "C&amp;C Callback",  count(eval(pAttackPhase="Lateral Movement")) as "Lateral Movement",  count(eval(pAttackPhase="Asset and Data Discovery")) as "Asset/Data Discovery",   count(eval(pAttackPhase="Data Exfiltration")) as "Data Exfiltration"  by cmpHost | addtotals | sort -Total | rename cmpHost as "Compromised Host"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=cef_severity&gt;=8 appGroup!=SMTP appGroup!=IMAP4 appGroup!=POP3 appGroup!=WEBMAIL pAttackPhase!=NULL (shost="$click.value$" OR dhost="$click.value$") earliest=$intime.earliest$ latest=$intime.latest$  $optional_globalfilter$  convert ctime(_time) as "Detected" 
+|table Detected,dvchost,src,shost,dst,dhost,app,cef_severity,ruleId,ruleName,pAttackPhase 
+|rename dvchost as "Device" | rename src as "Source IP" | rename shost as "Source Host" 
+|rename dst as "Destination IP" | rename dhost as "Destination Host" | rename app as Protocol 
+|rename ruleId as "Rule ID" | rename ruleName as "Rule Name" | rename cef_severity as Severity | rename pAttackPhase as "Attack Phase"</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	<div style="font-size: 150%; ">Targeted Hosts</div>
+      </html>
+      <table>
+        <title>Hosts targeted by malicious activities and incoming threats</title>
+        <searchString>appGroup!=SMTP appGroup!=IMAP4 appGroup!=POP3  appGroup!=WEBMAIL  (pComp="VSAPI" OR (pComp="CAV" AND ruleId=706 AND cef_severity&gt;=8) OR (pComp="TMUFE" AND cn2 &lt; 50  AND (urlCat="*Phishing*" OR urlCat="Disease Vector*")) )  | eval tgtHost=if(interestedIp=src, shost, dhost) $optional_globalfilter$ chart count(eval(pComp="VSAPI")) as "Malware", count(eval(pComp="CAV" AND ruleId=706)) as "Unknown Threats", count(eval(pComp="TMUFE")) as "Malicious URL" by tgtHost | addtotals | sort - Total | rename tgtHost as "Targeted Host"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=appGroup!=SMTP appGroup!=IMAP4 appGroup!=POP3 appGroup!=WEBMAIL (pComp="VSAPI" OR (pComp="CAV" AND ruleId=706 AND cef_severity&gt;=8) OR (pComp="TMUFE" AND cn2 &lt; 50  AND (urlCat="*Phishing*" OR urlCat="Disease Vector*")) ) earliest=$intime.earliest$ latest=$intime.latest$ 
+ (shost="$click.value$" OR dhost="$click.value$")
+ $optional_globalfilter$ convert ctime(_time) as "Detected" 
+|table Detected,dvchost,src,shost,cs4,dst,dhost,app,cef_severity,pComp
+|rename dvchost as "Device" | rename src as "Source IP" | rename shost as "Source Host" | rename cs4 as "Source Group"
+|rename dst as "Destination IP" | rename dhost as "Destination Host" | rename app as Protocol | rename cef_severity as Severity
+|rename pComp as "Engine"</link>
+        </drilldown>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	<div style="font-size: 150%; ">Targeted Email Recipients</div>
+      </html>
+      <table>
+        <title>Email recipients targeted by malicious content</title>
+        <searchString>(appGroup=SMTP OR appGroup=IMAP4 OR appGroup=POP3 OR appGroup=WEBMAIL)(pComp="VSAPI" OR (pComp="CAV" AND ruleId=706  AND cef_severity&gt;=8) OR (pComp="TMUFE" AND cn2 &lt; 50  AND (urlCat="*Phishing*" OR urlCat="Disease Vector*")) ) $optional_globalfilter$  chart count(eval(pComp="VSAPI")) as "Malware", count(eval(pComp="CAV" AND ruleId=706)) as "Unknown Threats", count(eval(pComp="TMUFE")) as "Malicious URL" by duser | addtotals | sort - Total  | rename duser as "Recipient"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=(appGroup=SMTP OR appGroup=IMAP4 OR appGroup=POP3 OR appGroup=WEBMAIL) (pComp="VSAPI" OR (pComp="CAV" AND ruleId=706 AND cef_severity&gt;=8) OR (pComp="TMUFE" AND cn2 &lt; 50  AND (urlCat="*Phishing*" OR urlCat="Disease Vector*")) ) earliest=$intime.earliest$ latest=$intime.latest$ 
+ duser="$click.value$" $optional_globalfilter$ convert ctime(_time) as "Detected" 
+|table Detected,dvchost,src,shost,suser,dst,dhost,duser,cs9,app,cef_severity,pComp
+|rename dvchost as "Device" | rename src as "Source IP" | rename shost as "Source Host" | rename suser as "Sender" 
+|rename dst as "Destination IP" | rename dhost as "Destination Host" | rename duser as Recipient | rename cs9 as "Destination Group" 
+|rename app as Protocol | rename cef_severity as Severity |rename pComp as "Engine"</link>
+        </drilldown>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

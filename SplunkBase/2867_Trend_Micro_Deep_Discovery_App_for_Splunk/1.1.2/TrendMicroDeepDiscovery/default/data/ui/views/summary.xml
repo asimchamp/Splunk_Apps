@@ -1,0 +1,314 @@
+<form>
+  <label>Summary</label>
+  <description/>
+  <fieldset autoRun="true" submitButton="false">
+    <input type="time" searchWhenChanged="true" token="intime">
+      <label>Period / Range:</label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="inproto" searchWhenChanged="true">
+      <label>Protocol:</label>
+      <default>*</default>
+      <choice value="*">Top 5</choice>
+      <choice value="AUTH">AUTH</choice>
+      <choice value="CIFS">CIFS</choice>
+      <choice value="DHCP">DHCP</choice>
+      <choice value="DNS Request">DNS Request</choice>
+      <choice value="DNS Response">DNS Response</choice>
+      <choice value="FTP">FTP</choice>
+      <choice value="HTTP">HTTP</choice>
+      <choice value="ICMP">ICMP</choice>
+      <choice value="IM">IM</choice>
+      <choice value="IMAP4">IMAP4</choice>
+      <choice value="IRC">IRC</choice>
+      <choice value="P2P">P2P</choice>
+      <choice value="POP3">POP3</choice>
+      <choice value="Remote Access">Remote Access</choice>
+      <choice value="SMTP">SMTP</choice>
+      <choice value="SQL">SQL</choice>
+      <choice value="STREAMING">STEAMING</choice>
+      <choice value="TCP">TCP</choice>
+      <choice value="TFTP">TFTP</choice>
+      <choice value="TUNNELING">TUNNELING</choice>
+      <choice value="UDP">UDP</choice>
+      <choice value="WEBMAIL">WEBMAIL</choice>
+      <choice value="OTHER">OTHER</choice>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="insever">
+      <label>Severity:</label>
+      <choice value="0">All</choice>
+      <choice value="8">High only</choice>
+      <choice value="5">High and medium</choice>
+      <choice value="3">High, medium, and low</choice>
+      <default>0</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Deep Discovery Inspector - Detections by Protocol</title>
+        <searchString>pComp!=Sandbox pComp!=Correlation appGroup="$inproto$" cef_severity&gt;=$insever$ 
+          | timechart count by appGroup limit=5</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.seriesColors">[0x4b9ae8, 0x62c15b, 0xf4ca39, 0x3cbde8, 0xff9860, 0xb987e8]</option>
+        <option name="charting.axisY.minimumNumber">0</option>
+        <option name="charting.drilldown">all</option>
+        <drilldown target="_blank">
+          <link>search?q=pComp!=Sandbox pComp!=Correlation appGroup="$click.name2$" cef_severity&gt;=$insever$ earliest=$earliest$ latest=$latest$
+|convert ctime(_time) as "Detected"
+|table Detected,dvchost,src,shost,dst,dhost,app,cef_severity,ruleId,ruleName,pAttackPhase
+|rename dvchost as "Device" | rename src as "Source IP" | rename shost as "Source Host"
+|rename dhost as "Destination Host" | rename dst as "Destination IP" | rename app as Protocol
+|rename ruleId as "Rule ID" | rename ruleName as "Rule Name" | rename cef_severity as Severity | rename pAttackPhase as "Attack Phase"</link>
+        </drilldown>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Deep Discovery Inspector - Detections by Severity</title>
+        <searchString>pComp!="Sandbox" appGroup="$inproto$" cef_severity&gt;=$insever$ | lookup severity.csv cef_severity OUTPUT Severity | timechart count by Severity | fields _time High Medium Low Informational</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.fieldColors">{"High": 0xe85a58, "Medium": 0xff9860, "Low":0xf4ca39, "Informational":0x4b9ae8}</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleX.text">Severity of Detections over Time</option>
+        <option name="charting.drilldown">all</option>
+        <drilldown target="_blank">
+          <link>search?q=pComp!="Sandbox" appGroup="$inproto$" earliest=$earliest$ latest=$latest$
+|lookup severity.csv cef_severity OUTPUT Severity | search Severity="$click.name2$" 
+|convert ctime(_time) as "Detected"
+|table Detected,dvchost,src,shost,dst,dhost,app,cef_severity,ruleId,ruleName,pAttackPhase
+|rename dvchost as "Device" | rename src as "Source IP" | rename shost as "Source Host"
+|rename dhost as "Destination Host" | rename dst as "Destination IP" | rename app as Protocol
+|rename ruleId as "Rule ID" | rename ruleName as "Rule Name" | rename cef_severity as Severity | rename pAttackPhase as "Attack Phase"</link>
+        </drilldown>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <map>
+        <title>C&amp;C Callback Server Locations</title>
+        <searchString>evtCat=Callback cs12Label=CCCA_Destination deviceDirection=1 | where NOT ( cidrmatch("10.0.0.0/8",dst) OR cidrmatch("172.16.0.0/12",dst) OR cidrmatch("192.168.0.0/16",dst) OR cidrmatch("169.254.0.0/16",dst))  | iplocation dst | geostats count by Country</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">scatter</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="drilldown">none</option>
+      </map>
+    </panel>
+    <panel>
+      <table>
+        <title>C&amp;C Callback Servers</title>
+        <searchString>evtCat=Callback cs12Label=CCCA_Destination deviceDirection=1 | where NOT ( cidrmatch("10.0.0.0/8",dst) OR cidrmatch("172.16.0.0/12",dst) OR cidrmatch("192.168.0.0/16",dst) OR cidrmatch("169.254.0.0/16",dst)) | top 50 dst  | iplocation dst | table dst  City Country count | rename dst as "C&amp;C Callback Server" |rename count as "Callback Attempts"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=evtCat=Callback cs12Label=CCCA_Destination deviceDirection=1 earliest=$earliest$ latest=$latest$ 
+|search dst="$click.value$" | convert ctime(_time) as "Detected"
+|table Detected,dvchost,cs12,dst,shost,src,app,cef_severity,ruleId,ruleName,pAttackPhase
+|rename dvchost as "Device" | rename src as "Source IP" | rename shost as "Source Host"
+|rename cs12 as "CCCA_Destination" | rename dst as "Destination IP" | rename app as Protocol
+|rename ruleId as "Rule ID" | rename ruleName as "Rule Name" | rename cef_severity as Severity | rename pAttackPhase as "Attack Phase"</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Known Malware Detections</title>
+        <searchString>pComp=VSAPI | top 50 malName,fname,fileHash | table malName,count,fileHash,fname | rename malName as "Malware Name" | rename count as Occurrences | rename fname as "File Name" | rename fileHash as "File SHA-1"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">markerGauge</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.map.center">(0,0)</option>
+        <option name="mapping.map.zoom">2</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.maxZoom">7</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="table.drilldown">all</option>
+        <option name="table.wrap">1</option>
+        <option name="type">list</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=pComp=VSAPI malName="$click.value$" earliest=$earliest$ latest=$latest$</link>
+        </drilldown>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Network Groups with Detections</title>
+        <searchString>pComp!=Correlation cs4Label="Deep Discovery_SrcGroup" cs9Label="Deep Discovery_DstGroup" interestedIp | eval interestedGroup=if(interestedIp=src, cs4, cs9) | top 100 interestedGroup | rename interestedGroup as "Network Group" | rename count as Occurrences | rename percent as "%"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=pComp!=Correlation cs4Label="Deep Discovery_SrcGroup" cs9Label="Deep Discovery_DstGroup" earliest=$earliest$ latest=$latest$
+|search (cs4="$click.value$" OR cs9="$click.value$") 
+|table _time, dvchost,src,shost,cs4, dst,dhost,cs9,app,cef_severity,ruleId,ruleName,pAttackPhase 
+|rename dvchost as "Device" |rename src as "Source IP" |rename shost as "Source Host" |rename cs4 as "Source Group" 
+|rename dst as "Destination IP" |rename dhost as "Destination Host" |rename cs9 as "Destination Group" |rename app as Protocol 
+|rename ruleId as "Rule ID" |rename ruleName as "Rule Name" |rename cef_severity as Severity |rename pAttackPhase as "Attack Phase"</link>
+        </drilldown>
+        <option name="count">10</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Network Groups with High Severity Lateral Movement</title>
+        <searchString>cef_severity&gt;=8  pComp!=Correlation pAttackPhase="Lateral Movement" cs4Label="Deep Discovery_SrcGroup" cs9Label="Deep Discovery_DstGroup" interestedIp | eval interestedGroup=if(interestedIp=src, cs4, cs9) | top 100 interestedGroup | rename interestedGroup as "Network Group" | rename count as "Activity in Group" | rename percent as "%"</searchString>
+        <earliestTime>$intime.earliest$</earliestTime>
+        <latestTime>$intime.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">row</option>
+        <drilldown target="_blank">
+          <link>search?q=pComp!=Correlation cs4Label="Deep Discovery_SrcGroup" cs9Label="Deep Discovery_DstGroup" earliest=$earliest$ 
+|search (cs4="$click.value$" OR cs9="$click.value$") cef_severity&gt;=8 pAttackPhase="Lateral Movement" 
+|table _time, dvchost,src,shost,cs4, dst,dhost,cs9,app,cef_severity,ruleId,ruleName,pAttackPhase 
+|rename dvchost as "Device" |rename src as "Source IP" |rename shost as "Source Host" |rename cs4 as "Source Group" 
+|rename dst as "Destination IP" |rename dhost as "Destination Host" |rename cs9 as "Destination Group" |rename app as Protocol 
+|rename ruleId as "Rule ID" |rename ruleName as "Rule Name" |rename cef_severity as Severity |rename pAttackPhase as "Attack Phase"</link>
+        </drilldown>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

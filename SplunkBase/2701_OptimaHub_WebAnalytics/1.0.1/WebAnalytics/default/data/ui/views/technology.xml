@@ -1,0 +1,328 @@
+<form script="link_switcher.js" stylesheet="common.css">
+  <label>Technology Overview</label>
+  <description></description>
+  <!-- use the autoRun attribute so the form runs when loaded -->
+  <fieldset autoRun="true">
+    <!-- Specify search when changed for the inputs -->
+    <input type="dropdown" token="website" searchWhenChanged="true">
+      <label>Domain:</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>`webanalytics_page_data` | stats count by event.meta.host</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>event.meta.host</fieldForLabel>
+      <fieldForValue>event.meta.host</fieldForValue>
+    </input>
+    <input type="dropdown" token="visitor" searchWhenChanged="true">
+      <label>Visitor Source:</label>
+      <default>person.id.cookie.optimahub3rd</default>
+      <populatingSearch earliest="-24h@h" latest="now" fieldForLabel="label" fieldForValue="visitor">| inputlookup visitor_source.csv</populatingSearch>
+    </input>
+    <!-- Add time range picker -->
+    <input type="time" searchWhenChanged="true">
+      <label>Time Range:</label>
+      <default>
+        <earliestTime>-24h@h</earliestTime>
+        <latestTime>now</latestTime>
+      </default>
+    </input>
+    <input type="dropdown" token="span_period" searchWhenChanged="true">
+      <label>Time Interval:</label>
+      <default>""</default>
+      <choice value="">Automatic</choice>
+      <prefix>span=</prefix>
+      <suffix></suffix>
+      <populatingSearch earliest="-24h@h" latest="now" fieldForLabel="label" fieldForValue="span_period">| inputlookup time_periods.csv</populatingSearch>
+    </input>
+  </fieldset>
+  <searchTemplate>source=webanalytics* (event.meta.scheme="http" OR event.meta.scheme="https") event.type="page|view" event.meta.host=$website$
+    | bin _time span=30m 
+    | stats count by _time, event.meta.host, session.id, person.id.browser.fingerprintjs, person.id.cookie.datacollector3rd, person.id.cookie.optimahub3rd, person.id.cookie.supertag1st, person.id.ip, session.technology.useragent.system.name, session.technology.useragent.browser.name, session.technology.screen.full, event.location.coordinates</searchTemplate>
+  <earliestTime>$earliest$</earliestTime>
+  <latestTime>$latest$</latestTime>
+  <row>
+    <panel>
+      <html>
+      <h2>Mobile Visitors</h2>
+        <!-- Placeholder/container for the link switcher to appear -->
+        <div class="link-switcher" data-items="link1,link2,link3">Select a view: <!--Links go here-->
+      </div>
+    </html>
+      <chart id="link1">
+        <title>Chart</title>
+        <searchPostProcess>rename session.technology.useragent.system.name AS system 
+        | dedup $visitor$
+        | eval devicetype=case(system like "%Phone%","Mobile",system like "%iOS%","Mobile",system like "%Android%","Mobile",system like "%BlackBerry%", "Mobile", 1=1,"Desktop") 
+        | top devicetype
+        | eval Percent=round(percent,2)
+        | fields devicetype,Percent</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisTitleY.text">Percentage</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+      <chart id="link2">
+        <title>Timechart</title>
+        <searchPostProcess>rename  session.technology.useragent.system.name AS system          
+        | eval devicetype=case(system like "%Phone%","Mobile",system like "%iOS%","Mobile",system like "%Android%","Mobile",system like "%BlackBerry%", "Mobile", 1=1,"Desktop") 
+        | timechart $span_period$ dc($visitor$) by devicetype</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisTitleY.text">Visitors</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+      <map id="link3">
+        <title>Map</title>
+        <searchPostProcess>rename  session.technology.useragent.system.name AS system
+        | dedup $visitor$
+        | eval devicetype=case(system like "%Phone%","Mobile",system like "%iOS%","Mobile",system like "%Android%","Mobile",system like "%BlackBerry%", "Mobile", 1=1,"Desktop") 
+        | rex field=event.location.coordinates "(?&lt;lat&gt;[^,]*),"         
+        | rex field=event.location.coordinates ",(?&lt;lon&gt;.*)"         
+        | geostats dc($visitor$) by devicetype</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="mapping.markerLayer.markerMaxSize">20</option>
+        <option name="mapping.map.center">(-34,149)</option>
+        <option name="mapping.map.zoom">3</option>
+        <option name="mapping.data.maxClusters">100</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.url">http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</option>
+        <option name="mapping.tileLayer.maxZoom">20</option>
+        <option name="mapping.tileLayer.subdomains">[a,b,c]</option>
+        <option name="mapping.drilldown">none</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h2>Visitor Browsers</h2>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <div class="link-switcher" data-items="link4,link5">Select a view: <!--Links go here-->
+      </div>
+      </html>
+      <chart id="link4">
+        <title>Chart</title>
+        <searchPostProcess>rename session.technology.useragent.browser.name AS browser
+        | dedup $visitor$
+        | top browser
+        | eval Percent=round(percent,2)
+        | fields browser,Percent</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.text">Browser</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Percentage</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+      </chart>
+      <chart id="link5">
+        <title>Timechart</title>
+        <searchPostProcess>timechart $span_period$ dc($visitor$) by session.technology.useragent.browser.name</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Page Views</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">none</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h2>Visitor Systems</h2>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <div class="link-switcher" data-items="link6,link7">Select a view: <!--Links go here-->
+      </div>
+    </html>
+      <chart id="link6">
+        <title>Chart</title>
+        <searchPostProcess>rename session.technology.useragent.system.name AS system
+        | dedup $visitor$
+        | top system
+        | eval Percent=round(percent,2)
+        | fields system,Percent</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.text">System</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Percentage</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+      <chart id="link7">
+        <title>Timechart</title>
+        <searchPostProcess>timechart $span_period$ dc($visitor$) by session.technology.useragent.system.name</searchPostProcess>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Visitors</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">none</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+      <h2>Visitor Screens</h2>
+      <!-- Placeholder/container for the link switcher to appear -->
+      <div class="link-switcher" data-items="link10,link11">Select a view: <!--Links go here-->
+      </div>
+    </html>
+      <chart id="link10">
+        <title>Chart</title>
+        <searchPostProcess>rename session.technology.screen.full AS screen
+        | dedup $visitor$
+        | top screen
+        | eval Percent=round(percent,2)
+        | fields screen,Percent</searchPostProcess>
+        <earliestTime>$earliest$</earliestTime>
+        <latestTime>$latest$</latestTime>
+        <option name="charting.axisTitleX.text">Screen Resolution</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Visitors</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisY.maximumNumber">100</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+      </chart>
+      <chart id="link11">
+        <title>Timechart</title>
+        <searchPostProcess>timechart $span_period$ dc($visitor$) by session.technology.screen.full</searchPostProcess>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Visitors</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">none</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

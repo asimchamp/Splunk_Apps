@@ -1,0 +1,17 @@
+<nav search_view="search">
+  <a href="search?q=sourcetype=piTemp">Search</a>
+  <view name="24hour_temp" default="true" />
+  <collection label="Reports">
+    <saved source="unclassified" />
+    <divider />
+      <view name="reports" />
+      <view name="alerts" />
+  </collection>
+  <collection label="Dashboards">
+     <view name="24hour_temp" default="true" />
+     <view source="unclassified" />
+     <divider />
+       <view name="dashboards" />
+  </collection>
+  <view name="data_models" />
+</nav>

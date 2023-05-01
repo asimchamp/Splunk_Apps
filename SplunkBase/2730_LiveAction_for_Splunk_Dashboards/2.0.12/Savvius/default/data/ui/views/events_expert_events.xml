@@ -1,0 +1,227 @@
+<form script="savvius.js" stylesheet="events_expert_events.css">
+  <label>Expert Events</label>
+  <fieldset submitButton="false" autorun="true">
+    <!-- Global timer. Not token is necessary -->
+    <input type="time" searchWhenChanged="true">
+      <label>Date &amp; Time</label>
+      <default>
+        <earliest>-1h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="source">
+      <label>Source</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_summaries | stats count by host</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>host</fieldForValue>
+      <fieldForLabel>host</fieldForLabel>
+    </input>
+    <input type="dropdown" searchWhenChanged="true" token="severity">
+      <label>Severity</label>
+      <default>*</default>
+      <choice value="*">All</choice>
+      <search>
+        <query>sourcetype=sv_event_counts | stats count by Severity | sort Severity</query>
+        <earliest>$earliest$</earliest>
+        <latest>$latest$</latest>
+      </search>
+      <fieldForValue>Severity</fieldForValue>
+      <fieldForLabel>Severity</fieldForLabel>
+    </input>
+    <input type="text" searchWhenChanged="true" token="filter">
+      <label>Filter</label>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="Informational" Severity="$severity$" "$filter$"
+            | appendpipe [stats count as no_event | where no_event==0 | eval Events=0]
+            | stats sum(Events) as totalEvents
+            | fieldformat totalEvents=tostring(totalEvents, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Informational Expert Events</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="Minor" Severity="$severity$" "$filter$"
+            | appendpipe [stats count as no_event | where no_event==0 | eval Events=0]
+            | stats sum(Events) as totalEvents
+            | fieldformat totalEvents=tostring(totalEvents, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Minor Expert Events</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="Major" Severity="$severity$" "$filter$"
+            | appendpipe [stats count as no_event | where no_event==0 | eval Events=0]
+            | stats sum(Events) as totalEvents
+            | fieldformat totalEvents=tostring(totalEvents, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Major Expert Events</option>
+        <option name="field">count</option>
+      </single>
+      <single>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="Severe" Severity="$severity$" "$filter$"
+            | appendpipe [stats count as no_event | where no_event==0 | eval Events=0]
+            | stats sum(Events) as totalEvents
+            | fieldformat totalEvents=tostring(totalEvents, "commas")</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="underLabel">Severe Expert Events</option>
+        <option name="field">count</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Expert Event Volume</title>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="$severity$" "$filter$"
+            | timechart sum(Events) as "Total Expert Events"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">250px</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Expert Event Volume By Severity</title>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="$severity$" "$filter$"
+            | timechart sum(Events) by Severity</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.axisY2.enabled">undefined</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Total Expert Events</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">zero</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="height">250px</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table1">
+        <title>Expert Event Trends</title>
+        <search>
+          <query>sourcetype=sv_event_counts host="$source$" Severity="$severity$" "$filter$"
+            | stats sparkline(sum(Events)) as "Count Trend", sum(Events) as "Total Count" by Event Layer Severity
+            | rename Event as "Expert Event"
+            | fieldformat "Total Count"=tostring('Total Count', "commas")
+            | sort - "Total Count"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="table2">
+        <title>Expert Event List</title>
+        <search>
+          <query>sourcetype=sv_events host="$source$" Severity="$severity$" "$filter$"
+            | stats sparkline(count) as "Count Trend", count as "Total Count" by Event "Source Addr" "Source Port" "Dest Addr" "Dest Port" Layer Severity
+            | rename Event as "Expert Event"
+            | rename "Source Addr" as "Source Address"
+            | rename "Dest Addr" as "Destination Address"
+            | rename "Dest Port" as "Destination Port"
+            | fieldformat "Total Count"=tostring('Total Count', "commas")
+            | sort - "Total Count"</query>
+          <earliest>$earliest$</earliest>
+          <latest>$latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <drilldown>
+          <condition field="Source Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+          <condition field="Destination Address">
+            <link>
+              <![CDATA[
+                        statistics_nodes?earliest=$earliest$&latest=$latest$&form.source=$source$&form.address=$click.value2$
+                    ]]>
+            </link>
+          </condition>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

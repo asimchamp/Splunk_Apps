@@ -1,0 +1,33 @@
+<dashboard>
+  <label>Webhook Alert Action</label>
+  <row>
+    <panel>
+      <html>
+         <h2>Webhook Alert Action</h2>
+        
+         <p>The webhook action performs a HTTP POST request against the provided URL, passing information about the triggered alert as part of the HTTP body in JSON format.
+         </p>
+
+         <br/><br/>
+
+         <pre>
+         	<![CDATA[
+{
+    "result": {
+        "sourcetype": "mongod", 
+        "count": "8"
+    },
+    "sid": "scheduler__admin__search__W2_at_1427942640_178",
+    "results_link": "http://windu.splunk.local:8000/app/search/@go?sid=scheduler__admin__search__W2_at_1427942640_178",
+    "search_name": null,
+    "owner": "admin",
+    "app": "search"
+}
+         	]]>
+         </pre>
+
+        
+      </html>
+    </panel>
+  </row>
+</dashboard>

@@ -1,0 +1,26 @@
+<form stylesheet="custom.css">
+  <label>URL Parser</label>
+  <searchTemplate>| script urlparser __EXECUTE__ "$input$"</searchTemplate>
+      <description>Enter the URL to parse below</description>
+  <!-- Add time range picker -->
+  <fieldset autoRun="True" submitButton="true">
+    <!-- Add Wildcard Filter -->
+    <input type="text" token="input" searchWhenChanged="true">
+      <label>URL:</label>
+      <suffix/>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Result</title>
+        <searchPostProcess> </searchPostProcess>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="count">70</option>
+      </table>
+    </panel>
+  </row>
+</form>
