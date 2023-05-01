@@ -16,8 +16,8 @@ echo
 splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 
 #splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
-#splunk_token=$SPLUNK_TOKEN
-splunk_token='g6keozounc4wtlqd0hsveijbbn29378v'
+splunk_token=$SPLUNK_TOKEN
+#splunk_token='g6keozounc4wtlqd0hsveijbbn29378v'
 
 workflow_number='_2'
 
