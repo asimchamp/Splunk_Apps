@@ -15,9 +15,7 @@ echo
 
 splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 
-#splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
 splunk_token=$SPLUNK_TOKEN
-#splunk_token='g6keozounc4wtlqd0hsveijbbn29378v'
 
 workflow_number='_2'
 
@@ -129,8 +127,7 @@ if [ "$file_tgz" = "1" ];
       echo "File already present."
    else
       cd $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/
-      pwd
-      curl -L -J -O -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/
+      curl -s -L -J -O -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$e/release/$BASE_APP_VER/download/
       sleep 2
       tar -xvzf $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER/*.tgz -C $splunk_home/SplunkBase/$e"_"$BASE_APP_NAME/$BASE_APP_VER
       sleep 2
