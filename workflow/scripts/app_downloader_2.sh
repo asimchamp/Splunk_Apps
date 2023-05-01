@@ -212,7 +212,7 @@ do
    echo "Performing app avaibility function"
    previous_check_func
 
-((++k))
+$((++k))
 
 done
 
@@ -258,7 +258,7 @@ echo "$e"
 fi
 
 # incrementing i by one  
-((++l))
+$((++l))
 
 done
 
