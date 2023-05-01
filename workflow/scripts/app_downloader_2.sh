@@ -20,7 +20,7 @@ splunk_home='/home/runner/work/Splunk_Apps/Splunk_Apps'
 #splunk_token=$( cat /home/runner/work/Splunk_Apps/Splunk_Apps/splunk_token.txt | awk '{print $3}' )
 splunk_token=$SPLUNK_TOKEN
 
-workflow_number='_1'
+workflow_number='_2'
 
 ### Checking the Workflow folder present or not
 
@@ -109,7 +109,7 @@ fi
 
 file_size=$(curl -s -H "X-Auth-Token: $splunk_token" https://splunkbase.splunk.com/app/$i | awk -F",\"release\":" '{print $2}' | awk -F"\"size\":" '{print $2}' | cut -d ',' -f 1)
 
-if [[ "$file_size" -gt "50000000" ]];
+if [ "$file_size" -gt "50000000" ];
    then
       echo "file_size=$file_size" "File size too large."
 	  
