@@ -176,7 +176,7 @@ fi
 }
 
 ########## Checking app avaibility on Splunk Base #################
-for i in $(cat $splunk_home/workflow/workflow$workflow_number/app_id.txt)
+for i in {1000..1010}
 do
    echo "Performing app avaibility function"
    previous_check_func
@@ -189,7 +189,7 @@ rm -rf $splunk_home/workflow/workflow$workflow_number/merge.txt $splunk_home/wor
 
 echo "Loop Completed for list"
 
-for e in $(cat $splunk_home/workflow/workflow$workflow_number/app_id.txt)
+for e in {1000..1010}
 do
    download_app=$(cat $splunk_home/workflow/workflow$workflow_number/splunk_name.txt | grep $e | wc -l )
    
